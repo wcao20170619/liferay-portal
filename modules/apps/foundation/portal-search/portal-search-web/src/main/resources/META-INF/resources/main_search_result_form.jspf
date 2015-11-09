@@ -21,6 +21,8 @@ summary.setHighlight(searchDisplayContext.isHighlightEnabled());
 summary.setQueryTerms(searchDisplayContext.getQueryTerms());
 
 AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(className, classPK);
+
+com.liferay.portal.search.web.search.results.map.portlet.SearchResultsMapGeolocationUtil.addLocation(request, document, summary);
 %>
 
 <c:if test="<%= assetEntry != null %>">
