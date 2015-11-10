@@ -18,6 +18,11 @@ public class GeolocationDemoDatasetBulkLoaderMainAsArquillianTest {
 		new GeolocationDemoDatasetBulkLoader().load(limit, dryRun);
 	}
 
+	@Test
+	public void exampleSearch() throws Exception {
+		new GeolocationDemoSearch().search();
+	}
+
 	@ClassRule
 	@Rule
 	public static final LiferayIntegrationTestRule testRule =
