@@ -2,6 +2,15 @@
 	"LiferayDocumentType": {
 		"dynamic_templates": [
 			{
+				"template_geo_point": {
+					"mapping": {
+						"store": "true",
+						"type": "geo_point"
+					},
+					"match": "*__geolocation_en_US"
+				}
+			},
+			{
 				"template_long_sortable": {
 					"mapping": {
 						"index": "not_analyzed",

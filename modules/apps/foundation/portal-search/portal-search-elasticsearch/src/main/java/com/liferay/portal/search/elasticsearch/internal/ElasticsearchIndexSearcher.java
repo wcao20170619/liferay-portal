@@ -70,6 +70,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.geo.GeoDistance;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -437,6 +438,27 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		}
 	}
 
+	protected Field createField(String name, SearchHitField searchHitField) {
+		if (name.contains("geolocation")) {
+			Field field = new Field(name);
+
+			GeoPoint geoPoint = GeoPoint.fromIndexLong(
+				(Long)searchHitField.getValue());
+
+			field.setGeoLocationPoint(
+				new GeoLocationPoint(geoPoint.lat(), geoPoint.lon()));
+
+			return field;
+		}
+
+		Collection<Object> fieldValues = searchHitField.getValues();
+
+		return new Field(
+			name,
+			ArrayUtil.toStringArray(
+				fieldValues.toArray(new Object[fieldValues.size()])));
+	}
+
 	protected SearchResponse doSearch(
 			SearchContext searchContext, Query query, int start, int end,
 			boolean count)
@@ -578,16 +600,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		for (Map.Entry<String, SearchHitField> entry :
 				searchHitFields.entrySet()) {
 
-			SearchHitField searchHitField = entry.getValue();
-
-			Collection<Object> fieldValues = searchHitField.getValues();
-
-			Field field = new Field(
-				entry.getKey(),
-				ArrayUtil.toStringArray(
-					fieldValues.toArray(new Object[fieldValues.size()])));
-
-			document.add(field);
+			document.add(createField(entry.getKey(), entry.getValue()));
 		}
 
 		populateUID(document, queryConfig);
