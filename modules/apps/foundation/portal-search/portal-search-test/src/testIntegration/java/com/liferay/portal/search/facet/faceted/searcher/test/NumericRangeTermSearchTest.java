@@ -68,16 +68,15 @@ public class NumericRangeTermSearchTest extends BaseFacetedSearcherTestCase {
 
 		String keyword = RandomTestUtil.randomString();
 		//user1 in group1
-		userSearchFixture.addUser(
-			group1, keyword + " " + RandomTestUtil.randomString());
+		addUser(group1, keyword + " " + RandomTestUtil.randomString());
 	
 		final Group group2 = userSearchFixture.addGroup();
 		//user2 in group2
-		userSearchFixture.addUser(group2, keyword + " " + RandomTestUtil.randomString());	
+		addUser(group2, keyword + " " + RandomTestUtil.randomString());
 		//user3 in group2
-		userSearchFixture.addUser(group2, keyword + " " + RandomTestUtil.randomString());
+		addUser(group2, keyword + " " + RandomTestUtil.randomString());
 		
-		SearchContext searchContext = getSearchContext(keyword);		
+		SearchContext searchContext = getSearchContext(keyword);
 		searchContext.setGroupIds(
 			new long[] {group1.getGroupId(), group2.getGroupId()});
 		
@@ -89,12 +88,12 @@ public class NumericRangeTermSearchTest extends BaseFacetedSearcherTestCase {
 		searchContext.setAttribute("numericRangeTerm", "modified");
 		searchContext.setAttribute("startVal", dateFormat.format(getDateFromToday(-3)));
 		searchContext.setAttribute("endVal", dateFormat.format(getDateFromToday(1)));
-		hits = search(searchContext);		
+		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
 		
 		searchContext.setAttribute("startVal", Long.MAX_VALUE);
 		searchContext.setAttribute("endVal", Long.MAX_VALUE);
-		hits = search(searchContext);		
+		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 		
 		searchContext.setAttribute("startVal", dateFormat.format(getDateFromToday(2)));
@@ -103,26 +102,26 @@ public class NumericRangeTermSearchTest extends BaseFacetedSearcherTestCase {
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 		
 		//test groupId
-		searchContext.setAttribute("numericRangeTerm", Field.GROUP_ID);	
+		searchContext.setAttribute("numericRangeTerm", Field.GROUP_ID);
 		searchContext.setAttribute("startVal", Long.MAX_VALUE);
-		searchContext.setAttribute("endVal",Long.MAX_VALUE);		
+		searchContext.setAttribute("endVal",Long.MAX_VALUE);
 		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 		
 		searchContext.setAttribute("startVal", Long.MIN_VALUE);
-		searchContext.setAttribute("endVal", Long.MAX_VALUE);		
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
 		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
 		
 		//test userId
-		searchContext.setAttribute("numericRangeTerm", Field.USER_ID);	
+		searchContext.setAttribute("numericRangeTerm", Field.USER_ID);
 		searchContext.setAttribute("startVal", Long.MAX_VALUE);
-		searchContext.setAttribute("endVal",Long.MAX_VALUE);		
+		searchContext.setAttribute("endVal",Long.MAX_VALUE);
 		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 
 		searchContext.setAttribute("startVal", Long.MIN_VALUE);
-		searchContext.setAttribute("endVal", Long.MAX_VALUE);		
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
 		hits = search(searchContext);
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
 	}
