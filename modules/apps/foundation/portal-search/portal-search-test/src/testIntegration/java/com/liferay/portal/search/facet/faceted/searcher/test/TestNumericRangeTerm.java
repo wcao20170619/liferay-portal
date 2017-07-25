@@ -22,39 +22,47 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 
-
 /**
  * @author Wade Cao
  */
-public class TestNumericRangeTerm extends BaseSearcher implements FacetedSearcher {
+public class TestNumericRangeTerm
+	extends BaseSearcher implements FacetedSearcher {
 
 	public TestNumericRangeTerm() {
 	}
-	
+
 	@Override
 	protected BooleanQuery createFullQuery(
 			BooleanFilter fullQueryBooleanFilter, SearchContext searchContext)
 		throws Exception {
-			
-		BooleanQuery fullBooleanQuery = super.createFullQuery(fullQueryBooleanFilter, searchContext);
-		
-		String numericRangeTerm = (String)searchContext.getAttribute("numericRangeTerm");
+
+		BooleanQuery fullBooleanQuery = super.createFullQuery(
+			fullQueryBooleanFilter, searchContext);
+
+		String numericRangeTerm = (String)searchContext.getAttribute(
+			"numericRangeTerm");
+
 		if (numericRangeTerm != null) {
-			addNumericRangeTerm(fullBooleanQuery, searchContext, numericRangeTerm);
+			_addNumericRangeTerm(
+				fullBooleanQuery, searchContext, numericRangeTerm);
 		}
-		
+
 		return fullBooleanQuery;
 	}
-	
 
-	private void addNumericRangeTerm(BooleanQuery fullBooleanQuery, SearchContext searchContext, String numericRangeTerm) throws Exception {
+	private void _addNumericRangeTerm(
+			BooleanQuery fullBooleanQuery, SearchContext searchContext,
+			String numericRangeTerm)
+		throws Exception {
 
 		BooleanQuery searchQuery = new BooleanQueryImpl();
-		
+
+		long startVal = GetterUtil.getLong(
+			searchContext.getAttribute("startVal"));
 		long endVal = GetterUtil.getLong(searchContext.getAttribute("endVal"));
-		long startVal = GetterUtil.getLong(searchContext.getAttribute("startVal"));
+
 		searchQuery.addNumericRangeTerm(numericRangeTerm, startVal, endVal);
-		
+
 		fullBooleanQuery.add(searchQuery, BooleanClauseOccur.MUST);
 	}
 

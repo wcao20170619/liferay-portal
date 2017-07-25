@@ -14,17 +14,6 @@
 
 package com.liferay.portal.search.facet.faceted.searcher.test;
 
-import java.text.Format;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.search.Field;
@@ -39,112 +28,153 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.text.Format;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 /**
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
 @Sync
 public class NumericRangeTermSearchTest extends BaseFacetedSearcherTestCase {
-	
+
 	@ClassRule
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
-				new AggregateTestRule(
-						new LiferayIntegrationTestRule(),
-						SynchronousDestinationTestRule.INSTANCE);
-	
+		new AggregateTestRule(
+			new LiferayIntegrationTestRule(),
+			SynchronousDestinationTestRule.INSTANCE);
+
 	@Before
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		String _INDEX_DATE_FORMAT_PATTERN = PropsUtil.get(PropsKeys.INDEX_DATE_FORMAT_PATTERN);
-		dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(_INDEX_DATE_FORMAT_PATTERN);
+
+		String indexDateFormatPattern = PropsUtil.get(
+			PropsKeys.INDEX_DATE_FORMAT_PATTERN);
+
+		_dateFormat = FastDateFormatFactoryUtil.getSimpleDateFormat(
+			indexDateFormatPattern);
 	}
-	
+
 	@Test
 	public void testSearchByRange() throws Exception {
-		
 		final Group group1 = userSearchFixture.addGroup();
 
 		String keyword = RandomTestUtil.randomString();
+
 		//user1 in group1
 		addUser(group1, keyword + " " + RandomTestUtil.randomString());
-	
+
 		final Group group2 = userSearchFixture.addGroup();
+
 		//user2 in group2
 		addUser(group2, keyword + " " + RandomTestUtil.randomString());
 		//user3 in group2
 		addUser(group2, keyword + " " + RandomTestUtil.randomString());
-		
+
 		SearchContext searchContext = getSearchContext(keyword);
+
 		searchContext.setGroupIds(
 			new long[] {group1.getGroupId(), group2.getGroupId()});
-		
+
 		//no numeric query
 		Hits hits = search(searchContext);
+
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
-		
+
 		//test date
+		searchContext.setAttribute(
+			"endVal", _dateFormat.format(getDateFromToday(1)));
 		searchContext.setAttribute("numericRangeTerm", "modified");
-		searchContext.setAttribute("startVal", dateFormat.format(getDateFromToday(-3)));
-		searchContext.setAttribute("endVal", dateFormat.format(getDateFromToday(1)));
+		searchContext.setAttribute(
+			"startVal", _dateFormat.format(getDateFromToday(-3)));
+
 		hits = search(searchContext);
+
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
-		
-		searchContext.setAttribute("startVal", Long.MAX_VALUE);
-		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+
+		searchContext.setAttribute(
+			"endVal", _dateFormat.format(getDateFromToday(100)));
+		searchContext.setAttribute(
+			"startVal", _dateFormat.format(getDateFromToday(99)));
+
 		hits = search(searchContext);
-		Assert.assertEquals(hits.toString(), 0, hits.getLength());
-		
-		searchContext.setAttribute("startVal", dateFormat.format(getDateFromToday(2)));
-		searchContext.setAttribute("endVal", dateFormat.format(getDateFromToday(2)));
-		hits = search(searchContext);
-		Assert.assertEquals(hits.toString(), 0, hits.getLength());
-		
-		//test groupId
-		searchContext.setAttribute("numericRangeTerm", Field.GROUP_ID);
-		searchContext.setAttribute("startVal", Long.MAX_VALUE);
-		searchContext.setAttribute("endVal",Long.MAX_VALUE);
-		hits = search(searchContext);
-		Assert.assertEquals(hits.toString(), 0, hits.getLength());
-		
-		searchContext.setAttribute("startVal", Long.MIN_VALUE);
-		searchContext.setAttribute("endVal", Long.MAX_VALUE);
-		hits = search(searchContext);
-		Assert.assertEquals(hits.toString(), 3, hits.getLength());
-		
-		//test userId
-		searchContext.setAttribute("numericRangeTerm", Field.USER_ID);
-		searchContext.setAttribute("startVal", Long.MAX_VALUE);
-		searchContext.setAttribute("endVal",Long.MAX_VALUE);
-		hits = search(searchContext);
+
 		Assert.assertEquals(hits.toString(), 0, hits.getLength());
 
-		searchContext.setAttribute("startVal", Long.MIN_VALUE);
-		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+		searchContext.setAttribute(
+			"endVal", _dateFormat.format(getDateFromToday(2)));
+		searchContext.setAttribute(
+			"startVal", _dateFormat.format(getDateFromToday(2)));
+
 		hits = search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 0, hits.getLength());
+
+		//test groupId
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+		searchContext.setAttribute("numericRangeTerm", Field.GROUP_ID);
+		searchContext.setAttribute("startVal", Long.MAX_VALUE);
+
+		hits = search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 0, hits.getLength());
+
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+		searchContext.setAttribute("startVal", Long.MIN_VALUE);
+
+		hits = search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 3, hits.getLength());
+
+		//test userId
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+		searchContext.setAttribute("numericRangeTerm", Field.USER_ID);
+		searchContext.setAttribute("startVal", Long.MAX_VALUE);
+
+		hits = search(searchContext);
+
+		Assert.assertEquals(hits.toString(), 0, hits.getLength());
+
+		searchContext.setAttribute("endVal", Long.MAX_VALUE);
+		searchContext.setAttribute("startVal", Long.MIN_VALUE);
+
+		hits = search(searchContext);
+
 		Assert.assertEquals(hits.toString(), 3, hits.getLength());
 	}
-	
+
+	protected static Date getDateFromToday(int dayOffset) {
+		Date currentDate = new Date();
+
+		if (dayOffset == 0) {
+			return currentDate;
+		}
+
+		Calendar cal = Calendar.getInstance();
+
+		cal.setTime(currentDate);
+		cal.add(Calendar.DATE, dayOffset);
+
+		return cal.getTime();
+	}
+
 	protected Hits search(SearchContext searchContext) throws Exception {
-		TestNumericRangeTerm testNumbericRangeTerm = 
-				new TestNumericRangeTerm();
+		TestNumericRangeTerm testNumbericRangeTerm = new TestNumericRangeTerm();
 
 		return testNumbericRangeTerm.search(searchContext);
 	}
-	
-	private static Date getDateFromToday(int dayOffset) {
-		
-		Date currentDate = new Date();
-		if (dayOffset == 0) return currentDate;
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(currentDate);
-		cal.add(Calendar.DATE, dayOffset);
-		
-		return cal.getTime();
-	}
-	
-	private Format dateFormat;
+
+	private Format _dateFormat;
 
 }

@@ -162,6 +162,7 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 		String field, short startValue, short endValue) {
 
 		List<Query> queries = new ArrayList<>();
+
 		queries.add(addRangeTerm(field, startValue, endValue));
 
 		return queries;
