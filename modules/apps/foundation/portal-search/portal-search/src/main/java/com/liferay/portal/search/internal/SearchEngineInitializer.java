@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
+import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.util.PropsValues;
 
@@ -40,10 +40,12 @@ import org.apache.commons.lang.time.StopWatch;
 public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(
-		long companyId, PortalExecutorManager portalExecutorManager) {
+		long companyId, PortalExecutorManager portalExecutorManager,
+		SearchEngineHelper searchEngineHelper) {
 
 		_companyId = companyId;
 		_portalExecutorManager = portalExecutorManager;
+		_searchEngineHelper = searchEngineHelper;
 	}
 
 	public Set<String> getUsedSearchEngineIds() {
@@ -100,9 +102,9 @@ public class SearchEngineInitializer implements Runnable {
 		stopWatch.start();
 
 		try {
-			SearchEngineHelperUtil.removeCompany(_companyId);
+			_searchEngineHelper.removeCompany(_companyId);
 
-			SearchEngineHelperUtil.initialize(_companyId);
+			_searchEngineHelper.initialize(_companyId);
 
 			List<FutureTask<Void>> futureTasks = new ArrayList<>();
 			Set<String> searchEngineIds = new HashSet<>();
@@ -180,6 +182,7 @@ public class SearchEngineInitializer implements Runnable {
 	private final long _companyId;
 	private boolean _finished;
 	private final PortalExecutorManager _portalExecutorManager;
+	private final SearchEngineHelper _searchEngineHelper;
 	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 
 }
