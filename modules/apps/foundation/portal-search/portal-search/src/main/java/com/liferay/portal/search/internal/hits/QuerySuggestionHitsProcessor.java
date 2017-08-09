@@ -15,7 +15,7 @@
 package com.liferay.portal.search.internal.hits;
 
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.IndexSearcherHelperUtil;
+import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.search.hits.HitsProcessor;
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -49,9 +50,8 @@ public class QuerySuggestionHitsProcessor implements HitsProcessor {
 			return true;
 		}
 
-		String[] querySuggestions =
-			IndexSearcherHelperUtil.suggestKeywordQueries(
-				searchContext, queryConfig.getQuerySuggestionMax());
+		String[] querySuggestions = indexSearcherHelper.suggestKeywordQueries(
+			searchContext, queryConfig.getQuerySuggestionMax());
 
 		querySuggestions = ArrayUtil.remove(
 			querySuggestions, searchContext.getKeywords());
@@ -60,5 +60,8 @@ public class QuerySuggestionHitsProcessor implements HitsProcessor {
 
 		return true;
 	}
+
+	@Reference
+	protected IndexSearcherHelper indexSearcherHelper;
 
 }
