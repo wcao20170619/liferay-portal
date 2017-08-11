@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
-import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSenderUtil;
+import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSender;
 import com.liferay.portal.search.internal.SearchEngineInitializer;
 
 /**
@@ -29,14 +29,17 @@ public class ReindexPortalBackgroundTaskExecutor
 	extends ReindexBackgroundTaskExecutor {
 
 	public ReindexPortalBackgroundTaskExecutor(
-		PortalExecutorManager portalExecutorManager) {
+		PortalExecutorManager portalExecutorManager,
+		ReindexStatusMessageSender reindexStatusMessageSender) {
 
 		_portalExecutorManager = portalExecutorManager;
+		_reindexStatusMessageSender = reindexStatusMessageSender;
 	}
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return new ReindexPortalBackgroundTaskExecutor(_portalExecutorManager);
+		return new ReindexPortalBackgroundTaskExecutor(
+			_portalExecutorManager, _reindexStatusMessageSender);
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class ReindexPortalBackgroundTaskExecutor
 		throws Exception {
 
 		for (long companyId : companyIds) {
-			ReindexStatusMessageSenderUtil.sendStatusMessage(
+			_reindexStatusMessageSender.sendStatusMessage(
 				ReindexBackgroundTaskConstants.PORTAL_START, companyId,
 				companyIds);
 
@@ -59,7 +62,7 @@ public class ReindexPortalBackgroundTaskExecutor
 				_log.error(e, e);
 			}
 			finally {
-				ReindexStatusMessageSenderUtil.sendStatusMessage(
+				_reindexStatusMessageSender.sendStatusMessage(
 					ReindexBackgroundTaskConstants.PORTAL_END, companyId,
 					companyIds);
 			}
@@ -70,5 +73,6 @@ public class ReindexPortalBackgroundTaskExecutor
 		ReindexPortalBackgroundTaskExecutor.class);
 
 	private final PortalExecutorManager _portalExecutorManager;
+	private final ReindexStatusMessageSender _reindexStatusMessageSender;
 
 }

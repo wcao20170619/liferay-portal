@@ -30,6 +30,8 @@ import com.liferay.portal.search.elasticsearch.index.IndexNameBuilder;
 import com.liferay.portal.search.elasticsearch.internal.util.DocumentTypes;
 import com.liferay.portal.search.elasticsearch.internal.util.LogUtil;
 
+import java.io.IOException;
+
 import java.util.Collection;
 
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequestBuilder;
@@ -95,8 +97,8 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 
 			LogUtil.logActionResponse(_log, refreshResponse);
 		}
-		catch (Exception e) {
-			throw new SearchException("Unable to commit indices", e);
+		catch (IOException ioe) {
+			throw new SearchException("Unable to commit indices", ioe);
 		}
 	}
 

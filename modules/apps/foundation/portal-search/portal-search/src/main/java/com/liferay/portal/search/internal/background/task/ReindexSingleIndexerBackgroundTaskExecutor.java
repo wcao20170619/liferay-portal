@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
-import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSenderUtil;
+import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSender;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
@@ -36,13 +36,17 @@ import java.util.Map;
 public class ReindexSingleIndexerBackgroundTaskExecutor
 	extends ReindexBackgroundTaskExecutor {
 
-	public ReindexSingleIndexerBackgroundTaskExecutor() {
+	public ReindexSingleIndexerBackgroundTaskExecutor(
+		ReindexStatusMessageSender reindexStatusMessageSender) {
+
 		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_TASK_NAME);
+		_reindexStatusMessageSender = reindexStatusMessageSender;
 	}
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return new ReindexSingleIndexerBackgroundTaskExecutor();
+		return new ReindexSingleIndexerBackgroundTaskExecutor(
+			_reindexStatusMessageSender);
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 		}
 
 		for (long companyId : companyIds) {
-			ReindexStatusMessageSenderUtil.sendStatusMessage(
+			_reindexStatusMessageSender.sendStatusMessage(
 				ReindexBackgroundTaskConstants.SINGLE_START, companyId,
 				companyIds);
 
@@ -84,7 +88,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 				_log.error(e, e);
 			}
 			finally {
-				ReindexStatusMessageSenderUtil.sendStatusMessage(
+				_reindexStatusMessageSender.sendStatusMessage(
 					ReindexBackgroundTaskConstants.SINGLE_END, companyId,
 					companyIds);
 			}
@@ -93,5 +97,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ReindexSingleIndexerBackgroundTaskExecutor.class);
+
+	private final ReindexStatusMessageSender _reindexStatusMessageSender;
 
 }
