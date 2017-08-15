@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
+import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
@@ -36,13 +36,17 @@ import java.util.Map;
 public class ReindexSingleIndexerBackgroundTaskExecutor
 	extends ReindexBackgroundTaskExecutor {
 
-	public ReindexSingleIndexerBackgroundTaskExecutor() {
+	public ReindexSingleIndexerBackgroundTaskExecutor(
+		IndexWriterHelper indexWriterHelper) {
+
 		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_TASK_NAME);
+		_indexWriterHelper = indexWriterHelper;
 	}
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return new ReindexSingleIndexerBackgroundTaskExecutor();
+		return new ReindexSingleIndexerBackgroundTaskExecutor(
+			_indexWriterHelper);
 	}
 
 	@Override
@@ -75,7 +79,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 				companyIds);
 
 			try {
-				IndexWriterHelperUtil.deleteEntityDocuments(
+				_indexWriterHelper.deleteEntityDocuments(
 					indexer.getSearchEngineId(), companyId, className, true);
 
 				indexer.reindex(new String[] {String.valueOf(companyId)});
@@ -93,5 +97,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ReindexSingleIndexerBackgroundTaskExecutor.class);
+
+	private final IndexWriterHelper _indexWriterHelper;
 
 }
