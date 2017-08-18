@@ -14,19 +14,12 @@
  */
 --%>
 
-<%@ page import="com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil" %><%@
-page import="com.liferay.asset.kernel.model.AssetEntry" %><%@
-page import="com.liferay.asset.kernel.model.AssetRenderer" %><%@
-page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@
-page import="com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil" %><%@
+<%@ page import="com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.json.JSONArray" %><%@
 page import="com.liferay.portal.kernel.json.JSONObject" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
-page import="com.liferay.portal.kernel.portlet.LiferayPortletRequest" %><%@
-page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse" %><%@
-page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
 page import="com.liferay.portal.kernel.portlet.PortalPreferences" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.search.Field" %><%@
@@ -67,6 +60,8 @@ page import="com.liferay.portal.search.web.facet.util.comparator.SearchFacetComp
 page import="com.liferay.portal.search.web.internal.display.context.SearchDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.display.context.SearchDisplayContextFactoryUtil" %><%@
 page import="com.liferay.portal.search.web.internal.facet.AssetEntriesSearchFacet" %><%@
+page import="com.liferay.portal.search.web.internal.result.display.builder.SearchResultContentDisplayBuilder" %><%@
+page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultContentDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultFieldDisplayContext" %><%@
 page import="com.liferay.taglib.aui.AUIUtil" %><%@
 page import="com.liferay.taglib.servlet.PipingServletResponse" %>
@@ -84,7 +79,10 @@ page import="java.util.Objects" %>
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@
+<%@
+>>>>>>> LPS-74505 fix for SearchDisplayContext casting error in init.jsp
+page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
@@ -105,7 +103,13 @@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(request);
 
-SearchDisplayContext searchDisplayContext = (SearchDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+Object object = request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
+
+SearchDisplayContext searchDisplayContext = null;
+
+if ((object != null) && (object instanceof SearchDisplayContext)) {
+	searchDisplayContext = (SearchDisplayContext)object;
+}
 
 if (searchDisplayContext == null) {
 	searchDisplayContext = SearchDisplayContextFactoryUtil.create(renderRequest, renderResponse, portletPreferences);

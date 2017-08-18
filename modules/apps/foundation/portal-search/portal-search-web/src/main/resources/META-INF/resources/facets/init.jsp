@@ -22,6 +22,7 @@ page import="com.liferay.portal.search.web.internal.facet.display.builder.AssetC
 page import="com.liferay.portal.search.web.internal.facet.display.builder.AssetEntriesSearchFacetDisplayBuilder" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.builder.FolderSearchFacetDisplayBuilder" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.builder.ScopeSearchFacetDisplayBuilder" %><%@
+page import="com.liferay.portal.search.web.internal.facet.display.builder.UserSearchFacetDisplayBuilder" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetEntriesSearchFacetDisplayContext" %><%@
@@ -30,7 +31,8 @@ page import="com.liferay.portal.search.web.internal.facet.display.context.Folder
 page import="com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetTermDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.FolderTitleLookupImpl" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetDisplayContext" %><%@
-page import="com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetTermDisplayContext" %>
+page import="com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetTermDisplayContext" %><%@
+page import="com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisplayContext" %>
 
 <%
 String randomNamespace = PortalUtil.generateRandomKey(request, _RANDOM_KEY_INPUT) + StringPool.UNDERLINE;

@@ -17,7 +17,7 @@
 <%@ include file="/facets/init.jsp" %>
 
 <%
-com.liferay.portal.search.web.internal.facet.display.builder.UserSearchFacetDisplayBuilder userSearchFacetDisplayBuilder = new com.liferay.portal.search.web.internal.facet.display.builder.UserSearchFacetDisplayBuilder();
+UserSearchFacetDisplayBuilder userSearchFacetDisplayBuilder = new UserSearchFacetDisplayBuilder();
 
 userSearchFacetDisplayBuilder.setFacet(facet);
 userSearchFacetDisplayBuilder.setFrequenciesVisible(dataJSONObject.getBoolean("showAssetCount", true));
@@ -26,7 +26,7 @@ userSearchFacetDisplayBuilder.setMaxTerms(dataJSONObject.getInt("maxTerms", 10))
 userSearchFacetDisplayBuilder.setParamName(facet.getFieldId());
 userSearchFacetDisplayBuilder.setParamValue(fieldParam);
 
-com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisplayContext userSearchFacetDisplayContext = userSearchFacetDisplayBuilder.build();
+UserSearchFacetDisplayContext userSearchFacetDisplayContext = userSearchFacetDisplayBuilder.build();
 %>
 
 <c:choose>
