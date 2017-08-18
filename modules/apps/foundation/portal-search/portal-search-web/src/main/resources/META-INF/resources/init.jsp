@@ -14,7 +14,8 @@
  */
 --%>
 
-<%@ page import="com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil" %><%@
+<%@ page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@
+page import="com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.json.JSONArray" %><%@
 page import="com.liferay.portal.kernel.json.JSONObject" %><%@
@@ -79,10 +80,7 @@ page import="java.util.Objects" %>
 page import="javax.portlet.PortletURL" %><%@
 page import="javax.portlet.WindowState" %>
 
-<%@
-<%@
->>>>>>> LPS-74505 fix for SearchDisplayContext casting error in init.jsp
-page import="com.liferay.asset.kernel.model.AssetRendererFactory" %><%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
