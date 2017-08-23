@@ -14,6 +14,13 @@
 
 package com.liferay.portal.search.solr.internal;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.mockito.Mockito;
+
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.util.Props;
@@ -21,8 +28,11 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.solr.connection.SolrClientManager;
 import com.liferay.portal.search.solr.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr.document.SolrUpdateDocumentCommand;
+import com.liferay.portal.search.solr.facet.FacetProcessor;
 import com.liferay.portal.search.solr.internal.document.DefaultSolrDocumentFactory;
+import com.liferay.portal.search.solr.internal.facet.CompositeFacetProcessor;
 import com.liferay.portal.search.solr.internal.facet.DefaultFacetProcessor;
+import com.liferay.portal.search.solr.internal.facet.RangeFacetProcessor;
 import com.liferay.portal.search.solr.internal.filter.BooleanFilterTranslatorImpl;
 import com.liferay.portal.search.solr.internal.filter.DateRangeTermFilterTranslatorImpl;
 import com.liferay.portal.search.solr.internal.filter.ExistsFilterTranslatorImpl;
@@ -53,11 +63,6 @@ import com.liferay.portal.search.solr.internal.query.TermRangeQueryTranslatorImp
 import com.liferay.portal.search.solr.internal.query.WildcardQueryTranslatorImpl;
 import com.liferay.portal.search.solr.internal.stats.DefaultStatsTranslator;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mockito.Mockito;
 
 /**
  * @author Miguel Angelo Caldas Gallindo
@@ -151,7 +156,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 			{
 				props = createProps();
 
-				setFacetProcessor(new DefaultFacetProcessor());
+				setFacetProcessor(createFacetProcessor());
 				setFilterTranslator(createSolrFilterTranslator());
 				setGroupByTranslator(new DefaultGroupByTranslator());
 				setQueryTranslator(createSolrQueryTranslator());
@@ -204,6 +209,17 @@ public class SolrIndexingFixture implements IndexingFixture {
 		properties.put("writeURL", "http://localhost:8983/solr/liferay");
 
 		return properties;
+	}
+
+	protected FacetProcessor<SolrQuery> createFacetProcessor() {
+		CompositeFacetProcessor compositeFacetProcessor = new CompositeFacetProcessor() {
+			{
+				setDefaultFacetProcessor(new DefaultFacetProcessor());
+				setFacetProcessor(new RangeFacetProcessor(), Collections.singletonMap("class.name", "com.liferay.portal.kernel.search.facet.RangeFacet"));
+
+			}
+		};
+		return compositeFacetProcessor;
 	}
 
 	private IndexSearcher _indexSearcher;
