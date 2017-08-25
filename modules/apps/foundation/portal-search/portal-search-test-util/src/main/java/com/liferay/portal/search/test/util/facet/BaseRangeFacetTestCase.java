@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.RangeFacet;
-import com.liferay.portal.search.test.util.indexing.QueryContributors;
 
 public abstract class BaseRangeFacetTestCase extends BaseFacetTestCase {
 
@@ -45,16 +44,17 @@ public abstract class BaseRangeFacetTestCase extends BaseFacetTestCase {
 		return Field.MODIFIED_DATE;
 	}
 	
-	protected void testModifiedStatic() throws Exception {
-		addDocument("200001011200");
-		addDocument("201101011200");
+	@SuppressWarnings("serial")
+	protected void testModifiedFullRange() throws Exception {
+		addDocument("20000101120000");
+		addDocument("20110101120000");
 
 		assertFacet(
-			setUpRangValue("200001011200", "201101011200", setUpRangesValue()),
+			setUpRangValue("20000101120000", "20110101120001", setUpRangesValue()),
 
 			new ArrayList<String>() {
 				{
-					add("200001011200 TO 201101011200=5"); 
+					add("[20000101120000 TO 20110101120001]=2"); 
 				}
 			});
 	}
@@ -93,7 +93,7 @@ public abstract class BaseRangeFacetTestCase extends BaseFacetTestCase {
 		
 		JSONObject rangeJSONObject = Mockito.mock(JSONObject.class);
 		Mockito.doReturn(
-			start + " TO " + end
+			"[" + start + " TO " + end + "]"
 		).when(
 			rangeJSONObject
 		).getString(
@@ -108,4 +108,5 @@ public abstract class BaseRangeFacetTestCase extends BaseFacetTestCase {
 
 		return jsonObject;
 	}
+	
 }

@@ -14,13 +14,14 @@
 
 package com.liferay.portal.search.elasticsearch.internal.facet;
 
-import org.junit.Test;
-
 import com.liferay.portal.search.elasticsearch.internal.ElasticsearchIndexingFixture;
 import com.liferay.portal.search.elasticsearch.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch.internal.connection.LiferayIndexCreator;
 import com.liferay.portal.search.test.util.facet.BaseRangeFacetTestCase;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
+
+import org.junit.Test;
 
 /**
  * @author Wade Cao
@@ -29,15 +30,18 @@ public class RangeFacetTest extends BaseRangeFacetTestCase {
 
 	@Override
 	@Test
-	public void testModifiedStatic() throws Exception {
-		super.testModifiedStatic();
+	public void testModifiedFullRange() throws Exception {
+		super.testModifiedFullRange();
 	}
-	
+
 	@Override
 	protected IndexingFixture createIndexingFixture() throws Exception {
+		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
+			RangeFacetTest.class.getSimpleName());
+
 		return new ElasticsearchIndexingFixture(
-			new ElasticsearchFixture(RangeFacetTest.class.getSimpleName()),
-			BaseIndexingTestCase.COMPANY_ID);		
+			elasticsearchFixture, BaseIndexingTestCase.COMPANY_ID,
+			new LiferayIndexCreator(elasticsearchFixture));
 	}
 
 }

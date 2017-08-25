@@ -21,12 +21,15 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.elasticsearch.connection.ElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch.connection.TestElasticsearchConnectionManager;
 import com.liferay.portal.search.elasticsearch.document.ElasticsearchUpdateDocumentCommand;
+import com.liferay.portal.search.elasticsearch.facet.FacetProcessor;
 import com.liferay.portal.search.elasticsearch.index.IndexNameBuilder;
 import com.liferay.portal.search.elasticsearch.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch.internal.connection.IndexName;
 import com.liferay.portal.search.elasticsearch.internal.document.DefaultElasticsearchDocumentFactory;
+import com.liferay.portal.search.elasticsearch.internal.facet.CompositeFacetProcessor;
 import com.liferay.portal.search.elasticsearch.internal.facet.DefaultFacetProcessor;
+import com.liferay.portal.search.elasticsearch.internal.facet.RangeFacetProcessor;
 import com.liferay.portal.search.elasticsearch.internal.filter.BooleanFilterTranslatorImpl;
 import com.liferay.portal.search.elasticsearch.internal.filter.DateRangeTermFilterTranslatorImpl;
 import com.liferay.portal.search.elasticsearch.internal.filter.ElasticsearchFilterTranslator;
@@ -57,6 +60,10 @@ import com.liferay.portal.search.elasticsearch.internal.query.TermRangeQueryTran
 import com.liferay.portal.search.elasticsearch.internal.query.WildcardQueryTranslatorImpl;
 import com.liferay.portal.search.elasticsearch.internal.stats.DefaultStatsTranslator;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
+
+import java.util.Collections;
+
+import org.elasticsearch.action.search.SearchRequestBuilder;
 
 import org.mockito.Mockito;
 
@@ -170,6 +177,24 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		};
 	}
 
+	protected FacetProcessor<SearchRequestBuilder> createFacetProcessor() {
+		CompositeFacetProcessor compositeFacetProcessor =
+			new CompositeFacetProcessor() {
+
+				{
+					setDefaultFacetProcessor(new DefaultFacetProcessor());
+					setFacetProcessor(
+						new RangeFacetProcessor(),
+						Collections.singletonMap(
+							"class.name",
+							"com.liferay.portal.kernel.search.facet." +
+								"RangeFacet"));
+				}
+			};
+
+		return compositeFacetProcessor;
+	}
+
 	protected void createIndex() {
 		_indexCreator.createIndex(
 			new IndexName(_indexNameBuilder.getIndexName(_companyId)));
@@ -183,7 +208,7 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 			{
 				elasticsearchConnectionManager =
 					elasticsearchConnectionManager1;
-				facetProcessor = new DefaultFacetProcessor();
+				facetProcessor = createFacetProcessor();
 				filterTranslator = createElasticsearchFilterTranslator();
 				groupByTranslator = new DefaultGroupByTranslator();
 				indexNameBuilder = indexNameBuilder1;
@@ -225,6 +250,7 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 					elasticsearchConnectionManager1;
 				elasticsearchUpdateDocumentCommand = updateDocumentCommand;
 				indexNameBuilder = indexNameBuilder1;
+				activate();
 			}
 		};
 	}

@@ -26,13 +26,15 @@ public class RangeFacetTest extends BaseRangeFacetTestCase {
 	
 	@Override
 	@Test
-	public void testModifiedStatic() throws Exception {
-		super.testModifiedStatic();
+	public void testModifiedFullRange() throws Exception {
+		super.testModifiedFullRange();
 	}
+	
 	
 	@Override
 	protected IndexingFixture createIndexingFixture() throws Exception {
 		return new SolrIndexingFixture();
 	}
+	
 
 }
