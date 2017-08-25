@@ -56,6 +56,16 @@ public class CompositeFacetProcessor
 	}
 
 	@Reference(
+		cardinality = ReferenceCardinality.MANDATORY,
+		target = "(class.name=DEFAULT)", unbind = "-"
+	)
+	protected void setDefaultFacetProcessor(
+		FacetProcessor<SearchRequestBuilder> defaultFacetProcessor) {
+
+		_defaultFacetProcessor = defaultFacetProcessor;
+	}
+
+	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC,
 		policyOption = ReferencePolicyOption.GREEDY,

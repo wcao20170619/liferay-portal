@@ -127,8 +127,8 @@ public interface ElasticsearchConfiguration {
 	public boolean httpCORSEnabled();
 
 	@Meta.AD(
-		deflt = "/https?:\\/\\/localhost(:[0-9]+)?/",
-		description = "http-cors-allow-origin-help", required = false
+		deflt = "/.*/", description = "http-cors-allow-origin-help",
+		required = false
 	)
 	public String httpCORSAllowOrigin();
 
