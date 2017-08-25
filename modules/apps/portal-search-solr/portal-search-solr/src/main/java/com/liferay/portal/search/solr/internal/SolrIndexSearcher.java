@@ -43,7 +43,6 @@ import com.liferay.portal.kernel.search.highlight.HighlightUtil;
 import com.liferay.portal.kernel.search.query.QueryTranslator;
 import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -663,53 +662,57 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 	protected String translateQuery(Query query, SearchContext searchContext) {
 		return _queryTranslator.translate(query, searchContext);
 	}
-
+	
 	protected void updateFacetCollectors(
-		QueryResponse queryResponse, SearchContext searchContext) {
+			QueryResponse queryResponse, SearchContext searchContext) {
 
 		Map<String, Facet> facetsMap = searchContext.getFacets();
 
 		List<FacetField> facetFields = queryResponse.getFacetFields();
 
-		if (ListUtil.isNotEmpty(facetFields)) {
-			for (FacetField facetField : facetFields) {
-				String facetFieldName = facetField.getName();
-
-				Facet facet = facetsMap.get(facetFieldName);
-
-				FacetCollector facetCollector = null;
-
-				if (facet instanceof RangeFacet) {
+		for (Map.Entry<String, Facet> entry : facetsMap.entrySet()) {
+			String facetFieldName = entry.getKey();
+			
+			Facet facet = entry.getValue();
+			
+			FacetCollector facetCollector = null;
+			
+			if (facet instanceof RangeFacet) {
+				
+				Map<String,Integer> facetQuery = queryResponse.getFacetQuery();
+				
+				if (facetQuery != null) {
 					facetCollector = new SolrFacetQueryCollector(
-						facetFieldName, queryResponse.getFacetQuery());
+						facetFieldName, facetQuery);
 				}
-				else {
+			}
+			else {
+				FacetField facetField = getFacetFieldFromList(facetFields, facetFieldName);
+				
+				if (facetField != null) {
 					facetCollector = new SolrFacetFieldCollector(
-						facetFieldName, facetField);
-				}
-
-				facet.setFacetCollector(facetCollector);
-			}
-		}
-
-		Map<String, Integer> facetQuery = queryResponse.getFacetQuery();
-
-		if (MapUtil.isNotEmpty(facetQuery)) {
-			for (String facetKey : facetQuery.keySet()) {
-				int pos = facetKey.indexOf(CharPool.COLON);
-
-				String facetFieldName = facetKey.substring(0, pos);
-
-				Facet facet = facetsMap.get(facetFieldName);
-
-				if (facet.getFacetCollector() == null) {
-					FacetCollector facetCollector = new SolrFacetQueryCollector(
-						facetFieldName, queryResponse.getFacetQuery());
-
-					facet.setFacetCollector(facetCollector);
+							facetFieldName, facetField);
 				}
 			}
+
+			facet.setFacetCollector(facetCollector);
 		}
+	}
+	
+	protected static FacetField getFacetFieldFromList(
+			List<FacetField> facetFields, String facetFieldName) {
+		FacetField ret = null;
+		
+		if (ListUtil.isEmpty(facetFields)) {
+			return ret;
+		}
+		for (FacetField facetField : facetFields) {
+			if (facetFieldName.equals(facetField.getName())) {
+				ret = facetField;
+				break;
+			}
+		}
+		return ret;
 	}
 
 	protected void updateGroupedHits(
