@@ -20,6 +20,11 @@ import com.liferay.portal.search.solr.connection.SolrClientManager;
 
 import java.util.Arrays;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.SolrParams;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,6 +46,24 @@ public class SolrQuerySuggesterTest {
 			Arrays.toString(querySuggestions), 0, querySuggestions.length);
 	}
 
+	@Test
+	public void testGetValidKeyword() throws Exception {
+		//return null for three characters with white spaces
+		String keyword = SolrQuerySuggester.getValidKeyword("A  B");
+
+		Assert.assertNull(keyword);
+		//return string with trimmed value
+		keyword = SolrQuerySuggester.getValidKeyword(
+			" I have been trimmed.   ");
+
+		Assert.assertEquals("I have been trimmed.", keyword);
+		//test embedded multiple white spaces
+		keyword = SolrQuerySuggester.getValidKeyword(
+			"I have    multiple    white spaces.");
+
+		Assert.assertEquals("I have multiple white spaces.", keyword);
+	}
+
 	protected SearchContext createSearchContext() {
 		return new SearchContext() {
 			{
@@ -49,10 +72,35 @@ public class SolrQuerySuggesterTest {
 		};
 	}
 
-	protected SolrQuerySuggester createSolrQuerySuggester() {
+	protected SolrQuerySuggester createSolrQuerySuggester() throws Exception {
+		QueryResponse queryResponse = Mockito.mock(QueryResponse.class);
+
+		Mockito.when(
+			queryResponse.getResults()
+		).thenReturn(
+			Mockito.mock(SolrDocumentList.class)
+		);
+
+		SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+		Mockito.when(
+			solrClient.query(Mockito.any(SolrParams.class))
+		).thenReturn(
+			queryResponse
+		);
+
+		SolrClientManager solrClientManager = Mockito.mock(
+			SolrClientManager.class);
+
+		Mockito.when(
+			solrClientManager.getSolrClient()
+		).thenReturn(
+			solrClient
+		);
+
 		return new SolrQuerySuggester() {
 			{
-				setSolrClientManager(Mockito.mock(SolrClientManager.class));
+				setSolrClientManager(solrClientManager);
 			}
 		};
 	}

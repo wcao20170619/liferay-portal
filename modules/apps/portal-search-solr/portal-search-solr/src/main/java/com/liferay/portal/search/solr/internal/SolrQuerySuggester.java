@@ -85,6 +85,12 @@ public class SolrQuerySuggester extends BaseQuerySuggester {
 			searchContext.getLanguageId());
 
 		for (String keyword : keywords) {
+			keyword = getValidKeyword(keyword);
+
+			if (keyword == null) {
+				continue;
+			}
+
 			List<String> keywordSuggestions = suggestKeywords(
 				searchContext, max, keyword);
 
@@ -146,6 +152,22 @@ public class SolrQuerySuggester extends BaseQuerySuggester {
 
 			return new String[0];
 		}
+	}
+
+	protected static String getValidKeyword(String keyword) {
+		String ret = keyword;
+
+		if (keyword == null) {
+			return ret;
+		}
+
+		ret = ret.trim().replaceAll("\\s+", " ");
+
+		if ((ret.indexOf(" ") > 0) && (ret.length() <= 3)) {
+			return null;
+		}
+
+		return ret;
 	}
 
 	@Activate
@@ -292,7 +314,6 @@ public class SolrQuerySuggester extends BaseQuerySuggester {
 		try {
 			Map<String, WeightedWord> weightedWordsMap = new HashMap<>();
 			TreeSet<WeightedWord> weightedWordsSet = new TreeSet<>();
-
 			SolrQuery solrQuery = _nGramQueryBuilder.getNGramQuery(input);
 
 			solrQuery.addFilterQuery(
