@@ -25,10 +25,11 @@ import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
@@ -41,6 +42,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,9 +64,13 @@ public class IndexerPostProcessorRegistryTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
+	@Before
+	public void setUp() throws Exception {
+	}
+
 	@Test
 	public void testMultipleIndexerPostProcessors() throws Exception {
-		Indexer<MBMessage> mbMessageIndexer = IndexerRegistryUtil.getIndexer(
+		Indexer<MBMessage> mbMessageIndexer = _indexerRegistry.getIndexer(
 			MBMessage.class.getName());
 
 		IndexerPostProcessor[] mbMessageIndexerPostProcessors =
@@ -79,7 +85,7 @@ public class IndexerPostProcessorRegistryTest {
 
 		Assert.assertNotNull(mbMessageIndexerPostProcessor);
 
-		Indexer<MBThread> mbThreadIndexer = IndexerRegistryUtil.getIndexer(
+		Indexer<MBThread> mbThreadIndexer = _indexerRegistry.getIndexer(
 			MBThread.class.getName());
 
 		IndexerPostProcessor[] mbThreadIndexerPostProcessors =
@@ -99,7 +105,7 @@ public class IndexerPostProcessorRegistryTest {
 
 	@Test
 	public void testMultipleModelIndexerPostProcessors() throws Exception {
-		Indexer<User> userIndexer = IndexerRegistryUtil.getIndexer(
+		Indexer<User> userIndexer = _indexerRegistry.getIndexer(
 			User.class.getName());
 
 		IndexerPostProcessor[] userIndexerPostProcessors =
@@ -114,7 +120,7 @@ public class IndexerPostProcessorRegistryTest {
 
 		Assert.assertNotNull(userIndexerPostProcessor);
 
-		Indexer<UserGroup> userGroupIndexer = IndexerRegistryUtil.getIndexer(
+		Indexer<UserGroup> userGroupIndexer = _indexerRegistry.getIndexer(
 			UserGroup.class.getName());
 
 		IndexerPostProcessor[] userGroupIndexerPostProcessors =
@@ -134,14 +140,10 @@ public class IndexerPostProcessorRegistryTest {
 
 	@Test
 	public void testNullIndexerIndexerPostProcessor() throws Exception {
-		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
+		Indexer<?> indexer = _indexerRegistry.getIndexer(
 			"com.liferay.portal.test.SampleModel");
 
 		Assert.assertNull(indexer);
-
-		Bundle bundle = FrameworkUtil.getBundle(getClass());
-
-		BundleContext bundleContext = bundle.getBundleContext();
 
 		Indexer<?> sampleIndexer = new BaseIndexer<Object>() {
 
@@ -184,12 +186,16 @@ public class IndexerPostProcessorRegistryTest {
 
 		};
 
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
 		ServiceRegistration<?> serviceRegistration =
 			bundleContext.registerService(
 				Indexer.class, sampleIndexer, new HashMapDictionary<>());
 
 		try {
-			indexer = IndexerRegistryUtil.getIndexer(
+			indexer = _indexerRegistry.getIndexer(
 				"com.liferay.portal.test.SampleModel");
 
 			Assert.assertNotNull(indexer);
@@ -218,8 +224,8 @@ public class IndexerPostProcessorRegistryTest {
 
 	@Test
 	public void testSingleIndexerPostProcessor() throws Exception {
-		Indexer<Organization> organizationIndexer =
-			IndexerRegistryUtil.getIndexer(Organization.class.getName());
+		Indexer<Organization> organizationIndexer = _indexerRegistry.getIndexer(
+			Organization.class.getName());
 
 		IndexerPostProcessor[] organizationIndexerPostProcessors =
 			organizationIndexer.getIndexerPostProcessors();
@@ -236,7 +242,7 @@ public class IndexerPostProcessorRegistryTest {
 
 	@Test
 	public void testSingleModelIndexerPostProcessor() throws Exception {
-		Indexer<Contact> contactIndexer = IndexerRegistryUtil.getIndexer(
+		Indexer<Contact> contactIndexer = _indexerRegistry.getIndexer(
 			Contact.class.getName());
 
 		IndexerPostProcessor[] contactIndexerPostProcessors =
@@ -251,5 +257,8 @@ public class IndexerPostProcessorRegistryTest {
 
 		Assert.assertNotNull(contactIndexerPostProcessor);
 	}
+
+	@Inject
+	private IndexerRegistry _indexerRegistry;
 
 }

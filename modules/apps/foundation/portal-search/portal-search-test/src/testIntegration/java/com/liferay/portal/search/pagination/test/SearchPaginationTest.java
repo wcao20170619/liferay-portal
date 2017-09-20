@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -50,6 +51,11 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Roberto Díaz
@@ -226,7 +232,19 @@ public class SearchPaginationTest {
 	protected Hits getHits(String keyword, int start, int end)
 		throws Exception {
 
-		Indexer<User> indexer = IndexerRegistryUtil.getIndexer(User.class);
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		Collection<ServiceReference<IndexerRegistry>> serviceReferences =
+			bundleContext.getServiceReferences(IndexerRegistry.class, null);
+
+		ServiceReference<IndexerRegistry> reference =
+			serviceReferences.iterator().next();
+
+		IndexerRegistry indexerRegistry = bundleContext.getService(reference);
+
+		Indexer<User> indexer = indexerRegistry.getIndexer(User.class);
 
 		SearchContext searchContext = new SearchContext();
 
