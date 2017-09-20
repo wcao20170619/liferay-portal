@@ -16,6 +16,8 @@ Import-Package:\
 	com.liferay.portal.kernel.workflow.*,\
 	com.liferay.portal.test.randomizerbumpers.*,\
 	\
-	org.junit
+	org.junit,\
+	\
+	org.osgi.framework.*
 Liferay-Releng-Module-Group-Description:
 Liferay-Releng-Module-Group-Title: Search

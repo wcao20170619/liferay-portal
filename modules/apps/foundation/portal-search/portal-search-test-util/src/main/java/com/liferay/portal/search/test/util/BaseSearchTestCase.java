@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.portal.test.randomizerbumpers.BBCodeRandomizerBumper;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,6 +54,11 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Eudaldo Alonso
@@ -63,6 +69,18 @@ public abstract class BaseSearchTestCase {
 	@Before
 	public void setUp() throws Exception {
 		group = GroupTestUtil.addGroup();
+
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
+		Collection<ServiceReference<IndexerRegistry>> serviceReferences =
+			bundleContext.getServiceReferences(IndexerRegistry.class, null);
+
+		ServiceReference<IndexerRegistry> reference =
+			serviceReferences.iterator().next();
+
+		_indexerRegistry = bundleContext.getService(reference);
 	}
 
 	@Test
@@ -413,7 +431,7 @@ public abstract class BaseSearchTestCase {
 			Class<?> clazz, long groupId, SearchContext searchContext)
 		throws Exception {
 
-		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(clazz);
+		Indexer<?> indexer = _indexerRegistry.getIndexer(clazz);
 
 		searchContext.setGroupIds(new long[] {groupId});
 
@@ -1072,5 +1090,7 @@ public abstract class BaseSearchTestCase {
 
 	@DeleteAfterTestRun
 	protected Group group;
+
+	private IndexerRegistry _indexerRegistry;
 
 }
