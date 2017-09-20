@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -538,11 +537,7 @@ public class SearchResultSummaryDisplayBuilder {
 	}
 
 	protected Indexer<Object> getIndexer(String className) {
-		if (_indexerRegistry != null) {
-			return _indexerRegistry.getIndexer(className);
-		}
-
-		return IndexerRegistryUtil.getIndexer(className);
+		return _indexerRegistry.getIndexer(className);
 	}
 
 	protected String getSearchResultViewURL(String className, long classPK) {

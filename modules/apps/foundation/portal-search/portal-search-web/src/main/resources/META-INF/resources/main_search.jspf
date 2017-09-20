@@ -107,6 +107,7 @@ Hits hits = searchDisplayContext.getHits();
 				searchResultSummaryDisplayBuilder.setSearchResultPreferences(searchDisplayContext.getSearchResultPreferences());
 				searchResultSummaryDisplayBuilder.setSummaryBuilderFactory(searchDisplayContext.getSummaryBuilderFactory());
 				searchResultSummaryDisplayBuilder.setThemeDisplay(themeDisplay);
+				searchResultSummaryDisplayBuilder.setIndexerRegistry(searchDisplayContext.getIndexerRegistry());
 
 				com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext searchResultSummaryDisplayContext = searchResultSummaryDisplayBuilder.build();
 				%>

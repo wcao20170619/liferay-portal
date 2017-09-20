@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
@@ -70,7 +71,8 @@ public class SearchDisplayContext {
 			FacetedSearcherManager facetedSearcherManager,
 			IndexSearchPropsValues indexSearchPropsValues,
 			PortletURLFactory portletURLFactory,
-			SummaryBuilderFactory summaryBuilderFactory)
+			SummaryBuilderFactory summaryBuilderFactory,
+			IndexerRegistry indexerRegistry)
 		throws PortletException {
 
 		_renderRequest = renderRequest;
@@ -78,6 +80,7 @@ public class SearchDisplayContext {
 		_indexSearchPropsValues = indexSearchPropsValues;
 		_portletURLFactory = portletURLFactory;
 		_summaryBuilderFactory = summaryBuilderFactory;
+		_indexerRegistry = indexerRegistry;
 
 		ThemeDisplaySupplier themeDisplaySupplier =
 			new PortletRequestThemeDisplaySupplier(renderRequest);
@@ -190,6 +193,10 @@ public class SearchDisplayContext {
 
 	public Hits getHits() {
 		return _hits;
+	}
+
+	public IndexerRegistry getIndexerRegistry() {
+		return _indexerRegistry;
 	}
 
 	public String getKeywords() {
@@ -608,6 +615,7 @@ public class SearchDisplayContext {
 	private List<SearchFacet> _enabledSearchFacets;
 	private final Hits _hits;
 	private Boolean _includeSystemPortlets;
+	private final IndexerRegistry _indexerRegistry;
 	private final IndexSearchPropsValues _indexSearchPropsValues;
 	private final Keywords _keywords;
 	private final PortletPreferences _portletPreferences;

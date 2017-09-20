@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
@@ -232,7 +233,8 @@ public class SearchDisplayContextTest {
 			createPortal(themeDisplay, renderRequest), Mockito.mock(Html.class),
 			Mockito.mock(Language.class), facetedSearcherManager,
 			Mockito.mock(IndexSearchPropsValues.class), portletURLFactory,
-			Mockito.mock(SummaryBuilderFactory.class));
+			Mockito.mock(SummaryBuilderFactory.class),
+			Mockito.mock(IndexerRegistry.class));
 	}
 
 	protected ThemeDisplay createThemeDisplay() throws Exception {
