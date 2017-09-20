@@ -17,19 +17,22 @@ package com.liferay.portal.search.internal.background.task;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusMessageTranslator;
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-
-import java.util.Set;
 
 /**
  * @author Andrew Betts
  */
 public class ReindexBackgroundTaskStatusMessageTranslator
 	implements BackgroundTaskStatusMessageTranslator {
+
+	public ReindexBackgroundTaskStatusMessageTranslator(
+		IndexerRegistry indexerRegistry) {
+
+		_indexerRegistry = indexerRegistry;
+	}
 
 	@Override
 	public void translate(
@@ -98,11 +101,9 @@ public class ReindexBackgroundTaskStatusMessageTranslator
 				backgroundTaskStatus.setAttribute("lastIndexer", className);
 			}
 
-			Set<Indexer<?>> indexers = IndexerRegistryUtil.getIndexers();
-
 			percentage = getPercentage(
-				companyCount, companyIds.length, indexerCount, indexers.size(),
-				count, total);
+				companyCount, companyIds.length, indexerCount,
+				_indexerRegistry.getIndexers().size(), count, total);
 		}
 		else if (phase.equals(ReindexBackgroundTaskConstants.SINGLE_START)) {
 			percentage = getPercentage(
@@ -153,5 +154,7 @@ public class ReindexBackgroundTaskStatusMessageTranslator
 			ReindexBackgroundTaskConstants.PHASE,
 			message.getString(ReindexBackgroundTaskConstants.PHASE));
 	}
+
+	private final IndexerRegistry _indexerRegistry;
 
 }

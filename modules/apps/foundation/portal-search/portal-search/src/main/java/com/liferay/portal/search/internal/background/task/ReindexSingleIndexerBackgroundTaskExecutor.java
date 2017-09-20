@@ -21,7 +21,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.background.task.ReindexBackgroundTaskConstants;
 import com.liferay.portal.kernel.search.background.task.ReindexStatusMessageSenderUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -36,13 +36,17 @@ import java.util.Map;
 public class ReindexSingleIndexerBackgroundTaskExecutor
 	extends ReindexBackgroundTaskExecutor {
 
-	public ReindexSingleIndexerBackgroundTaskExecutor() {
+	public ReindexSingleIndexerBackgroundTaskExecutor(
+		IndexerRegistry indexerRegistry) {
+
+		super(indexerRegistry);
 		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_TASK_NAME);
 	}
 
 	@Override
 	public BackgroundTaskExecutor clone() {
-		return new ReindexSingleIndexerBackgroundTaskExecutor();
+		return new ReindexSingleIndexerBackgroundTaskExecutor(
+			getIndexerRegistry());
 	}
 
 	@Override
@@ -63,7 +67,7 @@ public class ReindexSingleIndexerBackgroundTaskExecutor
 	protected void reindex(String className, long[] companyIds)
 		throws Exception {
 
-		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(className);
+		Indexer<?> indexer = getIndexerRegistry().getIndexer(className);
 
 		if (indexer == null) {
 			return;

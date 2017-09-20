@@ -16,6 +16,7 @@ package com.liferay.portal.search.internal.background.task;
 
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.executor.PortalExecutorManager;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 
 import java.util.Dictionary;
@@ -38,13 +39,14 @@ public class BackgroundTaskExecutorConfigurator {
 	@Activate
 	protected void activate(BundleContext bundleContext) {
 		BackgroundTaskExecutor reindexPortalBackgroundTaskExecutor =
-			new ReindexPortalBackgroundTaskExecutor(_portalExecutorManager);
+			new ReindexPortalBackgroundTaskExecutor(
+				_portalExecutorManager, _indexerRegistry);
 
 		registerBackgroundTaskExecutor(
 			bundleContext, reindexPortalBackgroundTaskExecutor);
 
 		BackgroundTaskExecutor reindexSingleIndexerBackgroundTaskExecutor =
-			new ReindexSingleIndexerBackgroundTaskExecutor();
+			new ReindexSingleIndexerBackgroundTaskExecutor(_indexerRegistry);
 
 		registerBackgroundTaskExecutor(
 			bundleContext, reindexSingleIndexerBackgroundTaskExecutor);
@@ -76,6 +78,9 @@ public class BackgroundTaskExecutorConfigurator {
 
 		_serviceRegistrations.add(serviceRegistration);
 	}
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
 
 	@Reference
 	private PortalExecutorManager _portalExecutorManager;

@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.util.PropsValues;
@@ -40,10 +40,12 @@ import org.apache.commons.lang.time.StopWatch;
 public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(
-		long companyId, PortalExecutorManager portalExecutorManager) {
+		long companyId, PortalExecutorManager portalExecutorManager,
+		IndexerRegistry indexerRegistry) {
 
 		_companyId = companyId;
 		_portalExecutorManager = portalExecutorManager;
+		_indexerRegistry = indexerRegistry;
 	}
 
 	public Set<String> getUsedSearchEngineIds() {
@@ -70,6 +72,7 @@ public class SearchEngineInitializer implements Runnable {
 		reindex(PropsValues.INDEX_ON_STARTUP_DELAY);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void doReIndex(int delay) {
 		if (IndexWriterHelperUtil.isIndexReadOnly()) {
 			return;
@@ -107,7 +110,7 @@ public class SearchEngineInitializer implements Runnable {
 			List<FutureTask<Void>> futureTasks = new ArrayList<>();
 			Set<String> searchEngineIds = new HashSet<>();
 
-			for (Indexer<?> indexer : IndexerRegistryUtil.getIndexers()) {
+			for (Indexer<?> indexer : _indexerRegistry.getIndexers()) {
 				String searchEngineId = indexer.getSearchEngineId();
 
 				if (searchEngineIds.add(searchEngineId)) {
@@ -179,6 +182,7 @@ public class SearchEngineInitializer implements Runnable {
 
 	private final long _companyId;
 	private boolean _finished;
+	private final IndexerRegistry _indexerRegistry;
 	private final PortalExecutorManager _portalExecutorManager;
 	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 

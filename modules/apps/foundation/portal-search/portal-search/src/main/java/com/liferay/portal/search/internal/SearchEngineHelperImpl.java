@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineConfigurator;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
@@ -100,7 +100,7 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	public String[] getEntryClassNames() {
 		Set<String> assetEntryClassNames = new HashSet<>();
 
-		for (Indexer<?> indexer : IndexerRegistryUtil.getIndexers()) {
+		for (Indexer<?> indexer : _indexerRegistry.getIndexers()) {
 			for (String className : indexer.getSearchClassNames()) {
 				if (!_excludedEntryClassNames.contains(className)) {
 					assetEntryClassNames.add(className);
@@ -155,7 +155,7 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	public String getSearchEngineId(Document document) {
 		String entryClassName = document.get("entryClassName");
 
-		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(entryClassName);
+		Indexer<?> indexer = _indexerRegistry.getIndexer(entryClassName);
 
 		String searchEngineId = indexer.getSearchEngineId();
 
@@ -307,6 +307,10 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	private final Map<Long, Long> _companyIds = new ConcurrentHashMap<>();
 	private String _defaultSearchEngineId;
 	private final Set<String> _excludedEntryClassNames = new HashSet<>();
+
+	@Reference
+	private IndexerRegistry _indexerRegistry;
+
 	private int _queueCapacity = 200;
 	private final Map<String, QueuingSearchEngine> _queuingSearchEngines =
 		new HashMap<>();
