@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
-import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.SearchPermissionChecker;
 import com.liferay.portal.kernel.search.facet.Facet;
@@ -72,7 +71,8 @@ public class FacetedSearcherImpl
 		IndexSearcherHelper indexSearcherHelper,
 		SearchEngineHelper searchEngineHelper,
 		Collection<SearchPermissionFilterContributor>
-			searchPermissionFilterContributors) {
+			searchPermissionFilterContributors,
+		SearchPermissionChecker searchPermissionChecker) {
 
 		_expandoBridgeFactory = expandoBridgeFactory;
 		_groupLocalService = groupLocalService;
@@ -81,6 +81,7 @@ public class FacetedSearcherImpl
 		_searchEngineHelper = searchEngineHelper;
 		_searchPermissionFilterContributors =
 			searchPermissionFilterContributors;
+		_searchPermissionChecker = searchPermissionChecker;
 	}
 
 	protected void addSearchExpando(
@@ -346,16 +347,13 @@ public class FacetedSearcherImpl
 			return;
 		}
 
-		SearchPermissionChecker searchPermissionChecker =
-			SearchEngineHelperUtil.getSearchPermissionChecker();
-
 		Optional<String> parentEntryClassNameOptional =
 			_getParentEntryClassName(entryClassName);
 
 		String permissionedEntryClassName = parentEntryClassNameOptional.orElse(
 			entryClassName);
 
-		searchPermissionChecker.getPermissionBooleanFilter(
+		_searchPermissionChecker.getPermissionBooleanFilter(
 			searchContext.getCompanyId(), searchContext.getGroupIds(),
 			searchContext.getUserId(), permissionedEntryClassName,
 			booleanFilter, searchContext);
@@ -505,6 +503,7 @@ public class FacetedSearcherImpl
 	private final IndexerRegistry _indexerRegistry;
 	private final IndexSearcherHelper _indexSearcherHelper;
 	private final SearchEngineHelper _searchEngineHelper;
+	private final SearchPermissionChecker _searchPermissionChecker;
 	private final Collection<SearchPermissionFilterContributor>
 		_searchPermissionFilterContributors;
 

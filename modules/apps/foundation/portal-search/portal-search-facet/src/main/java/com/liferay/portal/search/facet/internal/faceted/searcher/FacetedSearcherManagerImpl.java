@@ -18,6 +18,7 @@ import com.liferay.expando.kernel.util.ExpandoBridgeFactory;
 import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
+import com.liferay.portal.kernel.search.SearchPermissionChecker;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -43,7 +44,7 @@ public class FacetedSearcherManagerImpl implements FacetedSearcherManager {
 		return new FacetedSearcherImpl(
 			expandoBridgeFactory, groupLocalService, indexerRegistry,
 			indexSearcherHelper, searchEngineHelper,
-			_searchPermissionFilterContributors);
+			_searchPermissionFilterContributors, searchPermissionChecker);
 	}
 
 	@Reference(
@@ -80,6 +81,9 @@ public class FacetedSearcherManagerImpl implements FacetedSearcherManager {
 
 	@Reference
 	protected SearchEngineHelper searchEngineHelper;
+
+	@Reference
+	protected SearchPermissionChecker searchPermissionChecker;
 
 	private final Collection<SearchPermissionFilterContributor>
 		_searchPermissionFilterContributors = new CopyOnWriteArrayList<>();
