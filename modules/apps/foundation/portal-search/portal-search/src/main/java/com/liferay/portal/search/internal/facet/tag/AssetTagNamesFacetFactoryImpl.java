@@ -14,9 +14,10 @@
 
 package com.liferay.portal.search.internal.facet.tag;
 
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.util.FacetFactory;
+import com.liferay.portal.search.facet.Facet;
 import com.liferay.portal.search.facet.tag.AssetTagNamesFacetFactory;
 
 import org.osgi.service.component.annotations.Component;
@@ -29,11 +30,11 @@ import org.osgi.service.component.annotations.Component;
 	service = {AssetTagNamesFacetFactory.class, FacetFactory.class}
 )
 public class AssetTagNamesFacetFactoryImpl
-	implements AssetTagNamesFacetFactory, FacetFactory {
+	implements AssetTagNamesFacetFactory {
 
 	@Override
 	public String getFacetClassName() {
-		return AssetTagNamesFacetFactory.class.getName();
+		return Field.ASSET_TAG_NAMES;
 	}
 
 	@Override
