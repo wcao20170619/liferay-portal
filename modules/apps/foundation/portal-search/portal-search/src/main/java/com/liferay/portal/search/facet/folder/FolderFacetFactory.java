@@ -12,15 +12,15 @@
  * details.
  */
 
-package com.liferay.portal.search.facet;
+package com.liferay.portal.search.facet.folder;
+
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.search.facet.FacetFactory;
 
 /**
- * @author André de Oliveira
+ * @author Wade Cao
  */
-public interface Facet extends com.liferay.portal.kernel.search.facet.Facet {
-
-	public void select(long[] selections);
-
-	public void select(String... selections);
-
+@ProviderType
+public interface FolderFacetFactory extends FacetFactory {
 }

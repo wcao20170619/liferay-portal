@@ -36,6 +36,13 @@ public class FacetImpl extends BaseFacet implements Facet {
 	}
 
 	@Override
+	public void select(long[] selections) {
+		if (!ArrayUtil.isEmpty(selections)) {
+			_selections = ArrayUtil.toStringArray(selections);
+		}
+	}
+
+	@Override
 	public void select(String... selections) {
 		_selections = selections;
 	}
