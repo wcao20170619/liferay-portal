@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 
 /**
  * @author André de Oliveira
+ *  @deprecated As of 7.1.0
  */
+@Deprecated
 public class FolderFacetFactory {
 
 	public MultiValueFacet newInstance(SearchContext searchContext) {

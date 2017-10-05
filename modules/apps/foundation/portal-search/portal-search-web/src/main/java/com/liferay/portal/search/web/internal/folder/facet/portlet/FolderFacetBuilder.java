@@ -15,10 +15,10 @@
 package com.liferay.portal.search.web.internal.folder.facet.portlet;
 
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.MultiValueFacet;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.facet.Facet;
+import com.liferay.portal.search.facet.folder.FolderFacetFactory;
 
 /**
  * @author Lino Alves
@@ -30,22 +30,18 @@ public class FolderFacetBuilder {
 	}
 
 	public Facet build() {
-		MultiValueFacet multiValueFacet = _folderFacetFactory.newInstance(
-			_searchContext);
+		Facet facet = _folderFacetFactory.newInstance(_searchContext);
 
-		multiValueFacet.setFacetConfiguration(
-			buildFacetConfiguration(multiValueFacet));
+		facet.setFacetConfiguration(buildFacetConfiguration(facet));
 
-		if (_selectedFolders != null) {
-			multiValueFacet.setValues(_selectedFolders);
+		facet.select(_selectedFolders);
 
-			_searchContext.setAttribute(
-				multiValueFacet.getFieldName(),
-				StringUtil.merge(_selectedFolders));
-			_searchContext.setFolderIds(_selectedFolders);
-		}
+		_searchContext.setAttribute(
+			facet.getFieldName(), StringUtil.merge(_selectedFolders));
 
-		return multiValueFacet;
+		_searchContext.setFolderIds(_selectedFolders);
+
+		return facet;
 	}
 
 	public void setFrequencyThreshold(int frequencyThreshold) {
