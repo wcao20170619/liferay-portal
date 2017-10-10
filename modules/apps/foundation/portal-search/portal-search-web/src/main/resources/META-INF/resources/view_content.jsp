@@ -17,56 +17,53 @@
 <%@ include file="/init.jsp" %>
 
 <%
-long assetEntryId = ParamUtil.getLong(request, "assetEntryId");
-String type = ParamUtil.getString(request, "type");
+SearchResultContentDisplayBuilder searchResultContentDisplayBuilder = new SearchResultContentDisplayBuilder();
 
-AssetRendererFactory<?> assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByType(type);
+searchResultContentDisplayBuilder.setPermissionChecker(permissionChecker);
+searchResultContentDisplayBuilder.setLocale(locale);
+searchResultContentDisplayBuilder.setAssetEntryId(ParamUtil.getLong(request, "assetEntryId"));
+searchResultContentDisplayBuilder.setType(ParamUtil.getString(request, "type"));
+searchResultContentDisplayBuilder.setRenderRequest(renderRequest);
+searchResultContentDisplayBuilder.setRenderResponse(renderResponse);
 
-AssetEntry assetEntry = assetRendererFactory.getAssetEntry(assetEntryId);
-
-AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
+SearchResultContentDisplayContext searchResultContentDisplayContext = searchResultContentDisplayBuilder.build();
 %>
 
-<c:if test="<%= (assetEntry != null) && assetEntry.isVisible() && assetRenderer.hasViewPermission(permissionChecker) %>">
+<c:if test="<%= searchResultContentDisplayContext.isVisible() %>">
 	<liferay-ui:header
 		localizeTitle="<%= false %>"
-		title="<%= assetRenderer.getTitle(locale) %>"
+		title="<%= searchResultContentDisplayContext.getTitle() %>"
 	/>
 
-	<c:if test="<%= assetRenderer.hasEditPermission(permissionChecker) %>">
+	<c:if test="<%= searchResultContentDisplayContext.hasEditPermission() %>">
+
+		<%
+		String displayNamespace = HtmlUtil.escape(portletDisplay.getNamespace());
+		searchResultContentDisplayContext.setDataId(displayNamespace);
+
+		String titleEscaped = HtmlUtil.escape(searchResultContentDisplayContext.getTitle());
+		searchResultContentDisplayContext.setDataTitle(request, titleEscaped);
+		searchResultContentDisplayContext.setMessage(request, titleEscaped);
+		%>
+
 		<div class="asset-actions lfr-meta-actions">
-
-			<%
-			PortletURL redirectURL = renderResponse.createRenderURL();
-
-			redirectURL.setParameter("mvcPath", "/edit_content_redirect.jsp");
-
-			PortletURL editPortletURL = assetRenderer.getURLEdit((LiferayPortletRequest)renderRequest, (LiferayPortletResponse)renderResponse, LiferayWindowState.POP_UP, redirectURL);
-
-			Map<String, Object> data = new HashMap<String, Object>();
-
-			data.put("destroyOnHide", true);
-			data.put("id", HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset");
-			data.put("title", LanguageUtil.format(request, "edit-x", HtmlUtil.escape(assetRenderer.getTitle(locale)), false));
-			%>
-
 			<liferay-ui:icon
 				cssClass="visible-interaction"
-				data="<%= data %>"
+				data="<%= searchResultContentDisplayContext.getData() %>"
 				icon="pencil"
 				label="<%= false %>"
 				markupView="lexicon"
-				message='<%= LanguageUtil.format(request, "edit-x-x", new Object[] {"hide-accessible", HtmlUtil.escape(assetRenderer.getTitle(locale))}, false) %>'
+				message="<%= searchResultContentDisplayContext.getMessage() %>"
 				method="get"
-				url="<%= editPortletURL.toString() %>"
+				url="<%= searchResultContentDisplayContext.getEditPortletURL() %>"
 				useDialog="<%= true %>"
 			/>
 		</div>
 	</c:if>
 
 	<liferay-asset:asset-display
-		assetEntry="<%= assetEntry %>"
-		assetRenderer="<%= assetRenderer %>"
-		assetRendererFactory="<%= assetRendererFactory %>"
+		assetEntry="<%= searchResultContentDisplayContext.getAssetEntry() %>"
+		assetRenderer="<%= searchResultContentDisplayContext.getAssetRenderer() %>"
+		assetRendererFactory="<%= searchResultContentDisplayContext.getAssetRendererFactory() %>"
 	/>
 </c:if>
