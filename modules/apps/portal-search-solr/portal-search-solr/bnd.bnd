@@ -14,6 +14,8 @@ Import-Package:\
 	\
 	!org.relaxng.datatype.*,\
 	\
+	com.liferay.portal.search.configurator,\
+	\
 	com.liferay.portal.search.analysis,\
 	\
 	*

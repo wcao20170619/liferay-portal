@@ -14,14 +14,14 @@
 
 package com.liferay.portal.search.solr.internal;
 
-import com.liferay.portal.kernel.search.AbstractSearchEngineConfigurator;
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineConfigurator;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.configurator.AbstractSearchEngineConfigurator;
+import com.liferay.portal.search.configurator.SearchEngineConfigurator;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
