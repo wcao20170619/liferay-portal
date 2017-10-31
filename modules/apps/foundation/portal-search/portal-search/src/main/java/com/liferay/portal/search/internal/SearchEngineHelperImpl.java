@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchEngine;
-import com.liferay.portal.kernel.search.SearchEngineConfigurator;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.search.queue.QueuingSearchEngine;
 import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
@@ -30,6 +29,7 @@ import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.search.configuration.SearchEngineHelperConfiguration;
+import com.liferay.portal.search.configurator.SearchEngineConfigurator;
 
 import java.util.Collection;
 import java.util.Collections;
