@@ -65,6 +65,7 @@ Import-Package:\
 	!sun.security.*,\
 	\
 	com.liferay.portal.search.analysis,\
+	com.liferay.portal.search.configurator,\
 	\
 	*
 Liferay-Releng-Module-Group-Description:
