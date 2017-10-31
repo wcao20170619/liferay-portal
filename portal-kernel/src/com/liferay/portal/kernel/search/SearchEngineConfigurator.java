@@ -18,7 +18,9 @@ import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
+ * @deprecated As of 7.1.0, replaced by {@link #com.liferay.portal.search.configurator.SearchEngineConfigurator}
  */
+@Deprecated
 public interface SearchEngineConfigurator {
 
 	public void afterPropertiesSet();

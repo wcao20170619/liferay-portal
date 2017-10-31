@@ -50,7 +50,9 @@ import java.util.Set;
 
 /**
  * @author Michael C. Han
+ * @deprecated As of 7.1.0, replaced by {@link #com.liferay.portal.search.configurator.AbstractSearchEngineConfigurator}
  */
+@Deprecated
 public abstract class AbstractSearchEngineConfigurator
 	implements SearchEngineConfigurator {
 

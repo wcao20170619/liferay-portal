@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 
 /**
  * @author Michael C. Han
+ * @deprecated As of 7.1.0, replaced with no replacement
  */
+@Deprecated
 public class PluginSearchEngineConfigurator
 	extends AbstractSearchEngineConfigurator {
 

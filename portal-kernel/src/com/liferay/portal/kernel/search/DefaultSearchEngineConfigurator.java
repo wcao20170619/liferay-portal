@@ -16,7 +16,9 @@ package com.liferay.portal.kernel.search;
 
 /**
  * @author Michael C. Han
+ * @deprecated As of 7.1.0, replaced by {@link #com.liferay.portal.search.internal.DefaultSearchEngineConfigurator}
  */
+@Deprecated
 public class DefaultSearchEngineConfigurator
 	extends AbstractSearchEngineConfigurator {
 
