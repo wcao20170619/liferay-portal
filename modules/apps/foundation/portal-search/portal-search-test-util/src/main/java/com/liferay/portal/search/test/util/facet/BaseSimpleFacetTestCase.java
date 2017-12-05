@@ -34,23 +34,24 @@ public abstract class BaseSimpleFacetTestCase extends BaseFacetTestCase {
 	protected Facet createFacet(SearchContext searchContext) {
 		Facet facet = new SimpleFacet(searchContext);
 
-		facet.setFieldName(Field.TITLE);
+		facet.setFieldName(Field.STATUS);
 
 		return facet;
 	}
 
 	@Override
 	protected String getField() {
-		return Field.TITLE;
+		return Field.STATUS;
 	}
 
+	@SuppressWarnings("serial")
 	protected void testFrequencyThreshold() throws Exception {
-		addDocument("One Two Three Four Five Six");
-		addDocument("ONE TWO THREE FOUR FIVE");
-		addDocument("one two three four");
-		addDocument("OnE tWo ThReE");
-		addDocument("oNE tWO");
-		addDocument("oNe");
+		addDocument("one", "one", "one", "one", "one", "one");
+		addDocument("two", "two", "two", "two", "two");
+		addDocument("three", "three", "three", "three");
+		addDocument("four", "four", "four");
+		addDocument("five", "five");
+		addDocument("six");
 
 		assertFacet(
 			setUpFrequencyThreshold(4, setUpMaxTerms(5)),
@@ -72,13 +73,13 @@ public abstract class BaseSimpleFacetTestCase extends BaseFacetTestCase {
 			});
 	}
 
+	@SuppressWarnings("serial")
 	protected void testMaxTerms() throws Exception {
-		addDocument("One Two Three Four Five Six");
-		addDocument("ONE TWO THREE FOUR FIVE");
-		addDocument("one two three four");
-		addDocument("OnE tWo ThReE");
-		addDocument("oNE tWO");
-		addDocument("oNe");
+		addDocument("one", "one", "one", "one", "one", "one");
+		addDocument("two", "two", "two", "two", "two");
+		addDocument("three", "three", "three", "three");
+		addDocument("four", "four", "four");
+		addDocument("five", "five");
 
 		assertFacet(setUpMaxTerms(1), Arrays.asList("one=6"));
 
@@ -96,13 +97,13 @@ public abstract class BaseSimpleFacetTestCase extends BaseFacetTestCase {
 	}
 
 	protected void testMaxTermsNegative() throws Exception {
-		addDocument("One");
+		addDocument("one");
 
 		assertFacet(setUpMaxTerms(-25), Arrays.asList("one=1"));
 	}
 
 	protected void testMaxTermsZero() throws Exception {
-		addDocument("One");
+		addDocument("one");
 
 		assertFacet(setUpMaxTerms(0), Arrays.asList("one=1"));
 	}
@@ -110,11 +111,11 @@ public abstract class BaseSimpleFacetTestCase extends BaseFacetTestCase {
 	protected void testUnmatchedAreIgnored() throws Exception {
 		String presentButUnmatched = RandomTestUtil.randomString();
 
-		addDocument("One");
+		addDocument("one");
 		addDocument(presentButUnmatched);
 
 		assertFacet(
-			QueryContributors.mustNotMatch(getField(), presentButUnmatched),
+			QueryContributors.termMustNotMatch(getField(), presentButUnmatched),
 			Arrays.asList("one=1"));
 	}
 
