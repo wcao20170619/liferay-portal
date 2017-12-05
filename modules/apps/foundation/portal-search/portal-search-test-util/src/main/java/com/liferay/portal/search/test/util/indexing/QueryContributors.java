@@ -16,6 +16,7 @@ package com.liferay.portal.search.test.util.indexing;
 
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.generic.MatchQuery;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 
 /**
  * @author André de Oliveira
@@ -31,6 +32,14 @@ public class QueryContributors {
 	public static QueryContributor mustNotMatch(String field, String value) {
 		return booleanQuery -> QueryContributor.add(
 			booleanQuery, new MatchQuery(field, value),
+			BooleanClauseOccur.MUST_NOT);
+	}
+
+	public static QueryContributor termMustNotMatch(
+		String field, String value) {
+
+		return booleanQuery -> QueryContributor.add(
+			booleanQuery, new TermQueryImpl(field, value),
 			BooleanClauseOccur.MUST_NOT);
 	}
 

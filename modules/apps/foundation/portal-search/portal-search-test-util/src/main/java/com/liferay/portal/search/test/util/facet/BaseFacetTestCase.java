@@ -45,7 +45,10 @@ import org.mockito.Mockito;
 public abstract class BaseFacetTestCase extends BaseIndexingTestCase {
 
 	protected void addDocument(final String... values) throws Exception {
-		addDocument(DocumentCreationHelpers.singleText(getField(), values));
+		for (String value : values) {
+			addDocument(
+				DocumentCreationHelpers.singleKeyword(getField(), value));
+		}
 	}
 
 	protected Facet addFacet(
