@@ -17,16 +17,34 @@ package com.liferay.portal.search.test.util;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.Assert;
+
 /**
  * @author André de Oliveira
  */
 public class FieldValuesAssert {
+
+	public static void assertEquals(
+		String message, Map<?, ?> expectedMap, Map<?, ?> actualMap) {
+
+		Assert.assertEquals(
+			message, _toString(expectedMap), _toString(actualMap));
+	}
+
+	public static void assertFieldValues(
+		Map<String, String> expected, Document document, String message) {
+
+		assertEquals(message, expected, _getFieldValues(null, document));
+	}
 
 	public static void assertFieldValues(
 		Map<String, String> expected, String prefix, Document document,
@@ -49,6 +67,10 @@ public class FieldValuesAssert {
 			entry -> {
 				String name = entry.getKey();
 
+				if (prefix == null) {
+					return name != null && !name.equals("");
+				}
+
 				return name.startsWith(prefix);
 			});
 
@@ -60,6 +82,18 @@ public class FieldValuesAssert {
 
 					return field.getValue();
 				}));
+	}
+
+	private static String _toString(Map<?, ?> map) {
+		List<String> list = new ArrayList<>(map.size());
+
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
+			list.add(entry.toString());
+		}
+
+		Collections.sort(list);
+
+		return list.toString();
 	}
 
 }
