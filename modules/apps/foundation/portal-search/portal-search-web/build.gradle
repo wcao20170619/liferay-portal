@@ -23,5 +23,8 @@ dependencies {
 	provided project(":apps:web-experience:asset:asset-service")
 	provided project(":apps:web-experience:asset:asset-taglib")
 
+
 	testCompile project(":apps:foundation:portal-search:portal-search")
+	provided project(":apps:foundation:portal-search:portal-search-web-api") 
+
 }
