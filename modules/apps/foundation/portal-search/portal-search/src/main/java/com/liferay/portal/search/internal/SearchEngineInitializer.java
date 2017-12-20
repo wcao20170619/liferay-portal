@@ -18,7 +18,7 @@ import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
+import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
@@ -42,10 +42,12 @@ import org.apache.commons.lang.time.StopWatch;
 public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(
-		long companyId, PortalExecutorManager portalExecutorManager) {
+		long companyId, PortalExecutorManager portalExecutorManager,
+		IndexWriterHelper indexWriterHelper) {
 
 		_companyId = companyId;
 		_portalExecutorManager = portalExecutorManager;
+		_indexWriterHelper = indexWriterHelper;
 	}
 
 	public Set<String> getUsedSearchEngineIds() {
@@ -73,7 +75,7 @@ public class SearchEngineInitializer implements Runnable {
 	}
 
 	protected void doReIndex(int delay) {
-		if (IndexWriterHelperUtil.isIndexReadOnly()) {
+		if (_indexWriterHelper.isIndexReadOnly()) {
 			return;
 		}
 
@@ -115,7 +117,7 @@ public class SearchEngineInitializer implements Runnable {
 				String searchEngineId = indexer.getSearchEngineId();
 
 				if (searchEngineIds.add(searchEngineId)) {
-					IndexWriterHelperUtil.deleteEntityDocuments(
+					_indexWriterHelper.deleteEntityDocuments(
 						searchEngineId, _companyId, indexer.getClassName(),
 						true);
 				}
@@ -189,6 +191,7 @@ public class SearchEngineInitializer implements Runnable {
 
 	private final long _companyId;
 	private boolean _finished;
+	private final IndexWriterHelper _indexWriterHelper;
 	private final PortalExecutorManager _portalExecutorManager;
 	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 
