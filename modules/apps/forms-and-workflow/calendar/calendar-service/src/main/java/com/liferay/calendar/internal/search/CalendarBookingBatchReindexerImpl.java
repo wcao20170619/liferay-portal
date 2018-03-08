@@ -20,6 +20,7 @@ import com.liferay.calendar.workflow.CalendarBookingWorkflowConstants;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
 import com.liferay.portal.search.indexer.IndexerDocumentBuilder;
 import com.liferay.portal.search.indexer.IndexerWriter;
@@ -51,7 +52,7 @@ public class CalendarBookingBatchReindexerImpl
 				Property statusProperty = PropertyFactoryUtil.forName("status");
 
 				int[] statuses = {
-					CalendarBookingWorkflowConstants.STATUS_APPROVED,
+					WorkflowConstants.STATUS_APPROVED,
 					CalendarBookingWorkflowConstants.STATUS_MAYBE
 				};
 

@@ -19,6 +19,7 @@ import com.liferay.calendar.service.CalendarBookingLocalService;
 import com.liferay.calendar.workflow.CalendarBookingWorkflowConstants;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.spi.model.index.contributor.ModelIndexerWriterContributor;
@@ -53,7 +54,7 @@ public class CalendarBookingModelIndexerWriterContributor
 				Property statusProperty = PropertyFactoryUtil.forName("status");
 
 				int[] statuses = {
-					CalendarBookingWorkflowConstants.STATUS_APPROVED,
+					WorkflowConstants.STATUS_APPROVED,
 					CalendarBookingWorkflowConstants.STATUS_MAYBE
 				};
 
@@ -95,7 +96,7 @@ public class CalendarBookingModelIndexerWriterContributor
 
 		int status = calendarBooking.getStatus();
 
-		if ((status == CalendarBookingWorkflowConstants.STATUS_APPROVED) ||
+		if ((status == WorkflowConstants.STATUS_APPROVED) ||
 			(status == CalendarBookingWorkflowConstants.STATUS_MAYBE)) {
 
 			return IndexerWriterMode.UPDATE;

@@ -14,14 +14,16 @@
 
 package com.liferay.calendar.internal.search;
 
-import com.liferay.calendar.service.permission.CalendarPermission;
+import com.liferay.calendar.model.Calendar;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.search.spi.model.result.contributor.ModelPermissionPostFilter;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -40,12 +42,17 @@ public class CalendarModelPermissionPostFilter
 		long entryClassPK, String actionId) {
 
 		try {
-			return CalendarPermission.contains(
+			return _calendarModelResourcePermission.contains(
 				permissionChecker, entryClassPK, ActionKeys.VIEW);
 		}
 		catch (PortalException pe) {
 			throw new SystemException(pe);
 		}
 	}
+
+	@Reference(
+		target = "(model.class.name=com.liferay.calendar.model.Calendar)"
+	)
+	private ModelResourcePermission<Calendar> _calendarModelResourcePermission;
 
 }
