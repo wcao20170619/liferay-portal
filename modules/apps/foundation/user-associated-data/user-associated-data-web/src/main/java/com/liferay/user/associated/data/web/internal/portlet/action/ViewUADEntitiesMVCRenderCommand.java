@@ -90,7 +90,7 @@ public class ViewUADEntitiesMVCRenderCommand implements MVCRenderCommand {
 				new ViewUADEntitiesDisplay();
 
 			viewUADEntitiesDisplay.setNavigationItems(
-				_getNaviagationItems(
+				_getNavigationItems(
 					applicationName, uadRegistryKey, currentURL,
 					liferayPortletResponse));
 
@@ -114,7 +114,7 @@ public class ViewUADEntitiesMVCRenderCommand implements MVCRenderCommand {
 		return "/view_uad_entities.jsp";
 	}
 
-	private List<NavigationItem> _getNaviagationItems(
+	private List<NavigationItem> _getNavigationItems(
 			String applicationName, String uadRegistryKey,
 			PortletURL currentURL,
 			LiferayPortletResponse liferayPortletResponse)
