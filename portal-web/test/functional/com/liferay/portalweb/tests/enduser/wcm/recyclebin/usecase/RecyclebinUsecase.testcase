@@ -324,7 +324,7 @@
 			<var name="userName" value="Test Test" />
 		</execute>
 
-		<execute macro="ProductMenuHelper#closeProductMenu" />
+		<execute macro="PortletEntry#clickEditFromEllipsis" />
 
 		<execute macro="MessageboardsThread#restoreMBAttachmentCP">
 			<var name="mbAttachmentFile" value="Document_1.doc" />
