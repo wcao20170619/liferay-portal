@@ -49,7 +49,7 @@ public class PersonModelFormTest {
 				"givenName", isReturnedIn(PersonForm::getGivenName)
 			).whereString(
 				"image", isReturnedIn(PersonForm::getImage)
-			).whereString(
+			).whereStringList(
 				"jobTitle", isReturnedIn(PersonForm::getJobTitles)
 			).build());
 
