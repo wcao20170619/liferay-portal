@@ -1027,6 +1027,10 @@ AUI.add(
 							ruleBuilder.show();
 						}
 
+						if (!A.one('.form-builder-rule-builder-container')) {
+							A.one('.lfr-ddm-add-field').addClass('hide');
+						}
+
 						A.one('.portlet-forms').addClass('liferay-ddm-form-rule-builder');
 
 						instance.one('#showRules').addClass('active');
