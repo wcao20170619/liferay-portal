@@ -50,7 +50,7 @@ public class PersonModelFormTest {
 			).whereString(
 				"image", isReturnedIn(PersonForm::getImage)
 			).whereString(
-				"jobTitle", isReturnedIn(PersonForm::getJobTitle)
+				"jobTitle", isReturnedIn(PersonForm::getJobTitles)
 			).build());
 
 		assertThat(form, isAFormWithConditions);
