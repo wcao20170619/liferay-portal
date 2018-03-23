@@ -2890,7 +2890,11 @@ AUI.add(
 						if (inputLocalized) {
 							inputLocalized.get('items').forEach(
 								function(item) {
-									localizationMap[item] = inputLocalized.getValue(item);
+									var value = inputLocalized.getValue(item);
+
+									if (value.trim() !== '') {
+										localizationMap[item] = value;
+									}
 								}
 							);
 						}
