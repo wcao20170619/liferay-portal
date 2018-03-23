@@ -192,7 +192,7 @@ public class FormConditions<T> extends TypeSafeDiagnosingMatcher<Form<T>> {
 		public Builder<T> whereLong(
 			String key, Function<Object, Matcher<T>> function) {
 
-			_add(key, function, "42", Long.valueOf(42));
+			_add(key, function, "42", 42L);
 
 			return this;
 		}
