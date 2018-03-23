@@ -363,7 +363,7 @@ public class FormUtil {
 					NumberFormat.getInstance()::parse
 				).map(
 					function::apply
-				).fold(
+				).voidFold(
 					__ -> {
 						throw new BadRequestException(
 							"Field \"" + key + "\" should be a number");
