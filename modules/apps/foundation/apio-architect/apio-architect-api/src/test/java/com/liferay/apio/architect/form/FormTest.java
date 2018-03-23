@@ -373,8 +373,8 @@ public class FormTest {
 		};
 
 		_body = Body.create(
-			key -> Optional.ofNullable(values.get(key)),
-			key -> Optional.ofNullable(files.get(key)));
+			key -> Optional.ofNullable(values.get(key)), __ -> Optional.empty(),
+			__ -> Optional.empty(), key -> Optional.ofNullable(files.get(key)));
 	}
 
 }

@@ -15,25 +15,43 @@
 package com.liferay.apio.architect.form;
 
 import static com.liferay.apio.architect.form.FieldType.BOOLEAN;
+import static com.liferay.apio.architect.form.FieldType.BOOLEAN_LIST;
 import static com.liferay.apio.architect.form.FieldType.DATE;
+import static com.liferay.apio.architect.form.FieldType.DATE_LIST;
 import static com.liferay.apio.architect.form.FieldType.DOUBLE;
+import static com.liferay.apio.architect.form.FieldType.DOUBLE_LIST;
 import static com.liferay.apio.architect.form.FieldType.FILE;
+import static com.liferay.apio.architect.form.FieldType.FILE_LIST;
 import static com.liferay.apio.architect.form.FieldType.LONG;
+import static com.liferay.apio.architect.form.FieldType.LONG_LIST;
 import static com.liferay.apio.architect.form.FieldType.STRING;
+import static com.liferay.apio.architect.form.FieldType.STRING_LIST;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalBoolean;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalBooleanList;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalDate;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalDateList;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalDouble;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalDoubleList;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalFile;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalFileList;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalFormFieldStream;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalLong;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalLongList;
 import static com.liferay.apio.architect.form.FormUtil.getOptionalString;
+import static com.liferay.apio.architect.form.FormUtil.getOptionalStringList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredBoolean;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredBooleanList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredDate;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredDateList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredDouble;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredDoubleList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredFile;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredFileList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredFormFieldStream;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredLong;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredLongList;
 import static com.liferay.apio.architect.form.FormUtil.getRequiredString;
+import static com.liferay.apio.architect.form.FormUtil.getRequiredStringList;
 
 import com.liferay.apio.architect.file.BinaryFile;
 import com.liferay.apio.architect.language.Language;
@@ -87,6 +105,18 @@ public class Form<T> {
 		_requiredFiles.forEach(getRequiredFile(body, t));
 		_requiredLongs.forEach(getRequiredLong(body, t));
 		_requiredStrings.forEach(getRequiredString(body, t));
+		_optionalBooleanLists.forEach(getOptionalBooleanList(body, t));
+		_optionalDateLists.forEach(getOptionalDateList(body, t));
+		_optionalDoubleLists.forEach(getOptionalDoubleList(body, t));
+		_optionalFileLists.forEach(getOptionalFileList(body, t));
+		_optionalLongLists.forEach(getOptionalLongList(body, t));
+		_optionalStringLists.forEach(getOptionalStringList(body, t));
+		_requiredBooleanLists.forEach(getRequiredBooleanList(body, t));
+		_requiredDateLists.forEach(getRequiredDateList(body, t));
+		_requiredDoubleLists.forEach(getRequiredDoubleList(body, t));
+		_requiredFileLists.forEach(getRequiredFileList(body, t));
+		_requiredLongLists.forEach(getRequiredLongList(body, t));
+		_requiredStringLists.forEach(getRequiredStringList(body, t));
 
 		return t;
 	}
@@ -120,7 +150,19 @@ public class Form<T> {
 			getRequiredFormFieldStream(_requiredDoubles, DOUBLE),
 			getRequiredFormFieldStream(_requiredFiles, FILE),
 			getRequiredFormFieldStream(_requiredLongs, LONG),
-			getRequiredFormFieldStream(_requiredStrings, STRING));
+			getRequiredFormFieldStream(_requiredStrings, STRING),
+			getOptionalFormFieldStream(_optionalBooleanLists, BOOLEAN_LIST),
+			getOptionalFormFieldStream(_optionalDateLists, DATE_LIST),
+			getOptionalFormFieldStream(_optionalDoubleLists, DOUBLE_LIST),
+			getOptionalFormFieldStream(_optionalFileLists, FILE_LIST),
+			getOptionalFormFieldStream(_optionalLongLists, LONG_LIST),
+			getOptionalFormFieldStream(_optionalStringLists, STRING_LIST),
+			getRequiredFormFieldStream(_requiredBooleanLists, BOOLEAN_LIST),
+			getRequiredFormFieldStream(_requiredDateLists, DATE_LIST),
+			getRequiredFormFieldStream(_requiredDoubleLists, DOUBLE_LIST),
+			getRequiredFormFieldStream(_requiredFileLists, FILE_LIST),
+			getRequiredFormFieldStream(_requiredLongLists, LONG_LIST),
+			getRequiredFormFieldStream(_requiredStringLists, STRING_LIST));
 
 		return stream.flatMap(
 			Function.identity()
