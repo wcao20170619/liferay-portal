@@ -1004,6 +1004,10 @@ AUI.add(
 
 						A.one('.ddm-form-builder-buttons').removeClass('hide');
 
+						if (A.one('.lfr-ddm-add-rule').hasClass('hide')) {
+							A.one('.lfr-ddm-add-rule').removeClass('hide');
+						}
+
 						instance.one('#showForm').addClass('active');
 					},
 
