@@ -74,13 +74,16 @@
 						<contains string="${siteTemplateName}" substring="{siteTemplateName}" />
 					</not>
 					<then>
-						<var name="siteType" value="${siteTemplateName}" />
+						<execute macro="LexiconEntry#gotoEntry">
+							<var name="rowEntry" value="${siteTemplateName}" />
+						</execute>
 					</then>
+					<else>
+						<execute macro="LexiconEntry#gotoEntry">
+							<var name="rowEntry" value="${siteType} Site" />
+						</execute>
+					</else>
 				</if>
-
-				<execute macro="LexiconEntry#gotoEntry">
-					<var name="rowEntry" value="${siteType} Site" />
-				</execute>
 
 				<execute macro="PortletEntry#inputName">
 					<var name="name" value="${siteName}" />
