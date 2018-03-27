@@ -766,8 +766,6 @@
 			<var name="assetType" value="Basic Web Content" />
 		</execute>
 
-		<execute function="SelectFrame" locator1="IFrame#DIALOG" />
-
 		<execute macro="WebContent#addCP">
 			<var name="webContentContent" value="${webContentContent}" />
 			<var name="webContentTitle" value="${webContentTitle}" />
