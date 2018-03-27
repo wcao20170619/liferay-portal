@@ -109,7 +109,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 	@Override
 	public void validateFragmentEntryHTML(String html) throws PortalException {
 		_validateDuplicatedIds(html);
-		_validateEmptyIds(html);
+		_validateEmptyAttributes(html);
 	}
 
 	private Document _getDocument(String html) {
@@ -154,7 +154,7 @@ public class EditableFragmentEntryProcessor implements FragmentEntryProcessor {
 		}
 	}
 
-	private void _validateEmptyIds(String html)
+	private void _validateEmptyAttributes(String html)
 		throws FragmentEntryContentException {
 
 		Document document = _getDocument(html);
