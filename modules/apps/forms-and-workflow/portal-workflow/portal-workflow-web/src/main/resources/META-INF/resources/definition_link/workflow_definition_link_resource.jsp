@@ -19,6 +19,8 @@
 <%
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
+String randomNamespace = (String)row.getParameter("randomNamespace");
+
 WorkflowDefinitionLinkSearchEntry workflowDefinitionLinkSearchEntry = (WorkflowDefinitionLinkSearchEntry)row.getObject();
 
 Map<String, String> resourceTooltips = (Map<String, String>)row.getParameter("resourceTooltips");
@@ -26,8 +28,6 @@ Map<String, String> resourceTooltips = (Map<String, String>)row.getParameter("re
 String classname = workflowDefinitionLinkSearchEntry.getClassName();
 
 String resource = workflowDefinitionLinkSearchEntry.getResource();
-
-String randomNamespace = (String)row.getParameter("randomNamespace");
 %>
 
 <c:choose>
