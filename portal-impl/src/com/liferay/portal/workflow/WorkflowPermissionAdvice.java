@@ -41,11 +41,11 @@ public class WorkflowPermissionAdvice {
 			new WorkflowPermissionInvocationHandler(workflowTaskManager));
 	}
 
-	private static final Method _ASSIGN_WORKFLOW_TASK_TO_USER_METHOD;
+	private static final Method _METHOD_ASSIGN_WORKFLOW_TASK_TO_USER;
 
 	static {
 		try {
-			_ASSIGN_WORKFLOW_TASK_TO_USER_METHOD =
+			_METHOD_ASSIGN_WORKFLOW_TASK_TO_USER =
 				WorkflowTaskManager.class.getMethod(
 					"assignWorkflowTaskToUser", long.class, long.class,
 					long.class, long.class, String.class, Date.class,
@@ -63,7 +63,7 @@ public class WorkflowPermissionAdvice {
 		public Object invoke(Object proxy, Method method, Object[] arguments)
 			throws Throwable {
 
-			if (_ASSIGN_WORKFLOW_TASK_TO_USER_METHOD.equals(method)) {
+			if (_METHOD_ASSIGN_WORKFLOW_TASK_TO_USER.equals(method)) {
 				long userId = (Long)arguments[1];
 
 				PermissionChecker permissionChecker =

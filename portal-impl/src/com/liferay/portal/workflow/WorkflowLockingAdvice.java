@@ -60,18 +60,18 @@ public class WorkflowLockingAdvice {
 			StringUtil.toHexString(version));
 	}
 
-	private static final Method _START_WORKFLOW_INSTANCE_METHOD;
+	private static final Method _METHOD_START_WORKFLOW_INSTANCE;
 
-	private static final Method _UNDEPLOY_WORKFLOW_DEFINITION_METHOD;
+	private static final Method _METHOD_UNDEPLOY_WORKFLOW_DEFINITION;
 
 	static {
 		try {
-			_START_WORKFLOW_INSTANCE_METHOD =
+			_METHOD_START_WORKFLOW_INSTANCE =
 				WorkflowInstanceManager.class.getMethod(
 					"startWorkflowInstance", long.class, long.class, long.class,
 					String.class, Integer.class, String.class, Map.class);
 
-			_UNDEPLOY_WORKFLOW_DEFINITION_METHOD =
+			_METHOD_UNDEPLOY_WORKFLOW_DEFINITION =
 				WorkflowDefinitionManager.class.getMethod(
 					"undeployWorkflowDefinition", long.class, long.class,
 					String.class, int.class);
@@ -88,7 +88,7 @@ public class WorkflowLockingAdvice {
 		public Object invoke(Object proxy, Method method, Object[] arguments)
 			throws Throwable {
 
-			if (_START_WORKFLOW_INSTANCE_METHOD.equals(method)) {
+			if (_METHOD_START_WORKFLOW_INSTANCE.equals(method)) {
 				String workflowDefinitionName = (String)arguments[3];
 				Integer workflowDefinitionVersion = (Integer)arguments[4];
 
@@ -107,7 +107,7 @@ public class WorkflowLockingAdvice {
 
 				return _invoke(method, arguments);
 			}
-			else if (!_UNDEPLOY_WORKFLOW_DEFINITION_METHOD.equals(method)) {
+			else if (!_METHOD_UNDEPLOY_WORKFLOW_DEFINITION.equals(method)) {
 				return _invoke(method, arguments);
 			}
 
