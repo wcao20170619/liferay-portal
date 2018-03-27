@@ -4725,6 +4725,25 @@ public class ServiceBuilder {
 			else if (StringUtil.equalsIgnoreCase(type, "long")) {
 				sb.append("LONG");
 			}
+			else if (type.equals("BigDecimal")) {
+				Map<String, String> hints = ModelHintsUtil.getHints(
+					_apiPackagePath + ".model." + entity.getName(),
+					entityColumn.getName());
+
+				String precision = "30";
+				String scale = "16";
+
+				if (hints != null) {
+					precision = hints.getOrDefault("precision", precision);
+					scale = hints.getOrDefault("scale", scale);
+				}
+
+				sb.append("DECIMAL(");
+				sb.append(precision);
+				sb.append(", ");
+				sb.append(scale);
+				sb.append(")");
+			}
 			else if (type.equals("Blob")) {
 				sb.append("BLOB");
 			}
@@ -4752,25 +4771,6 @@ public class ServiceBuilder {
 				else if (maxLength > 4000) {
 					sb.append("TEXT");
 				}
-			}
-			else if (type.equals("BigDecimal")) {
-				Map<String, String> hints = ModelHintsUtil.getHints(
-					_apiPackagePath + ".model." + entity.getName(),
-					entityColumn.getName());
-
-				String precision = "30";
-				String scale = "16";
-
-				if (hints != null) {
-					precision = hints.getOrDefault("precision", precision);
-					scale = hints.getOrDefault("scale", scale);
-				}
-
-				sb.append("DECIMAL(");
-				sb.append(precision);
-				sb.append(", ");
-				sb.append(scale);
-				sb.append(")");
 			}
 			else {
 				sb.append("invalid");
