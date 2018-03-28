@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -127,7 +128,15 @@ public class WebDriverUtil extends PropsValues {
 
 		desiredCapabilities.setCapability("chrome.prefs", preferences);
 
-		return new ChromeDriver(desiredCapabilities);
+		ChromeOptions chromeOptions = new ChromeOptions();
+
+		chromeOptions.merge(desiredCapabilities);
+
+		if (Validator.isNotNull(PropsValues.BROWSER_CHROME_BIN_ARGS)) {
+			chromeOptions.addArguments(PropsValues.BROWSER_CHROME_BIN_ARGS);
+		}
+
+		return new ChromeDriver(chromeOptions);
 	}
 
 	private WebDriver _getEdgeDriver() {
