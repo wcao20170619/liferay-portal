@@ -1279,6 +1279,10 @@
 	<command name="viewSiteClonedFromSiteTemplateCP">
 		<var name="key_siteTemplateName" value="${siteTemplateName}" />
 
+		<execute macro="Navigator#gotoNavTab">
+			<var name="navTab" value="General" />
+		</execute>
+
 		<execute macro="Panel#expandPanel">
 			<var name="panel" value="Site Template" />
 		</execute>
