@@ -67,23 +67,16 @@
 				<equals arg1="${singleSiteTypePermission}" arg2="true" />
 			</not>
 			<then>
-				<var name="siteType" value="${siteType}" />
-
 				<if>
-					<not>
-						<contains string="${siteTemplateName}" substring="{siteTemplateName}" />
-					</not>
+					<contains string="${siteTemplateName}" substring="{siteTemplateName}" />
 					<then>
-						<execute macro="LexiconEntry#gotoEntry">
-							<var name="rowEntry" value="${siteTemplateName}" />
-						</execute>
+						<var name="siteTemplateName" value="${siteType} Site" />
 					</then>
-					<else>
-						<execute macro="LexiconEntry#gotoEntry">
-							<var name="rowEntry" value="${siteType} Site" />
-						</execute>
-					</else>
 				</if>
+
+				<execute macro="LexiconEntry#gotoEntry">
+					<var name="rowEntry" value="${siteTemplateName}" />
+				</execute>
 
 				<execute macro="PortletEntry#inputName">
 					<var name="name" value="${siteName}" />
