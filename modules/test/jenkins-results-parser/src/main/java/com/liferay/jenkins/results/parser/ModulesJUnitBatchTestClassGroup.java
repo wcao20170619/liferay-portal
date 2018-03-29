@@ -14,6 +14,12 @@
 
 package com.liferay.jenkins.results.parser;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Yi-Chen Tsai
  */
@@ -24,6 +30,57 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 		String testSuiteName) {
 
 		super(batchName, gitWorkingDirectory, testSuiteName);
+	}
+
+	@Override
+	protected List<String> getRelevantTestClassNamesRelativeGlobs(
+		List<String> testClassNamesRelativeGlobs) {
+
+		List<String> relevantTestClassNameRelativeGlobs = new ArrayList<>();
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			(PortalGitWorkingDirectory)gitWorkingDirectory;
+
+		List<File> moduleGroupDirs = null;
+
+		try {
+			moduleGroupDirs =
+				portalGitWorkingDirectory.getCurrentBranchModuleGroupDirs();
+		}
+		catch (IOException ioe) {
+			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
+
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get relevant module group directories in ",
+					workingDirectory.getPath()),
+				ioe);
+		}
+
+		for (File moduleGroupDir : moduleGroupDirs) {
+			String modulesGroupRelativePath = moduleGroupDir.getPath();
+
+			modulesGroupRelativePath = modulesGroupRelativePath.substring(
+				modulesGroupRelativePath.indexOf("modules/"));
+
+			for (String testClassNamesRelativeGlob :
+					testClassNamesRelativeGlobs) {
+
+				relevantTestClassNameRelativeGlobs.add(
+					JenkinsResultsParserUtil.combine(
+						modulesGroupRelativePath, "/",
+						testClassNamesRelativeGlob));
+
+				if (testClassNamesRelativeGlob.startsWith("**/")) {
+					relevantTestClassNameRelativeGlobs.add(
+						JenkinsResultsParserUtil.combine(
+							modulesGroupRelativePath, "/",
+							testClassNamesRelativeGlob.substring(3)));
+				}
+			}
+		}
+
+		return relevantTestClassNameRelativeGlobs;
 	}
 
 }
