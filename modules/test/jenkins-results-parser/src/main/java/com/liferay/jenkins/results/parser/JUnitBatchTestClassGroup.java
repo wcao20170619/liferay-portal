@@ -57,6 +57,56 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		_setAxisTestClassGroups();
 	}
 
+	protected List<String> getRelevantTestClassNamesRelativeGlobs(
+		List<String> testClassNamesRelativeGlobs) {
+
+		List<String> relevantTestClassNameRelativeGlobs = new ArrayList<>();
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			(PortalGitWorkingDirectory)gitWorkingDirectory;
+
+		List<File> moduleGroupDirs = null;
+
+		try {
+			moduleGroupDirs =
+				portalGitWorkingDirectory.getCurrentBranchModuleGroupDirs();
+		}
+		catch (IOException ioe) {
+			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
+
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get relevant module group directories in ",
+					workingDirectory.getPath()),
+				ioe);
+		}
+
+		for (File moduleGroupDir : moduleGroupDirs) {
+			String modulesGroupRelativePath = moduleGroupDir.getPath();
+
+			modulesGroupRelativePath = modulesGroupRelativePath.substring(
+				modulesGroupRelativePath.indexOf("modules/"));
+
+			for (String testClassNamesRelativeGlob :
+					testClassNamesRelativeGlobs) {
+
+				relevantTestClassNameRelativeGlobs.add(
+					JenkinsResultsParserUtil.combine(
+						modulesGroupRelativePath, "/",
+						testClassNamesRelativeGlob));
+
+				if (testClassNamesRelativeGlob.startsWith("**/")) {
+					relevantTestClassNameRelativeGlobs.add(
+						JenkinsResultsParserUtil.combine(
+							modulesGroupRelativePath, "/",
+							testClassNamesRelativeGlob.substring(3)));
+				}
+			}
+		}
+
+		return relevantTestClassNameRelativeGlobs;
+	}
+
 	private int _getAxisMaxSize() {
 		String axisMaxSize = _getAxisMaxSizePropertyValue();
 
@@ -117,56 +167,6 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		}
 
 		return null;
-	}
-
-	private List<String> _getRelevantTestClassNamesRelativeGlobs(
-		List<String> testClassNamesRelativeGlobs) {
-
-		List<String> relevantTestClassNameRelativeGlobs = new ArrayList<>();
-
-		PortalGitWorkingDirectory portalGitWorkingDirectory =
-			(PortalGitWorkingDirectory)gitWorkingDirectory;
-
-		List<File> moduleGroupDirs = null;
-
-		try {
-			moduleGroupDirs =
-				portalGitWorkingDirectory.getCurrentBranchModuleGroupDirs();
-		}
-		catch (IOException ioe) {
-			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
-
-			throw new RuntimeException(
-				JenkinsResultsParserUtil.combine(
-					"Unable to get relevant module group directories in ",
-					workingDirectory.getPath()),
-				ioe);
-		}
-
-		for (File moduleGroupDir : moduleGroupDirs) {
-			String modulesGroupRelativePath = moduleGroupDir.getPath();
-
-			modulesGroupRelativePath = modulesGroupRelativePath.substring(
-				modulesGroupRelativePath.indexOf("modules/"));
-
-			for (String testClassNamesRelativeGlob :
-					testClassNamesRelativeGlobs) {
-
-				relevantTestClassNameRelativeGlobs.add(
-					JenkinsResultsParserUtil.combine(
-						modulesGroupRelativePath, "/",
-						testClassNamesRelativeGlob));
-
-				if (testClassNamesRelativeGlob.startsWith("**/")) {
-					relevantTestClassNameRelativeGlobs.add(
-						JenkinsResultsParserUtil.combine(
-							modulesGroupRelativePath, "/",
-							testClassNamesRelativeGlob.substring(3)));
-				}
-			}
-		}
-
-		return relevantTestClassNameRelativeGlobs;
 	}
 
 	private String _getTestClassNamesExcludesPropertyValue() {
@@ -431,7 +431,7 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		if (_testRelevantChanges) {
 			testClassNamesExcludesRelativeGlobs =
-				_getRelevantTestClassNamesRelativeGlobs(
+				getRelevantTestClassNamesRelativeGlobs(
 					testClassNamesExcludesRelativeGlobs);
 		}
 
@@ -455,7 +455,7 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		if (_testRelevantChanges) {
 			testClassNamesIncludesRelativeGlobs =
-				_getRelevantTestClassNamesRelativeGlobs(
+				getRelevantTestClassNamesRelativeGlobs(
 					testClassNamesIncludesRelativeGlobs);
 		}
 
