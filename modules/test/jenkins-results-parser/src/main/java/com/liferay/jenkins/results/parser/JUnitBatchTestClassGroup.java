@@ -83,19 +83,26 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		List<File> modifiedFilesList =
 			gitWorkingDirectory.getModifiedFilesList();
 
-		for (File moduleDir : moduleDirsList) {
-			String moduleAbsolutePath = moduleDir.getAbsolutePath();
+		for (File modifiedFile : modifiedFilesList) {
+			String modifiedFileAbsolutePath = modifiedFile.getAbsolutePath();
 
-			for (File modifiedFile : modifiedFilesList) {
-				String modifiedFileAbsolutePath =
-					modifiedFile.getAbsolutePath();
+			boolean moduleFile = false;
 
-				if (!modifiedFileAbsolutePath.startsWith(moduleAbsolutePath)) {
-					relevantTestClassNameRelativeGlobs.addAll(
-						testClassNamesRelativeGlobs);
+			for (File moduleDir : moduleDirsList) {
+				String moduleAbsolutePath = moduleDir.getAbsolutePath();
 
-					return relevantTestClassNameRelativeGlobs;
+				if (modifiedFileAbsolutePath.startsWith(moduleAbsolutePath)) {
+					moduleFile = true;
+
+					break;
 				}
+			}
+
+			if (!moduleFile) {
+				relevantTestClassNameRelativeGlobs.addAll(
+					testClassNamesRelativeGlobs);
+
+				return relevantTestClassNameRelativeGlobs;
 			}
 		}
 
