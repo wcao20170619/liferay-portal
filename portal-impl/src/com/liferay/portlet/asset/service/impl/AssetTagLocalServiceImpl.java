@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.exception.DuplicateTagException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -51,6 +52,7 @@ import com.liferay.social.kernel.util.SocialCounterPeriodUtil;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -523,7 +525,14 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 	 */
 	@Override
 	public List<AssetTag> getTags(long classNameId, long classPK) {
-		return assetTagFinder.findByC_C(classNameId, classPK);
+		AssetEntry entry = assetEntryPersistence.fetchByC_C(
+			classNameId, classPK);
+
+		if (entry == null) {
+			return Collections.emptyList();
+		}
+
+		return assetEntryPersistence.getAssetTags(entry.getEntryId());
 	}
 
 	@Override
@@ -549,6 +558,7 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 	 * @return the asset tags of the entity
 	 */
 	@Override
+	@ThreadLocalCachable
 	public List<AssetTag> getTags(String className, long classPK) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 
