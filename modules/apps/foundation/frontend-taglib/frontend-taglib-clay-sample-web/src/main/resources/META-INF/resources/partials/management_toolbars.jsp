@@ -28,7 +28,7 @@
 	searchInputName="mySearchInputName"
 	selectable="<%= true %>"
 	sortingOrder="desc"
-	viewTypes="<%= managementToolbarsDisplayContext.getViewTypesItemList() %>"
+	viewTypes="<%= managementToolbarsDisplayContext.getViewTypeItemList() %>"
 />
 
 <h3>ACTIVE STATE</h3>

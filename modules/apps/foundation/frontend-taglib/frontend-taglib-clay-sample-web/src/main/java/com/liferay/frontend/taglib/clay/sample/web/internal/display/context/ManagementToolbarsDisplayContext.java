@@ -155,12 +155,12 @@ public class ManagementToolbarsDisplayContext {
 		return _filterItemList;
 	}
 
-	public ViewTypeItemList getViewTypesItemList() {
-		if (_viewTypesItemList != null) {
-			return _viewTypesItemList;
+	public ViewTypeItemList getViewTypeItemList() {
+		if (_viewTypeItemList != null) {
+			return _viewTypeItemList;
 		}
 
-		_viewTypesItemList = new ViewTypeItemList() {
+		_viewTypeItemList = new ViewTypeItemList() {
 			{
 				addCardViewTypeItem(
 					viewTypeItem -> {
@@ -180,13 +180,13 @@ public class ManagementToolbarsDisplayContext {
 			}
 		};
 
-		return _viewTypesItemList;
+		return _viewTypeItemList;
 	}
 
 	private DropdownItemList _actionDropdownItemList;
 	private CreationMenu _creationMenu;
 	private DropdownItemList _filterItemList;
 	private final HttpServletRequest _request;
-	private ViewTypeItemList _viewTypesItemList;
+	private ViewTypeItemList _viewTypeItemList;
 
 }
