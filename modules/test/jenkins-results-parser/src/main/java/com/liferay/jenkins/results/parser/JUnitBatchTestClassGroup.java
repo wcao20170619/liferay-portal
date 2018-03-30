@@ -67,15 +67,15 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		List<File> moduleDirsList = null;
 
-		File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
-
 		try {
 			moduleDirsList = portalGitWorkingDirectory.getModuleDirsList();
 		}
 		catch (IOException ioe) {
+			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
+
 			throw new RuntimeException(
 				JenkinsResultsParserUtil.combine(
-					"Unable to get module group directories in ",
+					"Unable to get module directories in ",
 					workingDirectory.getPath()),
 				ioe);
 		}
