@@ -39,13 +39,6 @@ public class ManagementToolbarTag extends BaseClayTag {
 	public int doStartTag() {
 		Map<String, Object> context = getContext();
 
-		Boolean showFiltersDoneButton = (Boolean)context.get(
-			"showFiltersDoneButton");
-
-		if (showFiltersDoneButton == null) {
-			setShowFiltersDoneButton(false);
-		}
-
 		String searchInputName = (String)context.get("searchInputName");
 
 		if (Validator.isNull(searchInputName)) {
@@ -66,6 +59,13 @@ public class ManagementToolbarTag extends BaseClayTag {
 
 		if (selectable == null) {
 			setSelectable(true);
+		}
+
+		Boolean showFiltersDoneButton = (Boolean)context.get(
+			"showFiltersDoneButton");
+
+		if (showFiltersDoneButton == null) {
+			setShowFiltersDoneButton(false);
 		}
 
 		return super.doStartTag();
