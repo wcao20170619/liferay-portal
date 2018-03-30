@@ -41,11 +41,11 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			(PortalGitWorkingDirectory)gitWorkingDirectory;
 
-		List<File> moduleGroupDirsList = null;
+		List<File> modifiedModuleDirsList = null;
 
 		try {
-			moduleGroupDirsList =
-				portalGitWorkingDirectory.getModifiedModuleGroupDirsList();
+			modifiedModuleDirsList =
+				portalGitWorkingDirectory.getModifiedModuleDirsList();
 		}
 		catch (IOException ioe) {
 			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
@@ -57,24 +57,24 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 				ioe);
 		}
 
-		for (File moduleGroupDir : moduleGroupDirsList) {
-			String modulesGroupRelativePath = moduleGroupDir.getPath();
+		for (File modifiedModuleDir : modifiedModuleDirsList) {
+			String modifiedModuleRelativePath = modifiedModuleDir.getPath();
 
-			modulesGroupRelativePath = modulesGroupRelativePath.substring(
-				modulesGroupRelativePath.indexOf("modules/"));
+			modifiedModuleRelativePath = modifiedModuleRelativePath.substring(
+				modifiedModuleRelativePath.indexOf("modules/"));
 
 			for (String testClassNamesRelativeGlob :
 					testClassNamesRelativeGlobs) {
 
 				relevantTestClassNameRelativeGlobs.add(
 					JenkinsResultsParserUtil.combine(
-						modulesGroupRelativePath, "/",
+						modifiedModuleRelativePath, "/",
 						testClassNamesRelativeGlob));
 
 				if (testClassNamesRelativeGlob.startsWith("**/")) {
 					relevantTestClassNameRelativeGlobs.add(
 						JenkinsResultsParserUtil.combine(
-							modulesGroupRelativePath, "/",
+							modifiedModuleRelativePath, "/",
 							testClassNamesRelativeGlob.substring(3)));
 				}
 			}

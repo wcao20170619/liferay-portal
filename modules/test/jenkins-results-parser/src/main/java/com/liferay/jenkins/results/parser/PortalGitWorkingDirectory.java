@@ -50,37 +50,37 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		super(upstreamBranchName, workingDirectoryPath, repositoryName);
 	}
 
-	public List<File> getModifiedModuleGroupDirsList() throws IOException {
-		List<File> modifiedModuleGroupDirsList = new ArrayList<>();
+	public List<File> getModifiedModuleDirsList() throws IOException {
+		List<File> modifiedModuleDirsList = new ArrayList<>();
 
 		List<File> modifiedFilesList = getModifiedFilesList();
 
-		for (File moduleGroupDir : getModuleGroupDirsList()) {
-			String moduleGroupPath = moduleGroupDir.getCanonicalPath();
+		for (File moduleDir : getModuleDirsList()) {
+			String modulePath = moduleDir.getCanonicalPath();
 
 			for (File currentBranchFile : modifiedFilesList) {
 				String currentBranchFilePath =
 					currentBranchFile.getCanonicalPath();
 
-				if (currentBranchFilePath.startsWith(moduleGroupPath)) {
-					modifiedModuleGroupDirsList.add(moduleGroupDir);
+				if (currentBranchFilePath.startsWith(modulePath)) {
+					modifiedModuleDirsList.add(moduleDir);
 
 					break;
 				}
 			}
 		}
 
-		return modifiedModuleGroupDirsList;
+		return modifiedModuleDirsList;
 	}
 
-	public List<File> getModuleGroupDirsList() throws IOException {
+	public List<File> getModuleDirsList() throws IOException {
 		final File modulesDir = new File(getWorkingDirectory(), "modules");
 
 		if (!modulesDir.exists()) {
 			return new ArrayList<>();
 		}
 
-		final List<File> moduleGroupDirsList = new ArrayList<>();
+		final List<File> moduleDirsList = new ArrayList<>();
 
 		Files.walkFileTree(
 			modulesDir.toPath(),
@@ -91,23 +91,22 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 						Path filePath, IOException exc)
 					throws IOException {
 
-					if (_moduleGroup == null) {
+					if (_module == null) {
 						return FileVisitResult.CONTINUE;
 					}
 
-					ModuleGroup currentModuleGroup = ModuleGroup.getModuleGroup(
-						filePath);
+					Module currentModule = Module.getModule(filePath);
 
-					if (currentModuleGroup == null) {
+					if (currentModule == null) {
 						return FileVisitResult.CONTINUE;
 					}
 
-					File currentFile = currentModuleGroup.getFile();
+					File currentFile = currentModule.getFile();
 
-					if (currentFile.equals(_moduleGroup.getFile())) {
-						moduleGroupDirsList.add(currentFile);
+					if (currentFile.equals(_module.getFile())) {
+						moduleDirsList.add(currentFile);
 
-						_moduleGroup = null;
+						_module = null;
 					}
 
 					return FileVisitResult.CONTINUE;
@@ -118,40 +117,39 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 						Path filePath, BasicFileAttributes attrs)
 					throws IOException {
 
-					ModuleGroup currentModuleGroup = ModuleGroup.getModuleGroup(
-						filePath);
+					Module currentModule = Module.getModule(filePath);
 
-					if (currentModuleGroup == null) {
+					if (currentModule == null) {
 						return FileVisitResult.CONTINUE;
 					}
 
-					if (_moduleGroup == null) {
-						_moduleGroup = currentModuleGroup;
+					if (_module == null) {
+						_module = currentModule;
 
 						return FileVisitResult.CONTINUE;
 					}
 
-					int currentPriority = currentModuleGroup.getPriority();
+					int currentPriority = currentModule.getPriority();
 
-					if (currentPriority < _moduleGroup.getPriority()) {
-						_moduleGroup = currentModuleGroup;
+					if (currentPriority < _module.getPriority()) {
+						_module = currentModule;
 					}
 
 					return FileVisitResult.CONTINUE;
 				}
 
-				private ModuleGroup _moduleGroup;
+				private Module _module;
 
 			});
 
-		Collections.sort(moduleGroupDirsList);
+		Collections.sort(moduleDirsList);
 
-		return moduleGroupDirsList;
+		return moduleDirsList;
 	}
 
-	private static class ModuleGroup {
+	private static class Module {
 
-		public static ModuleGroup getModuleGroup(Path path) {
+		public static Module getModule(Path path) {
 			File file = path.toFile();
 
 			if (!file.isDirectory()) {
@@ -163,7 +161,7 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 					File markerFile = new File(file, markerFileName);
 
 					if (markerFile.exists()) {
-						return new ModuleGroup(file, i);
+						return new Module(file, i);
 					}
 				}
 			}
@@ -185,7 +183,7 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 				Integer.toString(_priority), " ", _file.toString());
 		}
 
-		private ModuleGroup(File file, int priority) {
+		private Module(File file, int priority) {
 			_file = file;
 			_priority = priority;
 		}
