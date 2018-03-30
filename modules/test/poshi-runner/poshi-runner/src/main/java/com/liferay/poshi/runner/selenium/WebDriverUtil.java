@@ -111,6 +111,8 @@ public class WebDriverUtil extends PropsValues {
 			"webdriver.chrome.driver",
 			SELENIUM_EXECUTABLE_DIR_NAME + SELENIUM_CHROME_DRIVER_EXECUTABLE);
 
+		ChromeOptions chromeOptions = new ChromeOptions();
+
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
 
 		Map<String, Object> preferences = new HashMap<>();
@@ -127,8 +129,6 @@ public class WebDriverUtil extends PropsValues {
 		preferences.put("download.prompt_for_download", false);
 
 		desiredCapabilities.setCapability("chrome.prefs", preferences);
-
-		ChromeOptions chromeOptions = new ChromeOptions();
 
 		chromeOptions.merge(desiredCapabilities);
 
