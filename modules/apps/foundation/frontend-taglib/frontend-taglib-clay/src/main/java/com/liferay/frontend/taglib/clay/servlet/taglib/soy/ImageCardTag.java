@@ -38,8 +38,8 @@ public class ImageCardTag extends BaseClayCardTag {
 		putValue("imageSrc", imageSrc);
 	}
 
-	public void setLabels(LabelItemList labels) {
-		putValue("labels", labels);
+	public void setLabels(LabelItemList labelItemList) {
+		putValue("labels", labelItemList);
 	}
 
 	public void setLabelStylesMap(Object labelStylesMap) {

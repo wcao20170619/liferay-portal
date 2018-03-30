@@ -71,8 +71,8 @@ public class DropdownActionsTag extends BaseClayTag {
 		putValue("helpText", helpText);
 	}
 
-	public void setItems(DropdownItemList items) {
-		putValue("items", items);
+	public void setItems(DropdownItemList dropdownItemList) {
+		putValue("items", dropdownItemList);
 	}
 
 	public void setTriggerCssClasses(String triggerCssClasses) {
