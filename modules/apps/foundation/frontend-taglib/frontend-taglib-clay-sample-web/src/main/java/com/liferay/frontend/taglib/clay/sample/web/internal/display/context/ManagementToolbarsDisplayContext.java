@@ -99,9 +99,9 @@ public class ManagementToolbarsDisplayContext {
 		return _creationMenu;
 	}
 
-	public DropdownItemList getFilterItemList() {
-		if (_filterItemList != null) {
-			return _filterItemList;
+	public DropdownItemList getFilterDropdownItemList() {
+		if (_filterDropdownItemList != null) {
+			return _filterDropdownItemList;
 		}
 
 		DropdownItemList filterByItemList = new DropdownItemList() {
@@ -136,7 +136,7 @@ public class ManagementToolbarsDisplayContext {
 			}
 		};
 
-		_filterItemList = new DropdownItemList() {
+		_filterDropdownItemList = new DropdownItemList() {
 			{
 				addGroup(
 					dropdownGroupItem -> {
@@ -152,7 +152,7 @@ public class ManagementToolbarsDisplayContext {
 			}
 		};
 
-		return _filterItemList;
+		return _filterDropdownItemList;
 	}
 
 	public ViewTypeItemList getViewTypeItemList() {
@@ -185,7 +185,7 @@ public class ManagementToolbarsDisplayContext {
 
 	private DropdownItemList _actionDropdownItemList;
 	private CreationMenu _creationMenu;
-	private DropdownItemList _filterItemList;
+	private DropdownItemList _filterDropdownItemList;
 	private final HttpServletRequest _request;
 	private ViewTypeItemList _viewTypeItemList;
 

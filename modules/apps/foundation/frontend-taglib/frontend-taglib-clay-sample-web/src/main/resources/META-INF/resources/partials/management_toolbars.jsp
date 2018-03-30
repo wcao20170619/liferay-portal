@@ -22,7 +22,7 @@
 
 <clay:management-toolbar
 	creationMenu="<%= managementToolbarsDisplayContext.getCreationMenu() %>"
-	filterItems="<%= managementToolbarsDisplayContext.getFilterItemList() %>"
+	filterItems="<%= managementToolbarsDisplayContext.getFilterDropdownItemList() %>"
 	searchActionURL="mySearchActionURL"
 	searchFormName="mySearchName"
 	searchInputName="mySearchInputName"
