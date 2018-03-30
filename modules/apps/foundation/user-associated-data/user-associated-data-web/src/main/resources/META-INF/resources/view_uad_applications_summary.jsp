@@ -19,7 +19,7 @@
 <%
 ViewUADApplicationsSummaryDisplay viewUADApplicationsSummaryDisplay = (ViewUADApplicationsSummaryDisplay)request.getAttribute(UADWebKeys.VIEW_UAD_APPLICATIONS_SUMMARY_DISPLAY);
 
-int totalCount = viewUADApplicationsSummaryDisplay.getTotalCount();
+SearchContainer<UADApplicationSummaryDisplay> uadApplicationsSummaryDisplaySearchContainer = viewUADApplicationsSummaryDisplay.getSearchContainer();
 
 portletDisplay.setShowBackIcon(true);
 
@@ -31,8 +31,6 @@ backURL.setParameter("p_u_i_d", String.valueOf(selectedUser.getUserId()));
 portletDisplay.setURLBack(backURL.toString());
 
 renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", LanguageUtil.get(request, "personal-data-erasure")));
-
-SearchContainer<UADApplicationSummaryDisplay> uadApplicationsSummaryDisplaySearchContainer = viewUADApplicationsSummaryDisplay.getSearchContainer();
 %>
 
 <div class="container-fluid container-fluid-max-xl container-form-lg">
@@ -49,12 +47,12 @@ SearchContainer<UADApplicationSummaryDisplay> uadApplicationsSummaryDisplaySearc
 			<div class="autofit-row autofit-row-center">
 				<div class="autofit-col autofit-col-expand">
 					<div class="autofit-section">
-						<strong><liferay-ui:message key="remaining-items" />: </strong><%= totalCount %>
+						<strong><liferay-ui:message key="remaining-items" />: </strong><%= viewUADApplicationsSummaryDisplay.getTotalCount() %>
 					</div>
 				</div>
 
 				<div class="autofit-col">
-					<aui:button cssClass="btn-sm" disabled="<%= totalCount > 0 %>" href="<%= backURL.toString() %>" primary="true" value="complete-step" />
+					<aui:button cssClass="btn-sm" disabled="<%= viewUADApplicationsSummaryDisplay.getTotalCount() > 0 %>" href="<%= backURL.toString() %>" primary="true" value="complete-step" />
 				</div>
 			</div>
 		</div>
