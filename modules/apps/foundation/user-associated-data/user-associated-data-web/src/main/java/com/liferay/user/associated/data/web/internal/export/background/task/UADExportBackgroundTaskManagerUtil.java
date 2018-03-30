@@ -39,10 +39,8 @@ public class UADExportBackgroundTaskManagerUtil {
 
 		dynamicQuery = dynamicQuery.add(
 			RestrictionsFactoryUtil.eq("name", name));
-
 		dynamicQuery = dynamicQuery.add(
 			RestrictionsFactoryUtil.eq("status", status));
-
 		dynamicQuery = dynamicQuery.addOrder(
 			OrderFactoryUtil.desc("createDate"));
 
@@ -123,10 +121,8 @@ public class UADExportBackgroundTaskManagerUtil {
 
 		dynamicQuery = dynamicQuery.add(
 			RestrictionsFactoryUtil.eq("groupId", groupId));
-
 		dynamicQuery = dynamicQuery.add(
 			RestrictionsFactoryUtil.eq("userId", userId));
-
 		dynamicQuery = dynamicQuery.add(
 			RestrictionsFactoryUtil.eq(
 				"taskExecutorClassName", _BACKGROUND_TASK_EXECUTOR_CLASS_NAME));
