@@ -52,8 +52,8 @@ public class SetOptionsFunctionTest extends BaseDDMFormRuleFunctionTestCase {
 	public void testEvaluate() {
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
-		jsonArray.put(createJSONObject("label a", "value a"));
-		jsonArray.put(createJSONObject("label b", "value b"));
+		jsonArray.put(createJSONObject("value a", "label a"));
+		jsonArray.put(createJSONObject("value b", "label b"));
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
@@ -80,13 +80,13 @@ public class SetOptionsFunctionTest extends BaseDDMFormRuleFunctionTestCase {
 
 		KeyValuePair keyValuePair1 = keyValuePairs.get(0);
 
-		Assert.assertEquals("label a", keyValuePair1.getValue());
-		Assert.assertEquals("value a", keyValuePair1.getKey());
+		Assert.assertEquals("label a", keyValuePair1.getKey());
+		Assert.assertEquals("value a", keyValuePair1.getValue());
 
 		KeyValuePair keyValuePair2 = keyValuePairs.get(1);
 
-		Assert.assertEquals("label b", keyValuePair2.getValue());
-		Assert.assertEquals("value b", keyValuePair2.getKey());
+		Assert.assertEquals("label b", keyValuePair2.getKey());
+		Assert.assertEquals("value b", keyValuePair2.getValue());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
