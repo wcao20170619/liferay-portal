@@ -162,18 +162,18 @@ public class ManagementToolbarsDisplayContext {
 
 		_viewTypesItemList = new ViewTypeItemList() {
 			{
-				addCardViewType(
+				addCardViewTypeItem(
 					viewTypeItem -> {
 						viewTypeItem.setActive(true);
 						viewTypeItem.setLabel("Card");
 					});
 
-				addListViewType(
+				addListViewTypeItem(
 					viewTypeItem -> {
 						viewTypeItem.setLabel("List");
 					});
 
-				addTableViewType(
+				addTableViewTypeItem(
 					viewTypeItem -> {
 						viewTypeItem.setLabel("Table");
 					});

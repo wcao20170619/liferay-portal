@@ -30,7 +30,7 @@ public class ViewTypeItemList extends ArrayList<ViewTypeItem> {
 		add(viewTypeItem);
 	}
 
-	public void addCardViewType(Consumer<ViewTypeItem> consumer) {
+	public void addCardViewTypeItem(Consumer<ViewTypeItem> consumer) {
 		ViewTypeItem viewTypeItem = new ViewTypeItem();
 
 		viewTypeItem.setIcon("cards2");
@@ -40,7 +40,7 @@ public class ViewTypeItemList extends ArrayList<ViewTypeItem> {
 		add(viewTypeItem);
 	}
 
-	public void addListViewType(Consumer<ViewTypeItem> consumer) {
+	public void addListViewTypeItem(Consumer<ViewTypeItem> consumer) {
 		ViewTypeItem viewTypeItem = new ViewTypeItem();
 
 		viewTypeItem.setIcon("list");
@@ -50,7 +50,7 @@ public class ViewTypeItemList extends ArrayList<ViewTypeItem> {
 		add(viewTypeItem);
 	}
 
-	public void addTableViewType(Consumer<ViewTypeItem> consumer) {
+	public void addTableViewTypeItem(Consumer<ViewTypeItem> consumer) {
 		ViewTypeItem viewTypeItem = new ViewTypeItem();
 
 		viewTypeItem.setIcon("table");
