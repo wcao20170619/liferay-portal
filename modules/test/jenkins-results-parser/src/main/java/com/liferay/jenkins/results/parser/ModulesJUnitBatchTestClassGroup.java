@@ -58,10 +58,12 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 		}
 
 		for (File modifiedModuleDir : modifiedModuleDirsList) {
-			String modifiedModuleRelativePath = modifiedModuleDir.getPath();
+			String modifiedModuleAbsolutePath =
+				modifiedModuleDir.getAbsolutePath();
 
-			modifiedModuleRelativePath = modifiedModuleRelativePath.substring(
-				modifiedModuleRelativePath.indexOf("modules/"));
+			String modifiedModuleRelativePath =
+				modifiedModuleAbsolutePath.substring(
+					modifiedModuleAbsolutePath.indexOf("modules/"));
 
 			for (String testClassNamesRelativeGlob :
 					testClassNamesRelativeGlobs) {
