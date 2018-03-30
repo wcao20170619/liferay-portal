@@ -50,37 +50,37 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		super(upstreamBranchName, workingDirectoryPath, repositoryName);
 	}
 
-	public List<File> getCurrentBranchModuleGroupDirs() throws IOException {
-		List<File> currentBranchModuleGroupDirs = new ArrayList<>();
+	public List<File> getModifiedModuleGroupDirsList() throws IOException {
+		List<File> modifiedModuleGroupDirsList = new ArrayList<>();
 
-		List<File> currentBranchFiles = getCurrentBranchFiles();
+		List<File> modifiedFilesList = getModifiedFilesList();
 
-		for (File moduleGroupDir : getModuleGroupDirs()) {
+		for (File moduleGroupDir : getModuleGroupDirsList()) {
 			String moduleGroupPath = moduleGroupDir.getCanonicalPath();
 
-			for (File currentBranchFile : currentBranchFiles) {
+			for (File currentBranchFile : modifiedFilesList) {
 				String currentBranchFilePath =
 					currentBranchFile.getCanonicalPath();
 
 				if (currentBranchFilePath.startsWith(moduleGroupPath)) {
-					currentBranchModuleGroupDirs.add(moduleGroupDir);
+					modifiedModuleGroupDirsList.add(moduleGroupDir);
 
 					break;
 				}
 			}
 		}
 
-		return currentBranchModuleGroupDirs;
+		return modifiedModuleGroupDirsList;
 	}
 
-	public List<File> getModuleGroupDirs() throws IOException {
+	public List<File> getModuleGroupDirsList() throws IOException {
 		final File modulesDir = new File(getWorkingDirectory(), "modules");
 
 		if (!modulesDir.exists()) {
 			return new ArrayList<>();
 		}
 
-		final List<File> moduleGroupDirs = new ArrayList<>();
+		final List<File> moduleGroupDirsList = new ArrayList<>();
 
 		Files.walkFileTree(
 			modulesDir.toPath(),
@@ -105,7 +105,7 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 					File currentFile = currentModuleGroup.getFile();
 
 					if (currentFile.equals(_moduleGroup.getFile())) {
-						moduleGroupDirs.add(currentFile);
+						moduleGroupDirsList.add(currentFile);
 
 						_moduleGroup = null;
 					}
@@ -144,9 +144,9 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 
 			});
 
-		Collections.sort(moduleGroupDirs);
+		Collections.sort(moduleGroupDirsList);
 
-		return moduleGroupDirs;
+		return moduleGroupDirsList;
 	}
 
 	private static class ModuleGroup {

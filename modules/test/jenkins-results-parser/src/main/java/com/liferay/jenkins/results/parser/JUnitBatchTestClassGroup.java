@@ -65,12 +65,13 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			(PortalGitWorkingDirectory)gitWorkingDirectory;
 
-		List<File> moduleGroupDirs = null;
+		List<File> moduleGroupDirsList = null;
 
 		File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
 
 		try {
-			moduleGroupDirs = portalGitWorkingDirectory.getModuleGroupDirs();
+			moduleGroupDirsList =
+				portalGitWorkingDirectory.getModuleGroupDirsList();
 		}
 		catch (IOException ioe) {
 			throw new RuntimeException(
@@ -80,19 +81,19 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 				ioe);
 		}
 
-		List<File> currentBranchFiles =
-			gitWorkingDirectory.getCurrentBranchFiles();
+		List<File> modifiedFilesList =
+			gitWorkingDirectory.getModifiedFilesList();
 
-		for (File moduleGroupDir : moduleGroupDirs) {
+		for (File moduleDir : moduleDirsList) {
+			String modulesGroupRelativePath = moduleDir.getPath();
+
+		for (File moduleGroupDir : moduleGroupDirsList) {
 			String modulesGroupRelativePath = moduleGroupDir.getPath();
 
-			for (File currentBranchFile : currentBranchFiles) {
-				String currentBranchFilePath =
-					currentBranchFile.getAbsolutePath();
+			for (File modifiedFile : modifiedFilesList) {
+				String modifiedFilePath = modifiedFile.getAbsolutePath();
 
-				if (!currentBranchFilePath.startsWith(
-						modulesGroupRelativePath)) {
-
+				if (!modifiedFilePath.startsWith(modulesGroupRelativePath)) {
 					relevantTestClassNameRelativeGlobs.addAll(
 						testClassNamesRelativeGlobs);
 

@@ -41,11 +41,11 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 		PortalGitWorkingDirectory portalGitWorkingDirectory =
 			(PortalGitWorkingDirectory)gitWorkingDirectory;
 
-		List<File> moduleGroupDirs = null;
+		List<File> moduleGroupDirsList = null;
 
 		try {
-			moduleGroupDirs =
-				portalGitWorkingDirectory.getCurrentBranchModuleGroupDirs();
+			moduleGroupDirsList =
+				portalGitWorkingDirectory.getModifiedModuleGroupDirsList();
 		}
 		catch (IOException ioe) {
 			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
@@ -57,7 +57,7 @@ public class ModulesJUnitBatchTestClassGroup extends JUnitBatchTestClassGroup {
 				ioe);
 		}
 
-		for (File moduleGroupDir : moduleGroupDirs) {
+		for (File moduleGroupDir : moduleGroupDirsList) {
 			String modulesGroupRelativePath = moduleGroupDir.getPath();
 
 			modulesGroupRelativePath = modulesGroupRelativePath.substring(
