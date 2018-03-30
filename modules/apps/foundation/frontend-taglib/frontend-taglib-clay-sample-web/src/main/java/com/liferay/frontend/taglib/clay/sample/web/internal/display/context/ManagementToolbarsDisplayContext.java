@@ -104,7 +104,7 @@ public class ManagementToolbarsDisplayContext {
 			return _filterDropdownItemList;
 		}
 
-		DropdownItemList filterByItemList = new DropdownItemList() {
+		DropdownItemList filterByDropdownItemList = new DropdownItemList() {
 			{
 				add(
 					dropdownItem -> {
@@ -120,7 +120,7 @@ public class ManagementToolbarsDisplayContext {
 			}
 		};
 
-		DropdownItemList orderByItemList = new DropdownItemList() {
+		DropdownItemList orderByDropdownItemList = new DropdownItemList() {
 			{
 				add(
 					dropdownItem -> {
@@ -140,13 +140,15 @@ public class ManagementToolbarsDisplayContext {
 			{
 				addGroup(
 					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItemList(filterByItemList);
+						dropdownGroupItem.setDropdownItemList(
+							filterByDropdownItemList);
 						dropdownGroupItem.setLabel("Filter By");
 					});
 
 				addGroup(
 					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItemList(orderByItemList);
+						dropdownGroupItem.setDropdownItemList(
+							orderByDropdownItemList);
 						dropdownGroupItem.setLabel("Order By");
 					});
 			}
