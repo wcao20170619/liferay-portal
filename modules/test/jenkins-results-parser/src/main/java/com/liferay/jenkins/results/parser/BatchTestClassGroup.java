@@ -46,12 +46,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 	}
 
 	protected BatchTestClassGroup(
-		String batchName, GitWorkingDirectory gitWorkingDirectory) {
-
-		this(batchName, gitWorkingDirectory, null);
-	}
-
-	protected BatchTestClassGroup(
 		String batchName, GitWorkingDirectory gitWorkingDirectory,
 		String testSuiteName) {
 
