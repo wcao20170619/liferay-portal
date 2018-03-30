@@ -61,8 +61,8 @@ public class BaseClayCardTag extends BaseClayTag {
 		return super.doStartTag();
 	}
 
-	public void setActionItems(DropdownItemList actionItems) {
-		putValue("actionItems", actionItems);
+	public void setActionItems(DropdownItemList dropdownItemList) {
+		putValue("actionItems", dropdownItemList);
 	}
 
 	public void setDisabled(Boolean disabled) {
