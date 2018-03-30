@@ -62,6 +62,45 @@ public class JUnitBatchTestClassGroup extends BatchTestClassGroup {
 
 		List<String> relevantTestClassNameRelativeGlobs = new ArrayList<>();
 
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			(PortalGitWorkingDirectory)gitWorkingDirectory;
+
+		List<File> moduleGroupDirs = null;
+
+		File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
+
+		try {
+			moduleGroupDirs = portalGitWorkingDirectory.getModuleGroupDirs();
+		}
+		catch (IOException ioe) {
+			throw new RuntimeException(
+				JenkinsResultsParserUtil.combine(
+					"Unable to get module group directories in ",
+					workingDirectory.getPath()),
+				ioe);
+		}
+
+		List<File> currentBranchFiles =
+			gitWorkingDirectory.getCurrentBranchFiles();
+
+		for (File moduleGroupDir : moduleGroupDirs) {
+			String modulesGroupRelativePath = moduleGroupDir.getPath();
+
+			for (File currentBranchFile : currentBranchFiles) {
+				String currentBranchFilePath =
+					currentBranchFile.getAbsolutePath();
+
+				if (!currentBranchFilePath.startsWith(
+						modulesGroupRelativePath)) {
+
+					relevantTestClassNameRelativeGlobs.addAll(
+						testClassNamesRelativeGlobs);
+
+					return relevantTestClassNameRelativeGlobs;
+				}
+			}
+		}
+
 		return relevantTestClassNameRelativeGlobs;
 	}
 
