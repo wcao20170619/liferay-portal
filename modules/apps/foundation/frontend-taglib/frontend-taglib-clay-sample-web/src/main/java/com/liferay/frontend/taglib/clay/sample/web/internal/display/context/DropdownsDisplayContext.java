@@ -100,7 +100,7 @@ public class DropdownsDisplayContext {
 			{
 				addGroup(
 					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
+						dropdownGroupItem.setDropdownItemList(
 							group1DropdownItemList);
 						dropdownGroupItem.setLabel("Group 1");
 						dropdownGroupItem.setSeparator(true);
@@ -108,7 +108,7 @@ public class DropdownsDisplayContext {
 
 				addGroup(
 					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
+						dropdownGroupItem.setDropdownItemList(
 							group2DropdownItemList);
 						dropdownGroupItem.setLabel("Group 2");
 					});
@@ -217,7 +217,7 @@ public class DropdownsDisplayContext {
 			{
 				addGroup(
 					dropdownGroupItem -> {
-						dropdownGroupItem.setDropdownItems(
+						dropdownGroupItem.setDropdownItemList(
 							group1DropdownItemList);
 						dropdownGroupItem.setLabel("Group 1");
 						dropdownGroupItem.setSeparator(true);
@@ -226,7 +226,7 @@ public class DropdownsDisplayContext {
 				addRadioGroup(
 					dropdownRadioGroupItem -> {
 						dropdownRadioGroupItem.setInputName("radiogroup");
-						dropdownRadioGroupItem.setDropdownItems(
+						dropdownRadioGroupItem.setDropdownItemList(
 							group2DropdownItemList);
 						dropdownRadioGroupItem.setLabel("Group 2");
 					});

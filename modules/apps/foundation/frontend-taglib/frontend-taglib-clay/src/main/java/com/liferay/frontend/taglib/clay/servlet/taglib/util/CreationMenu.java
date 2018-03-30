@@ -82,7 +82,7 @@ public class CreationMenu extends HashMap {
 		if (!_favoriteDropdownItemList.isEmpty()) {
 			secondaryDropdownItemList.addGroup(
 				dropdownGroupItem -> {
-					dropdownGroupItem.setDropdownItems(
+					dropdownGroupItem.setDropdownItemList(
 						_favoriteDropdownItemList);
 					dropdownGroupItem.setLabel(
 						LanguageUtil.get(_request, "favorites"));
@@ -96,7 +96,7 @@ public class CreationMenu extends HashMap {
 		if (!_restDropdownItemList.isEmpty()) {
 			secondaryDropdownItemList.addGroup(
 				dropdownGroupItem -> {
-					dropdownGroupItem.setDropdownItems(_restDropdownItemList);
+					dropdownGroupItem.setDropdownItemList(_restDropdownItemList);
 				});
 		}
 

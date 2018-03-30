@@ -23,8 +23,8 @@ public class DropdownGroupItem extends DropdownItem {
 		put("type", "group");
 	}
 
-	public void setDropdownItems(DropdownItemList dropdownItems) {
-		put("items", dropdownItems);
+	public void setDropdownItemList(DropdownItemList dropdownItemList) {
+		put("items", dropdownItemList);
 	}
 
 }
