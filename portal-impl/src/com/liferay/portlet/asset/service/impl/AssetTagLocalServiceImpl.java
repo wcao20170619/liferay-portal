@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.exception.DuplicateTagException;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
@@ -550,7 +549,6 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 	 * @return the asset tags of the entity
 	 */
 	@Override
-	@ThreadLocalCachable
 	public List<AssetTag> getTags(String className, long classPK) {
 		long classNameId = classNameLocalService.getClassNameId(className);
 
