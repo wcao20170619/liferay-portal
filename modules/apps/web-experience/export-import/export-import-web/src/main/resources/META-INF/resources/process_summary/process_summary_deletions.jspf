@@ -34,8 +34,8 @@ boolean exportIndividualDeletions = MapUtil.getBoolean(parameterMap, PortletData
 		<c:if test="<%= exportIndividualDeletions %>">
 
 			<%
-			String individualDeletionsTitle;
-			String individualDeletionsDescription;
+			String individualDeletionsTitle = null;
+			String individualDeletionsDescription = null;
 
 			if (processCmd.equals(Constants.EXPORT)) {
 				individualDeletionsTitle = LanguageUtil.get(request, "export-individual-deletions");

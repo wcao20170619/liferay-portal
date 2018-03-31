@@ -24,8 +24,8 @@ boolean permissions = MapUtil.getBoolean(parameterMap, PortletDataHandlerKeys.PE
 	<div class="process-summary-section">
 
 		<%
-		String permissionsTitle;
-		String inputDescription;
+		String permissionsTitle = null;
+		String inputDescription = null;
 
 		if (processCmd.equals(Constants.PUBLISH_TO_LIVE) || processCmd.equals(Constants.PUBLISH_TO_REMOTE) || processCmd.equals(Constants.PUBLISH)) {
 			permissionsTitle = "publish-permissions";
