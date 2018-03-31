@@ -210,7 +210,7 @@ public class LayoutStagingBackgroundTaskExecutor
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Failed to process manifest for the process summary " +
+						"Unable to process manifest for the process summary " +
 							"screen");
 				}
 			}
