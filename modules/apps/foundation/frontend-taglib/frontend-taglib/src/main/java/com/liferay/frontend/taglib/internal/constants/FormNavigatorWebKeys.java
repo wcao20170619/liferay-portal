@@ -19,10 +19,11 @@ package com.liferay.frontend.taglib.internal.constants;
  */
 public class FormNavigatorWebKeys {
 
-	public static final String CURRENT_TAB = "currentTab";
+	public static final String CURRENT_TAB = "CURRENT_TAB";
 
-	public static final String ERROR_TAB = "errorTab";
+	public static final String ERROR_TAB = "ERROR_TAB";
 
-	public static final String FORM_NAVIGATOR_ENTRIES = "formNavigatorEntries";
+	public static final String FORM_NAVIGATOR_ENTRIES =
+		"FORM_NAVIGATOR_ENTRIES";
 
 }
