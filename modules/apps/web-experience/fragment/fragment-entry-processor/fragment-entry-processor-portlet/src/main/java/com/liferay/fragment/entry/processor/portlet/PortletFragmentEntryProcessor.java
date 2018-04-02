@@ -297,15 +297,15 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			String defaultPreferences)
 		throws PortalException {
 
-		String portletId = PortletIdCodec.encode(
-			PortletIdCodec.decodePortletName(portletName),
-			PortletIdCodec.decodeUserId(portletName),
-			String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()));
-
 		Group group = _groupLocalService.getGroup(
 			fragmentEntryLink.getGroupId());
 
 		long defaultPlid = _portal.getControlPanelPlid(group.getCompanyId());
+
+		String portletId = PortletIdCodec.encode(
+			PortletIdCodec.decodePortletName(portletName),
+			PortletIdCodec.decodeUserId(portletName),
+			String.valueOf(fragmentEntryLink.getFragmentEntryLinkId()));
 
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getLayoutPortletSetup(
