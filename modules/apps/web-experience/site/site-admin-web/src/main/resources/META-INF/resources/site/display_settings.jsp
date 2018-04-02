@@ -145,9 +145,9 @@ if (publicLayoutSet.isLayoutSetPrototypeLinkEnabled() || privateLayoutSet.isLayo
 
 		// Left list
 
-		String groupLanguageIds = typeSettingsProperties.getProperty(PropsKeys.LOCALES);
-
 		List leftList = new ArrayList();
+
+		String groupLanguageIds = typeSettingsProperties.getProperty(PropsKeys.LOCALES);
 
 		if (groupLanguageIds != null) {
 			for (Locale currentLocale : LocaleUtil.fromLanguageIds(StringUtil.split(groupLanguageIds))) {
