@@ -85,17 +85,17 @@ public class BigDecimalEntryTest {
 	}
 
 	@Test
-	public void testFindByGreaterThanBigDecimalValue() throws Exception {
+	public void testFindByGtBigDecimalValue() throws Exception {
 		List<BigDecimalEntry> bigDecimalEntries =
-			_persistence.findByGreaterThanBigDecimalValue(new BigDecimal(0));
+			_persistence.findByGtBigDecimalValue(new BigDecimal(0));
 
 		_assertEquals(_bigDecimalEntries.subList(2, 5), bigDecimalEntries);
 	}
 
 	@Test
-	public void testFindByLessThanBigDecimalValue() throws Exception {
+	public void testFindByLtBigDecimalValue() throws Exception {
 		List<BigDecimalEntry> bigDecimalEntries =
-			_persistence.findByLessThanBigDecimalValue(new BigDecimal(0));
+			_persistence.findByLtBigDecimalValue(new BigDecimal(0));
 
 		_assertEquals(_bigDecimalEntries.subList(0, 2), bigDecimalEntries);
 	}

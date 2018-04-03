@@ -24,11 +24,11 @@
 		<finder name="BigDecimalValue" return-type="Collection">
 			<finder-column name="bigDecimalValue" />
 		</finder>
-		<finder name="LessThanBigDecimalValue" return-type="Collection">
-			<finder-column comparator="&lt;" name="bigDecimalValue" />
-		</finder>
-		<finder name="GreaterThanBigDecimalValue" return-type="Collection">
+		<finder name="GtBigDecimalValue" return-type="Collection">
 			<finder-column comparator="&gt;" name="bigDecimalValue" />
+		</finder>
+		<finder name="LtDecimalValue" return-type="Collection">
+			<finder-column comparator="&lt;" name="bigDecimalValue" />
 		</finder>
 	</entity>
 </service-builder>
