@@ -178,6 +178,7 @@
 		<check name="JavaCleanUpMethodSuperCleanUpCheck" />
 		<check name="JavaCleanUpMethodVariablesCheck" />
 		<check name="JavaDataAccessConnectionCheck" />
+		<check name="JavaDeprecatedKernelClassesCheck" />
 		<check name="JavaFinderCacheCheck" />
 		<check name="JavaFinderImplCustomSQLCheck" />
 		<check name="JavaLogClassNameCheck" />
