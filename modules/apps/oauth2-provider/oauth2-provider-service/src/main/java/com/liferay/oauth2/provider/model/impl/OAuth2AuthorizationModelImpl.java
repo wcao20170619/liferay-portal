@@ -175,15 +175,16 @@ public class OAuth2AuthorizationModelImpl extends BaseModelImpl<OAuth2Authorizat
 		return models;
 	}
 
-	public static final String MAPPING_TABLE_OAUTH2AUTH_SCOPEGRANTS_NAME = "OAuth2Auth_ScopeGrants";
-	public static final Object[][] MAPPING_TABLE_OAUTH2AUTH_SCOPEGRANTS_COLUMNS = {
+	public static final String MAPPING_TABLE_OA2AUTHS_OA2SCOPEGRANTS_NAME = "OA2Auths_OA2ScopeGrants";
+	public static final Object[][] MAPPING_TABLE_OA2AUTHS_OA2SCOPEGRANTS_COLUMNS =
+		{
 			{ "companyId", Types.BIGINT },
 			{ "oAuth2AuthorizationId", Types.BIGINT },
 			{ "oAuth2ScopeGrantId", Types.BIGINT }
 		};
-	public static final String MAPPING_TABLE_OAUTH2AUTH_SCOPEGRANTS_SQL_CREATE = "create table OAuth2Auth_ScopeGrants (companyId LONG not null,oAuth2AuthorizationId LONG not null,oAuth2ScopeGrantId LONG not null,primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId))";
-	public static final boolean FINDER_CACHE_ENABLED_OAUTH2AUTH_SCOPEGRANTS = GetterUtil.getBoolean(com.liferay.oauth2.provider.service.util.ServiceProps.get(
-				"value.object.finder.cache.enabled.OAuth2Auth_ScopeGrants"),
+	public static final String MAPPING_TABLE_OA2AUTHS_OA2SCOPEGRANTS_SQL_CREATE = "create table OA2Auths_OA2ScopeGrants (companyId LONG not null,oAuth2AuthorizationId LONG not null,oAuth2ScopeGrantId LONG not null,primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId))";
+	public static final boolean FINDER_CACHE_ENABLED_OA2AUTHS_OA2SCOPEGRANTS = GetterUtil.getBoolean(com.liferay.oauth2.provider.service.util.ServiceProps.get(
+				"value.object.finder.cache.enabled.OA2Auths_OA2ScopeGrants"),
 			true);
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(com.liferay.oauth2.provider.service.util.ServiceProps.get(
 				"lock.expiration.time.com.liferay.oauth2.provider.model.OAuth2Authorization"));

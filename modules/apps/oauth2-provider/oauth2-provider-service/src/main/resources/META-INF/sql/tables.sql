@@ -1,16 +1,8 @@
-create table OAuth2AccessToken (
-	oAuth2AccessTokenId LONG not null primary key,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	oAuth2ApplicationId LONG,
-	oAuth2RefreshTokenId LONG,
-	expirationDate DATE null,
-	remoteIPInfo VARCHAR(75) null,
-	scopeAliases TEXT null,
-	tokenContent TEXT null,
-	tokenType VARCHAR(75) null
+create table OA2Auths_OA2ScopeGrants (
+	companyId LONG not null,
+	oAuth2AuthorizationId LONG not null,
+	oAuth2ScopeGrantId LONG not null,
+	primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId)
 );
 
 create table OAuth2Application (
@@ -44,13 +36,6 @@ create table OAuth2ApplicationScopeAliases (
 	scopeAliases TEXT null
 );
 
-create table OAuth2Auth_ScopeGrants (
-	companyId LONG not null,
-	oAuth2AuthorizationId LONG not null,
-	oAuth2ScopeGrantId LONG not null,
-	primary key (oAuth2AuthorizationId, oAuth2ScopeGrantId)
-);
-
 create table OAuth2Authorization (
 	oAuth2AuthorizationId LONG not null primary key,
 	companyId LONG,
@@ -66,19 +51,6 @@ create table OAuth2Authorization (
 	refreshTokenContent TEXT null,
 	refreshTokenCreateDate DATE null,
 	refreshTokenExpirationDate DATE null
-);
-
-create table OAuth2RefreshToken (
-	oAuth2RefreshTokenId LONG not null primary key,
-	companyId LONG,
-	userId LONG,
-	userName VARCHAR(75) null,
-	createDate DATE null,
-	oAuth2ApplicationId LONG,
-	expirationDate DATE null,
-	remoteIPInfo VARCHAR(75) null,
-	scopeAliases TEXT null,
-	tokenContent TEXT null
 );
 
 create table OAuth2ScopeGrant (

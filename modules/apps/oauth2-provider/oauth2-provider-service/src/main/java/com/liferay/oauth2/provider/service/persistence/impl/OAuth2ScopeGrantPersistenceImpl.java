@@ -2127,7 +2127,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 	 * Initializes the o auth2 scope grant persistence.
 	 */
 	public void afterPropertiesSet() {
-		oAuth2ScopeGrantToOAuth2AuthorizationTableMapper = TableMapperFactory.getTableMapper("OAuth2Auth_ScopeGrants",
+		oAuth2ScopeGrantToOAuth2AuthorizationTableMapper = TableMapperFactory.getTableMapper("OA2Auths_OA2ScopeGrants",
 				"companyId", "oAuth2ScopeGrantId", "oAuth2AuthorizationId",
 				this, oAuth2AuthorizationPersistence);
 	}
@@ -2138,7 +2138,7 @@ public class OAuth2ScopeGrantPersistenceImpl extends BasePersistenceImpl<OAuth2S
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
 		finderCache.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 
-		TableMapperFactory.removeTableMapper("OAuth2Auth_ScopeGrants");
+		TableMapperFactory.removeTableMapper("OA2Auths_OA2ScopeGrants");
 	}
 
 	@ServiceReference(type = CompanyProviderWrapper.class)
