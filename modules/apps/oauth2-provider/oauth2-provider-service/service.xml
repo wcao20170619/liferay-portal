@@ -115,7 +115,7 @@
 
 		<!-- Relationships -->
 
-		<column entity="OAuth2ScopeGrant" mapping-table="OAuth2Auth_ScopeGrants" name="oAuth2ScopeGrants" type="Collection" />
+		<column entity="OAuth2ScopeGrant" mapping-table="OA2Auths_OA2ScopeGrants" name="oAuth2ScopeGrants" type="Collection" />
 
 		<!-- Finder methods -->
 
@@ -156,7 +156,7 @@
 
 		<!-- Relationships -->
 
-		<column entity="OAuth2Authorization" mapping-table="OAuth2Auth_ScopeGrants" name="oAuth2Authorizations" type="Collection" />
+		<column entity="OAuth2Authorization" mapping-table="OA2Auths_OA2ScopeGrants" name="oAuth2Authorizations" type="Collection" />
 
 		<!-- Finder methods -->
 
