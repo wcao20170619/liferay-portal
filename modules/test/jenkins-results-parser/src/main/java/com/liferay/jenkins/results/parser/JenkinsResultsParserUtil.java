@@ -939,7 +939,7 @@ public class JenkinsResultsParserUtil {
 
 	public static String getRegexLiteral(String string) {
 		if (string == null) {
-			throw new NullPointerException("String may not be null");
+			throw new NullPointerException("String is NULL");
 		}
 
 		String specialCharactersString = "\\^$.|?*+()[]{}";
@@ -1002,11 +1002,11 @@ public class JenkinsResultsParserUtil {
 
 	public static boolean isFileInDirectory(File directory, File file) {
 		if (directory == null) {
-			throw new IllegalArgumentException("directory may not be null");
+			throw new IllegalArgumentException("Directory is NULL");
 		}
 
 		if (file == null) {
-			throw new IllegalArgumentException("file may not be null");
+			throw new IllegalArgumentException("File is NULL");
 		}
 
 		if (!directory.isDirectory()) {
