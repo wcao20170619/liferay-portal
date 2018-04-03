@@ -61,15 +61,15 @@
 	</command>
 
 	<command name="selectLanguagePG">
+		<var name="portletName" value="${portletName}" />
+
 		<if>
 			<contains string="${portletName}" substring="{portletName}" />
 			<then>
-				<var name="key_portletName" value="LanguagePortlet" />
+				<var name="portletName" value="LanguagePortlet" />
 			</then>
-			<else>
-				<var name="key_portletName" value="${portletName}" />
-			</else>
 		</if>
+
 		<if>
 			<condition function="IsTextNotEqual" locator1="Language#DROPDOWN_LANGUAGE" value1="${locale}" />
 			<then>
