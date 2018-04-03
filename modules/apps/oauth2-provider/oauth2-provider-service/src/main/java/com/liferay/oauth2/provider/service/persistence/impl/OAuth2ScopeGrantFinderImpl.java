@@ -38,8 +38,8 @@ public class OAuth2ScopeGrantFinderImpl
 
 	@Override
 	public Collection<OAuth2ScopeGrant> findByC_A_A_B(
-		long companyId, String accessTokenContent, String applicationName,
-		String bundleSymbolicName) {
+		long companyId, String applicationName, String bundleSymbolicName,
+		String accessTokenContent) {
 
 		Session session = null;
 
