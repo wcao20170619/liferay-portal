@@ -65,10 +65,11 @@ public class JavaModuleComponentCheck extends BaseJavaTermCheck {
 
 				addMessage(
 					fileName,
-					"Do not use @Component in '-api' or '-spi' module");
+					"Do not use @Component in '-api' or '-spi' module",
+					"component.markdown");
 			}
 		}
-		else {
+		else if (!javaTerm.isAbstract()) {
 			JavaClass javaClass = (JavaClass)javaTerm;
 
 			for (JavaTerm childJavaTerm : javaClass.getChildJavaTerms()) {

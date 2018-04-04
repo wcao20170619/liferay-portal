@@ -253,7 +253,7 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Details" />
+			<var name="panel" value="Details" />
 		</execute>
 
 		<execute macro="PortletEntry#inputDescriptionTextInput">
@@ -604,8 +604,9 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#addLocale">
-			<var name="language" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Title" />
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="WebContent#addCP">
@@ -1874,7 +1875,7 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Details" />
+			<var name="panel" value="Details" />
 		</execute>
 
 		<execute macro="PortletEntry#inputDescription">
@@ -1976,7 +1977,7 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Details" />
+			<var name="panel" value="Details" />
 		</execute>
 
 		<execute macro="PortletEntry#inputDescriptionTextInput">
@@ -2044,8 +2045,9 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#addLocale">
-			<var name="language" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Title" />
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="WebContent#addCP">
@@ -2064,8 +2066,9 @@
 			<var name="webContentTitle" value="WC WebContent Title" />
 		</execute>
 
-		<execute macro="WebContent#selectLocale">
-			<var name="language" value="Spanish (Spain)" />
+		<execute macro="PortletEntry#changeLocale">
+			<var name="fieldName" value="Title" />
+			<var name="locale" value="es-ES" />
 		</execute>
 
 		<execute macro="WebContent#viewCP">

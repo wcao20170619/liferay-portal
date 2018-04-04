@@ -23,6 +23,11 @@
 	}
 }
 
+.portlet-forms .ddm-form-basic-info .ddm-form-name {
+	color: #000;
+	font-weight: 500;
+}
+
 .lfr-ddm-form-container {
 	word-break: normal;
 
@@ -389,6 +394,12 @@
 			text-transform: uppercase;
 			width: auto;
 		}
+	}
+}
+
+.liferay-ddm-form-renderer-pagination-content {
+	a {
+		pointer-events: none;
 	}
 }
 

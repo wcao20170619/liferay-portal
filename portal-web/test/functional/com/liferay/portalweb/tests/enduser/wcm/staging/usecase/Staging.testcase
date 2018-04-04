@@ -379,7 +379,7 @@
 		</execute>
 
 		<execute macro="Panel#expandPanel">
-			<var name="panelHeading" value="Categorization" />
+			<var name="panel" value="Categorization" />
 		</execute>
 
 		<execute macro="BlogsEntry#addTag">
@@ -945,7 +945,7 @@
 		</execute>
 
 		<execute macro="Workflow#configureWorkflow">
-			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+			<var name="workflowDefinition" value="Single Approver" />
 			<var name="workflowResourceValue" value="Page Revision" />
 		</execute>
 
@@ -1005,7 +1005,7 @@
 		</execute>
 
 		<execute macro="Workflow#configureWorkflow">
-			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+			<var name="workflowDefinition" value="Single Approver" />
 			<var name="workflowResourceValue" value="Page Revision" />
 		</execute>
 
@@ -1020,7 +1020,7 @@
 		</execute>
 
 		<execute macro="Workflow#configureWorkflowViaFolderInfo">
-			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+			<var name="workflowDefinition" value="Single Approver" />
 		</execute>
 
 		<execute macro="Navigator#openSiteURL">
@@ -1591,7 +1591,7 @@
 		</execute>
 
 		<execute macro="Workflow#configureWorkflow">
-			<var name="workflowDefinition" value="Single Approver (Version 1)" />
+			<var name="workflowDefinition" value="Single Approver" />
 			<var name="workflowResourceValue" value="Blogs Entry" />
 		</execute>
 
