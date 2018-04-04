@@ -51,7 +51,7 @@ portletURL.setParameter("tabs2", tabs2);
 	new Liferay.Portlet.Admin(
 		{
 			form: document.<portlet:namespace />fm,
-			indexActionsPanel: '#adminServerAdministrationIndexActionsPanel',
+			indexActionsPanel: '',
 			namespace: '<portlet:namespace />',
 			redirectUrl: '<%= redirectURL %>',
 			submitButton: '.save-server-button',
