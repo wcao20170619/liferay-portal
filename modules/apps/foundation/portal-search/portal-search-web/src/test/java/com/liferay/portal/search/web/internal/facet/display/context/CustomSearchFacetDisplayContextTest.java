@@ -109,7 +109,6 @@ public class CustomSearchFacetDisplayContextTest {
 	@Test
 	public void testOneTerm() throws Exception {
 		String fieldName = RandomTestUtil.randomString();
-
 		int count = RandomTestUtil.randomInt();
 
 		setUpOneTermCollector(fieldName, count);
@@ -148,7 +147,6 @@ public class CustomSearchFacetDisplayContextTest {
 	@Test
 	public void testOneTermWithPreviousSelection() throws Exception {
 		String fieldName = RandomTestUtil.randomString();
-
 		int count = RandomTestUtil.randomInt();
 
 		setUpOneTermCollector(fieldName, count);

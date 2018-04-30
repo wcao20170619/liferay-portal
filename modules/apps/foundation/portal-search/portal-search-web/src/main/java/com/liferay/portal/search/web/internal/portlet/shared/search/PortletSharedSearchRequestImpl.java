@@ -251,7 +251,7 @@ public class PortletSharedSearchRequestImpl
 		return searchSettings -> portletSharedSearchContributor.contribute(
 			new PortletSharedSearchSettingsImpl(
 				searchSettings, portletPreferencesOptional,
-				portletSharedRequestHelper, renderRequest));
+				portletSharedRequestHelper, renderRequest, portletId));
 	}
 
 	protected ThemeDisplay getThemeDisplay(RenderRequest renderRequest) {

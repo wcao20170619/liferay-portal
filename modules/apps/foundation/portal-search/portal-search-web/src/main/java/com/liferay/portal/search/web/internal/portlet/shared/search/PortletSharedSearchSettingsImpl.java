@@ -41,12 +41,13 @@ public class PortletSharedSearchSettingsImpl
 		SearchSettings searchSettings,
 		Optional<PortletPreferences> portletPreferencesOptional,
 		PortletSharedRequestHelper portletSharedRequestHelper,
-		RenderRequest renderRequest) {
+		RenderRequest renderRequest, String portletId) {
 
 		_searchSettings = searchSettings;
 		_portletPreferencesOptional = portletPreferencesOptional;
 		_portletSharedRequestHelper = portletSharedRequestHelper;
 		_renderRequest = renderRequest;
+		_portletId = portletId;
 	}
 
 	@Override
@@ -93,6 +94,11 @@ public class PortletSharedSearchSettingsImpl
 	public Optional<String[]> getParameterValues(String name) {
 		return _portletSharedRequestHelper.getParameterValues(
 			name, _renderRequest);
+	}
+
+	@Override
+	public String getPortletId() {
+		return _portletId;
 	}
 
 	@Override
@@ -156,6 +162,7 @@ public class PortletSharedSearchSettingsImpl
 			paginationStartParameterName);
 	}
 
+	private final String _portletId;
 	private final Optional<PortletPreferences> _portletPreferencesOptional;
 	private final PortletSharedRequestHelper _portletSharedRequestHelper;
 	private final RenderRequest _renderRequest;

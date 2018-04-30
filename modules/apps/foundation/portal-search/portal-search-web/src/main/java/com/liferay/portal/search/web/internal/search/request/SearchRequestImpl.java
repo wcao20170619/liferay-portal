@@ -15,6 +15,7 @@
 package com.liferay.portal.search.web.internal.search.request;
 
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.HitsImpl;
@@ -22,14 +23,19 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.ScopeFacet;
+import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.search.web.internal.custom.facet.portlet.CustomFacetPortletPreferences;
 import com.liferay.portal.search.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.web.search.request.SearchRequest;
 import com.liferay.portal.search.web.search.request.SearchSettings;
 import com.liferay.portal.search.web.search.request.SearchSettingsContributor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -145,6 +151,52 @@ public class SearchRequestImpl implements SearchRequest {
 		return searchSettingsImpl;
 	}
 
+	protected void mergeCustomFactes(SearchContext searchContext) {
+		Map<String, Facet> facets = searchContext.getFacets();
+		List<Facet> facetList = new ArrayList<>();
+
+		for (Map.Entry<String, Facet> entry : facets.entrySet()) {
+			String key = entry.getKey();
+
+			if (key.startsWith(
+					CustomFacetPortletPreferences.
+						PREFERENCE_KEY_FIELD_TO_AGGREGATE)) {
+
+				facetList.add(entry.getValue());
+				facets.remove(key);
+			}
+		}
+
+		for (Facet facet : facetList) {
+			Facet previousFacet = facets.get(facet.getFieldName());
+
+			if (previousFacet != null) {
+				FacetConfiguration previousFacetConfig =
+					previousFacet.getFacetConfiguration();
+
+				JSONObject previousJSONObject = previousFacetConfig.getData();
+
+				int previousMaxTerm = previousJSONObject.getInt("maxTerms");
+
+				FacetConfiguration currentFacetConfig =
+					facet.getFacetConfiguration();
+
+				JSONObject currentJSONObject = currentFacetConfig.getData();
+
+				int currentMaxTerm = currentJSONObject.getInt("maxTerms");
+
+				if (currentMaxTerm > previousMaxTerm) {
+					previousJSONObject.put("maxTerms", currentMaxTerm);
+				}
+
+				previousFacet.setStatic(false);
+			}
+			else {
+				facets.put(facet.getFieldName(), facet);
+			}
+		}
+	}
+
 	protected Hits search(
 		FacetedSearcher facetedSearcher, SearchContext searchContext) {
 
@@ -157,6 +209,8 @@ public class SearchRequestImpl implements SearchRequest {
 	}
 
 	protected Hits search(SearchContext searchContext) {
+		mergeCustomFactes(searchContext);
+
 		Optional<String> keywordsOptional = SearchStringUtil.maybe(
 			searchContext.getKeywords());
 
