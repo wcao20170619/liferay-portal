@@ -121,7 +121,6 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		Map<String, String> contentStrings = new HashMap<String, String>() {
 			{
-				put("content", originalContent);
 				put("content_en_US", originalContent);
 				put("content_hu_HU", translatedContent);
 			}
@@ -226,6 +225,54 @@ public class JournalArticleIndexerLocalizedContentTest {
 	}
 
 	@Test
+	public void testIndexedFieldsWithUnindexedTranslation() throws Exception {
+		String title = "entity title";
+
+		setTitle(
+			new JournalArticleTitle() {
+				{
+					put(LocaleUtil.US, title);
+				}
+			});
+
+		String content = "entity content";
+
+		setContent(
+			new JournalArticleContent() {
+				{
+					name = "content";
+					defaultLocale = LocaleUtil.US;
+
+					put(LocaleUtil.US, content);
+				}
+			});
+
+		addArticle();
+
+		Document document = _search("title", LocaleUtil.HUNGARY);
+
+		Map<String, String> titleStrings = new HashMap<String, String>() {
+			{
+				put("title_en_US", title);
+			}
+		};
+
+		FieldValuesAssert.assertFieldValues(
+			titleStrings, "title", document, title);
+
+		document = _search("content", LocaleUtil.HUNGARY);
+
+		Map<String, String> contentStrings = new HashMap<String, String>() {
+			{
+				put("content_en_US", content);
+			}
+		};
+
+		FieldValuesAssert.assertFieldValues(
+			contentStrings, "content", document, title);
+	}
+
+	@Test
 	public void testJapaneseTitle() throws Exception {
 		String title = "新規作成";
 
@@ -258,7 +305,6 @@ public class JournalArticleIndexerLocalizedContentTest {
 
 		Map<String, String> contentStrings = new HashMap<String, String>() {
 			{
-				put("content", content);
 				put("content_ja_JP", content);
 			}
 		};
