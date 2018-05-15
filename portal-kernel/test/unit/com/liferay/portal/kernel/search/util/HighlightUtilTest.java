@@ -41,6 +41,13 @@ public class HighlightUtilTest {
 	public void testAddSnippet() {
 		assertAddSnippet("<liferay-hl>Hello World</liferay-hl>", "Hello World");
 	}
+	
+	@Test
+	public void testCJKHighlight() {
+		String s = "test 新規作成 | JPN";		
+		//assertHighlight(s, "test [[新]][[規]][[作]][[成]] | JPN", "新","規","作","成");
+		assertHighlight(s, "test 新規作[[成]] | JPN", "新","規","作","成");
+	}
 
 	@Test
 	public void testHighlight() {

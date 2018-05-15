@@ -84,7 +84,7 @@ public abstract class BaseIndexingTestCase {
 		_indexingFixture.tearDown();
 	}
 
-	protected static SearchContext createSearchContext() {
+	protected SearchContext createSearchContext() {
 		SearchContext searchContext = new SearchContext();
 
 		searchContext.setCompanyId(COMPANY_ID);

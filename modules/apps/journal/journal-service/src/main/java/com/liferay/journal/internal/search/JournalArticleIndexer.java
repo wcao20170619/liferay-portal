@@ -630,14 +630,25 @@ public class JournalArticleIndexer
 				Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
 				Field.TITLE);
 		}
-
-		String content = getDDMContentSummary(
-			document, snippetLocale, portletRequest, portletResponse);
+		
+		String content = document.get(
+			snippetLocale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
+			Field.CONTENT);
 
 		if (Validator.isNull(content) && !snippetLocale.equals(defaultLocale)) {
-			content = getDDMContentSummary(
-				document, defaultLocale, portletRequest, portletResponse);
+			title = document.get(
+				defaultLocale,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
+				Field.CONTENT);
 		}
+
+//		String content = getDDMContentSummary(
+//			document, snippetLocale, portletRequest, portletResponse);
+//
+//		if (Validator.isNull(content) && !snippetLocale.equals(defaultLocale)) {
+//			content = getDDMContentSummary(
+//				document, defaultLocale, portletRequest, portletResponse);
+//		}
 
 		Summary summary = new Summary(snippetLocale, title, content);
 

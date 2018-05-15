@@ -27,7 +27,6 @@ import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.search.MatchQuery.ZeroTermsQuery;
-
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -120,6 +119,10 @@ public class MatchQueryTranslatorImpl
 
 		MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(
 			field, value);
+		
+//		if (containsCJKV(value)) {
+//			matchQueryBuilder.operator(Operator.AND);
+//		}
 
 		if (Validator.isNotNull(matchQuery.getAnalyzer())) {
 			matchQueryBuilder.analyzer(matchQuery.getAnalyzer());
@@ -182,5 +185,10 @@ public class MatchQueryTranslatorImpl
 
 		return matchQueryBuilder;
 	}
-
+	
+	protected static boolean containsCJKV(String value) {
+		 return value.codePoints().anyMatch(
+			codepoint -> Character.UnicodeScript.of(
+				codepoint) == Character.UnicodeScript.HAN);
+	}
 }

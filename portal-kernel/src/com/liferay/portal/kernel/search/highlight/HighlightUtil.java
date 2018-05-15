@@ -79,7 +79,7 @@ public class HighlightUtil {
 			}
 
 			sb.append(Pattern.quote(queryTerms[i].trim()));
-
+		
 			sb.append(_REGEXP_WORD_BOUNDARY);
 		}
 
