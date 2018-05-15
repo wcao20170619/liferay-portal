@@ -47,7 +47,7 @@ com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisp
 
 					<ul class="list-unstyled users">
 						<li class="default facet-value">
-							<a class="<%= userSearchFacetDisplayContext.isNothingSelected() ? "text-primary" : "text-default" %>" data-value="" href="javascript:;"><liferay-ui:message key="<%= HtmlUtil.escape(facetConfiguration.getLabel()) %>" /></a>
+							<a class="<%= userSearchFacetDisplayContext.isNothingSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="" href="javascript:;"><liferay-ui:message key="<%= HtmlUtil.escape(facetConfiguration.getLabel()) %>" /></a>
 						</li>
 
 						<%
@@ -58,7 +58,7 @@ com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisp
 						%>
 
 							<li class="facet-value">
-								<a class="<%= userSearchFacetTermDisplayContext.isSelected() ? "text-primary" : "text-default" %>" data-value="<%= HtmlUtil.escapeAttribute(userSearchFacetTermDisplayContext.getUserName()) %>" href="javascript:;">
+								<a class="<%= userSearchFacetTermDisplayContext.isSelected() ? "facet-term-selected" : "facet-term-unselected" %>" data-value="<%= HtmlUtil.escapeAttribute(userSearchFacetTermDisplayContext.getUserName()) %>" href="javascript:;">
 									<%= HtmlUtil.escape(userSearchFacetTermDisplayContext.getUserName()) %>
 
 									<c:if test="<%= userSearchFacetTermDisplayContext.isFrequencyVisible() %>">
