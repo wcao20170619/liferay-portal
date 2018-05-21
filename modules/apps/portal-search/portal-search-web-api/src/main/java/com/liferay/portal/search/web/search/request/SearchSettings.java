@@ -52,6 +52,8 @@ public interface SearchSettings {
 
 	public void setKeywordsParameterName(String keywordsParameterName);
 
+	public void setLuceneSyntax(boolean useLuceneSyntax);
+
 	public void setPaginationDelta(int paginationDelta);
 
 	public void setPaginationDeltaParameterName(
