@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.generic.BooleanClauseImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.search.web.internal.display.context.Keywords;
 import com.liferay.portal.search.web.internal.display.context.SearchScope;
 import com.liferay.portal.search.web.internal.search.bar.constants.SearchBarPortletKeys;
 import com.liferay.portal.search.web.internal.search.bar.portlet.SearchBarPortletPreferences;
@@ -119,7 +120,22 @@ public class SearchBarPortletSharedSearchContributor
 				searchBarPortletPreferences.getKeywordsParameterName());
 
 		parameterValueOptional.ifPresent(
-			portletSharedSearchSettings::setKeywords);
+			value -> {
+				Keywords keywords = new Keywords(value);
+
+				boolean luceneSyntax =
+					searchBarPortletPreferences.isUseAdvancedSearchSyntax();
+
+				if (!luceneSyntax) {
+					luceneSyntax = keywords.isLuceneSyntax();
+				}
+
+				if (luceneSyntax) {
+					portletSharedSearchSettings.setLuceneSyntax(Boolean.TRUE);
+				}
+
+				portletSharedSearchSettings.setKeywords(keywords.getKeywords());
+			});
 
 		portletSharedSearchSettings.setKeywordsParameterName(
 			searchBarPortletPreferences.getKeywordsParameterName());

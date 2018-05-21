@@ -33,6 +33,9 @@ public interface SearchBarPortletPreferences {
 
 	public static final String PREFERENCE_KEY_SEARCH_SCOPE = "searchScope";
 
+	public static final String PREFERENCE_KEY_USE_ADVANCED_SEARCH_SYNTAX =
+		"useAdvancedSearchSyntax";
+
 	public Optional<String> getDestination();
 
 	public String getDestinationString();
@@ -44,5 +47,9 @@ public interface SearchBarPortletPreferences {
 	public SearchScopePreference getSearchScopePreference();
 
 	public String getSearchScopePreferenceString();
+
+	public Optional<Boolean> getUseAdvancedSearchSyntax();
+
+	public boolean isUseAdvancedSearchSyntax();
 
 }

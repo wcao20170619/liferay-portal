@@ -140,6 +140,11 @@ public class PortletSharedSearchSettingsImpl
 	}
 
 	@Override
+	public void setLuceneSyntax(boolean useLuceneSyntax) {
+		_searchSettings.setLuceneSyntax(useLuceneSyntax);
+	}
+
+	@Override
 	public void setPaginationDelta(int delta) {
 		_searchSettings.setPaginationDelta(delta);
 	}

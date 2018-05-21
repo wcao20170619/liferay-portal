@@ -104,6 +104,11 @@ public class SearchSettingsImpl implements SearchSettings {
 	}
 
 	@Override
+	public void setLuceneSyntax(boolean useAdvancedLuceneSyntax) {
+		_searchContext.setAttribute("luceneSyntax", useAdvancedLuceneSyntax);
+	}
+
+	@Override
 	public void setPaginationDelta(int paginationDelta) {
 		_paginationDelta = paginationDelta;
 	}
