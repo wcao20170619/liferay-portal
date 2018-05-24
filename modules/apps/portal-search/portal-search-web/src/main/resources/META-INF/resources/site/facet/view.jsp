@@ -16,6 +16,7 @@
 
 <%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.URLCodec" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.ScopeSearchFacetTermDisplayContext" %>
@@ -68,7 +69,7 @@ ScopeSearchFacetDisplayContext scopeSearchFacetDisplayContext = (ScopeSearchFace
 			>
 				<aui:form method="post" name="siteFacetForm">
 					<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(scopeSearchFacetDisplayContext.getParameterName()) %>" type="hidden" value="<%= scopeSearchFacetDisplayContext.getParameterValue() %>" />
-					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= scopeSearchFacetDisplayContext.getParameterName() %>" />
+					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= URLCodec.encodeURL(scopeSearchFacetDisplayContext.getParameterName()) %>" />
 
 					<aui:fieldset>
 						<ul class="list-unstyled">

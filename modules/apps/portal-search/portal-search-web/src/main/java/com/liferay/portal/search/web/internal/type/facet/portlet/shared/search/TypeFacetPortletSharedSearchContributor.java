@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.type.facet.portlet.shared.search;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.facet.type.AssetEntriesFacetFactory;
 import com.liferay.portal.search.web.internal.type.facet.constants.TypeFacetPortletKeys;
 import com.liferay.portal.search.web.internal.type.facet.portlet.AssetEntriesFacetBuilder;
@@ -76,7 +77,8 @@ public class TypeFacetPortletSharedSearchContributor
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchSettings.getParameterValues(
-				typeFacetPortletPreferences.getParameterName()),
+				URLCodec.encodeURL(
+					typeFacetPortletPreferences.getParameterName())),
 			assetEntriesFacetBuilder::setSelectedEntryClassNames);
 
 		return assetEntriesFacetBuilder.build();

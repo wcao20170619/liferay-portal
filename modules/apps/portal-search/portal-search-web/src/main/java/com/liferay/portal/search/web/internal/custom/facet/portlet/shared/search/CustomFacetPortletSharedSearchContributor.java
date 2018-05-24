@@ -16,6 +16,7 @@ package com.liferay.portal.search.web.internal.custom.facet.portlet.shared.searc
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.facet.custom.CustomFacetFactory;
 import com.liferay.portal.search.web.internal.custom.facet.builder.CustomFacetBuilder;
 import com.liferay.portal.search.web.internal.custom.facet.constants.CustomFacetPortletKeys;
@@ -81,7 +82,8 @@ public class CustomFacetPortletSharedSearchContributor
 
 		copy(
 			() -> portletSharedSearchSettings.getParameterValues(
-				getParameterName(customFacetPortletPreferences)),
+				URLCodec.encodeURL(
+					getParameterName(customFacetPortletPreferences))),
 			customFacetBuilder::setSelectedValues);
 
 		return customFacetBuilder.build();

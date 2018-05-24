@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.type.facet.portlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.type.AssetEntriesFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.AssetEntriesSearchFacetDisplayBuilder;
@@ -131,7 +132,8 @@ public class TypeFacetPortlet extends MVCPortlet {
 		assetEntriesSearchFacetDisplayBuilder.setParameterName(parameterName);
 
 		Optional<List<String>> typesOptional = getParameterValues(
-			parameterName, portletSharedSearchResponse, renderRequest);
+			URLCodec.encodeURL(parameterName), portletSharedSearchResponse,
+			renderRequest);
 
 		typesOptional.ifPresent(
 			assetEntriesSearchFacetDisplayBuilder::setParameterValues);

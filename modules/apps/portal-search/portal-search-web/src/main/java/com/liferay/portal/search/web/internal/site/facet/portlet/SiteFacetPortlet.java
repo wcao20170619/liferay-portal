@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.site.SiteFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.ScopeSearchFacetDisplayBuilder;
@@ -136,7 +137,8 @@ public class SiteFacetPortlet extends MVCPortlet {
 
 		SearchOptionalUtil.copy(
 			() -> getParameterValuesOptional(
-				parameterName, portletSharedSearchResponse, renderRequest),
+				URLCodec.encodeURL(parameterName), portletSharedSearchResponse,
+				renderRequest),
 			scopeSearchFacetDisplayBuilder::setParameterValues);
 
 		return scopeSearchFacetDisplayBuilder.build();

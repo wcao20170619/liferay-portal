@@ -16,6 +16,7 @@
 
 <%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.URLCodec" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.FolderSearchFacetTermDisplayContext" %>
@@ -68,7 +69,7 @@ FolderSearchFacetDisplayContext folderSearchFacetDisplayContext = (FolderSearchF
 			>
 				<aui:form method="post" name="folderFacetForm">
 					<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(folderSearchFacetDisplayContext.getParameterName()) %>" type="hidden" value="<%= folderSearchFacetDisplayContext.getParameterValue() %>" />
-					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= folderSearchFacetDisplayContext.getParameterName() %>" />
+					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= URLCodec.encodeURL(folderSearchFacetDisplayContext.getParameterName()) %>" />
 
 					<aui:fieldset>
 						<ul class="list-unstyled">

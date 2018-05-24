@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.web.internal.search.bar.constants.SearchBarPortletKeys;
@@ -127,7 +128,7 @@ public class SearchBarPortlet extends MVCPortlet {
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchResponse.getParameter(
-				scopeParameterName, renderRequest),
+				URLCodec.encodeURL(scopeParameterName), renderRequest),
 			searchBarPortletDisplayBuilder::setScopeParameterValue);
 
 		searchBarPortletDisplayBuilder.setSearchScopePreference(

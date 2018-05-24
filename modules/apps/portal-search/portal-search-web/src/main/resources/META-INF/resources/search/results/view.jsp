@@ -188,7 +188,7 @@ com.liferay.portal.kernel.dao.search.SearchContainer<com.liferay.portal.kernel.s
 
 										<tr>
 											<td>
-												<strong><%= HtmlUtil.escape(searchResultFieldDisplayContext.getName()) %></strong>
+												<strong><%= HtmlUtil.escapeAttribute(searchResultFieldDisplayContext.getName()) %></strong>
 												<br />
 
 												<em>
@@ -197,7 +197,7 @@ com.liferay.portal.kernel.dao.search.SearchContainer<com.liferay.portal.kernel.s
 											</td>
 											<td>
 												<code>
-													<%= searchResultFieldDisplayContext.getValuesToString() %>
+													<%= HtmlUtil.escapeAttribute(searchResultFieldDisplayContext.getValuesToString()) %>
 												</code>
 											</td>
 										</tr>

@@ -16,6 +16,7 @@
 
 <%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
+page import="com.liferay.portal.kernel.util.URLCodec" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext" %>
@@ -68,7 +69,7 @@ AssetCategoriesSearchFacetDisplayContext assetCategoriesSearchFacetDisplayContex
 			>
 				<aui:form method="post" name="categoryFacetForm">
 					<aui:input autocomplete="off" name="<%= HtmlUtil.escapeAttribute(assetCategoriesSearchFacetDisplayContext.getParameterName()) %>" type="hidden" value="<%= assetCategoriesSearchFacetDisplayContext.getParameterValue() %>" />
-					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= assetCategoriesSearchFacetDisplayContext.getParameterName() %>" />
+					<aui:input cssClass="facet-parameter-name" name="facet-parameter-name" type="hidden" value="<%= URLCodec.encodeURL(assetCategoriesSearchFacetDisplayContext.getParameterName()) %>" />
 
 					<aui:fieldset>
 						<ul class="<%= assetCategoriesSearchFacetDisplayContext.isCloud() ? "tag-cloud" : "tag-list" %> list-unstyled">

@@ -16,6 +16,7 @@ package com.liferay.portal.search.web.internal.user.facet.portlet;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.user.UserFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.UserSearchFacetDisplayBuilder;
@@ -121,7 +122,8 @@ public class UserFacetPortlet extends MVCPortlet {
 		userSearchFacetDisplayBuilder.setParamName(parameterName);
 
 		Optional<List<String>> usersOptional = getParameterValues(
-			parameterName, portletSharedSearchResponse, renderRequest);
+			URLCodec.encodeURL(parameterName), portletSharedSearchResponse,
+			renderRequest);
 
 		usersOptional.ifPresent(userSearchFacetDisplayBuilder::setParamValues);
 

@@ -16,6 +16,7 @@ package com.liferay.portal.search.web.internal.tag.facet.portlet;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.tag.AssetTagNamesFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.AssetTagsSearchFacetDisplayBuilder;
@@ -124,7 +125,7 @@ public class TagFacetPortlet extends MVCPortlet {
 
 		Optional<String[]> parameterValuesOptional =
 			portletSharedSearchResponse.getParameterValues(
-				parameterName, renderRequest);
+				URLCodec.encodeURL(parameterName), renderRequest);
 
 		parameterValuesOptional.ifPresent(
 			assetTagsSearchFacetDisplayBuilder::setParameterValues);

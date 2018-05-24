@@ -16,6 +16,7 @@ package com.liferay.portal.search.web.internal.search.bar.portlet.shared.search;
 
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.web.internal.display.context.Keywords;
 import com.liferay.portal.search.web.internal.display.context.SearchScope;
@@ -106,7 +107,8 @@ public class SearchBarPortletSharedSearchContributor
 
 		Optional<String> parameterValueOptional =
 			portletSharedSearchSettings.getParameter(
-				searchBarPortletPreferences.getScopeParameterName());
+				URLCodec.encodeURL(
+					searchBarPortletPreferences.getScopeParameterName()));
 
 		return parameterValueOptional.map(
 			SearchScope::getSearchScope
@@ -133,7 +135,8 @@ public class SearchBarPortletSharedSearchContributor
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
 		Optional<String> optional = portletSharedSearchSettings.getParameter(
-			searchBarPortletPreferences.getKeywordsParameterName());
+			URLCodec.encodeURL(
+				searchBarPortletPreferences.getKeywordsParameterName()));
 
 		optional.ifPresent(
 			value -> {

@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.custom.facet.portlet;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.web.internal.custom.facet.constants.CustomFacetPortletKeys;
 import com.liferay.portal.search.web.internal.custom.facet.display.context.CustomFacetDisplayBuilder;
@@ -130,7 +131,8 @@ public class CustomFacetPortlet extends MVCPortlet {
 
 		copy(
 			() -> getParameterValues(
-				parameterName, portletSharedSearchResponse, renderRequest),
+				URLCodec.encodeURL(parameterName), portletSharedSearchResponse,
+				renderRequest),
 			customFacetDisplayBuilder::setParameterValues);
 
 		return customFacetDisplayBuilder.build();

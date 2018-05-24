@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.folder.facet.portlet.shared.searc
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.facet.folder.FolderFacetFactory;
 import com.liferay.portal.search.web.internal.folder.facet.constants.FolderFacetPortletKeys;
 import com.liferay.portal.search.web.internal.folder.facet.portlet.FolderFacetBuilder;
@@ -74,7 +75,8 @@ public class FolderFacetPortletSharedSearchContributor
 			() -> {
 				Optional<String[]> optional =
 					portletSharedSearchSettings.getParameterValues(
-						folderFacetPortletPreferences.getParameterName());
+						URLCodec.encodeURL(
+							folderFacetPortletPreferences.getParameterName()));
 
 				return optional.map(
 					parameterValues -> ListUtil.toLongArray(

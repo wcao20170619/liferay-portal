@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.folder.facet.portlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.folder.FolderFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.FolderSearchFacetDisplayBuilder;
@@ -127,7 +128,7 @@ public class FolderFacetPortlet extends MVCPortlet {
 
 		Optional<String[]> parameterValuesOptional =
 			portletSharedSearchResponse.getParameterValues(
-				parameterName, renderRequest);
+				URLCodec.encodeURL(parameterName), renderRequest);
 
 		parameterValuesOptional.ifPresent(
 			folderSearchFacetDisplayBuilder::setParameterValues);

@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.summary.SummaryBuilderFactory;
@@ -166,11 +167,11 @@ public class SearchResultsPortlet extends MVCPortlet {
 			buildSearchContainer(
 				documents, portletSharedSearchResponse.getTotalHits(),
 				portletSharedSearchResponse.getPaginationStart(),
-				searchResultsPortletPreferences.
-					getPaginationStartParameterName(),
+				URLCodec.encodeURL(searchResultsPortletPreferences.
+					getPaginationStartParameterName()),
 				portletSharedSearchResponse.getPaginationDelta(),
-				searchResultsPortletPreferences.
-					getPaginationDeltaParameterName(),
+				URLCodec.encodeURL(searchResultsPortletPreferences.
+					getPaginationDeltaParameterName()),
 				renderRequest));
 
 		searchResultsPortletDisplayContext.setSearchResultsSummariesHolder(
