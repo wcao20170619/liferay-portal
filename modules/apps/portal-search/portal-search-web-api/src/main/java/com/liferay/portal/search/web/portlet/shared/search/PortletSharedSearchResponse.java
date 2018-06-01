@@ -41,4 +41,6 @@ public interface PortletSharedSearchResponse extends SearchResponse {
 
 	public ThemeDisplay getThemeDisplay(RenderRequest renderRequest);
 
+	public boolean isEmptySearchEnabled();
+
 }
