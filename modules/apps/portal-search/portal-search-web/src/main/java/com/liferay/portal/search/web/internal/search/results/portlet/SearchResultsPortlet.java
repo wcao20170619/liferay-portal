@@ -150,18 +150,20 @@ public class SearchResultsPortlet extends MVCPortlet {
 		searchResultsPortletDisplayContext.setKeywords(
 			keywordsOptional.orElse(StringPool.BLANK));
 
-		boolean renderNothing = false;
-
-		if (!keywordsOptional.isPresent()) {
-			renderNothing = true;
-		}
-
-		searchResultsPortletDisplayContext.setRenderNothing(renderNothing);
-
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
 					renderRequest));
+
+		boolean renderNothing = false;
+
+		if (!keywordsOptional.isPresent() &&
+			!portletSharedSearchResponse.isEmptySearchEnabled()) {
+
+			renderNothing = true;
+		}
+
+		searchResultsPortletDisplayContext.setRenderNothing(renderNothing);
 
 		searchResultsPortletDisplayContext.setSearchContainer(
 			buildSearchContainer(

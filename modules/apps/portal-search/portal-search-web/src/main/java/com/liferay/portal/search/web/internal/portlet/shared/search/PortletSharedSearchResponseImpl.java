@@ -15,11 +15,14 @@
 package com.liferay.portal.search.web.internal.portlet.shared.search;
 
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
+import com.liferay.portal.search.web.internal.search.options.portlet.SearchOptionsPortletPreferences;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchResponse;
 import com.liferay.portal.search.web.search.request.SearchResponse;
 import com.liferay.portal.search.web.search.request.SearchSettings;
@@ -131,6 +134,18 @@ public class PortletSharedSearchResponseImpl
 	@Override
 	public int getTotalHits() {
 		return _searchResponse.getTotalHits();
+	}
+
+	@Override
+	public boolean isEmptySearchEnabled() {
+		SearchSettings searchSettings = getSearchSettings();
+
+		SearchContext searchContext = searchSettings.getSearchContext();
+
+		return GetterUtil.getBoolean(
+			searchContext.getAttribute(
+				SearchOptionsPortletPreferences.
+					PREFERENCE_KEY_EMPTY_SEARCH_ENABLED));
 	}
 
 	private final PortletSharedRequestHelper _portletSharedRequestHelper;

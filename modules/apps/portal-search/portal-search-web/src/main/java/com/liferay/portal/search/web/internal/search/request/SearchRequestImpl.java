@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.web.internal.search.options.portlet.SearchOptionsPortletPreferences;
 import com.liferay.portal.search.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.web.search.request.SearchRequest;
 import com.liferay.portal.search.web.search.request.SearchSettings;
@@ -155,6 +157,18 @@ public class SearchRequestImpl implements SearchRequest {
 
 				return search(facetedSearcher, searchContext);
 			});
+
+		if (!keywordsOptional.isPresent() &&
+			GetterUtil.getBoolean(
+				searchContext.getAttribute(
+					SearchOptionsPortletPreferences.
+						PREFERENCE_KEY_EMPTY_SEARCH_ENABLED))) {
+
+			FacetedSearcher facetedSearcher =
+				_facetedSearcherManager.createFacetedSearcher();
+
+			return search(facetedSearcher, searchContext);
+		}
 
 		return hitsOptional.orElseGet(HitsImpl::new);
 	}
