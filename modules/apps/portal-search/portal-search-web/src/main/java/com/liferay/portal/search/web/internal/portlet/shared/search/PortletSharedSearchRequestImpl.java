@@ -25,12 +25,14 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.search.web.internal.display.context.PortletRequestThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.display.context.ThemeDisplaySupplier;
 import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
+import com.liferay.portal.search.web.internal.search.bar.constants.SearchBarPortletKeys;
 import com.liferay.portal.search.web.internal.search.request.SearchContainerBuilder;
 import com.liferay.portal.search.web.internal.search.request.SearchContextBuilder;
 import com.liferay.portal.search.web.internal.search.request.SearchRequestImpl;
@@ -197,6 +199,13 @@ public class PortletSharedSearchRequestImpl
 
 		List<Portlet> portlets = layoutTypePortlet.getExplicitlyAddedPortlets();
 
+		Portlet searchBarPortlet = _portletLocalService.getPortletById(
+			layout.getCompanyId(), SearchBarPortletKeys.SEARCH_BAR);
+
+		if (portlets.indexOf(searchBarPortlet) < 0) {
+			portlets.add(searchBarPortlet);
+		}
+
 		return portlets.stream();
 	}
 
@@ -268,6 +277,9 @@ public class PortletSharedSearchRequestImpl
 
 	@Reference
 	protected PortletSharedTaskExecutor portletSharedTaskExecutor;
+
+	@Reference
+	private PortletLocalService _portletLocalService;
 
 	private ServiceTrackerMap<String, PortletSharedSearchContributor>
 		_portletSharedSearchContributors;
