@@ -199,8 +199,11 @@ public class PortletSharedSearchRequestImpl
 
 		List<Portlet> portlets = layoutTypePortlet.getExplicitlyAddedPortlets();
 
+//		Portlet searchBarPortlet = _portletLocalService.getPortletById(
+//			layout.getCompanyId(), SearchBarPortletKeys.SEARCH_BAR);
+		
 		Portlet searchBarPortlet = _portletLocalService.getPortletById(
-			layout.getCompanyId(), SearchBarPortletKeys.SEARCH_BAR);
+				layout.getCompanyId(), SearchBarPortletKeys.SEARCH_BAR + "_INSTANCE_templateSearch");
 
 		if (portlets.indexOf(searchBarPortlet) < 0) {
 			portlets.add(searchBarPortlet);
