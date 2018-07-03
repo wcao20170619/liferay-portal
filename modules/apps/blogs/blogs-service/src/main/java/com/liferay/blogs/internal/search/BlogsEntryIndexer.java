@@ -126,7 +126,7 @@ public class BlogsEntryIndexer extends BaseIndexer<BlogsEntry> {
 
 		Summary summary = createSummary(document);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

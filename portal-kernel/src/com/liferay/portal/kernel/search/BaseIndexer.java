@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.service.RegionServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -1758,6 +1759,31 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 	protected void setStagingAware(boolean stagingAware) {
 		_stagingAware = stagingAware;
+	}
+
+	protected void setSummaryMaxContentLength(Summary summary) {
+		String content = summary.getContent();
+
+		int defaultContentLength = 200;
+
+		if (defaultContentLength < content.length()) {
+			String strippedContent = HtmlUtil.stripHtml(content);
+
+			int strippedLength = strippedContent.length();
+
+			if (strippedLength < defaultContentLength) {
+				defaultContentLength = content.length();
+			}
+			else if (strippedLength < content.length()) {
+				String strippedBeginning = HtmlUtil.stripHtml(
+					content.substring(0, defaultContentLength));
+
+				defaultContentLength =
+					defaultContentLength * 2 - strippedBeginning.length();
+			}
+		}
+
+		summary.setMaxContentLength(defaultContentLength);
 	}
 
 	private void _addPreFilters(

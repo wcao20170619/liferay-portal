@@ -675,7 +675,7 @@ public class JournalArticleIndexer
 
 		Summary summary = new Summary(snippetLocale, title, content);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

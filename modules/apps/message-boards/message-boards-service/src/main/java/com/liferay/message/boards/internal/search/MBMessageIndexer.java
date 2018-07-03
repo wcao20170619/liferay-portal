@@ -354,7 +354,7 @@ public class MBMessageIndexer
 
 		Summary summary = createSummary(document, title, content);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

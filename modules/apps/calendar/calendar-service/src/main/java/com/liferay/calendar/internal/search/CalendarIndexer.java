@@ -131,7 +131,7 @@ public class CalendarIndexer extends BaseIndexer<Calendar> {
 		Summary summary = createSummary(
 			document, Field.NAME, Field.DESCRIPTION);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

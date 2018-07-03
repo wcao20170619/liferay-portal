@@ -233,7 +233,7 @@ public class WikiPageIndexer
 
 		Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

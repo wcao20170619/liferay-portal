@@ -164,7 +164,7 @@ public class KBArticleIndexer extends BaseIndexer<KBArticle> {
 
 		Summary summary = new Summary(title, content);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

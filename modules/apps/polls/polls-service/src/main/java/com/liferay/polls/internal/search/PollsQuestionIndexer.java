@@ -88,7 +88,7 @@ public class PollsQuestionIndexer extends BaseIndexer<PollsQuestion> {
 
 		Summary summary = createSummary(document);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

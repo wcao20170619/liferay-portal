@@ -262,7 +262,7 @@ public class DDMFormInstanceRecordIndexer
 		Summary summary = createSummary(
 			document, Field.TITLE, Field.DESCRIPTION);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 		summary.setTitle(title);
 
 		return summary;

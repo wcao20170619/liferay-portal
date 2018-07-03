@@ -271,7 +271,7 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		Summary summary = createSummary(
 			document, Field.TITLE, Field.DESCRIPTION);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

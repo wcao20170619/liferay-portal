@@ -246,7 +246,7 @@ public class CalendarBookingIndexer extends BaseIndexer<CalendarBooking> {
 
 		Summary summary = new Summary(snippetLocale, title, description);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}

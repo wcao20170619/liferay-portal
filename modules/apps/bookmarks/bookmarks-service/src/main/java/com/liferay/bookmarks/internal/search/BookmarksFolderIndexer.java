@@ -129,7 +129,7 @@ public class BookmarksFolderIndexer
 		Summary summary = createSummary(
 			document, Field.TITLE, Field.DESCRIPTION);
 
-		summary.setMaxContentLength(200);
+		setSummaryMaxContentLength(summary);
 
 		return summary;
 	}
