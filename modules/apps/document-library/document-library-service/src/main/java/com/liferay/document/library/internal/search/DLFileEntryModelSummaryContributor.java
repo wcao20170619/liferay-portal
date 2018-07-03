@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.spi.model.result.contributor.ModelSummaryContributor;
 
@@ -53,7 +54,26 @@ public class DLFileEntryModelSummaryContributor
 
 		Summary summary = new Summary(title, content);
 
-		summary.setMaxContentLength(200);
+		int defaultContentLength = 200;
+
+		if (defaultContentLength < content.length()) {
+			String strippedContent = HtmlUtil.stripHtml(content);
+
+			int strippedLength = strippedContent.length();
+
+			if (strippedLength < defaultContentLength) {
+				defaultContentLength = content.length();
+			}
+			else if (strippedLength < content.length()) {
+				String strippedBeginning = HtmlUtil.stripHtml(
+					content.substring(0, defaultContentLength));
+
+				defaultContentLength =
+					defaultContentLength * 2 - strippedBeginning.length();
+			}
+		}
+
+		summary.setMaxContentLength(defaultContentLength);
 
 		return summary;
 	}

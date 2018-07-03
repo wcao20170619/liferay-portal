@@ -84,7 +84,26 @@ public class CalendarBookingModelSummaryContributor
 
 		Summary summary = new Summary(snippetLocale, title, description);
 
-		summary.setMaxContentLength(200);
+		int defaultContentLength = 200;
+
+		if (defaultContentLength < description.length()) {
+			String strippedDescription = HtmlUtil.stripHtml(description);
+
+			int strippedLength = strippedDescription.length();
+
+			if (strippedLength < defaultContentLength) {
+				defaultContentLength = description.length();
+			}
+			else if (strippedLength < description.length()) {
+				String strippedBeginning = HtmlUtil.stripHtml(
+					description.substring(0, defaultContentLength));
+
+				defaultContentLength =
+					defaultContentLength * 2 - strippedBeginning.length();
+			}
+		}
+
+		summary.setMaxContentLength(defaultContentLength);
 
 		return summary;
 	}
