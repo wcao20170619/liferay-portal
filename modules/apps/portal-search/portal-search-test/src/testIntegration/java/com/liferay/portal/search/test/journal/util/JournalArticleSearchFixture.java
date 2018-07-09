@@ -38,7 +38,8 @@ public class JournalArticleSearchFixture {
 		long groupId = journalArticleBlueprint.getGroupId();
 		long folderId = JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 		Map<Locale, String> titleMap = journalArticleBlueprint.getTitleMap();
-		Map<Locale, String> descriptionMap = null;
+		Map<Locale, String> descriptionMap =
+			journalArticleBlueprint.getDescriptionMap();
 		String contentString = journalArticleBlueprint.getContentString();
 		String ddmStructureKey = "BASIC-WEB-CONTENT";
 		String ddmTemplateKey = "BASIC-WEB-CONTENT";
