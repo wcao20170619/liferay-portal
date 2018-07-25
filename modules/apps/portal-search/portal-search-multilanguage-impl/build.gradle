@@ -1,0 +1,18 @@
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+dependencies {
+	compileInclude group: "com.youcruit.com.cybozu.labs", name: "langdetect", version: "1.1.2-20151117"
+	compileInclude group: "net.arnx", name: "jsonic", version: "1.3.10"
+	compileInclude project(":apps:portal-search:portal-search-multilanguage-api")
+
+	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
+	compileOnly group: "org.mockito", name: "mockito-core", version: "1.10.8"
+	compileOnly group: "org.osgi", name: "org.osgi.core", version: "5.0.0"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
+
+	testCompile group: "log4j", name: "log4j", version: "1.2.17"
+	testCompile project(":core:petra:petra-lang")
+	testCompile project(":core:petra:petra-string")
+}

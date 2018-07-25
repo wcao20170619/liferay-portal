@@ -1,0 +1,14 @@
+Bundle-Name: Liferay Portal Search Multilanguage Implementation
+Bundle-SymbolicName: com.liferay.portal.search.multilanguage.impl
+Bundle-Version: 1.0.0
+Import-Package:\
+	!com.google.inject,\
+	\
+	!org.seasar.framework.container,\
+	!org.seasar.framework.container.factory,\
+	!org.seasar.framework.log,\
+	\
+	com.liferay.portal.search.multilanguage.detect,\
+	\
+	*
+-dsannotations-options: inherit
