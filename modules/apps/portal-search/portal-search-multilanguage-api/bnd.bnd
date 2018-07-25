@@ -1,0 +1,5 @@
+Bundle-Name: Liferay Portal Search Multilanguage API
+Bundle-SymbolicName: com.liferay.portal.search.multilanguage.api
+Bundle-Version: 1.0.0
+Export-Package: 	com.liferay.portal.search.multilanguage.detect
+-dsannotations-options: inherit
