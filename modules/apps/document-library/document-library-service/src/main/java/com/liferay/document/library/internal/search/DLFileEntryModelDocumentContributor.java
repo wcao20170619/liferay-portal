@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.RelatedEntryIndexer;
 import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistry;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -40,6 +41,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
+import com.liferay.portal.search.multilanguage.detect.LanguageDetector;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -103,22 +105,20 @@ public class DLFileEntryModelDocumentContributor
 
 			if (indexContent) {
 				if (is != null) {
-					try {
-						Locale defaultLocale = portal.getSiteDefaultLocale(
-							dlFileEntry.getGroupId());
+					Locale defaultLocale = portal.getSiteDefaultLocale(
+						dlFileEntry.getGroupId());
 
-						String localizedField = Field.getLocalizedName(
-							defaultLocale.toString(), Field.CONTENT);
+					String localizedField = Field.getLocalizedName(
+						defaultLocale.toString(), Field.CONTENT);
 
-						document.addFile(
-							localizedField, is, dlFileEntry.getTitle(),
-							PropsValues.DL_FILE_INDEXING_MAX_SIZE);
-					}
-					catch (IOException ioe) {
-						if (_log.isWarnEnabled()) {
-							_log.warn("Unable to index content", ioe);
-						}
-					}
+					String textString = FileUtil.extractText(
+						is, dlFileEntry.getTitle(),
+						PropsValues.DL_FILE_INDEXING_MAX_SIZE);
+
+					document.addText(localizedField, textString);
+
+					addDocumentFileForDetectedLocale(
+						document, dlFileEntry, textString, defaultLocale);
 				}
 				else if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -210,6 +210,34 @@ public class DLFileEntryModelDocumentContributor
 		}
 	}
 
+	protected void addDocumentFileForDetectedLocale(
+		Document document, DLFileEntry dlFileEntry, String textString,
+		Locale defaultLocale) {
+
+		List<Locale> detectedLocales = _languageDetector.detectLocales(
+			textString, PropsValues.DL_FILE_INDEXING_MAX_SIZE, false);
+
+		if (detectedLocales != null) {
+			detectedLocales.forEach(
+				locale -> {
+					if (!locale.equals(defaultLocale)) {
+						String field = Field.getLocalizedName(
+							locale.toString(), Field.CONTENT);
+
+						try {
+							document.addText(field, textString);
+						}
+						catch (Exception e) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(
+									"Unable to add file for " + field, e);
+							}
+						}
+					}
+				});
+		}
+	}
+
 	protected void addFileEntryTypeAttributes(
 			Document document, DLFileVersion dlFileVersion)
 		throws PortalException {
@@ -291,5 +319,8 @@ public class DLFileEntryModelDocumentContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryModelDocumentContributor.class);
+
+	@Reference
+	private LanguageDetector _languageDetector;
 
 }

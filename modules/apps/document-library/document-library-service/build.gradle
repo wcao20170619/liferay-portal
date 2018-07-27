@@ -20,6 +20,7 @@ dependencies {
 	compileOnly project(":apps:portal-configuration:portal-configuration-upgrade-api")
 	compileOnly project(":apps:portal-instances:portal-instances-api")
 	compileOnly project(":apps:portal-search:portal-search-api")
+	compileOnly project(":apps:portal-search:portal-search-multilanguage-api")
 	compileOnly project(":apps:portal-search:portal-search-spi")
 	compileOnly project(":apps:portal:portal-instance-lifecycle-api")
 	compileOnly project(":apps:portal:portal-upgrade-api")
