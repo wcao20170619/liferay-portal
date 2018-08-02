@@ -83,6 +83,10 @@ public abstract class BaseFacetTestCase extends BaseIndexingTestCase {
 		}
 	}
 
+	protected long doSearchCount(SearchContext searchContext) {
+		return searchCount(searchContext);
+	}
+
 	protected abstract String getField();
 
 	protected Facet initFacet(Facet facet) {
@@ -129,6 +133,10 @@ public abstract class BaseFacetTestCase extends BaseIndexingTestCase {
 
 		public void search(QueryContributor queryContributor) {
 			_hits = doSearch(_searchContext, queryContributor);
+		}
+
+		public long searchCount() {
+			return doSearchCount(_searchContext);
 		}
 
 		public void setSearchContextAttribute(String name, Serializable value) {

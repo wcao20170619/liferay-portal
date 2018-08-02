@@ -25,6 +25,7 @@ import com.liferay.portal.search.test.util.indexing.QueryContributors;
 
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -132,6 +133,26 @@ public abstract class BaseSimpleFacetTestCase extends BaseFacetTestCase {
 				helper.search();
 
 				helper.assertFrequencies(facet, Arrays.asList("One=1"));
+			});
+	}
+
+	@Test
+	public void testSearchCountSelection() throws Exception {
+		addDocuments(6, "one");
+		addDocuments(5, "two");
+		addDocuments(4, "three");
+		addDocuments(3, "four");
+		addDocuments(2, "five");
+
+		assertSearchFacet(
+			helper -> {
+				Facet facet = helper.addFacet(this::createFacet);
+
+				select(facet, "three", helper);
+
+				long count = helper.searchCount();
+
+				Assert.assertEquals(4, count);
 			});
 	}
 

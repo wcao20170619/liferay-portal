@@ -195,6 +195,31 @@ public abstract class BaseIndexingTestCase {
 		return search(searchContext, _getQuery(queryContributor));
 	}
 
+	protected long searchCount(SearchContext searchContext) {
+		return searchCount(searchContext, getDefaultQuery());
+	}
+
+	protected long searchCount(SearchContext searchContext, Query query) {
+		try {
+			return _indexSearcher.searchCount(searchContext, query);
+		}
+		catch (SearchException se) {
+			Throwable t = se.getCause();
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+
+			throw new RuntimeException(se);
+		}
+	}
+
+	protected long searchCount(
+		SearchContext searchContext, QueryContributor queryContributor) {
+
+		return searchCount(searchContext, _getQuery(queryContributor));
+	}
+
 	protected void setPreBooleanFilter(Filter filter, Query query) {
 		BooleanFilter booleanFilter = new BooleanFilter();
 
