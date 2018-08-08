@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.TimeValue;
@@ -52,8 +53,12 @@ public class CommonSearchResponseAssemblerImpl
 		setExecutionTime(searchResponse, baseSearchResponse);
 
 		baseSearchResponse.setSearchRequestString(searchRequestBuilderString);
-		baseSearchResponse.setTerminatedEarly(
-			searchResponse.isTerminatedEarly());
+
+		if (searchResponse.isTerminatedEarly() != null) {
+			baseSearchResponse.setTerminatedEarly(
+				searchResponse.isTerminatedEarly());
+		}
+
 		baseSearchResponse.setTimedOut(searchResponse.isTimedOut());
 	}
 
