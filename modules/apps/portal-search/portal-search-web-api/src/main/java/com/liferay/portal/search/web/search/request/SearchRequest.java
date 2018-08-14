@@ -25,6 +25,9 @@ public interface SearchRequest {
 	public void addSearchSettingsContributor(
 		SearchSettingsContributor searchSettingsContributor);
 
+	public void addFederatedSearcher(
+		FederatedSearcher federatedSearcher);
+
 	public void removeSearchSettingsContributor(
 		SearchSettingsContributor searchSettingsContributor);
 

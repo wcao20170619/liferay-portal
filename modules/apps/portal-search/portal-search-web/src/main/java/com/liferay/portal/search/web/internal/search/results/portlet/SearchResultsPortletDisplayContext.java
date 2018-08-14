@@ -16,11 +16,13 @@ package com.liferay.portal.search.web.internal.search.results.portlet;
 
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.search.web.internal.result.display.builder.FederatedSearchSummary;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author André de Oliveira
@@ -53,12 +55,20 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 		return _renderNothing;
 	}
 
+	public Map<String, List<FederatedSearchSummary>> getFederatedSearchSummaries() {
+		return _federatedSearchSummaries;
+	}
+
 	public void setDocuments(List<Document> documents) {
 		_documents = documents;
 	}
 
 	public void setKeywords(String keywords) {
 		_keywords = keywords;
+	}
+
+	public void setFederatedSearchSummaries(Map<String, List<FederatedSearchSummary>> federatedSearchSummaries) {
+		_federatedSearchSummaries = federatedSearchSummaries;
 	}
 
 	public void setRenderNothing(boolean renderNothing) {
@@ -81,6 +91,7 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 
 	private List<Document> _documents;
 	private String _keywords;
+	private Map<String, List<FederatedSearchSummary>> _federatedSearchSummaries;
 	private boolean _renderNothing;
 	private SearchContainer<Document> _searchContainer;
 	private SearchResultsSummariesHolder _searchResultsSummariesHolder;

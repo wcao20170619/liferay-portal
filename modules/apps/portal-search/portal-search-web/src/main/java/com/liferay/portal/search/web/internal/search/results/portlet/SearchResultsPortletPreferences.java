@@ -22,6 +22,9 @@ public interface SearchResultsPortletPreferences {
 	public static final String PREFERENCE_KEY_DISPLAY_IN_DOCUMENT_FORM =
 		"displayInDocumentForm";
 
+	public static final String PREFERENCE_KEY_FEDERATED_SEARCH_SOURCE_NAME =
+		"federatedSearchSourceName";
+
 	public static final String PREFERENCE_KEY_HIGHLIGHT_ENABLED =
 		"highlightEnabled";
 
@@ -35,6 +38,10 @@ public interface SearchResultsPortletPreferences {
 		"paginationStartParameterName";
 
 	public static final String PREFERENCE_KEY_VIEW_IN_CONTEXT = "viewInContext";
+
+	public String[] getFederatedSearchSourceNames();
+
+	public String getFederatedSearchSourceName();
 
 	public int getPaginationDelta();
 

@@ -19,7 +19,11 @@ page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultFieldDisplayContext" %><%@
 page import="com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext" %><%@
-page import="com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletDisplayContext" %>
+page import="com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletDisplayContext" %><%@
+page import="java.util.List" %><%@
+page import="java.util.Map" %><%@
+page import="com.liferay.portal.search.web.internal.result.display.builder.FederatedSearchSummary" %><%@
+page import="com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferences" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -39,6 +43,49 @@ if (searchResultsPortletDisplayContext.isRenderNothing()) {
 }
 
 com.liferay.portal.kernel.dao.search.SearchContainer<com.liferay.portal.kernel.search.Document> searchContainer1 = searchResultsPortletDisplayContext.getSearchContainer();
+
+SearchResultsPortletPreferences searchResultsPortletPreferences = new com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferencesImpl(java.util.Optional.ofNullable(portletPreferences), null);
+
+Map<String, List<FederatedSearchSummary>> federatedSearchSummaries = searchResultsPortletDisplayContext.getFederatedSearchSummaries();
+
+String source = searchResultsPortletPreferences.getFederatedSearchSourceName();
+
+List<FederatedSearchSummary> federatedSearchResultSummaries = federatedSearchSummaries.get(source);
+
+if (federatedSearchResultSummaries.size() > 0) {
+%>
+	<h3 >Federated Search Results</h3>
+
+	<ul>
+		<li>
+			Source: <strong><%= source %></strong>
+		</li>
+	</ul>
+
+	<ol>
+	<%
+	for (FederatedSearchSummary federatedSearchSummary : federatedSearchResultSummaries) {
+
+	String videoURL = "https://www.youtube.com/watch?v=" + federatedSearchSummary.getURL();
+	String thumbURL = "https://img.youtube.com/vi/" + federatedSearchSummary.getURL() + "/0.jpg";
+	%>
+		<li>
+			Title: <%= federatedSearchSummary.getTitle() %>
+			<br>
+			Content: <%= federatedSearchSummary.getContent() %>
+			<br>
+
+			<aui:a href="<%= videoURL %>" rel="external" title='<%= federatedSearchSummary.getTitle() %>'>
+				<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="youtube-video" />" height="<%= 100 %>" src="<%= thumbURL %>" width="<%= 150 %>" />
+			</aui:a>
+			<br>
+		</li>
+	<%
+	}
+	%>
+	</ol>
+<%
+}
 %>
 
 <style>

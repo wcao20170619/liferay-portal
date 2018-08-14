@@ -15,6 +15,8 @@
 package com.liferay.portal.search.web.internal.search.results.portlet;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -41,6 +43,8 @@ import com.liferay.portal.search.web.internal.document.DocumentFormPermissionChe
 import com.liferay.portal.search.web.internal.portlet.shared.search.NullPortletURL;
 import com.liferay.portal.search.web.internal.portlet.shared.task.PortletSharedRequestHelper;
 import com.liferay.portal.search.web.internal.result.display.builder.AssetRendererFactoryLookup;
+import com.liferay.portal.search.web.internal.result.display.builder.FederatedSearchResultSummaryBuilder;
+import com.liferay.portal.search.web.internal.result.display.builder.FederatedSearchSummary;
 import com.liferay.portal.search.web.internal.result.display.builder.SearchResultSummaryDisplayBuilder;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 import com.liferay.portal.search.web.internal.search.results.constants.SearchResultsPortletKeys;
@@ -52,8 +56,10 @@ import com.liferay.portal.search.web.search.result.SearchResultImageContributor;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -66,6 +72,9 @@ import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.portal.search.web.search.result.FederatedSearchResults;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -117,7 +126,45 @@ public class SearchResultsPortlet extends MVCPortlet {
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
 			searchResultsPortletDisplayContext);
 
+		Map<String, List<FederatedSearchSummary>> federatedSearchSummaries =
+				new HashMap<>();
+
+		FederatedSearchResults federatedSearchResults =
+			portletSharedSearchResponse.getFederatedSearchResults();
+
+		for (FederatedSearchResultSummaryBuilder
+			 federatedSearchResultSummaryBuilder :
+				_federatedSearchResultSummaryBuilders) {
+
+			String source = federatedSearchResultSummaryBuilder.getSource();
+
+			Document[] documents =
+				federatedSearchResults.getDocumentsFromSource(source);
+
+			List<FederatedSearchSummary> federatedSearchResultSummaries =
+				new ArrayList<>();
+
+			for (Document document : documents) {
+				FederatedSearchSummary federatedSearchSummary =
+					federatedSearchResultSummaryBuilder.getSummary(
+						document);
+
+				federatedSearchResultSummaries.add(federatedSearchSummary);
+			}
+
+			federatedSearchSummaries.put(source, federatedSearchResultSummaries);
+		}
+
+		searchResultsPortletDisplayContext.setFederatedSearchSummaries(
+			federatedSearchSummaries);
+
 		super.render(renderRequest, renderResponse);
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_federatedSearchResultSummaryBuilders = ServiceTrackerListFactory.open(
+			bundleContext, FederatedSearchResultSummaryBuilder.class);
 	}
 
 	@Reference(
@@ -159,7 +206,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
-					renderRequest));
+					renderRequest), null);
 
 		searchResultsPortletDisplayContext.setSearchContainer(
 			buildSearchContainer(
@@ -239,7 +286,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
-					renderRequest));
+					renderRequest), null);
 
 		ThemeDisplay themeDisplay = portletSharedSearchResponse.getThemeDisplay(
 			renderRequest);
@@ -439,5 +486,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 	private final Set<SearchResultImageContributor>
 		_searchResultImageContributors = new HashSet<>();
+
+	private ServiceTrackerList<FederatedSearchResultSummaryBuilder, FederatedSearchResultSummaryBuilder>
+		_federatedSearchResultSummaryBuilders;
 
 }

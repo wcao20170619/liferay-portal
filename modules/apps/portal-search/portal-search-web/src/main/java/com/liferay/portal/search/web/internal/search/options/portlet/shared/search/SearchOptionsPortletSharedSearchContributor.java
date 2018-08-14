@@ -22,7 +22,13 @@ import com.liferay.portal.search.web.internal.search.options.portlet.SearchOptio
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchContributor;
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
+import com.liferay.portal.search.web.search.request.FederatedSearcher;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import org.osgi.service.component.annotations.Component;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Wade Cao
@@ -38,14 +44,28 @@ public class SearchOptionsPortletSharedSearchContributor
 	public void contribute(
 		PortletSharedSearchSettings portletSharedSearchSettings) {
 
+		Registry registry = RegistryUtil.getRegistry();
+
+		Collection<FederatedSearcher> federatedSearchers = Collections.EMPTY_SET;
+
+		try {
+			federatedSearchers =
+				registry.getServices(FederatedSearcher.class, null);
+		}
+		catch (Exception e) {
+		}
+
 		SearchOptionsPortletPreferences searchOptionsPortletPreferences =
 			new SearchOptionsPortletPreferencesImpl(
-				portletSharedSearchSettings.getPortletPreferences());
+				portletSharedSearchSettings.getPortletPreferences(), federatedSearchers);
 
 		enableBasicFacetSelection(
 			searchOptionsPortletPreferences, portletSharedSearchSettings);
 
 		enableEmptySearches(
+			searchOptionsPortletPreferences, portletSharedSearchSettings);
+
+		enableFederatedSearch(
 			searchOptionsPortletPreferences, portletSharedSearchSettings);
 	}
 
@@ -78,6 +98,22 @@ public class SearchOptionsPortletSharedSearchContributor
 
 		searchContext.setAttribute(
 			SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH, Boolean.TRUE);
+	}
+
+	protected void enableFederatedSearch(
+		SearchOptionsPortletPreferences searchOptionsPortletPreferences,
+		PortletSharedSearchSettings portletSharedSearchSettings) {
+
+		if (!searchOptionsPortletPreferences.federatedSearchEnabled()) {
+			return;
+		}
+
+		SearchContext searchContext =
+			portletSharedSearchSettings.getSearchContext();
+
+		searchContext.setAttribute(
+			SearchContextAttributes.ATTRIBUTE_KEY_FEDERATED_SEARCH_SOURCES,
+			searchOptionsPortletPreferences.getCurrentFederatedSearchSourcesArray());
 	}
 
 }

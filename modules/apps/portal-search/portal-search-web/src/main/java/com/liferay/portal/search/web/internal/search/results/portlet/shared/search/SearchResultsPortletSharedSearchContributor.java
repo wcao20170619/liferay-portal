@@ -42,7 +42,7 @@ public class SearchResultsPortletSharedSearchContributor
 
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
-				portletSharedSearchSettings.getPortletPreferences());
+				portletSharedSearchSettings.getPortletPreferences(), null);
 
 		paginate(searchResultsPortletPreferences, portletSharedSearchSettings);
 

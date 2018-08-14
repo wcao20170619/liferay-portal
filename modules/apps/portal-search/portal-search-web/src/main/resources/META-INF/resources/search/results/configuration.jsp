@@ -23,11 +23,22 @@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 <%@ page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferences" %><%@
 page import="com.liferay.portal.search.web.internal.util.PortletPreferencesJspUtil" %>
+<%@ page
+	import="com.liferay.portal.search.web.search.request.FederatedSearcher" %>
+<%@ page import="java.util.Collection" %>
+<%@ page import="com.liferay.registry.RegistryUtil" %>
+<%@ page import="com.liferay.registry.Registry" %>
 
 <portlet:defineObjects />
 
 <%
-SearchResultsPortletPreferences searchResultsPortletPreferences = new com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferencesImpl(java.util.Optional.ofNullable(portletPreferences));
+Registry registry = RegistryUtil.getRegistry();
+
+Collection<FederatedSearcher> federatedSearchers = registry.getServices(FederatedSearcher.class, null);
+
+SearchResultsPortletPreferences searchResultsPortletPreferences =
+	new com.liferay.portal.search.web.internal.search.results.portlet.SearchResultsPortletPreferencesImpl(
+		java.util.Optional.ofNullable(portletPreferences), federatedSearchers);
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -55,6 +66,18 @@ SearchResultsPortletPreferences searchResultsPortletPreferences = new com.lifera
 			<aui:input label="pagination-delta" name="<%= PortletPreferencesJspUtil.getInputName(SearchResultsPortletPreferences.PREFERENCE_KEY_PAGINATION_DELTA) %>" type="text" value="<%= searchResultsPortletPreferences.getPaginationDelta() %>" />
 
 			<aui:input label="pagination-delta-parameter-name" name="<%= PortletPreferencesJspUtil.getInputName(SearchResultsPortletPreferences.PREFERENCE_KEY_PAGINATION_DELTA_PARAMETER_NAME) %>" type="text" value="<%= searchResultsPortletPreferences.getPaginationDeltaParameterName() %>" />
+
+			<aui:select label="Federated Search Source Name" name="<%= PortletPreferencesJspUtil.getInputName(SearchResultsPortletPreferences.PREFERENCE_KEY_FEDERATED_SEARCH_SOURCE_NAME) %>">
+			<%
+			String[] sourceNames = searchResultsPortletPreferences.getFederatedSearchSourceNames();
+
+			for (String sourceName : sourceNames) {
+			%>
+				<aui:option label="<%= sourceName %>" selected="<%= sourceName.equals(searchResultsPortletPreferences.getFederatedSearchSourceName()) %>" value="<%= sourceName %>" />
+			<%
+			}
+			%>
+			</aui:select>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 

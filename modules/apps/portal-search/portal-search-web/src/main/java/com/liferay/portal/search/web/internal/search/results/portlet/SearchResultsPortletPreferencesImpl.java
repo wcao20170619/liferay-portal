@@ -14,8 +14,14 @@
 
 package com.liferay.portal.search.web.internal.search.results.portlet;
 
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.web.internal.util.PortletPreferencesHelper;
+import com.liferay.portal.search.web.search.request.FederatedSearcher;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.portlet.PortletPreferences;
@@ -27,10 +33,30 @@ public class SearchResultsPortletPreferencesImpl
 	implements SearchResultsPortletPreferences {
 
 	public SearchResultsPortletPreferencesImpl(
-		Optional<PortletPreferences> portletPreferencesOptional) {
+		Optional<PortletPreferences> portletPreferencesOptional, Collection<FederatedSearcher> federatedSearchers) {
 
 		_portletPreferencesHelper = new PortletPreferencesHelper(
 			portletPreferencesOptional);
+
+		_federatedSearchers = federatedSearchers;
+	}
+
+	public String[] getFederatedSearchSourceNames() {
+		List<String> sources = new ArrayList<>();
+
+		for (FederatedSearcher federatedSearcher : _federatedSearchers) {
+			sources.add(federatedSearcher.getSource());
+		}
+
+		return ArrayUtil.toStringArray(sources);
+	}
+
+	@Override
+	public String getFederatedSearchSourceName() {
+		return _portletPreferencesHelper.getString(
+			SearchResultsPortletPreferences.
+				PREFERENCE_KEY_FEDERATED_SEARCH_SOURCE_NAME,
+			StringPool.BLANK);
 	}
 
 	@Override
@@ -80,4 +106,5 @@ public class SearchResultsPortletPreferencesImpl
 
 	private final PortletPreferencesHelper _portletPreferencesHelper;
 
+	private Collection<FederatedSearcher> _federatedSearchers;
 }
