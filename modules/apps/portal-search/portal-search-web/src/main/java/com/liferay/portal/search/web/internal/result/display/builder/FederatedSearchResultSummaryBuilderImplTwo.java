@@ -32,8 +32,8 @@ public class FederatedSearchResultSummaryBuilderImplTwo implements
 
 		SummaryBuilder builder = summaryBuilderFactory.newInstance();
 
-		builder.setTitle(document.get("federatedTitle"));
-		builder.setContent(document.get("federatedContent"));
+		builder.setTitle(document.get("regularTextTitle"));
+		builder.setContent(document.get("regularTextContent"));
 
 		Summary summary = builder.build();
 
