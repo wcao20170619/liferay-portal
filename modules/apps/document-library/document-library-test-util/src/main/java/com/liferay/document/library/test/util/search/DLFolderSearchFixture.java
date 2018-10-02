@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.search.test.documentlibrary.util;
+package com.liferay.document.library.test.util.search;
 
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolder;
