@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.search.test.documentlibrary.util;
+package com.liferay.document.library.test.util.search;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.petra.string.StringPool;
@@ -34,6 +34,30 @@ public class FileEntrySearchFixture {
 
 	public FileEntrySearchFixture(DLAppLocalService dlAppLocalService) {
 		this.dlAppLocalService = dlAppLocalService;
+	}
+
+	public FileEntry addFileEntry(FileEntryBlueprint fileEntryBlueprint)
+		throws Exception {
+
+		long groupId = fileEntryBlueprint.getGroupId();
+		String keyword = fileEntryBlueprint.getKeyword();
+		long userId = fileEntryBlueprint.getUserId();
+		String[] assetTagNames = fileEntryBlueprint.getAssetTagNames();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(groupId);
+
+		serviceContext.setAssetTagNames(assetTagNames);
+
+		String title =
+			keyword + StringPool.SPACE + RandomTestUtil.randomString();
+
+		FileEntry fileEntry = DLAppTestUtil.addFileEntryWithWorkflow(
+			userId, groupId, 0, StringPool.BLANK, title, true, serviceContext);
+
+		_fileEntries.add(fileEntry);
+
+		return fileEntry;
 	}
 
 	public FileEntry addFileEntry(Group group, User user, String keyword)
