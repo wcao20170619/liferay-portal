@@ -319,6 +319,12 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			searchRequestBuilder, query, searchContext.getFacets(),
 			basicFacetSelection);
 
+		boolean explainSearch = GetterUtil.getBoolean(
+			searchContext.getAttribute(
+				SearchContextAttributes.ATTRIBUTE_KEY_EXPLAIN_SEARCH));
+
+		searchRequestBuilder.setExplain(explainSearch);
+
 		if (!count) {
 			addGroupBy(
 				searchRequestBuilder, searchContext.getGroupBy(),
