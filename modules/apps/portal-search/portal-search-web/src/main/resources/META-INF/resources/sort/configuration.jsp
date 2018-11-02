@@ -70,19 +70,6 @@ SortTypePreference[] sortTypePreferences = sortPortletPreferences.getSortTypePre
 
 							<aui:input cssClass="sort-field-input" label="field" name='<%= "field_" + i %>' value='<%= jsonObject.getString("field") %>' />
 
-							<aui:select cssClass="type-input" label="type" name='<%= "type_" + i %>' value='<%= jsonObject.getString("type") %>'>
-
-								<%
-								for (int j = 0; j < sortTypePreferences.length; j++) {
-								%>
-
-								<aui:option label="<%= sortTypePreferences[j].getPreferenceString() %>" value="<%= sortTypePreferences[j].getSortType() %>" />
-
-								<%
-								}
-								%>
-
-							</aui:select>
 						</div>
 					</div>
 

@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,15 +43,29 @@ public class GroupedModelDocumentContributor implements DocumentContributor {
 
 		GroupedModel groupedModel = (GroupedModel)baseModel;
 
-		document.addKeyword(
+		DocumentBuilder documentBuilder = 
+			documentBuilderFactory.getBuilder();
+
+//		document.addKeyword(
+//			Field.GROUP_ID,
+//			GroupUtil.getSiteGroupId(
+//				groupLocalService, groupedModel.getGroupId()));
+
+		documentBuilder.add(
 			Field.GROUP_ID,
 			GroupUtil.getSiteGroupId(
 				groupLocalService, groupedModel.getGroupId()));
-
-		document.addKeyword(Field.SCOPE_GROUP_ID, groupedModel.getGroupId());
+				
+//		document.addKeyword(Field.SCOPE_GROUP_ID, groupedModel.getGroupId());
+		documentBuilder.add(Field.SCOPE_GROUP_ID, groupedModel.getGroupId());
+		
+		document = documentBuilder.build(document);  
 	}
 
 	@Reference
 	protected GroupLocalService groupLocalService;
+	
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 }

@@ -18,9 +18,13 @@ import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
-import com.liferay.portal.kernel.search.DocumentHelper;
+//import com.liferay.portal.kernel.search.DocumentHelper;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -33,13 +37,26 @@ public class AttachedModelDocumentContributor implements DocumentContributor {
 		if (!(baseModel instanceof AttachedModel)) {
 			return;
 		}
-
-		DocumentHelper documentHelper = new DocumentHelper(document);
-
+		
+//		DocumentHelper documentHelper = new DocumentHelper(document);
+		
 		AttachedModel attachedModel = (AttachedModel)baseModel;
 
-		documentHelper.setAttachmentOwnerKey(
-			attachedModel.getClassNameId(), attachedModel.getClassPK());
+		DocumentBuilder documentBuilder = 
+			documentBuilderFactory.getBuilder();
+		
+//		documentHelper.setAttachmentOwnerKey(
+//			attachedModel.getClassNameId(), attachedModel.getClassPK());
+//		
+		documentBuilder.add(
+			Field.CLASS_NAME_ID, String.valueOf(attachedModel.getClassNameId()));
+		documentBuilder.add(
+			Field.CLASS_PK, String.valueOf(attachedModel.getClassPK()));
+		
+		document = documentBuilder.build(document);  
 	}
+	
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 }

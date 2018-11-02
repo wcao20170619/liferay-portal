@@ -21,6 +21,7 @@ import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.spi.model.index.contributor.ExpandoBridgeRetriever;
 
 import org.osgi.framework.BundleContext;

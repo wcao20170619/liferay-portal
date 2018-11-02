@@ -64,6 +64,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.List;
 import java.util.Locale;
@@ -279,27 +281,38 @@ public class MBMessageIndexer
 	@Override
 	protected Document doGetDocument(MBMessage mbMessage) throws Exception {
 		Document document = getBaseModelDocument(CLASS_NAME, mbMessage);
-
-		document.addKeyword(Field.CATEGORY_ID, mbMessage.getCategoryId());
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
+		
+		//document.addKeyword(Field.CATEGORY_ID, mbMessage.getCategoryId());
+		documentBuilder.add(Field.CATEGORY_ID, mbMessage.getCategoryId());
 
 		for (Locale locale :
 				LanguageUtil.getAvailableLocales(mbMessage.getGroupId())) {
 
 			String languageId = LocaleUtil.toLanguageId(locale);
 
-			document.addText(
-				LocalizationUtil.getLocalizedName(Field.CONTENT, languageId),
+//			document.addText(
+//				LocalizationUtil.getLocalizedName(Field.CONTENT, languageId),
+//				processContent(mbMessage));
+//			document.addText(
+//				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+//				mbMessage.getSubject());
+			documentBuilder.add(
+				Field.CONTENT, languageId,
 				processContent(mbMessage));
-			document.addText(
-				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+			documentBuilder.add(
+				Field.TITLE, languageId,
 				mbMessage.getSubject());
 		}
 
-		document.addKeyword(
+//		document.addKeyword(
+//			Field.ROOT_ENTRY_CLASS_PK, mbMessage.getRootMessageId());
+		documentBuilder.add(
 			Field.ROOT_ENTRY_CLASS_PK, mbMessage.getRootMessageId());
 
 		if (mbMessage.isAnonymous()) {
-			document.remove(Field.USER_NAME);
+			documentBuilder.remove(Field.USER_NAME);
 		}
 
 		MBDiscussion discussion =
@@ -307,13 +320,16 @@ public class MBMessageIndexer
 				mbMessage.getThreadId());
 
 		if (discussion == null) {
-			document.addKeyword("discussion", false);
+			//document.addKeyword("discussion", false);
+			documentBuilder.add("discussion", false);
 		}
 		else {
-			document.addKeyword("discussion", true);
+			//document.addKeyword("discussion", true);
+			documentBuilder.add("discussion", true);
 		}
 
-		document.addKeyword("threadId", mbMessage.getThreadId());
+//		document.addKeyword("threadId", mbMessage.getThreadId());
+		documentBuilder.add("threadId", mbMessage.getThreadId());
 
 		if (mbMessage.isDiscussion()) {
 			List<RelatedEntryIndexer> relatedEntryIndexers =
@@ -331,13 +347,14 @@ public class MBMessageIndexer
 						relatedEntryIndexer.addRelatedEntryFields(
 							document, comment);
 
-						document.addKeyword(Field.RELATED_ENTRY, true);
+//						document.addKeyword(Field.RELATED_ENTRY, true);
+						documentBuilder.add(Field.RELATED_ENTRY, true);
 					}
 				}
 			}
 		}
 
-		return document;
+		return documentBuilder.build(document);
 	}
 
 	@Override
@@ -628,6 +645,9 @@ public class MBMessageIndexer
 	)
 	private ModelResourcePermission<MBMessage> _messageModelResourcePermission;
 
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
+	
 	private final RelatedEntryIndexer _relatedEntryIndexer =
 		new BaseRelatedEntryIndexer();
 

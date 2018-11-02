@@ -53,9 +53,10 @@ import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.io.Serializable;
-
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -162,7 +163,8 @@ public class DDMFormInstanceRecordIndexer
 
 	protected void addContent(
 			DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion,
-			DDMFormValues ddmFormValues, Document document)
+			DDMFormValues ddmFormValues, Document document, 
+			DocumentBuilder documentBuilder)
 		throws Exception {
 
 		Set<Locale> locales = ddmFormValues.getAvailableLocales();
@@ -174,9 +176,12 @@ public class DDMFormInstanceRecordIndexer
 			sb.append(StringPool.UNDERLINE);
 			sb.append(LocaleUtil.toLanguageId(locale));
 
-			document.addText(
+//			document.addText(
+//				sb.toString(),
+//				extractContent(ddmFormInstanceRecordVersion, locale));
+			documentBuilder.add(
 				sb.toString(),
-				extractContent(ddmFormInstanceRecordVersion, locale));
+				extractContent(ddmFormInstanceRecordVersion, locale));		
 		}
 	}
 
@@ -211,6 +216,8 @@ public class DDMFormInstanceRecordIndexer
 
 		Document document = getBaseModelDocument(
 			CLASS_NAME, ddmFormInstanceRecord);
+		DocumentBuilder documentBuilder = 
+			documentBuilderFactory.getBuilder();
 
 		DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion =
 			ddmFormInstanceRecord.getFormInstanceRecordVersion();
@@ -218,21 +225,37 @@ public class DDMFormInstanceRecordIndexer
 		DDMFormInstance ddmFormInstance =
 			ddmFormInstanceRecordVersion.getFormInstance();
 
-		document.addKeyword(
+//		document.addKeyword(
+//			Field.CLASS_NAME_ID,
+//			classNameLocalService.getClassNameId(DDMFormInstance.class));
+//		document.addKeyword(
+//			Field.CLASS_PK, ddmFormInstance.getFormInstanceId());
+//		document.addKeyword(
+//			Field.CLASS_TYPE_ID,
+//			ddmFormInstanceRecordVersion.getFormInstanceId());
+//		document.addKeyword(Field.RELATED_ENTRY, true);
+//		document.addKeyword(
+//			Field.STATUS, ddmFormInstanceRecordVersion.getStatus());
+//		document.addKeyword(
+//			Field.VERSION, ddmFormInstanceRecordVersion.getVersion());
+//
+//		document.addKeyword(
+//			"formInstanceId", ddmFormInstance.getFormInstanceId());
+		documentBuilder.add(
 			Field.CLASS_NAME_ID,
 			classNameLocalService.getClassNameId(DDMFormInstance.class));
-		document.addKeyword(
+		documentBuilder.add(
 			Field.CLASS_PK, ddmFormInstance.getFormInstanceId());
-		document.addKeyword(
+		documentBuilder.add(
 			Field.CLASS_TYPE_ID,
 			ddmFormInstanceRecordVersion.getFormInstanceId());
-		document.addKeyword(Field.RELATED_ENTRY, true);
-		document.addKeyword(
+		documentBuilder.add(Field.RELATED_ENTRY, true);
+		documentBuilder.add(
 			Field.STATUS, ddmFormInstanceRecordVersion.getStatus());
-		document.addKeyword(
+		documentBuilder.add(
 			Field.VERSION, ddmFormInstanceRecordVersion.getVersion());
 
-		document.addKeyword(
+		documentBuilder.add(
 			"formInstanceId", ddmFormInstance.getFormInstanceId());
 
 		DDMStructure ddmStructure = ddmFormInstance.getStructure();
@@ -240,11 +263,13 @@ public class DDMFormInstanceRecordIndexer
 		DDMFormValues ddmFormValues =
 			ddmFormInstanceRecordVersion.getDDMFormValues();
 
-		addContent(ddmFormInstanceRecordVersion, ddmFormValues, document);
+		addContent(
+			ddmFormInstanceRecordVersion, 
+			ddmFormValues, document, documentBuilder);
 
 		ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
 
-		return document;
+		return documentBuilder.build(document);
 	}
 
 	@Override
@@ -414,6 +439,9 @@ public class DDMFormInstanceRecordIndexer
 
 	@Reference
 	protected SearchPermissionChecker searchPermissionChecker;
+	
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMFormInstanceRecordIndexer.class);

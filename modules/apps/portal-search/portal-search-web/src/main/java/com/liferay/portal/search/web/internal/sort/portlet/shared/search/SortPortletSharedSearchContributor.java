@@ -17,6 +17,7 @@ package com.liferay.portal.search.web.internal.sort.portlet.shared.search;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.search.sort.SortBuilderFactory;
 import com.liferay.portal.search.web.internal.sort.constants.SortPortletKeys;
 import com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferences;
 import com.liferay.portal.search.web.internal.sort.portlet.SortPortletPreferencesImpl;
@@ -26,6 +27,7 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchCo
 import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchSettings;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Wade Cao
@@ -59,7 +61,8 @@ public class SortPortletSharedSearchContributor
 		PortletSharedSearchSettings portletSharedSearchSettings,
 		SortPortletPreferences sortPortletPreferences) {
 
-		SortsBuilder sortsBuilder = new SortsBuilder(sortPortletPreferences);
+		SortsBuilder sortsBuilder = new SortsBuilder(
+			sortPortletPreferences, _sortBuilderFactory);
 
 		SearchOptionalUtil.copy(
 			() -> portletSharedSearchSettings.getParameterValues(
@@ -68,5 +71,8 @@ public class SortPortletSharedSearchContributor
 
 		return sortsBuilder.build();
 	}
+	
+	@Reference
+	SortBuilderFactory _sortBuilderFactory;
 
 }

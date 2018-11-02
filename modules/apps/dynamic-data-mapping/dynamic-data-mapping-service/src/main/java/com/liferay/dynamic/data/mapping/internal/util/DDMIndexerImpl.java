@@ -44,13 +44,12 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.io.Serializable;
-
 import java.math.BigDecimal;
-
 import java.text.Format;
-
 import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
@@ -73,6 +72,8 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		Fields fields = toFields(ddmStructure, ddmFormValues);
 
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
 		for (Field field : fields) {
 			try {
 				String indexType = ddmStructure.getFieldProperty(
@@ -90,46 +91,60 @@ public class DDMIndexerImpl implements DDMIndexer {
 					Serializable value = field.getValue(locale);
 
 					if (value instanceof BigDecimal) {
-						document.addNumberSortable(name, (BigDecimal)value);
+						//document.addNumberSortable(name, (BigDecimal)value);
+						documentBuilder.add(name, (BigDecimal)value);
 					}
 					else if (value instanceof BigDecimal[]) {
-						document.addNumberSortable(name, (BigDecimal[])value);
+						//document.addNumberSortable(name, (BigDecimal[])value);
+						documentBuilder.add(name, (BigDecimal[])value);
 					}
 					else if (value instanceof Boolean) {
-						document.addKeywordSortable(name, (Boolean)value);
+						//document.addKeywordSortable(name, (Boolean)value);
+						documentBuilder.add(name, (Boolean)value);
 					}
 					else if (value instanceof Boolean[]) {
-						document.addKeywordSortable(name, (Boolean[])value);
+						//document.addKeywordSortable(name, (Boolean[])value);
+						documentBuilder.add(name, (Boolean[])value);
 					}
 					else if (value instanceof Date) {
-						document.addDateSortable(name, (Date)value);
+						//document.addDateSortable(name, (Date)value);
+						documentBuilder.add(name, (Date)value);
 					}
 					else if (value instanceof Date[]) {
-						document.addDateSortable(name, (Date[])value);
+						//document.addDateSortable(name, (Date[])value);
+						documentBuilder.add(name, (Date[])value);
 					}
 					else if (value instanceof Double) {
-						document.addNumberSortable(name, (Double)value);
+						//document.addNumberSortable(name, (Double)value);
+						documentBuilder.add(name, (Double)value);
 					}
 					else if (value instanceof Double[]) {
-						document.addNumberSortable(name, (Double[])value);
+						//document.addNumberSortable(name, (Double[])value);
+						documentBuilder.add(name, (Double[])value);
 					}
 					else if (value instanceof Integer) {
-						document.addNumberSortable(name, (Integer)value);
+						//document.addNumberSortable(name, (Integer)value);
+						documentBuilder.add(name, (Integer)value);
 					}
 					else if (value instanceof Integer[]) {
-						document.addNumberSortable(name, (Integer[])value);
+						//document.addNumberSortable(name, (Integer[])value);
+						documentBuilder.add(name, (Integer[])value);
 					}
 					else if (value instanceof Long) {
-						document.addNumberSortable(name, (Long)value);
+						//document.addNumberSortable(name, (Long)value);
+						documentBuilder.add(name, (Long)value);
 					}
 					else if (value instanceof Long[]) {
-						document.addNumberSortable(name, (Long[])value);
+						//document.addNumberSortable(name, (Long[])value);
+						documentBuilder.add(name, (Long[])value);
 					}
 					else if (value instanceof Float) {
-						document.addNumberSortable(name, (Float)value);
+						//document.addNumberSortable(name, (Float)value);
+						documentBuilder.add(name, (Float)value);
 					}
 					else if (value instanceof Float[]) {
-						document.addNumberSortable(name, (Float[])value);
+						//document.addNumberSortable(name, (Float[])value);
+						documentBuilder.add(name, (Float[])value);
 					}
 					else if (value instanceof Number[]) {
 						Number[] numbers = (Number[])value;
@@ -140,17 +155,20 @@ public class DDMIndexerImpl implements DDMIndexer {
 							doubles[i] = numbers[i].doubleValue();
 						}
 
-						document.addNumberSortable(name, doubles);
+						//document.addNumberSortable(name, doubles);
+						documentBuilder.add(name, doubles);
 					}
 					else if (value instanceof Object[]) {
 						String[] valuesString = ArrayUtil.toStringArray(
 							(Object[])value);
 
 						if (indexType.equals("keyword")) {
-							document.addKeywordSortable(name, valuesString);
+							//document.addKeywordSortable(name, valuesString);
+							documentBuilder.add(name, valuesString);
 						}
 						else {
-							document.addTextSortable(name, valuesString);
+							//document.addTextSortable(name, valuesString);
+							documentBuilder.add(name, valuesString);
 						}
 					}
 					else {
@@ -167,7 +185,10 @@ public class DDMIndexerImpl implements DDMIndexer {
 							double longitude = jsonObject.getDouble(
 								"longitude", 0);
 
-							document.addGeoLocation(
+//							document.addGeoLocation(
+//								name.concat("_geolocation"), latitude,
+//								longitude);
+							documentBuilder.add(
 								name.concat("_geolocation"), latitude,
 								longitude);
 						}
@@ -178,7 +199,8 @@ public class DDMIndexerImpl implements DDMIndexer {
 							String[] stringArray = ArrayUtil.toStringArray(
 								jsonArray);
 
-							document.addKeywordSortable(name, stringArray);
+							//document.addKeywordSortable(name, stringArray);
+							documentBuilder.add(name, stringArray);
 						}
 						else {
 							if (type.equals(DDMImpl.TYPE_DDM_TEXT_HTML)) {
@@ -186,10 +208,12 @@ public class DDMIndexerImpl implements DDMIndexer {
 							}
 
 							if (indexType.equals("keyword")) {
-								document.addKeywordSortable(name, valueString);
+								//document.addKeywordSortable(name, valueString);
+								documentBuilder.add(name, valueString);
 							}
 							else {
-								document.addTextSortable(name, valueString);
+								//document.addTextSortable(name, valueString);
+								documentBuilder.add(name, valueString);
 							}
 						}
 					}
@@ -201,6 +225,7 @@ public class DDMIndexerImpl implements DDMIndexer {
 				}
 			}
 		}
+		document = documentBuilder.build(document); 
 	}
 
 	@Override
@@ -392,6 +417,9 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 		_ddmStructureLocalService = ddmStructureLocalService;
 	}
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 	protected Fields toFields(
 		DDMStructure ddmStructure, DDMFormValues ddmFormValues) {

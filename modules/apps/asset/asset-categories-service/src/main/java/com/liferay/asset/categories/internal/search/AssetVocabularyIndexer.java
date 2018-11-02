@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portlet.asset.service.permission.AssetVocabularyPermission;
 
 import java.util.Locale;
@@ -113,28 +115,40 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 		}
 
 		Document document = getBaseModelDocument(CLASS_NAME, assetVocabulary);
-
-		document.addKeyword(
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
+		
+//		document.addKeyword(
+//			Field.ASSET_VOCABULARY_ID, assetVocabulary.getVocabularyId());
+		documentBuilder.add(
 			Field.ASSET_VOCABULARY_ID, assetVocabulary.getVocabularyId());
 
 		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
 			assetVocabulary.getGroupId());
 
-		addLocalizedField(
-			document, Field.DESCRIPTION, siteDefaultLocale,
+//		addLocalizedField(
+//			document, Field.DESCRIPTION, siteDefaultLocale,
+//			assetVocabulary.getDescriptionMap());
+		documentBuilder.add(
+			Field.DESCRIPTION, siteDefaultLocale,
 			assetVocabulary.getDescriptionMap());
 
-		document.addText(Field.NAME, assetVocabulary.getName());
 
-		addLocalizedField(
-			document, Field.TITLE, siteDefaultLocale,
+//		document.addText(Field.NAME, assetVocabulary.getName());
+		documentBuilder.add(Field.NAME, assetVocabulary.getName());
+
+//		addLocalizedField(
+//			document, Field.TITLE, siteDefaultLocale,
+//			assetVocabulary.getTitleMap());
+		documentBuilder.add(
+			Field.TITLE, siteDefaultLocale,
 			assetVocabulary.getTitleMap());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + assetVocabulary + " indexed successfully");
 		}
 
-		return document;
+		return documentBuilder.build(document);
 	}
 
 	@Override
@@ -205,5 +219,8 @@ public class AssetVocabularyIndexer extends BaseIndexer<AssetVocabulary> {
 
 	@Reference
 	private Portal _portal;
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

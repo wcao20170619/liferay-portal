@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.Date;
 import java.util.Locale;
@@ -62,36 +64,58 @@ public class AssetEntryDocumentContributor implements DocumentContributor {
 		if (assetEntry == null) {
 			return;
 		}
+		
+		DocumentBuilder documentBuilder = 
+			documentBuilderFactory.getBuilder();
 
 		if (!document.hasField(Field.CREATE_DATE)) {
-			document.addDate(Field.CREATE_DATE, assetEntry.getCreateDate());
+			//document.addDate(Field.CREATE_DATE, assetEntry.getCreateDate());
+			documentBuilder.add(Field.CREATE_DATE, assetEntry.getCreateDate());
 		}
 
 		if (assetEntry.getExpirationDate() != null) {
-			document.addDate(
+//			document.addDate(
+//				Field.EXPIRATION_DATE, assetEntry.getExpirationDate());
+			documentBuilder.add(
 				Field.EXPIRATION_DATE, assetEntry.getExpirationDate());
 		}
 		else {
-			document.addDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
+			//document.addDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
+			documentBuilder.add(
+				Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
 		}
 
 		if (!document.hasField(Field.MODIFIED_DATE)) {
-			document.addDate(Field.MODIFIED_DATE, assetEntry.getModifiedDate());
+			//document.addDate(Field.MODIFIED_DATE, assetEntry.getModifiedDate());
+			documentBuilder.add(
+				Field.MODIFIED_DATE, assetEntry.getModifiedDate());
 		}
 
-		document.addNumber(Field.PRIORITY, assetEntry.getPriority());
+		//document.addNumber(Field.PRIORITY, assetEntry.getPriority());
+		documentBuilder.add(
+			Field.PRIORITY, assetEntry.getPriority());
 
 		if (assetEntry.getPublishDate() != null) {
-			document.addDate(Field.PUBLISH_DATE, assetEntry.getPublishDate());
+			//document.addDate(Field.PUBLISH_DATE, assetEntry.getPublishDate());
+			documentBuilder.add(
+				Field.PUBLISH_DATE, assetEntry.getPublishDate());
 		}
 		else {
-			document.addDate(Field.PUBLISH_DATE, new Date(0));
+			//document.addDate(Field.PUBLISH_DATE, new Date(0));
+			documentBuilder.add(
+				Field.PUBLISH_DATE, new Date(0));
 		}
 
-		document.addLocalizedKeyword(
+//		document.addLocalizedKeyword(
+//			"localized_title",
+//			populateMap(assetEntry, assetEntry.getTitleMap()), true, true);
+		documentBuilder.add(
 			"localized_title",
 			populateMap(assetEntry, assetEntry.getTitleMap()), true, true);
-		document.addKeyword("visible", assetEntry.isVisible());
+//		document.addKeyword("visible", assetEntry.isVisible());
+		documentBuilder.add("visible", assetEntry.isVisible());
+		
+		document = documentBuilder.build(document);  
 	}
 
 	protected Map<Locale, String> populateMap(
@@ -115,5 +139,8 @@ public class AssetEntryDocumentContributor implements DocumentContributor {
 
 	@Reference
 	protected AssetEntryLocalService assetEntryLocalService;
+	
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 }

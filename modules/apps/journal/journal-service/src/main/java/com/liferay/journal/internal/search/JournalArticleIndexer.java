@@ -81,15 +81,15 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.batch.BatchIndexingHelper;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.filter.DateRangeFilterBuilder;
 import com.liferay.portal.search.filter.FilterBuilders;
 import com.liferay.portal.search.index.IndexStatusManager;
 import com.liferay.trash.TrashHelper;
 
 import java.io.Serializable;
-
 import java.text.Format;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -289,6 +289,8 @@ public class JournalArticleIndexer
 				addSearchExpando(searchQuery, searchContext, expandoAttributes);
 			}
 		}
+		
+		//_documentBuilderFactory.processSortFields(searchContext);
 	}
 
 	@Override
@@ -383,38 +385,74 @@ public class JournalArticleIndexer
 		}
 	}
 
-	protected void addDDMStructureAttributes(
-			Document document, JournalArticle article)
+	protected Document addDDMStructureAttributes(
+		DocumentBuilder documentBuilder, Document document, JournalArticle article)
 		throws Exception {
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
 			_portal.getSiteGroupId(article.getGroupId()),
 			_portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
-
-		if (ddmStructure == null) {
-			return;
-		}
-
-		document.addKeyword(Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
-
+		
 		DDMFormValues ddmFormValues = null;
 
-		try {
-			Fields fields = _journalConverter.getDDMFields(
-				ddmStructure, article.getDocument());
+		if (ddmStructure != null) {
+		
+			documentBuilder.add(Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
 
-			ddmFormValues = _fieldsToDDMFormValuesConverter.convert(
-				ddmStructure, fields);
-		}
-		catch (Exception e) {
-			return;
-		}
+			try {
+				Fields fields = _journalConverter.getDDMFields(
+					ddmStructure, article.getDocument());
 
+				ddmFormValues = _fieldsToDDMFormValuesConverter.convert(
+					ddmStructure, fields);
+			}
+			catch (Exception e) {
+				ddmFormValues = null;
+			}
+		}
+		
+		document = documentBuilder.build(document); 
+		
 		if (ddmFormValues != null) {
 			_ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
 		}
+		
+		return document;
 	}
+	
+//	protected void addDDMStructureAttributes(
+//			Document document, JournalArticle article)
+//		throws Exception {
+//
+//		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
+//			_portal.getSiteGroupId(article.getGroupId()),
+//			_portal.getClassNameId(JournalArticle.class),
+//			article.getDDMStructureKey(), true);
+//
+//		if (ddmStructure == null) {
+//			return;
+//		}
+//
+//		document.addKeyword(Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
+//
+//		DDMFormValues ddmFormValues = null;
+//
+//		try {
+//			Fields fields = _journalConverter.getDDMFields(
+//				ddmStructure, article.getDocument());
+//
+//			ddmFormValues = _fieldsToDDMFormValuesConverter.convert(
+//				ddmStructure, fields);
+//		}
+//		catch (Exception e) {
+//			return;
+//		}
+//
+//		if (ddmFormValues != null) {
+//			_ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
+//		}
+//	}
 
 	@Override
 	protected Map<String, Query> addSearchLocalizedTerm(
@@ -515,14 +553,17 @@ public class JournalArticleIndexer
 		throws Exception {
 
 		Document document = getBaseModelDocument(CLASS_NAME, journalArticle);
-
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
+		
 		long classPK = journalArticle.getId();
 
 		if (!isIndexAllArticleVersions()) {
 			classPK = journalArticle.getResourcePrimKey();
 		}
 
-		document.addUID(CLASS_NAME, classPK);
+		//document.addUID(CLASS_NAME, classPK);
+		documentBuilder.addUID(CLASS_NAME, classPK);
 
 		String articleDefaultLanguageId = LocalizationUtil.getDefaultLanguageId(
 			journalArticle.getDocument());
@@ -538,24 +579,35 @@ public class JournalArticleIndexer
 			String title = journalArticle.getTitle(languageId);
 
 			if (languageId.equals(articleDefaultLanguageId)) {
-				document.addText(Field.CONTENT, content);
-				document.addText(Field.DESCRIPTION, description);
-				document.addText("defaultLanguageId", languageId);
+//				document.addText(Field.CONTENT, content);
+//				document.addText(Field.DESCRIPTION, description);
+//				document.addText("defaultLanguageId", languageId);
+				documentBuilder.add(Field.CONTENT, content);
+				documentBuilder.add(Field.DESCRIPTION, description);
+				documentBuilder.add("defaultLanguageId", languageId);
+				
 			}
 
-			document.addText(
-				LocalizationUtil.getLocalizedName(Field.CONTENT, languageId),
-				content);
-			document.addText(
-				LocalizationUtil.getLocalizedName(
-					Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
-				title);
+//			document.addText(
+//				LocalizationUtil.getLocalizedName(Field.CONTENT, languageId),
+//				content);
+//			document.addText(
+//				LocalizationUtil.getLocalizedName(
+//					Field.DESCRIPTION, languageId),
+//				description);
+//			document.addText(
+//				LocalizationUtil.getLocalizedName(Field.TITLE, languageId),
+//				title);
+			documentBuilder.add(
+				Field.CONTENT, languageId, content);
+			documentBuilder.add(
+				Field.DESCRIPTION, languageId, description);
+			documentBuilder.add(
+				Field.TITLE, languageId, title);
 		}
 
-		document.addKeyword(Field.FOLDER_ID, journalArticle.getFolderId());
+		//document.addKeyword(Field.FOLDER_ID, journalArticle.getFolderId());
+		documentBuilder.add(Field.FOLDER_ID, journalArticle.getFolderId());
 
 		String articleId = journalArticle.getArticleId();
 
@@ -563,28 +615,47 @@ public class JournalArticleIndexer
 			articleId = _trashHelper.getOriginalTitle(articleId);
 		}
 
-		document.addKeywordSortable(Field.ARTICLE_ID, articleId);
+		//document.addKeywordSortable(Field.ARTICLE_ID, articleId);
+		documentBuilder.add(Field.ARTICLE_ID, articleId);
 
-		document.addDate(Field.DISPLAY_DATE, journalArticle.getDisplayDate());
-		document.addKeyword(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
-		document.addKeyword(
+		//document.addDate(Field.DISPLAY_DATE, journalArticle.getDisplayDate());
+		documentBuilder.add(Field.DISPLAY_DATE, journalArticle.getDisplayDate());
+
+		//document.addKeyword(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
+		documentBuilder.add(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
+//		document.addKeyword(
+//			Field.TREE_PATH,
+//			StringUtil.split(journalArticle.getTreePath(), CharPool.SLASH));
+		documentBuilder.add(
 			Field.TREE_PATH,
 			StringUtil.split(journalArticle.getTreePath(), CharPool.SLASH));
-		document.addKeyword(Field.VERSION, journalArticle.getVersion());
+		//document.addKeyword(Field.VERSION, journalArticle.getVersion());
+		documentBuilder.add(Field.VERSION, journalArticle.getVersion());
 
-		document.addKeyword(
+//		document.addKeyword(
+//			"ddmStructureKey", journalArticle.getDDMStructureKey());
+//		document.addKeyword(
+//			"ddmTemplateKey", journalArticle.getDDMTemplateKey());
+		documentBuilder.add(
 			"ddmStructureKey", journalArticle.getDDMStructureKey());
-		document.addKeyword(
+		documentBuilder.add(
 			"ddmTemplateKey", journalArticle.getDDMTemplateKey());
-		document.addKeyword("head", JournalUtil.isHead(journalArticle));
+		documentBuilder.add("head", JournalUtil.isHead(journalArticle));
+
+		//document.addDate("displayDate", journalArticle.getDisplayDate());
+		//documentBuilder.addDate("displayDate", journalArticle.getDisplayDate());
+		//document.addKeyword("head", JournalUtil.isHead(journalArticle));
+		//documentBuilder.addKeyword("head", JournalUtil.isHead(journalArticle));
 
 		boolean headListable = JournalUtil.isHeadListable(journalArticle);
 
-		document.addKeyword("headListable", headListable);
+		//document.addKeyword("headListable", headListable);
+		documentBuilder.add("headListable", headListable);
 
 		boolean latestArticle = JournalUtil.isLatestArticle(journalArticle);
 
-		document.addKeyword("latest", latestArticle);
+		//document.addKeyword("latest", latestArticle);
+		documentBuilder.add("latest", latestArticle);
 
 		// Scheduled listable articles should be visible in asset browser
 
@@ -592,13 +663,13 @@ public class JournalArticleIndexer
 			boolean visible = GetterUtil.getBoolean(document.get("visible"));
 
 			if (!visible) {
-				document.addKeyword("visible", true);
+				//document.addKeyword("visible", true);
+				documentBuilder.add("visible", true);
 			}
 		}
 
-		addDDMStructureAttributes(document, journalArticle);
-
-		return document;
+		//addDDMStructureAttributes(document, journalArticle);
+		return addDDMStructureAttributes(documentBuilder, document, journalArticle);
 	}
 
 	@Override
@@ -1059,5 +1130,8 @@ public class JournalArticleIndexer
 
 	@Reference
 	private TrashHelper _trashHelper;
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

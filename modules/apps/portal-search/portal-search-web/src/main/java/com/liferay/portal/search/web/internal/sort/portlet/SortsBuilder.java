@@ -17,17 +17,25 @@ package com.liferay.portal.search.web.internal.sort.portlet;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.search.sort.SortBuilder;
+import com.liferay.portal.search.sort.SortBuilderFactory;
 
 /**
  * @author Wade Cao
  */
 public class SortsBuilder {
 
-	public SortsBuilder(SortPortletPreferences sortPortletPreferences) {
-		_sortPortletPreferences = sortPortletPreferences;
+	public SortsBuilder(
+		SortPortletPreferences sortPortletPreferences, 
+		SortBuilderFactory sortBuilderFactory) {
+			_sortPortletPreferences = sortPortletPreferences;
+			_sortBuilderFactory = sortBuilderFactory;
 	}
 
 	public Sort[] build() {
+		
+		SortBuilder sortBuilder = _sortBuilderFactory.getBuilder();
+		
 		Sort[] sorts = null;
 
 		if (_fieldValues == null) {
@@ -40,10 +48,10 @@ public class SortsBuilder {
 			String field = _fieldValues[i];
 			boolean reverse = false;
 
-			if (field.equals("")) {
-				sorts[i] = new Sort(null, Sort.SCORE_TYPE, reverse);
-				continue;
-			}
+//			if (field.equals("")) {
+//				sorts[i] = new Sort(null, Sort.SCORE_TYPE, reverse);
+//				continue;
+//			}
 
 			if (_fieldValues[i].endsWith("+")) {
 				field = field.substring(0, field.lastIndexOf("+"));
@@ -53,9 +61,12 @@ public class SortsBuilder {
 				reverse = true;
 			}
 
-			int type = getTypeValueByFieldValue(_fieldValues[i]);
+			//int type = getTypeValueByFieldValue(_fieldValues[i]);
 
-			sorts[i] = new Sort(field, type, reverse);
+			//sorts[i] = new Sort(field, type, reverse);
+			sortBuilder.setField(field);
+			sortBuilder.setReverse(reverse);
+			sorts[i] = sortBuilder.build();
 		}
 
 		return sorts;
@@ -87,5 +98,6 @@ public class SortsBuilder {
 
 	private String[] _fieldValues;
 	private final SortPortletPreferences _sortPortletPreferences;
+	private final SortBuilderFactory _sortBuilderFactory;
 
 }

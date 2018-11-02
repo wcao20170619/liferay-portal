@@ -99,13 +99,19 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.sort.SortBuilder;
+import com.liferay.portal.search.sort.SortBuilderFactory;
+import com.liferay.registry.Registry;
+import com.liferay.registry.RegistryUtil;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.trash.TrashHelper;
 
 import java.io.Serializable;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,7 +121,6 @@ import java.util.Objects;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletURL;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -141,6 +146,7 @@ public class JournalDisplayContext {
 			_request);
 		_themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
+		_sortBuilderFactory = SortBuilderFactory.getSortBuilderFactory();
 	}
 
 	public String[] getAddMenuFavItems() throws PortalException {
@@ -885,21 +891,25 @@ public class JournalDisplayContext {
 				}
 
 				Sort sort = null;
-
+				
 				if (Objects.equals(getOrderByCol(), "display-date")) {
-					sort = new Sort("displayDate", Sort.LONG_TYPE, orderByAsc);
+					//sort = new Sort("displayDate", Sort.LONG_TYPE, orderByAsc);
+					sort = _getSort("displayDate", orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "id")) {
-					sort = new Sort(
-						Field.getSortableFieldName(Field.ARTICLE_ID),
-						Sort.STRING_TYPE, !orderByAsc);
+//					sort = new Sort(
+//						Field.getSortableFieldName(Field.ARTICLE_ID),
+//						Sort.STRING_TYPE, !orderByAsc);
+					sort = _getSort(Field.ARTICLE_ID, !orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "modified-date")) {
-					sort = new Sort(
-						Field.MODIFIED_DATE, Sort.LONG_TYPE, orderByAsc);
+//					sort = new Sort(
+//						Field.MODIFIED_DATE, Sort.LONG_TYPE, orderByAsc);
+					sort = _getSort(Field.MODIFIED_DATE, orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "title")) {
-					sort = new Sort("title", Sort.STRING_TYPE, !orderByAsc);
+//					sort = new Sort("title", Sort.STRING_TYPE, !orderByAsc);
+					sort = _getSort("title", !orderByAsc);
 				}
 
 				LinkedHashMap<String, Object> params = new LinkedHashMap<>();
@@ -1381,6 +1391,15 @@ public class JournalDisplayContext {
 
 		return jsonArray;
 	}
+	
+	private Sort _getSort(String field, boolean reverse) {
+		SortBuilder sortBuilder = _sortBuilderFactory.getBuilder();
+		
+		sortBuilder.setField(field);
+		sortBuilder.setReverse(reverse);
+		
+		return sortBuilder.build();
+	}
 
 	private boolean _isShowPublishAction() {
 		PermissionChecker permissionChecker =
@@ -1495,5 +1514,5 @@ public class JournalDisplayContext {
 	private String _tabs1;
 	private final ThemeDisplay _themeDisplay;
 	private final TrashHelper _trashHelper;
-
+	private final SortBuilderFactory _sortBuilderFactory;
 }
