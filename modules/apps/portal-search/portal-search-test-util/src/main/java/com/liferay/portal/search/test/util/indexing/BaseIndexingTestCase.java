@@ -115,15 +115,18 @@ public abstract class BaseIndexingTestCase {
 		return Collections.singletonMap(key, value);
 	}
 
-	protected void addDocument(DocumentCreationHelper documentCreationHelper)
-		throws Exception {
-
+	protected void addDocument(DocumentCreationHelper documentCreationHelper) {
 		Document document = DocumentFixture.newDocument(
 			COMPANY_ID, GROUP_ID, _entryClassName);
 
 		documentCreationHelper.populate(document);
 
-		_indexWriter.addDocument(createSearchContext(), document);
+		try {
+			_indexWriter.addDocument(createSearchContext(), document);
+		}
+		catch (SearchException se) {
+			throw new RuntimeException(se);
+		}
 	}
 
 	protected void addDocuments(
@@ -232,7 +235,9 @@ public abstract class BaseIndexingTestCase {
 			Document[] documents = _hits.getDocs();
 
 			Assert.assertEquals(
-				Arrays.toString(documents), expected, documents.length);
+				(String)_searchContext.getAttribute("queryString") + "->" +
+					Arrays.toString(documents),
+				expected, documents.length);
 		}
 
 		public void assertValues(
