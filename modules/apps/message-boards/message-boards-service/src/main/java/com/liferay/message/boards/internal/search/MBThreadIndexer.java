@@ -44,6 +44,8 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.Date;
 import java.util.List;
@@ -128,26 +130,33 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 	@Override
 	protected Document doGetDocument(MBThread mbThread) throws Exception {
 		Document document = getBaseModelDocument(CLASS_NAME, mbThread);
-
+		DocumentBuilder documentBuilder = 
+			documentBuilderFactory.getBuilder();
+		
 		MBDiscussion discussion =
 			mbDiscussionLocalService.fetchThreadDiscussion(
 				mbThread.getThreadId());
 
 		if (discussion == null) {
-			document.addKeyword("discussion", false);
+//			document.addKeyword("discussion", false);
+			documentBuilder.add("discussion", false);
 		}
 		else {
-			document.addKeyword("discussion", true);
+//			document.addKeyword("discussion", true);
+			documentBuilder.add("discussion", true);
 		}
 
 		Date lastPostDate = mbThread.getLastPostDate();
 
-		document.addKeyword("lastPostDate", lastPostDate.getTime());
+//		document.addKeyword("lastPostDate", lastPostDate.getTime());
+		documentBuilder.add("lastPostDate", lastPostDate.getTime());
 
-		document.addKeyword(
+//		document.addKeyword(
+//			"participantUserIds", mbThread.getParticipantUserIds());
+		documentBuilder.add(
 			"participantUserIds", mbThread.getParticipantUserIds());
 
-		return document;
+		return documentBuilder.build(document);
 	}
 
 	@Override
@@ -321,6 +330,9 @@ public class MBThreadIndexer extends BaseIndexer<MBThread> {
 
 	@Reference
 	protected MBThreadLocalService mbThreadLocalService;
+	
+	@Reference
+	private DocumentBuilderFactory documentBuilderFactory;
 
 	private DynamicQuery _getDistinctGroupIdDynamicQuery(
 			long companyId, long categoryId)

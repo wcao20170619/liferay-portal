@@ -142,8 +142,8 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 				continue;
 			}
 
-			String sortFieldName = Field.getSortFieldName(sort, "_score");
-
+			String sortFieldName = _getSortFieldName(sort, "_score");
+			
 			if (sortFieldNames.contains(sortFieldName)) {
 				continue;
 			}
@@ -243,5 +243,13 @@ public class DefaultGroupByTranslator implements GroupByTranslator {
 
 		return topHitsAggregationBuilder;
 	}
-
+	
+	private static String _getSortFieldName(Sort sort, String scoreFieldName) {
+		
+		if (sort.getType() == Sort.CUSTOM_TYPE) {
+			return sort.getFieldName();
+		}
+		
+		return Field.getSortFieldName(sort, "_score");
+	}
 }

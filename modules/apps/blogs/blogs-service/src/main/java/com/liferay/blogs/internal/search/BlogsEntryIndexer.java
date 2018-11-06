@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.Date;
 import java.util.Locale;
@@ -104,17 +106,27 @@ public class BlogsEntryIndexer extends BaseIndexer<BlogsEntry> {
 	@Override
 	protected Document doGetDocument(BlogsEntry blogsEntry) throws Exception {
 		Document document = getBaseModelDocument(CLASS_NAME, blogsEntry);
-
-		document.addText(Field.CAPTION, blogsEntry.getCoverImageCaption());
-		document.addText(
+		DocumentBuilder documentBuilder = 
+				_documentBuilderFactory.getBuilder();
+		
+//		document.addText(Field.CAPTION, blogsEntry.getCoverImageCaption());
+//		document.addText(
+//			Field.CONTENT, HtmlUtil.extractText(blogsEntry.getContent()));
+//		document.addText(Field.DESCRIPTION, blogsEntry.getDescription());
+//		document.addDate(Field.DISPLAY_DATE, blogsEntry.getDisplayDate());
+//		document.addDate(Field.MODIFIED_DATE, blogsEntry.getModifiedDate());
+//		document.addText(Field.SUBTITLE, blogsEntry.getSubtitle());
+//		document.addText(Field.TITLE, blogsEntry.getTitle());documentBuilder
+		documentBuilder.add(Field.CAPTION, blogsEntry.getCoverImageCaption());
+		documentBuilder.add(
 			Field.CONTENT, HtmlUtil.extractText(blogsEntry.getContent()));
-		document.addText(Field.DESCRIPTION, blogsEntry.getDescription());
-		document.addDate(Field.DISPLAY_DATE, blogsEntry.getDisplayDate());
-		document.addDate(Field.MODIFIED_DATE, blogsEntry.getModifiedDate());
-		document.addText(Field.SUBTITLE, blogsEntry.getSubtitle());
-		document.addText(Field.TITLE, blogsEntry.getTitle());
+		documentBuilder.add(Field.DESCRIPTION, blogsEntry.getDescription());
+		documentBuilder.add(Field.DISPLAY_DATE, blogsEntry.getDisplayDate());
+		documentBuilder.add(Field.MODIFIED_DATE, blogsEntry.getModifiedDate());
+		documentBuilder.add(Field.SUBTITLE, blogsEntry.getSubtitle());
+		documentBuilder.add(Field.TITLE, blogsEntry.getTitle());
 
-		return document;
+		return documentBuilder.build(document); 
 	}
 
 	@Override
@@ -206,5 +218,8 @@ public class BlogsEntryIndexer extends BaseIndexer<BlogsEntry> {
 	@Reference(target = "(model.class.name=com.liferay.blogs.model.BlogsEntry)")
 	private ModelResourcePermission<BlogsEntry>
 		_blogsEntryModelResourcePermission;
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

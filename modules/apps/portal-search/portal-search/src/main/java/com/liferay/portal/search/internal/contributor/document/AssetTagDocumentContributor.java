@@ -30,6 +30,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.List;
 import java.util.Locale;
@@ -59,19 +61,25 @@ public class AssetTagDocumentContributor implements DocumentContributor {
 			return;
 		}
 
-		contributeAssetTagIds(document, assetTags);
-		contributeAssetTagNamesLocalized(document, assetTags, baseModel);
-		contributeAssetTagNamesRaw(document, assetTags);
+		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder();
+
+		contributeAssetTagIds(documentBuilder, assetTags);
+		contributeAssetTagNamesLocalized(documentBuilder, assetTags, baseModel);
+		contributeAssetTagNamesRaw(documentBuilder, assetTags);
+
+		document = documentBuilder.build(document);
 	}
 
 	protected void contributeAssetTagIds(
-		Document document, List<AssetTag> assetTags) {
+		DocumentBuilder documentBuilder, List<AssetTag> assetTags) {
 
-		document.addKeyword(Field.ASSET_TAG_IDS, getTagIds(assetTags));
+		//document.addKeyword(Field.ASSET_TAG_IDS, getTagIds(assetTags));
+		documentBuilder.add(Field.ASSET_TAG_IDS, getTagIds(assetTags));
 	}
 
 	protected void contributeAssetTagNamesLocalized(
-		Document document, List<AssetTag> assetTags, BaseModel baseModel) {
+		DocumentBuilder documentBuilder, List<AssetTag> assetTags,
+		BaseModel baseModel) {
 
 		Long groupId = getGroupId(baseModel);
 
@@ -81,17 +89,23 @@ public class AssetTagDocumentContributor implements DocumentContributor {
 
 		Localization localization = getLocalization();
 
-		document.addText(
-			localization.getLocalizedName(
-				Field.ASSET_TAG_NAMES,
-				LocaleUtil.toLanguageId(getSiteDefaultLocale(groupId))),
+//		document.addText(
+//			localization.getLocalizedName(
+//				Field.ASSET_TAG_NAMES,
+//				LocaleUtil.toLanguageId(getSiteDefaultLocale(groupId))),
+//			getNames(assetTags));
+//
+		documentBuilder.add(
+			Field.ASSET_TAG_NAMES,
+			LocaleUtil.toLanguageId(getSiteDefaultLocale(groupId)),
 			getNames(assetTags));
 	}
 
 	protected void contributeAssetTagNamesRaw(
-		Document document, List<AssetTag> assetTags) {
+		DocumentBuilder documentBuilder, List<AssetTag> assetTags) {
 
-		document.addText(Field.ASSET_TAG_NAMES, getNames(assetTags));
+//		document.addText(Field.ASSET_TAG_NAMES, getNames(assetTags));
+		documentBuilder.add(Field.ASSET_TAG_NAMES, getNames(assetTags));
 	}
 
 	protected Long getGroupId(BaseModel baseModel) {
@@ -152,6 +166,9 @@ public class AssetTagDocumentContributor implements DocumentContributor {
 
 	@Reference
 	protected AssetTagLocalService assetTagLocalService;
+
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 	protected Localization localization;
 

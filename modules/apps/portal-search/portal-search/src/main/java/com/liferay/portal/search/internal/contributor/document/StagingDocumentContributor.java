@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.Map;
 
@@ -62,8 +64,12 @@ public class StagingDocumentContributor implements DocumentContributor {
 		}
 
 		long groupId = GetterUtil.getLong(groupIdField.getValue());
+		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder();
 
-		document.addKeyword(Field.STAGING_GROUP, isStagingGroup(groupId));
+//		document.addKeyword(Field.STAGING_GROUP, isStagingGroup(groupId));
+		documentBuilder.add(Field.STAGING_GROUP, isStagingGroup(groupId));
+
+		document = documentBuilder.build(document);
 	}
 
 	protected boolean isStagingGroup(long groupId) {
@@ -75,6 +81,9 @@ public class StagingDocumentContributor implements DocumentContributor {
 
 		return group.isStagingGroup();
 	}
+
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 	@Reference
 	protected GroupLocalService groupLocalService;

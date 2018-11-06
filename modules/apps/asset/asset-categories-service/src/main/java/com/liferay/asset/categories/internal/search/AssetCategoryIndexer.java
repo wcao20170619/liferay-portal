@@ -36,13 +36,17 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -156,46 +160,65 @@ public class AssetCategoryIndexer extends BaseIndexer<AssetCategory> {
 		}
 
 		Document document = getBaseModelDocument(CLASS_NAME, assetCategory);
+		
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
 
-		document.addKeyword(
+//		document.addKeyword(
+//			Field.ASSET_CATEGORY_ID, assetCategory.getCategoryId());	
+		documentBuilder.add(
 			Field.ASSET_CATEGORY_ID, assetCategory.getCategoryId());
 
 		List<AssetCategory> categories = new ArrayList<>(1);
 
 		categories.add(assetCategory);
 
-		addSearchAssetCategoryTitles(
-			document, Field.ASSET_CATEGORY_TITLE, categories);
+//		addSearchAssetCategoryTitles(
+//			document, Field.ASSET_CATEGORY_TITLE, categories);
 
-		document.addKeyword(
+//		document.addKeyword(
+//			Field.ASSET_PARENT_CATEGORY_ID,
+//			assetCategory.getParentCategoryId());
+//		document.addKeyword(
+//			Field.ASSET_VOCABULARY_ID, assetCategory.getVocabularyId());
+		documentBuilder.add(
 			Field.ASSET_PARENT_CATEGORY_ID,
 			assetCategory.getParentCategoryId());
-		document.addKeyword(
+		documentBuilder.add(
 			Field.ASSET_VOCABULARY_ID, assetCategory.getVocabularyId());
 
 		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
 			assetCategory.getGroupId());
 
-		addLocalizedField(
-			document, Field.DESCRIPTION, siteDefaultLocale,
+//		addLocalizedField(
+//			Field.DESCRIPTION, siteDefaultLocale,
+//			assetCategory.getDescriptionMap());
+		documentBuilder.add(
+			Field.DESCRIPTION, siteDefaultLocale,
 			assetCategory.getDescriptionMap());
 
-		document.addText(Field.NAME, assetCategory.getName());
-
-		addLocalizedField(
-			document, Field.TITLE, siteDefaultLocale,
+		//document.addText(Field.NAME, assetCategory.getName());
+		documentBuilder.add(Field.NAME, assetCategory.getName());
+//		addLocalizedField(
+//			Field.TITLE, siteDefaultLocale,
+//			assetCategory.getTitleMap());
+		documentBuilder.add(
+			Field.TITLE, siteDefaultLocale,
 			assetCategory.getTitleMap());
 
-		document.addKeyword(
+//		document.addKeyword(
+//			"leftCategoryId", assetCategory.getLeftCategoryId());
+		documentBuilder.add(
 			"leftCategoryId", assetCategory.getLeftCategoryId());
+		
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + assetCategory + " indexed successfully");
 		}
 
-		return document;
+		return documentBuilder.build(document);
 	}
-
+	
 	@Override
 	protected Summary doGetSummary(
 		Document document, Locale locale, String snippet,
@@ -266,5 +289,8 @@ public class AssetCategoryIndexer extends BaseIndexer<AssetCategory> {
 
 	@Reference
 	private Portal _portal;
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

@@ -16,7 +16,6 @@ package com.liferay.portal.search.internal.contributor.document;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
@@ -25,6 +24,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,14 +53,20 @@ public class AssetCategoryDocumentContributor implements DocumentContributor {
 		long[] assetCategoryIds = ListUtil.toLongArray(
 			assetCategories, AssetCategory.CATEGORY_ID_ACCESSOR);
 
-		document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
+		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder();
+
+		//document.addKeyword(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
+		documentBuilder.add(Field.ASSET_CATEGORY_IDS, assetCategoryIds);
 
 		addAssetCategoryTitles(
-			document, Field.ASSET_CATEGORY_TITLES, assetCategories);
+			documentBuilder, Field.ASSET_CATEGORY_TITLES, assetCategories);
+
+		document = documentBuilder.build(document);
 	}
 
 	protected void addAssetCategoryTitles(
-		Document document, String field, List<AssetCategory> assetCategories) {
+		DocumentBuilder documentBuilder, String field,
+		List<AssetCategory> assetCategories) {
 
 		Map<Locale, List<String>> assetCategoryTitles = new HashMap<>();
 
@@ -91,13 +98,17 @@ public class AssetCategoryDocumentContributor implements DocumentContributor {
 
 			String[] titlesArray = titles.toArray(new String[titles.size()]);
 
-			document.addText(
-				field.concat(StringPool.UNDERLINE).concat(locale.toString()),
-				titlesArray);
+//			document.addText(
+//				field.concat(StringPool.UNDERLINE).concat(locale.toString()),
+//				titlesArray);
+			documentBuilder.add(field, locale, titlesArray);
 		}
 	}
 
 	@Reference
 	protected AssetCategoryLocalService assetCategoryLocalService;
+
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 }

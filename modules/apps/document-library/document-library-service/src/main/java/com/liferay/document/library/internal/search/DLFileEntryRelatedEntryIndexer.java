@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -71,12 +73,20 @@ public class DLFileEntryRelatedEntryIndexer implements RelatedEntryIndexer {
 
 		if (fileEntry instanceof LiferayFileEntry) {
 			DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
-
-			document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
-			document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
-			document.addKeyword(
+			DocumentBuilder documentBuilder = 
+					_documentBuilderFactory.getBuilder();
+			
+//			document.addKeyword(Field.FOLDER_ID, dlFileEntry.getFolderId());
+//			document.addKeyword(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
+//			document.addKeyword(
+//				Field.TREE_PATH,
+//				StringUtil.split(dlFileEntry.getTreePath(), CharPool.SLASH));
+			documentBuilder.add(Field.FOLDER_ID, dlFileEntry.getFolderId());
+			documentBuilder.add(Field.HIDDEN, dlFileEntry.isInHiddenFolder());
+			documentBuilder.add(
 				Field.TREE_PATH,
 				StringUtil.split(dlFileEntry.getTreePath(), CharPool.SLASH));
+			document = documentBuilder.build(document); 
 		}
 	}
 
@@ -119,6 +129,9 @@ public class DLFileEntryRelatedEntryIndexer implements RelatedEntryIndexer {
 
 	@Reference
 	protected DLAppLocalService dlAppLocalService;
+	
+	@Reference
+	protected DocumentBuilderFactory _documentBuilderFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLFileEntryRelatedEntryIndexer.class);

@@ -35,6 +35,8 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.trash.TrashHelper;
 
 import java.util.Locale;
@@ -105,9 +107,13 @@ public class JournalFolderIndexer
 		}
 
 		Document document = getBaseModelDocument(CLASS_NAME, journalFolder);
-
-		document.addText(Field.DESCRIPTION, journalFolder.getDescription());
-		document.addKeyword(Field.FOLDER_ID, journalFolder.getParentFolderId());
+		DocumentBuilder documentBuilder = 
+			_documentBuilderFactory.getBuilder();
+		
+//		document.addText(Field.DESCRIPTION, journalFolder.getDescription());
+//		document.addKeyword(Field.FOLDER_ID, journalFolder.getParentFolderId());
+		documentBuilder.add(Field.DESCRIPTION, journalFolder.getDescription());
+		documentBuilder.add(Field.FOLDER_ID, journalFolder.getParentFolderId());
 
 		String title = journalFolder.getName();
 
@@ -115,17 +121,23 @@ public class JournalFolderIndexer
 			title = _trashHelper.getOriginalTitle(title);
 		}
 
-		document.addText(Field.TITLE, title);
+//		document.addText(Field.TITLE, title);
+//
+//		document.addKeyword(
+//			Field.TREE_PATH,
+//			StringUtil.split(journalFolder.getTreePath(), CharPool.SLASH));
+		documentBuilder.add(Field.TITLE, title);
 
-		document.addKeyword(
+		documentBuilder.add(
 			Field.TREE_PATH,
 			StringUtil.split(journalFolder.getTreePath(), CharPool.SLASH));
+
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Document " + journalFolder + " indexed successfully");
 		}
 
-		return document;
+		return documentBuilder.build(document);
 	}
 
 	@Override
@@ -215,5 +227,8 @@ public class JournalFolderIndexer
 
 	@Reference
 	private TrashHelper _trashHelper;
+	
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

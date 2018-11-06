@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,16 +40,29 @@ public class AuditedModelDocumentContributor implements DocumentContributor {
 
 		AuditedModel auditedModel = (AuditedModel)baseModel;
 
-		document.addKeyword(Field.COMPANY_ID, auditedModel.getCompanyId());
-		document.addDate(Field.CREATE_DATE, auditedModel.getCreateDate());
-		document.addDate(Field.MODIFIED_DATE, auditedModel.getModifiedDate());
-		document.addKeyword(Field.USER_ID, auditedModel.getUserId());
+		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder();
+
+//		document.addKeyword(Field.COMPANY_ID, auditedModel.getCompanyId());
+//		document.addDate(Field.CREATE_DATE, auditedModel.getCreateDate());
+//		document.addDate(Field.MODIFIED_DATE, auditedModel.getModifiedDate());
+//		document.addKeyword(Field.USER_ID, auditedModel.getUserId());
+		documentBuilder.add(Field.COMPANY_ID, auditedModel.getCompanyId());
+		documentBuilder.add(Field.CREATE_DATE, auditedModel.getCreateDate());
+		documentBuilder.add(
+			Field.MODIFIED_DATE, auditedModel.getModifiedDate());
+		documentBuilder.add(Field.USER_ID, auditedModel.getUserId());
 
 		String userName = portal.getUserName(
 			auditedModel.getUserId(), auditedModel.getUserName());
 
-		document.addKeyword(Field.USER_NAME, userName, true);
+		//document.addKeyword(Field.USER_NAME, userName, true);
+		documentBuilder.add(Field.USER_NAME, userName, true);
+
+		document = documentBuilder.build(document);
 	}
+
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 	@Reference
 	protected Portal portal;

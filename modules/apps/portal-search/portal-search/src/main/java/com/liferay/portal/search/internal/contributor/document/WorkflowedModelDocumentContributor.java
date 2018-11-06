@@ -19,8 +19,11 @@ import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentContributor;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.search.document.DocumentBuilder;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -36,7 +39,15 @@ public class WorkflowedModelDocumentContributor implements DocumentContributor {
 
 		WorkflowedModel workflowedModel = (WorkflowedModel)baseModel;
 
-		document.addKeyword(Field.STATUS, workflowedModel.getStatus());
+		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder();
+//		document.addKeyword(Field.STATUS, workflowedModel.getStatus());
+
+		documentBuilder.add(Field.STATUS, workflowedModel.getStatus());
+
+		document = documentBuilder.build(document);
 	}
+
+	@Reference
+	protected DocumentBuilderFactory documentBuilderFactory;
 
 }
