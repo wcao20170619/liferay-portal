@@ -626,6 +626,10 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		if (Objects.equals(sortFieldName, Field.PRIORITY)) {
 			return sortFieldName;
 		}
+		
+		if (sort.getType() == Sort.CUSTOM_TYPE) {
+			return sortFieldName;
+		}
 
 		return Field.getSortFieldName(sort, scoreFieldName);
 	}
