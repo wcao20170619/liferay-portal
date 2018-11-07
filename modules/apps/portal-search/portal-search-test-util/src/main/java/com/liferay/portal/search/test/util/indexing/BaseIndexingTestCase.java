@@ -195,6 +195,21 @@ public abstract class BaseIndexingTestCase {
 		}
 	}
 
+	protected long searchCount(SearchContext searchContext, Query query) {
+		try {
+			return _indexSearcher.searchCount(searchContext, query);
+		}
+		catch (SearchException se) {
+			Throwable t = se.getCause();
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+
+			throw new RuntimeException(se);
+		}
+	}
+
 	protected void setPreBooleanFilter(Filter filter, Query query) {
 		BooleanFilter booleanFilter = new BooleanFilter();
 
@@ -241,25 +256,13 @@ public abstract class BaseIndexingTestCase {
 		}
 
 		public void search() {
-			Query query = _query;
+			_hits = BaseIndexingTestCase.this.search(
+				_searchContext, getQuery());
+		}
 
-			if (query == null) {
-				query = getDefaultQuery();
-			}
-
-			if (_queryContributor != null) {
-				_queryContributor.contribute(query);
-			}
-
-			if (_filter != null) {
-				setPreBooleanFilter(_filter, query);
-			}
-
-			if (_postFilter != null) {
-				query.setPostFilter(_postFilter);
-			}
-
-			_hits = BaseIndexingTestCase.this.search(_searchContext, query);
+		public long searchCount() {
+			return BaseIndexingTestCase.this.searchCount(
+				_searchContext, getQuery());
 		}
 
 		public void setFilter(Filter filter) {
@@ -284,6 +287,28 @@ public abstract class BaseIndexingTestCase {
 
 		public void verify(Consumer<Hits> consumer) {
 			consumer.accept(_hits);
+		}
+
+		protected Query getQuery() {
+			Query query = _query;
+
+			if (query == null) {
+				query = getDefaultQuery();
+			}
+
+			if (_queryContributor != null) {
+				_queryContributor.contribute(query);
+			}
+
+			if (_filter != null) {
+				setPreBooleanFilter(_filter, query);
+			}
+
+			if (_postFilter != null) {
+				query.setPostFilter(_postFilter);
+			}
+
+			return query;
 		}
 
 		private Filter _filter;
