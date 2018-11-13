@@ -140,6 +140,12 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 				searchSearchRequest.setLuceneSyntax(luceneSyntax);
 
+				boolean explain = GetterUtil.getBoolean(
+					searchContext.getAttribute(
+						SearchContextAttributes.ATTRIBUTE_KEY_EXPLAIN));
+
+				searchSearchRequest.setExplain(explain);
+
 				searchSearchRequest.setQuery(query);
 				searchSearchRequest.setPostFilter(query.getPostFilter());
 

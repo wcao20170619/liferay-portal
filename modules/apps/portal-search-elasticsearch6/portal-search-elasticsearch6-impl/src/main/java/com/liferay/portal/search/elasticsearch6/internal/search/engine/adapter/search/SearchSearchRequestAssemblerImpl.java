@@ -56,6 +56,8 @@ public class SearchSearchRequestAssemblerImpl
 					searchRequestBuilder, stat));
 		}
 
+		searchRequestBuilder.setExplain(searchSearchRequest.isExplain());
+
 		addGroupBy(searchRequestBuilder, searchSearchRequest);
 
 		if (searchSearchRequest.isHighlightEnabled()) {
