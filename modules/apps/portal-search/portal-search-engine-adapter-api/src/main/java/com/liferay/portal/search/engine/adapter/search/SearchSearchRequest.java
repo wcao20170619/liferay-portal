@@ -96,6 +96,10 @@ public class SearchSearchRequest
 		return _stats;
 	}
 
+	public boolean isExplain() {
+		return _explain;
+	}
+
 	public boolean isHighlightEnabled() {
 		return _highlightEnabled;
 	}
@@ -122,6 +126,10 @@ public class SearchSearchRequest
 
 	public void setAlternateUidFieldName(String alternateUidFieldName) {
 		_alternateUidFieldName = alternateUidFieldName;
+	}
+
+	public void setExplain(boolean explain) {
+		_explain = explain;
 	}
 
 	public void setGroupBy(GroupBy groupBy) {
@@ -187,6 +195,7 @@ public class SearchSearchRequest
 	}
 
 	private String _alternateUidFieldName;
+	private boolean _explain;
 	private GroupBy _groupBy;
 	private boolean _highlightEnabled;
 	private String[] _highlightFieldNames;
