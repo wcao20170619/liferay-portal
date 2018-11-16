@@ -133,7 +133,7 @@ public class IndexerPostProcessorTest {
 
 		Hits results = _indexer.search(searchContext);
 
-		DocumentsAssert.assertValues(
+		DocumentsAssert.assertValuesIgnoreRelevance(
 			(String)searchContext.getAttribute("queryString"),
 			results.getDocs(), _TEST_FIELD, expectedFieldValues);
 	}
