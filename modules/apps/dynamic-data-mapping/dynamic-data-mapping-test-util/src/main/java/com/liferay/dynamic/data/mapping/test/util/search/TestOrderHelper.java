@@ -399,9 +399,9 @@ public abstract class TestOrderHelper {
 
 	protected void testOrderByDDMRadioField(String indexType) throws Exception {
 		testOrderByDDMRadioField(
-			new String[] {"a", "D", "c", "B"},
-			new String[] {"a", "B", "c", "D"}, FieldConstants.STRING, indexType,
-			DDMFormFieldType.RADIO);
+			new String[] {"a", "D", "c", "B", ""},
+			new String[] {"a", "B", "c", "D", ""}, FieldConstants.STRING,
+			indexType, DDMFormFieldType.RADIO);
 	}
 
 	protected void testOrderByDDMRadioField(
@@ -423,9 +423,9 @@ public abstract class TestOrderHelper {
 
 	protected void testOrderByDDMTextField(String indexType) throws Exception {
 		testOrderByDDMField(
-			new String[] {"a", "D", "c", "B"},
-			new String[] {"a", "B", "c", "D"}, FieldConstants.STRING, indexType,
-			DDMFormFieldType.TEXT);
+			new String[] {"a", "D", "c", "B", ""},
+			new String[] {"a", "B", "c", "D", ""}, FieldConstants.STRING,
+			indexType, DDMFormFieldType.TEXT);
 	}
 
 	private String _dataType;
