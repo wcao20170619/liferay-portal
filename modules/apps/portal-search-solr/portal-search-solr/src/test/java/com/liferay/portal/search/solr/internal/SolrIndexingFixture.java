@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.solr.connection.SolrClientManager;
 import com.liferay.portal.search.solr.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr.document.SolrUpdateDocumentCommand;
@@ -91,6 +92,11 @@ public class SolrIndexingFixture implements IndexingFixture {
 	@Override
 	public IndexWriter getIndexWriter() {
 		return _indexWriter;
+	}
+
+	@Override
+	public SearchEngineAdapter getSearchEngineAdapter() {
+		return null;
 	}
 
 	@Override
