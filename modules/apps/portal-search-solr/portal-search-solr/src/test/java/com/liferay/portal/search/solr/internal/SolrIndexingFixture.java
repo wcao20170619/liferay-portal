@@ -23,6 +23,10 @@ import com.liferay.portal.kernel.util.Digester;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.internal.document.DocumentBuilderFactoryImpl;
+import com.liferay.portal.search.internal.field.FieldRegistryImpl;
 import com.liferay.portal.search.solr.connection.SolrClientManager;
 import com.liferay.portal.search.solr.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr.document.SolrUpdateDocumentCommand;
@@ -84,6 +88,21 @@ public class SolrIndexingFixture implements IndexingFixture {
 	}
 
 	@Override
+	public void addIndexingFixtureListener(
+		IndexingFixtureListener indexingFixtureListener) {
+	}
+
+	@Override
+	public DocumentBuilderFactory getDocumentBuilderFactory() {
+		return _documentBuilderFactory;
+	}
+
+	@Override
+	public FieldRegistry getFieldRegistry() {
+		return _fieldRegistry;
+	}
+
+	@Override
 	public IndexSearcher getIndexSearcher() {
 		return _indexSearcher;
 	}
@@ -110,6 +129,15 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		SolrClientManager solrClientManager = new TestSolrClientManager(
 			_properties);
+
+		FieldRegistry fieldRegistry = createFieldRegistry();
+
+		DocumentBuilderFactory documentBuilderFactory =
+			createDocumentBuilderFactory(fieldRegistry);
+
+		_documentBuilderFactory = documentBuilderFactory;
+
+		_fieldRegistry = fieldRegistry;
 
 		_indexSearcher = createIndexSearcher(solrClientManager);
 		_indexWriter = createIndexWriter(solrClientManager);
@@ -188,12 +216,26 @@ public class SolrIndexingFixture implements IndexingFixture {
 		return digester;
 	}
 
+	protected DocumentBuilderFactory createDocumentBuilderFactory(
+		FieldRegistry fieldRegistry1) {
+
+		return new DocumentBuilderFactoryImpl() {
+			{
+				fieldRegistry = fieldRegistry1;
+			}
+		};
+	}
+
 	protected FacetProcessor createFacetProcessor() {
 		return new DefaultFacetProcessor() {
 			{
 				jsonFactory = _jsonFactory;
 			}
 		};
+	}
+
+	protected FieldRegistry createFieldRegistry() {
+		return new FieldRegistryImpl();
 	}
 
 	protected IndexSearcher createIndexSearcher(
@@ -316,7 +358,9 @@ public class SolrIndexingFixture implements IndexingFixture {
 		};
 	}
 
+	private DocumentBuilderFactory _documentBuilderFactory;
 	private FacetProcessor<SolrQuery> _facetProcessor;
+	private FieldRegistry _fieldRegistry;
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
