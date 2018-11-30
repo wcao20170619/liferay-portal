@@ -130,6 +130,10 @@ public class DefaultSortTranslator implements SortTranslator {
 			return sortFieldName;
 		}
 
+		if (sort.getType() == Sort.CUSTOM_TYPE) {
+			return sort.getFieldName();
+		}
+
 		return Field.getSortFieldName(sort, scoreFieldName);
 	}
 

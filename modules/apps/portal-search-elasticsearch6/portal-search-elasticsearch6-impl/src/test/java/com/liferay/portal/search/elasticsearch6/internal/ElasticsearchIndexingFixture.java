@@ -80,6 +80,11 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 	}
 
 	@Override
+	public SearchEngineAdapter getSearchEngineAdapter() {
+		return _searchEngineAdapter;
+	}
+
+	@Override
 	public boolean isSearchEngineAvailable() {
 		return true;
 	}
@@ -103,15 +108,15 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 			new ElasticsearchEngineAdapterFixture(
 				elasticsearchConnectionManager, _facetProcessor);
 
-		SearchEngineAdapter searchEngineAdapter =
+		_searchEngineAdapter =
 			elasticsearchEngineAdapterFixture.getSearchEngineAdapter();
 
 		_indexSearcher = createIndexSearcher(
-			elasticsearchConnectionManager, searchEngineAdapter,
+			elasticsearchConnectionManager, _searchEngineAdapter,
 			_indexNameBuilder);
 
 		_indexWriter = createIndexWriter(
-			searchEngineAdapter, _indexNameBuilder);
+			_searchEngineAdapter, _indexNameBuilder);
 	}
 
 	@Override
@@ -240,5 +245,6 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;
 	private final Localization _localization = new LocalizationImpl();
+	private SearchEngineAdapter _searchEngineAdapter;
 
 }
