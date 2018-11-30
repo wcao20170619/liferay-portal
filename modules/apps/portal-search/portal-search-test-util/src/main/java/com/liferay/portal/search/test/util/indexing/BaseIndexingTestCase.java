@@ -36,6 +36,7 @@ import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderI
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.SearchMapUtil;
@@ -80,6 +81,7 @@ public abstract class BaseIndexingTestCase {
 
 		_indexSearcher = _indexingFixture.getIndexSearcher();
 		_indexWriter = _indexingFixture.getIndexWriter();
+		_searchEngineAdapter = _indexingFixture.getSearchEngineAdapter();
 	}
 
 	@After
@@ -203,6 +205,10 @@ public abstract class BaseIndexingTestCase {
 
 	protected IndexWriter getIndexWriter() {
 		return _indexWriter;
+	}
+
+	protected SearchEngineAdapter getSearchEngineAdapter() {
+		return _searchEngineAdapter;
 	}
 
 	protected Hits search(SearchContext searchContext) {
@@ -385,5 +391,6 @@ public abstract class BaseIndexingTestCase {
 	private IndexingFixture _indexingFixture;
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;
+	private SearchEngineAdapter _searchEngineAdapter;
 
 }

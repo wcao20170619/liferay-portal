@@ -112,19 +112,19 @@ public abstract class BaseDocumentTestCase extends BaseIndexingTestCase {
 
 	protected void populateNumbers() {
 		int maxInt = Integer.MAX_VALUE;
-		long minLong = Long.MIN_VALUE;
+		long maxLong = Long.MAX_VALUE;
 
-		populateNumbers("firstuser", 1e-11, 8e-5F, maxInt, minLong);
+		populateNumbers("firstuser", 1e-11, 8e-5F, maxInt, maxLong - 5);
 
-		populateNumbers("seconduser", 3e-11, 7e-5F, maxInt - 1, minLong + 1);
+		populateNumbers("seconduser", 3e-11, 7e-5F, maxInt - 1, maxLong - 4);
 
-		populateNumbers("thirduser", 5e-11, 6e-5F, maxInt - 2, minLong + 2);
+		populateNumbers("thirduser", 5e-11, 6e-5F, maxInt - 2, maxLong - 3);
 
-		populateNumbers("fourthuser", 2e-11, 5e-5F, maxInt - 3, minLong + 3);
+		populateNumbers("fourthuser", 2e-11, 5e-5F, maxInt - 3, maxLong - 2);
 
-		populateNumbers("fifthuser", 4e-11, 4e-5F, maxInt - 4, minLong + 4);
+		populateNumbers("fifthuser", 4e-11, 4e-5F, maxInt - 4, maxLong - 1);
 
-		populateNumbers("sixthuser", 6e-11, 3e-5F, maxInt - 5, minLong + 5);
+		populateNumbers("sixthuser", 6e-11, 3e-5F, maxInt - 5, maxLong);
 	}
 
 	protected void populateNumbers(
