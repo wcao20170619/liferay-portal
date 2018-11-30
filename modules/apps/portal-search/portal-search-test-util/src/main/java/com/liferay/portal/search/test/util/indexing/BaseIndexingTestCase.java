@@ -31,6 +31,8 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.search.field.FieldRegistry;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderImpl;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -39,6 +41,7 @@ import com.liferay.portal.search.searcher.SearchResponseBuilder;
 import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.SearchMapUtil;
+import com.liferay.portal.search.test.util.indexing.IndexingFixture.IndexingFixtureListenerHelper;
 
 import java.io.Serializable;
 
@@ -60,12 +63,18 @@ import org.junit.Before;
 /**
  * @author Miguel Angelo Caldas Gallindo
  */
-public abstract class BaseIndexingTestCase {
+public abstract class BaseIndexingTestCase
+	implements IndexingFixture.IndexingFixtureListener {
 
 	public BaseIndexingTestCase() {
 		Class<?> clazz = getClass();
 
 		_entryClassName = StringUtil.toLowerCase(clazz.getSimpleName());
+	}
+
+	@Override
+	public void beforeActivate(
+		IndexingFixtureListenerHelper indexingFixtureListenerHelper) {
 	}
 
 	@Before
@@ -76,8 +85,12 @@ public abstract class BaseIndexingTestCase {
 
 		Assume.assumeTrue(_indexingFixture.isSearchEngineAvailable());
 
+		_indexingFixture.addIndexingFixtureListener(this);
+
 		_indexingFixture.setUp();
 
+		_documentBuilderFactory = _indexingFixture.getDocumentBuilderFactory();
+		_fieldRegistry = _indexingFixture.getFieldRegistry();
 		_indexSearcher = _indexingFixture.getIndexSearcher();
 		_indexWriter = _indexingFixture.getIndexWriter();
 	}
@@ -88,12 +101,7 @@ public abstract class BaseIndexingTestCase {
 			return;
 		}
 
-		try {
-			_indexWriter.deleteEntityDocuments(
-				createSearchContext(), _entryClassName);
-		}
-		catch (SearchException se) {
-		}
+		deleteTestDocuments();
 
 		_documentFixture.tearDown();
 
@@ -179,6 +187,13 @@ public abstract class BaseIndexingTestCase {
 
 	protected abstract IndexingFixture createIndexingFixture() throws Exception;
 
+	protected void deleteTestDocuments() throws Exception {
+		if (_indexWriter != null) {
+			_indexWriter.deleteEntityDocuments(
+				createSearchContext(), _entryClassName);
+		}
+	}
+
 	protected Query getDefaultQuery() {
 		Map<String, String> map = SearchMapUtil.join(
 			toMap(Field.COMPANY_ID, String.valueOf(COMPANY_ID)),
@@ -193,8 +208,16 @@ public abstract class BaseIndexingTestCase {
 		return booleanQueryImpl;
 	}
 
+	protected DocumentBuilderFactory getDocumentBuilderFactory() {
+		return _documentBuilderFactory;
+	}
+
 	protected String getEntryClassName() {
 		return _entryClassName;
+	}
+
+	protected FieldRegistry getFieldRegistry() {
+		return _fieldRegistry;
 	}
 
 	protected IndexSearcher getIndexSearcher() {
@@ -380,8 +403,10 @@ public abstract class BaseIndexingTestCase {
 
 	}
 
+	private DocumentBuilderFactory _documentBuilderFactory;
 	private final DocumentFixture _documentFixture = new DocumentFixture();
 	private final String _entryClassName;
+	private FieldRegistry _fieldRegistry;
 	private IndexingFixture _indexingFixture;
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;

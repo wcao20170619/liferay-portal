@@ -16,12 +16,22 @@ package com.liferay.portal.search.test.util.indexing;
 
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
+import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.spi.field.contributor.FieldRegistryContributor;
 
 /**
  * @author Miguel Angelo Caldas Gallindo
  * @author André de Oliveira
  */
 public interface IndexingFixture {
+
+	public void addIndexingFixtureListener(
+		IndexingFixtureListener indexingFixtureListener);
+
+	public DocumentBuilderFactory getDocumentBuilderFactory();
+
+	public FieldRegistry getFieldRegistry();
 
 	public IndexSearcher getIndexSearcher();
 
@@ -32,5 +42,19 @@ public interface IndexingFixture {
 	public void setUp() throws Exception;
 
 	public void tearDown() throws Exception;
+
+	public interface IndexingFixtureListener {
+
+		public void beforeActivate(
+			IndexingFixtureListenerHelper indexingFixtureListenerHelper);
+
+	}
+
+	public interface IndexingFixtureListenerHelper {
+
+		public void addFieldRegistryContributor(
+			FieldRegistryContributor fieldRegistryContributor);
+
+	}
 
 }

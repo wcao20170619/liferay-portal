@@ -16,21 +16,30 @@ package com.liferay.portal.search.test.util.sort;
 
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.Sort;
-import com.liferay.portal.kernel.search.SortFactory;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.internal.SortFactoryImpl;
+import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.internal.sort.DefaultSortBuilderFactory;
+import com.liferay.portal.search.internal.sort.SortTranslator;
+import com.liferay.portal.search.sort.SortBuilder;
+import com.liferay.portal.search.sort.SortBuilderFactory;
 import com.liferay.portal.search.test.util.document.BaseDocumentTestCase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -38,91 +47,128 @@ import org.junit.Test;
  */
 public abstract class BaseDocumentSortTestCase extends BaseDocumentTestCase {
 
-	@Test
-	public void testDoubleSort() throws Exception {
-		assertSort(
-			"Smith", FIELD_DOUBLE, Sort.DOUBLE_TYPE,
-			_SCREEN_NAMES_DOUBLE_ORDER);
+	@Before
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+
+		FieldRegistry fieldRegistry1 = getFieldRegistry();
+
+		sortBuilderFactory = new DefaultSortBuilderFactory() {
+			{
+				fieldRegistry = fieldRegistry1;
+				sortTranslator = new SortTranslator();
+			}
+		};
 	}
 
 	@Test
-	public void testDoubleSortIgnoresScores() throws Exception {
-		for (String keywords : _KEYWORDS) {
-			assertSort(
-				keywords, FIELD_DOUBLE, Sort.DOUBLE_TYPE,
-				_SCREEN_NAMES_DOUBLE_ORDER);
-		}
-
-		for (String keywords : _KEYWORDS_ODD) {
-			assertSort(
-				keywords, FIELD_DOUBLE, Sort.DOUBLE_TYPE,
-				_SCREEN_NAMES_ODD_DOUBLE_ORDER);
-		}
+	public void testDate() throws Exception {
+		assertSort(FIELD_DATE, dates);
 	}
 
 	@Test
-	public void testFloatSort() throws Exception {
-		assertSort(
-			"Smith", FIELD_FLOAT, Sort.FLOAT_TYPE, _SCREEN_NAMES_FLOAT_ORDER);
+	public void testDatePremappedFieldCreate() throws Exception {
+		assertSort(Field.CREATE_DATE, dates);
 	}
 
 	@Test
-	public void testFloatSortIgnoresScores() throws Exception {
-		for (String keywords : _KEYWORDS) {
-			assertSort(
-				keywords, FIELD_FLOAT, Sort.FLOAT_TYPE,
-				_SCREEN_NAMES_FLOAT_ORDER);
-		}
-
-		for (String keywords : _KEYWORDS_ODD) {
-			assertSort(
-				keywords, FIELD_FLOAT, Sort.FLOAT_TYPE,
-				_SCREEN_NAMES_ODD_FLOAT_ORDER);
-		}
+	public void testDatePremappedFieldModified() throws Exception {
+		assertSort(Field.MODIFIED_DATE, dates);
 	}
 
 	@Test
-	public void testIntegerSort() throws Exception {
-		assertSort(
-			"Smith", FIELD_INTEGER, Sort.INT_TYPE, _SCREEN_NAMES_INTEGER_ORDER);
+	public void testDouble() throws Exception {
+		assertSort(FIELD_DOUBLE, doubles);
 	}
 
 	@Test
-	public void testIntegerSortIgnoresScores() throws Exception {
-		for (String keywords : _KEYWORDS) {
-			assertSort(
-				keywords, FIELD_INTEGER, Sort.INT_TYPE,
-				_SCREEN_NAMES_INTEGER_ORDER);
-		}
-
-		for (String keywords : _KEYWORDS_ODD) {
-			assertSort(
-				keywords, FIELD_INTEGER, Sort.INT_TYPE,
-				_SCREEN_NAMES_ODD_INTEGER_ORDER);
-		}
+	public void testFloat() throws Exception {
+		assertSort(FIELD_FLOAT, floats);
 	}
 
 	@Test
-	public void testLongSort() throws Exception {
-		assertSort(
-			"Smith", FIELD_LONG, Sort.LONG_TYPE, _SCREEN_NAMES_LONG_ORDER);
+	public void testInteger() throws Exception {
+		assertSort(FIELD_INTEGER, integers);
 	}
 
 	@Test
-	public void testLongSortIgnoresScores() throws Exception {
-		for (String keywords : _KEYWORDS) {
-			assertSort(
-				keywords, FIELD_LONG, Sort.LONG_TYPE, _SCREEN_NAMES_LONG_ORDER);
+	public void testLong() throws Exception {
+		assertSort(FIELD_LONG, longs);
+	}
+
+	protected static <K, V extends Comparable<? super V>> List<K>
+		getKeysSortedByValue(Map<K, V> map) {
+
+		Set<Map.Entry<K, V>> set = map.entrySet();
+
+		Stream<Map.Entry<K, V>> stream = set.stream();
+
+		return stream.sorted(
+			Map.Entry.comparingByValue()
+		).map(
+			Map.Entry::getKey
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected static <V> Map<String, V> getOdds(Map<String, V> map) {
+		Set<Map.Entry<String, V>> entrySet = map.entrySet();
+
+		String[] odds = {"fifthuser", "firstuser", "thirduser"};
+
+		Stream<Map.Entry<String, V>> stream = entrySet.stream();
+
+		return stream.filter(
+			entry -> ArrayUtil.contains(odds, entry.getKey())
+		).collect(
+			Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)
+		);
+	}
+
+	protected <V extends Comparable<? super V>> void assertSort(
+			String fieldName, Map<String, V> map)
+		throws Exception {
+
+		String[] searches = {
+			"sixth second first fourth fifth third",
+			"second first fourth fifth third sixth",
+			"first fourth fifth third sixth second",
+			"fourth fifth third sixth second first",
+			"fifth third sixth second first fourth",
+			"third sixth second first fourth fifth"
+		};
+
+		for (String search : searches) {
+			_assertSort(search, fieldName, map);
 		}
 
-		for (String keywords : _KEYWORDS_ODD) {
-			assertSort(
-				keywords, FIELD_LONG, Sort.LONG_TYPE,
-				_SCREEN_NAMES_ODD_LONG_ORDER);
+		String[] oddSearches = {
+			"first fifth third", "fifth third first", "third first fifth",
+			"first third fifth", "fifth first third"
+		};
+
+		for (String search : oddSearches) {
+			_assertSort(search, fieldName, getOdds(map));
 		}
 	}
 
-	protected void assertSort(String keywords, Sort sort, String... screenNames)
+	protected Query getQuery(String keywords) {
+		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
+
+		booleanQueryImpl.add(
+			new MatchQuery("firstName", keywords), BooleanClauseOccur.SHOULD);
+		booleanQueryImpl.add(
+			new MatchQuery("lastName", keywords), BooleanClauseOccur.SHOULD);
+
+		return booleanQueryImpl;
+	}
+
+	protected SortBuilderFactory sortBuilderFactory;
+
+	private void _assertSort(
+			String keywords, Sort sort, List<String> screenNames)
 		throws Exception {
 
 		assertSearch(
@@ -137,9 +183,9 @@ public abstract class BaseDocumentSortTestCase extends BaseDocumentTestCase {
 				indexingTestHelper.verify(
 					hits -> {
 						List<String> searchResultValues = new ArrayList<>(
-							screenNames.length);
+							screenNames.size());
 						List<String> screenNamesList = new ArrayList<>(
-							screenNames.length);
+							screenNames.size());
 
 						for (int i = 0; i < hits.getLength(); i++) {
 							Document document = hits.doc(i);
@@ -158,86 +204,29 @@ public abstract class BaseDocumentSortTestCase extends BaseDocumentTestCase {
 			});
 	}
 
-	protected void assertSort(
-			String keywords, String field, int type,
-			String... ascendingScreenNames)
+	private <V extends Comparable<? super V>> void _assertSort(
+			String keywords, String field, Map<String, V> map)
 		throws Exception {
 
-		SortFactory sortFactory = new SortFactoryImpl();
+		SortBuilder sortBuilder = sortBuilderFactory.getBuilder();
 
-		assertSort(
-			keywords, sortFactory.create(field, type, false),
+		sortBuilder.setField(field);
+
+		List<String> screenNames = getKeysSortedByValue(map);
+
+		List<String> ascendingScreenNames = new ArrayList<>(screenNames);
+
+		_assertSort(
+			keywords, sortBuilder.setReverse(false).build(),
 			ascendingScreenNames);
 
-		String[] descendingScreenNames = Arrays.copyOf(
-			ascendingScreenNames, ascendingScreenNames.length);
+		List<String> descendingScreenNames = new ArrayList<>(screenNames);
 
-		ArrayUtil.reverse(descendingScreenNames);
+		Collections.reverse(descendingScreenNames);
 
-		assertSort(
-			keywords, sortFactory.create(field, type, true),
+		_assertSort(
+			keywords, sortBuilder.setReverse(true).build(),
 			descendingScreenNames);
 	}
-
-	protected Query getQuery(String keywords) {
-		BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
-
-		booleanQueryImpl.add(
-			new MatchQuery("firstName", keywords), BooleanClauseOccur.SHOULD);
-		booleanQueryImpl.add(
-			new MatchQuery("lastName", keywords), BooleanClauseOccur.SHOULD);
-
-		return booleanQueryImpl;
-	}
-
-	private static final String[] _KEYWORDS = {
-		"sixth second first fourth fifth third",
-		"second first fourth fifth third sixth",
-		"first fourth fifth third sixth second",
-		"fourth fifth third sixth second first",
-		"fifth third sixth second first fourth",
-		"third sixth second first fourth fifth"
-	};
-
-	private static final String[] _KEYWORDS_ODD = {
-		"first fifth third", "fifth third first", "third first fifth",
-		"first third fifth", "fifth first third"
-	};
-
-	private static final String[] _SCREEN_NAMES_DOUBLE_ORDER = {
-		"firstuser", "fourthuser", "seconduser", "fifthuser", "thirduser",
-		"sixthuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_FLOAT_ORDER = {
-		"sixthuser", "fifthuser", "fourthuser", "thirduser", "seconduser",
-		"firstuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_INTEGER_ORDER = {
-		"sixthuser", "fifthuser", "fourthuser", "thirduser", "seconduser",
-		"firstuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_LONG_ORDER = {
-		"firstuser", "seconduser", "thirduser", "fourthuser", "fifthuser",
-		"sixthuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_ODD_DOUBLE_ORDER = {
-		"firstuser", "fifthuser", "thirduser"
-	};
-
-	private static final String[] _SCREEN_NAMES_ODD_FLOAT_ORDER = {
-		"fifthuser", "thirduser", "firstuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_ODD_INTEGER_ORDER = {
-		"fifthuser", "thirduser", "firstuser"
-	};
-
-	private static final String[] _SCREEN_NAMES_ODD_LONG_ORDER = {
-		"firstuser", "thirduser", "fifthuser"
-	};
 
 }
