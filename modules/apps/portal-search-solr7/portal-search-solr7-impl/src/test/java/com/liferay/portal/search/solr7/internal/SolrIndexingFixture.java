@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.solr7.internal.connection.SolrClientManager;
 import com.liferay.portal.search.solr7.internal.connection.TestSolrClientManager;
 import com.liferay.portal.search.solr7.internal.document.DefaultSolrDocumentFactory;
@@ -93,6 +94,11 @@ public class SolrIndexingFixture implements IndexingFixture {
 	@Override
 	public IndexWriter getIndexWriter() {
 		return _indexWriter;
+	}
+
+	@Override
+	public SearchEngineAdapter getSearchEngineAdapter() {
+		return _searchEngineAdapter;
 	}
 
 	@Override
@@ -328,5 +334,6 @@ public class SolrIndexingFixture implements IndexingFixture {
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 	private final Localization _localization = new LocalizationImpl();
 	private final Map<String, Object> _properties;
+	private SearchEngineAdapter _searchEngineAdapter;
 
 }
