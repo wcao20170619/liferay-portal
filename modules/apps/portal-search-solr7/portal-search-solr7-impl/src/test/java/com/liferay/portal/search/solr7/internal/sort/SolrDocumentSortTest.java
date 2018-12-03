@@ -18,25 +18,10 @@ import com.liferay.portal.search.solr7.internal.SolrIndexingFixture;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.sort.BaseDocumentSortTestCase;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 /**
  * @author Wade Cao
  */
 public class SolrDocumentSortTest extends BaseDocumentSortTestCase {
-
-	@Ignore("LPS-83586")
-	@Override
-	@Test
-	public void testLongSort() throws Exception {
-	}
-
-	@Ignore("LPS-83586")
-	@Override
-	@Test
-	public void testLongSortIgnoresScores() throws Exception {
-	}
 
 	@Override
 	protected IndexingFixture createIndexingFixture() {
