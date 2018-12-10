@@ -102,6 +102,9 @@ public class SearchInsightsPortlet extends MVCPortlet {
 		searchInsightsDisplayContext.setQueryString(
 			buildQueryString(portletSharedSearchResponse, renderRequest));
 
+		searchInsightsDisplayContext.setResponseString(
+			buildResponseString(portletSharedSearchResponse, renderRequest));
+
 		return searchInsightsDisplayContext;
 	}
 
@@ -113,6 +116,16 @@ public class SearchInsightsPortlet extends MVCPortlet {
 			portletSharedSearchResponse.getQueryString());
 
 		return queryString.orElseGet(() -> getHelp(renderRequest));
+	}
+
+	protected String buildResponseString(
+		PortletSharedSearchResponse portletSharedSearchResponse,
+		RenderRequest renderRequest) {
+
+		Optional<String> responseString = SearchStringUtil.maybe(
+			portletSharedSearchResponse.getResponseString());
+
+		return responseString.orElseGet(() -> getHelp(renderRequest));
 	}
 
 	protected String getHelp(RenderRequest renderRequest) {

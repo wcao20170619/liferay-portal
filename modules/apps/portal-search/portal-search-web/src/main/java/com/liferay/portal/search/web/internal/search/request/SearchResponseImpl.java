@@ -84,6 +84,11 @@ public class SearchResponseImpl implements SearchResponse {
 		return Arrays.asList(_hits.getQuerySuggestions());
 	}
 
+	@Override
+	public String getResponseString() {
+		return _responseString;
+	}
+
 	public SearchContainer<Document> getSearchContainer() {
 		return _searchContainer;
 	}
@@ -131,6 +136,10 @@ public class SearchResponseImpl implements SearchResponse {
 		_queryString = queryString;
 	}
 
+	public void setResponseString(String responseString) {
+		_responseString = responseString;
+	}
+
 	public void setSearchContainer(SearchContainer<Document> searchContainer) {
 		_searchContainer = searchContainer;
 	}
@@ -153,6 +162,7 @@ public class SearchResponseImpl implements SearchResponse {
 	private int _paginationDelta;
 	private int _paginationStart;
 	private String _queryString;
+	private String _responseString;
 	private SearchContainer<Document> _searchContainer;
 	private SearchContext _searchContext;
 	private SearchSettings _searchSettings;

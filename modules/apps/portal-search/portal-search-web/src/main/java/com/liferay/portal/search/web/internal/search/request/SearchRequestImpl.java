@@ -112,6 +112,8 @@ public class SearchRequestImpl implements SearchRequest {
 		searchResponseImpl.setPaginationStart(searchContainer.getCur());
 		searchResponseImpl.setQueryString(
 			(String)searchContext.getAttribute("queryString"));
+		searchResponseImpl.setResponseString(
+			(String)searchContext.getAttribute("responseString"));
 		searchResponseImpl.setSearchContainer(searchContainer);
 		searchResponseImpl.setSearchContext(searchContext);
 		searchResponseImpl.setSearchSettings(searchSettings);

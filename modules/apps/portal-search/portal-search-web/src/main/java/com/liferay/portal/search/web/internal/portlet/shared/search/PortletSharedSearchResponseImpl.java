@@ -111,6 +111,11 @@ public class PortletSharedSearchResponseImpl
 	}
 
 	@Override
+	public String getResponseString() {
+		return _searchResponse.getResponseString();
+	}
+
+	@Override
 	public SearchSettings getSearchSettings() {
 		return _searchResponse.getSearchSettings();
 	}

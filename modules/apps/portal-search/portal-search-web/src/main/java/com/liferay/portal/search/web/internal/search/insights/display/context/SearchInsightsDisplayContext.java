@@ -25,10 +25,21 @@ public class SearchInsightsDisplayContext implements Serializable {
 		return _queryString;
 	}
 
+	public String getResponseString() {
+		return _responseString;
+	}
+
 	public void setQueryString(String queryString) {
 		_queryString = queryString;
 	}
 
+	public void setResponseString(String responseString) {
+		_responseString = responseString;
+	}
+
+	private static final long serialVersionUID = 1L;
+
 	private String _queryString;
+	private String _responseString;
 
 }
