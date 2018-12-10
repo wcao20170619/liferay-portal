@@ -110,6 +110,16 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 					"queryString",
 					searchSearchResponse.getSearchRequestString());
 
+				if (GetterUtil.getBoolean(
+						searchContext.getAttribute(
+							SearchContextAttributes.
+								ATTRIBUTE_KEY_INSIGHTS_RESPONSE_STRING))) {
+
+					searchContext.setAttribute(
+						"responseString",
+						searchSearchResponse.getSearchResponseString());
+				}
+
 				hits = searchSearchResponse.getHits();
 
 				Document[] documents = hits.getDocs();

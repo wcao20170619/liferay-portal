@@ -54,6 +54,7 @@ public class CommonSearchResponseAssemblerImpl
 		setExecutionTime(searchResponse, baseSearchResponse);
 
 		baseSearchResponse.setSearchRequestString(searchRequestBuilderString);
+		baseSearchResponse.setSearchResponseString(searchResponse.toString());
 		baseSearchResponse.setTerminatedEarly(
 			GetterUtil.getBoolean(searchResponse.isTerminatedEarly()));
 		baseSearchResponse.setTimedOut(searchResponse.isTimedOut());
