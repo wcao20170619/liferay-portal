@@ -49,6 +49,8 @@ public interface SearchResponse {
 
 	public List<String> getRelatedQueriesSuggestions();
 
+	public String getResponseString();
+
 	public SearchSettings getSearchSettings();
 
 	public Optional<String> getSpellCheckSuggestionOptional();
