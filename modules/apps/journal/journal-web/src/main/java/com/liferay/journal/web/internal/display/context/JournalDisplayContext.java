@@ -95,6 +95,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.sort.SortBuilder;
+import com.liferay.portal.search.sort.SortBuilderFactory;
+import com.liferay.portal.search.sort.SortBuilderFactoryUtil;
 import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.trash.TrashHelper;
@@ -139,6 +142,7 @@ public class JournalDisplayContext {
 			_request);
 		_themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
+		_sortBuilderFactory = SortBuilderFactoryUtil.getSortBuilderFactory();
 	}
 
 	public String[] getAddMenuFavItems() throws PortalException {
@@ -911,19 +915,16 @@ public class JournalDisplayContext {
 				Sort sort = null;
 
 				if (Objects.equals(getOrderByCol(), "display-date")) {
-					sort = new Sort("displayDate", Sort.LONG_TYPE, orderByAsc);
+					sort = _getSort("displayDate", orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "id")) {
-					sort = new Sort(
-						Field.getSortableFieldName(Field.ARTICLE_ID),
-						Sort.STRING_TYPE, !orderByAsc);
+					sort = _getSort(Field.ARTICLE_ID, !orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "modified-date")) {
-					sort = new Sort(
-						Field.MODIFIED_DATE, Sort.LONG_TYPE, orderByAsc);
+					sort = _getSort(Field.MODIFIED_DATE, orderByAsc);
 				}
 				else if (Objects.equals(getOrderByCol(), "title")) {
-					sort = new Sort("title", Sort.STRING_TYPE, !orderByAsc);
+					sort = _getSort("title", !orderByAsc);
 				}
 
 				LinkedHashMap<String, Object> params = new LinkedHashMap<>();
@@ -1409,6 +1410,15 @@ public class JournalDisplayContext {
 		return jsonArray;
 	}
 
+	private Sort _getSort(String field, boolean reverse) {
+		SortBuilder sortBuilder = _sortBuilderFactory.getBuilder();
+
+		sortBuilder.setField(field);
+		sortBuilder.setReverse(reverse);
+
+		return sortBuilder.build();
+	}
+
 	private boolean _isShowPublishAction() {
 		PermissionChecker permissionChecker =
 			_themeDisplay.getPermissionChecker();
@@ -1498,6 +1508,7 @@ public class JournalDisplayContext {
 	private final PortletPreferences _portletPreferences;
 	private final HttpServletRequest _request;
 	private Integer _restrictionType;
+	private final SortBuilderFactory _sortBuilderFactory;
 	private Integer _status;
 	private String _tabs1;
 	private final ThemeDisplay _themeDisplay;

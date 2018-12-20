@@ -32,6 +32,7 @@ dependencies {
 	compileOnly project(":apps:layout:layout-item-selector-api")
 	compileOnly project(":apps:layout:layout-page-template-api")
 	compileOnly project(":apps:message-boards:message-boards-api")
+	compileOnly project(":apps:portal-search:portal-search-api")
 	compileOnly project(":apps:portal:portal-upgrade-api")
 	compileOnly project(":apps:rss:rss-api")
 	compileOnly project(":apps:site-navigation:site-navigation-taglib")
@@ -44,6 +45,7 @@ dependencies {
 	compileOnly project(":core:osgi-service-tracker-collections")
 	compileOnly project(":core:petra:petra-lang")
 	compileOnly project(":core:petra:petra-string")
+	compileOnly project(":core:registry-api")
 
 	soyCompile project(":apps:frontend-js:frontend-js-metal-web")
 	soyCompile project(":apps:frontend-js:frontend-js-web")
