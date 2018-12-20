@@ -45,8 +45,12 @@ import com.liferay.journal.web.internal.search.JournalSearcher;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalArticleActionDropdownItems;
 import com.liferay.journal.web.internal.servlet.taglib.util.JournalFolderActionDropdownItems;
 import com.liferay.journal.web.util.JournalPortletUtil;
+import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.kernel.service.MBMessageLocalServiceUtil;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
@@ -85,12 +89,15 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.sort.SortBuilder;
+import com.liferay.portal.search.sort.SortBuilderFactory;
 import com.liferay.trash.TrashHelper;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -101,6 +108,9 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Eudaldo Alonso
@@ -885,19 +895,16 @@ public class JournalDisplayContext {
 			Sort sort = null;
 
 			if (Objects.equals(getOrderByCol(), "display-date")) {
-				sort = new Sort("displayDate", Sort.LONG_TYPE, orderByAsc);
+				sort = _getSort("displayDate", orderByAsc);
 			}
 			else if (Objects.equals(getOrderByCol(), "id")) {
-				sort = new Sort(
-					Field.getSortableFieldName(Field.ARTICLE_ID),
-					Sort.STRING_TYPE, !orderByAsc);
+				sort = _getSort(Field.ARTICLE_ID, !orderByAsc);
 			}
 			else if (Objects.equals(getOrderByCol(), "modified-date")) {
-				sort = new Sort(
-					Field.MODIFIED_DATE, Sort.LONG_TYPE, orderByAsc);
+				sort = _getSort(Field.MODIFIED_DATE, orderByAsc);
 			}
 			else if (Objects.equals(getOrderByCol(), "title")) {
-				sort = new Sort("title", Sort.STRING_TYPE, !orderByAsc);
+				sort = _getSort("title", !orderByAsc);
 			}
 
 			Indexer indexer = null;
@@ -1231,6 +1238,37 @@ public class JournalDisplayContext {
 		}
 
 		return jsonArray;
+	}
+
+	private Sort _getSort(String field, boolean reverse) {
+		SortBuilderFactory sortBuilderFactory = _getSortBuilderFactory();
+
+		SortBuilder sortBuilder = sortBuilderFactory.getBuilder();
+
+		sortBuilder.setField(field);
+		sortBuilder.setReverse(reverse);
+
+		return sortBuilder.build();
+	}
+
+	private SortBuilderFactory _getSortBuilderFactory() {
+		Iterator<SortBuilderFactory> iterator =
+			_sortBuilderFactoryServiceTrackerList.iterator();
+
+		return iterator.next();
+	}
+
+	private static final ServiceTrackerList<SortBuilderFactory, SortBuilderFactory>
+		_sortBuilderFactoryServiceTrackerList =
+			_openSortBuilderFactoryServiceTrackerList();
+
+	private static ServiceTrackerList<SortBuilderFactory, SortBuilderFactory>
+		_openSortBuilderFactoryServiceTrackerList() {
+			Bundle bundle = FrameworkUtil.getBundle(
+				JournalDisplayContext.class);
+
+			return ServiceTrackerListFactory.open(
+				bundle.getBundleContext(), SortBuilderFactory.class);
 	}
 
 	private String[] _addMenuFavItems;
