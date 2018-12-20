@@ -24,6 +24,8 @@ public interface FieldRegistry {
 
 	public void addField(String name, String fieldName, MappedField field);
 
+	public boolean isSortableTextField(String name);
+
 	public boolean isTheFieldType(String name, String type);
 
 	public boolean putPropertiesMappingIndex(
@@ -40,5 +42,7 @@ public interface FieldRegistry {
 	public void registerFieldTermVector(String name, String termVector);
 
 	public void registerFieldType(String name, String type);
+
+	public void registerSortableTextField(String name);
 
 }
