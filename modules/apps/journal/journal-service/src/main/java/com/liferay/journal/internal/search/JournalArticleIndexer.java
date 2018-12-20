@@ -109,6 +109,9 @@ import java.util.Set;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -396,8 +399,9 @@ public class JournalArticleIndexer
 		}
 	}
 
-	protected void addDDMStructureAttributes(
-			Document document, JournalArticle article)
+	protected Document addDDMStructureAttributes(
+			DocumentBuilder documentBuilder, Document document,
+			JournalArticle article)
 		throws Exception {
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
@@ -405,28 +409,31 @@ public class JournalArticleIndexer
 			_portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
 
-		if (ddmStructure == null) {
-			return;
-		}
-
-		document.addKeyword(Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
-
 		DDMFormValues ddmFormValues = null;
 
-		try {
-			Fields fields = _journalConverter.getDDMFields(
-				ddmStructure, article.getDocument());
+		if (ddmStructure != null) {
+			documentBuilder.add(
+				Field.CLASS_TYPE_ID, ddmStructure.getStructureId());
 
-			ddmFormValues = _fieldsToDDMFormValuesConverter.convert(
-				ddmStructure, fields);
+			try {
+				Fields fields = _journalConverter.getDDMFields(
+					ddmStructure, article.getDocument());
+
+				ddmFormValues = _fieldsToDDMFormValuesConverter.convert(
+					ddmStructure, fields);
+			}
+			catch (Exception e) {
+				ddmFormValues = null;
+			}
 		}
-		catch (Exception e) {
-			return;
-		}
+
+		document = documentBuilder.build(document);
 
 		if (ddmFormValues != null) {
 			_ddmIndexer.addAttributes(document, ddmStructure, ddmFormValues);
 		}
+
+		return document;
 	}
 
 	protected Map<String, Query> addLocalizedFields(
@@ -545,6 +552,7 @@ public class JournalArticleIndexer
 		throws Exception {
 
 		Document document = getBaseModelDocument(CLASS_NAME, journalArticle);
+		DocumentBuilder documentBuilder = _documentBuilderFactory.getBuilder();
 
 		long classPK = journalArticle.getId();
 
@@ -552,7 +560,7 @@ public class JournalArticleIndexer
 			classPK = journalArticle.getResourcePrimKey();
 		}
 
-		document.addUID(CLASS_NAME, classPK);
+		documentBuilder.addUID(CLASS_NAME, classPK);
 
 		Localization localization = getLocalization();
 
@@ -566,17 +574,12 @@ public class JournalArticleIndexer
 
 			String title = journalArticle.getTitle(languageId);
 
-			document.addText(
-				localization.getLocalizedName(Field.CONTENT, languageId),
-				content);
-			document.addText(
-				localization.getLocalizedName(Field.DESCRIPTION, languageId),
-				description);
-			document.addText(
-				localization.getLocalizedName(Field.TITLE, languageId), title);
+			documentBuilder.add(Field.CONTENT, languageId, content);
+			documentBuilder.add(Field.DESCRIPTION, languageId, description);
+			documentBuilder.add(Field.TITLE, languageId, title);
 		}
 
-		document.addKeyword(Field.FOLDER_ID, journalArticle.getFolderId());
+		documentBuilder.add(Field.FOLDER_ID, journalArticle.getFolderId());
 
 		String articleId = journalArticle.getArticleId();
 
@@ -584,35 +587,38 @@ public class JournalArticleIndexer
 			articleId = _trashHelper.getOriginalTitle(articleId);
 		}
 
-		document.addKeywordSortable(Field.ARTICLE_ID, articleId);
+		documentBuilder.addString(Field.ARTICLE_ID, articleId);
 
-		document.addDate(Field.DISPLAY_DATE, journalArticle.getDisplayDate());
-		document.addKeyword(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
-		document.addKeyword(
+		documentBuilder.addDate(
+			Field.DISPLAY_DATE, journalArticle.getDisplayDate());
+
+		documentBuilder.add(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
+
+		documentBuilder.add(
 			Field.TREE_PATH,
 			StringUtil.split(journalArticle.getTreePath(), CharPool.SLASH));
-		document.addKeyword(Field.VERSION, journalArticle.getVersion());
 
-		document.addKeyword(
+		documentBuilder.add(Field.VERSION, journalArticle.getVersion());
+
+		documentBuilder.add(
 			"ddmStructureKey", journalArticle.getDDMStructureKey());
-		document.addKeyword(
+		documentBuilder.add(
 			"ddmTemplateKey", journalArticle.getDDMTemplateKey());
 
 		String defaultLanguageId = localization.getDefaultLanguageId(
 			journalArticle.getDocument());
 
-		document.addText("defaultLanguageId", defaultLanguageId);
+		documentBuilder.add("defaultLanguageId", defaultLanguageId);
 
-		document.addDate("displayDate", journalArticle.getDisplayDate());
-		document.addKeyword("head", JournalUtil.isHead(journalArticle));
+		documentBuilder.addBoolean("head", JournalUtil.isHead(journalArticle));
 
 		boolean headListable = JournalUtil.isHeadListable(journalArticle);
 
-		document.addKeyword("headListable", headListable);
+		documentBuilder.add("headListable", headListable);
 
 		boolean latestArticle = JournalUtil.isLatestArticle(journalArticle);
 
-		document.addKeyword("latest", latestArticle);
+		documentBuilder.add("latest", latestArticle);
 
 		// Scheduled listable articles should be visible in asset browser
 
@@ -620,13 +626,12 @@ public class JournalArticleIndexer
 			boolean visible = GetterUtil.getBoolean(document.get("visible"));
 
 			if (!visible) {
-				document.addKeyword("visible", true);
+				documentBuilder.add("visible", true);
 			}
 		}
 
-		addDDMStructureAttributes(document, journalArticle);
-
-		return document;
+		return addDDMStructureAttributes(
+			documentBuilder, document, journalArticle);
 	}
 
 	@Override
@@ -1053,13 +1058,11 @@ public class JournalArticleIndexer
 		return text;
 	}
 
-	private static final String[] _ESCAPE_SAFE_HIGHLIGHTS = {
-		"[@HIGHLIGHT1@]", "[@HIGHLIGHT2@]"
-	};
+	private static final String[] _ESCAPE_SAFE_HIGHLIGHTS =
+		{"[@HIGHLIGHT1@]", "[@HIGHLIGHT2@]"};
 
-	private static final String[] _HIGHLIGHT_TAGS = {
-		HighlightUtil.HIGHLIGHT_TAG_OPEN, HighlightUtil.HIGHLIGHT_TAG_CLOSE
-	};
+	private static final String[] _HIGHLIGHT_TAGS =
+		{HighlightUtil.HIGHLIGHT_TAG_OPEN, HighlightUtil.HIGHLIGHT_TAG_CLOSE};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalArticleIndexer.class);
@@ -1070,6 +1073,10 @@ public class JournalArticleIndexer
 	private ConfigurationProvider _configurationProvider;
 	private DDMIndexer _ddmIndexer;
 	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private DocumentBuilderFactory _documentBuilderFactory;
+
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
 
 	@Reference
