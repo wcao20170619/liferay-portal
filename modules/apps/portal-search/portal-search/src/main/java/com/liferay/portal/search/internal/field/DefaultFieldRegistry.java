@@ -26,6 +26,7 @@ import com.liferay.portal.search.field.FieldType;
 import com.liferay.portal.search.field.MappedField;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public class DefaultFieldRegistry implements FieldRegistry {
 		MappedField mappedFieldType = _createMappedFieldIfNotExist(name);
 
 		mappedFieldType.addField(fieldName, field);
+	}
+
+	@Override
+	public boolean isSortableTextField(String name) {
+		return _sortableTextFields.contains(name);
 	}
 
 	@Override
@@ -132,6 +138,11 @@ public class DefaultFieldRegistry implements FieldRegistry {
 		_fieldTypeMap.put(name, mappedFieldType);
 	}
 
+	@Override
+	public void registerSortableTextField(String name) {
+		_sortableTextFields.add(name);
+	}
+
 	@Activate
 	protected void activate() {
 		_registerFieldTypes();
@@ -141,6 +152,7 @@ public class DefaultFieldRegistry implements FieldRegistry {
 
 		defaultSortableTextFields.forEach(
 			defaultSortableTextField -> {
+				registerSortableTextField(defaultSortableTextField);
 				registerFieldType(defaultSortableTextField, "text");
 			});
 	}
@@ -180,5 +192,6 @@ public class DefaultFieldRegistry implements FieldRegistry {
 	}
 
 	private final Map<String, MappedField> _fieldTypeMap = new HashMap<>();
+	private final Set<String> _sortableTextFields = new HashSet<>();
 
 }

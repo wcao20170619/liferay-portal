@@ -144,10 +144,8 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 			datesTime[i] = values[i].getTime();
 		}
 
-		if (_fieldRegistry.isTheFieldType(name, FieldType.DATE)) {
-			_documentBuilderHelper.createSortableNumericField(
-				name, false, datesTime);
-		}
+		_documentBuilderHelper.createSortableNumericField(
+			name, false, datesTime);
 
 		Field field = _documentBuilderHelper.createField(name, datesString);
 
@@ -427,7 +425,11 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 
 		if (_fieldRegistry.isTheFieldType(name, FieldType.STRING_ANALYZED)) {
 			field.setTokenized(true);
-			_documentBuilderHelper.createSortableTextField(name, false, value);
+
+			if (_fieldRegistry.isSortableTextField(name)) {
+				_documentBuilderHelper.createSortableTextField(
+					name, false, value);
+			}
 		}
 	}
 
@@ -440,14 +442,7 @@ public class DocumentBuilderImpl implements DocumentBuilder {
 		String nameLanguageId = LocalizationUtil.getLocalizedName(
 			name, languageId);
 
-		Field field = _documentBuilderHelper.createField(nameLanguageId, value);
-
-		if (_fieldRegistry.isTheFieldType(name, FieldType.STRING_ANALYZED)) {
-			field.setTokenized(true);
-
-			_documentBuilderHelper.createSortableTextField(
-				nameLanguageId, false, value);
-		}
+		add(nameLanguageId, value);
 	}
 
 	@Override

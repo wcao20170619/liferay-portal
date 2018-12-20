@@ -16,7 +16,6 @@ package com.liferay.portal.search.internal.sort;
 
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.search.field.FieldRegistry;
-import com.liferay.portal.search.field.FieldType;
 import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortBuilder;
 
@@ -57,10 +56,7 @@ public class SortBuilderImpl implements SortBuilder {
 	}
 
 	protected String getSortableName(String name) {
-		if (_fieldRegistry.isTheFieldType(name, FieldType.STRING_ANALYZED) ||
-			_fieldRegistry.isTheFieldType(name, FieldType.DATE) ||
-			_fieldRegistry.isTheFieldType(name, FieldType.NUMERIC)) {
-
+		if (_fieldRegistry.isSortableTextField(name)) {
 			return Field.getSortableFieldName(name);
 		}
 

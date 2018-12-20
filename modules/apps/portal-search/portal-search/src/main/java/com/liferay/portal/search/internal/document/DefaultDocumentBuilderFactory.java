@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.field.FieldRegistry;
-import com.liferay.portal.search.field.FieldType;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,10 +49,7 @@ public class DefaultDocumentBuilderFactory implements DocumentBuilderFactory {
 	}
 
 	protected String getSortableName(String name) {
-		if (fieldRegistry.isTheFieldType(name, FieldType.STRING_ANALYZED) ||
-			fieldRegistry.isTheFieldType(name, FieldType.DATE) ||
-			fieldRegistry.isTheFieldType(name, FieldType.NUMERIC)) {
-
+		if (fieldRegistry.isSortableTextField(name)) {
 			return Field.getSortableFieldName(name);
 		}
 
