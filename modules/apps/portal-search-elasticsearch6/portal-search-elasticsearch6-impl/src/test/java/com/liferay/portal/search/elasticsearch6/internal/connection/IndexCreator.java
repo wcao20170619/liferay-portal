@@ -14,7 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.connection;
 
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexContributor;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptions;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptionsBuilder;
@@ -42,13 +41,14 @@ public class IndexCreator {
 	public void addCreateIndexContributor(
 		CreateIndexContributor createIndexContributor) {
 
-		createIndexContributors.add(createIndexContributor);
+		_createIndexContributors.add(createIndexContributor);
 	}
 
 	public Index createIndex(IndexName indexName) {
 		if (_liferayMappingsAddedToIndex) {
 			addCreateIndexContributor(
-				new LiferayCreateIndexContributor(elasticsearchClientResolver));
+				new LiferayCreateIndexContributor(
+					_elasticsearchClientResolver));
 		}
 
 		CreateIndexRequestFactory createIndexRequestFactory =
@@ -62,7 +62,7 @@ public class IndexCreator {
 				createIndexOptionsBuilder.addContributor(
 					new DeleteBeforeCreateIndexContributor()
 				).addContributors(
-					createIndexContributors
+					_createIndexContributors
 				).adminClient(
 					getAdminClient()
 				).indexName(
@@ -75,27 +75,14 @@ public class IndexCreator {
 	}
 
 	public Collection<CreateIndexContributor> getCreateIndexContributors() {
-		return Collections.unmodifiableCollection(createIndexContributors);
-	}
-
-	public void setLiferayMappingsAddedToIndex(
-		boolean liferayMappingsAddedToIndex) {
-
-		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
+		return Collections.unmodifiableCollection(_createIndexContributors);
 	}
 
 	protected AdminClient getAdminClient() {
-		Client client = elasticsearchClientResolver.getClient();
+		Client client = _elasticsearchClientResolver.getClient();
 
 		return client.admin();
 	}
-
-	protected final List<CreateIndexContributor> createIndexContributors =
-		new ArrayList<>();
-	protected ElasticsearchClientResolver elasticsearchClientResolver;
-	protected JSONFactory jsonFactory;
-
-	private boolean _liferayMappingsAddedToIndex;
 
 	private class DeleteBeforeCreateIndexContributor
 		extends DummyCreateIndexContributor {
@@ -124,20 +111,16 @@ public class IndexCreator {
 		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
-	protected void setIndexCreationHelper(
-		IndexCreationHelper indexCreationHelper) {
-
-		_indexCreationHelper = indexCreationHelper;
-	}
-
 	protected void setLiferayMappingsAddedToIndex(
 		boolean liferayMappingsAddedToIndex) {
 
 		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
 	}
 
+	private final List<CreateIndexContributor> _createIndexContributors =
+		new ArrayList<>();
+
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
-	private IndexCreationHelper _indexCreationHelper;
 	private boolean _liferayMappingsAddedToIndex;
 
 }
