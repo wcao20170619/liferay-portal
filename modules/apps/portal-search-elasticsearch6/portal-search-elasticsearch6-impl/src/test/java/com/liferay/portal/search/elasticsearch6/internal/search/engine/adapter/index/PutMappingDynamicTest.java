@@ -28,6 +28,7 @@ import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.d
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.DocumentRequestExecutor;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
+import com.liferay.portal.search.internal.legacy.document.DocumentBuilderFactoryImpl;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
@@ -111,14 +112,19 @@ public class PutMappingDynamicTest {
 	public TestName testName = new TestName();
 
 	protected static DocumentRequestExecutor createDocumentRequestExecutor(
-		ElasticsearchClientResolver elasticsearchClientResolver1) {
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		DocumentRequestExecutorFixture documentRequestExecutorFixture =
 			new DocumentRequestExecutorFixture() {
 				{
-					elasticsearchClientResolver = elasticsearchClientResolver1;
-					elasticsearchDocumentFactory =
-						new DefaultElasticsearchDocumentFactory();
+					setElasticsearchClientResolver(elasticsearchClientResolver);
+					setElasticsearchDocumentFactory(
+						new DefaultElasticsearchDocumentFactory() {
+							{
+								setDocumentBuilderFactory(
+									new DocumentBuilderFactoryImpl());
+							}
+						});
 				}
 			};
 
@@ -132,14 +138,18 @@ public class PutMappingDynamicTest {
 
 		return new ElasticsearchSearchEngineAdapterImpl() {
 			{
-				documentRequestExecutor = createDocumentRequestExecutor(
-					elasticsearchFixture);
+				setDocumentRequestExecutor(
+					createDocumentRequestExecutor(elasticsearchFixture));
 			}
 		};
 	}
 
 	protected Index createIndex(ElasticsearchFixture elasticsearchFixture) {
-		IndexCreator indexCreator = new IndexCreator(elasticsearchFixture);
+		IndexCreator indexCreator = new IndexCreator() {
+			{
+				setElasticsearchClientResolver(elasticsearchFixture);
+			}
+		};
 
 		return indexCreator.createIndex(
 			new IndexName(testName.getMethodName()));
