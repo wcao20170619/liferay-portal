@@ -16,6 +16,8 @@ package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.document.DefaultElasticsearchDocumentFactory;
 import com.liferay.portal.search.elasticsearch6.internal.document.ElasticsearchDocumentFactory;
@@ -92,7 +94,7 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 
 			Document document = indexDocumentRequest.getDocument();
 
-			indexRequestBuilder.setId(document.getUID());
+			setIndexRequestBuilderId(indexRequestBuilder, document);
 
 			indexRequestBuilder.setIndex(indexDocumentRequest.getIndexName());
 
@@ -134,9 +136,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 			UpdateRequestBuilder updateRequestBuilder =
 				UpdateAction.INSTANCE.newRequestBuilder(client);
 
-			Document document = updateDocumentRequest.getDocument();
-
-			updateRequestBuilder.setId(document.getUID());
+			setUpdateRequestBuilderId(
+				updateRequestBuilder, updateDocumentRequest);
 
 			updateRequestBuilder.setIndex(updateDocumentRequest.getIndexName());
 
@@ -149,6 +150,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 
 			ElasticsearchDocumentFactory elasticsearchDocumentFactory =
 				new DefaultElasticsearchDocumentFactory();
+
+			Document document = updateDocumentRequest.getDocument();
 
 			String elasticsearchDocument =
 				elasticsearchDocumentFactory.getElasticsearchDocument(document);
@@ -165,6 +168,39 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
 		}
+	}
+
+	protected void setIndexRequestBuilderId(
+		IndexRequestBuilder indexRequestBuilder, Document document) {
+
+		Field field = document.getField(Field.UID);
+
+		if (field != null) {
+			String uid = field.getValue();
+
+			if (!Validator.isBlank(uid)) {
+				indexRequestBuilder.setId(uid);
+			}
+		}
+	}
+
+	protected void setUpdateRequestBuilderId(
+		UpdateRequestBuilder updateRequestBuilder,
+		UpdateDocumentRequest updateDocumentRequest) {
+
+		String uid = updateDocumentRequest.getUid();
+
+		if (Validator.isBlank(uid)) {
+			Document document = updateDocumentRequest.getDocument();
+
+			Field field = document.getField(Field.UID);
+
+			if (field != null) {
+				uid = field.getValue();
+			}
+		}
+
+		updateRequestBuilder.setId(uid);
 	}
 
 	@Reference
