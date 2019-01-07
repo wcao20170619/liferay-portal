@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.document.DocumentRequestExecutorFixture;
@@ -196,6 +197,119 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 		Assert.assertEquals(Boolean.TRUE.toString(), map2.get(_FIELD_NAME));
 	}
 
+	@Test
+	public void testExecuteBulkDocumentRequestNoUid() {
+		Document document1 = new DocumentImpl();
+
+		document1.addKeyword(_FIELD_NAME, Boolean.TRUE.toString());
+
+		IndexDocumentRequest indexDocumentRequest = new IndexDocumentRequest(
+			_INDEX_NAME, document1);
+
+		indexDocumentRequest.setType(_MAPPING_NAME);
+
+		BulkDocumentRequest bulkDocumentRequest = new BulkDocumentRequest();
+
+		bulkDocumentRequest.addBulkableDocumentRequest(indexDocumentRequest);
+
+		Document document2 = new DocumentImpl();
+
+		document2.addKeyword(_FIELD_NAME, Boolean.FALSE.toString());
+
+		IndexDocumentRequest indexDocumentRequest2 = new IndexDocumentRequest(
+			_INDEX_NAME, document2);
+
+		indexDocumentRequest2.setType(_MAPPING_NAME);
+
+		bulkDocumentRequest.addBulkableDocumentRequest(indexDocumentRequest2);
+
+		BulkDocumentResponse bulkDocumentResponse =
+			_searchEngineAdapter.execute(bulkDocumentRequest);
+
+		Assert.assertFalse(bulkDocumentResponse.hasErrors());
+
+		List<BulkDocumentItemResponse> bulkDocumentItemResponses =
+			bulkDocumentResponse.getBulkDocumentItemResponses();
+
+		Assert.assertEquals(
+			bulkDocumentItemResponses.toString(), 2,
+			bulkDocumentItemResponses.size());
+
+		BulkDocumentItemResponse bulkDocumentItemResponse1 =
+			bulkDocumentItemResponses.get(0);
+
+		Assert.assertFalse(
+			Validator.isBlank(bulkDocumentItemResponse1.getId()));
+
+		BulkDocumentItemResponse bulkDocumentItemResponse2 =
+			bulkDocumentItemResponses.get(1);
+
+		Assert.assertFalse(
+			Validator.isBlank(bulkDocumentItemResponse2.getId()));
+
+		DeleteDocumentRequest deleteDocumentRequest = new DeleteDocumentRequest(
+			_INDEX_NAME, bulkDocumentItemResponse1.getId());
+
+		deleteDocumentRequest.setType(_MAPPING_NAME);
+
+		BulkDocumentRequest bulkDocumentRequest2 = new BulkDocumentRequest();
+
+		bulkDocumentRequest2.addBulkableDocumentRequest(deleteDocumentRequest);
+
+		Document document2Update = new DocumentImpl();
+
+		document2Update.addKeyword(
+			Field.UID, bulkDocumentItemResponse2.getId());
+		document2Update.addKeyword(_FIELD_NAME, Boolean.TRUE.toString());
+
+		UpdateDocumentRequest updateDocumentRequest = new UpdateDocumentRequest(
+			_INDEX_NAME, bulkDocumentItemResponse2.getId(), document2Update);
+
+		updateDocumentRequest.setType(_MAPPING_NAME);
+
+		bulkDocumentRequest2.addBulkableDocumentRequest(updateDocumentRequest);
+
+		BulkDocumentResponse bulkDocumentResponse2 =
+			_searchEngineAdapter.execute(bulkDocumentRequest2);
+
+		Assert.assertFalse(bulkDocumentResponse2.hasErrors());
+
+		List<BulkDocumentItemResponse> bulkDocumentItemResponses2 =
+			bulkDocumentResponse2.getBulkDocumentItemResponses();
+
+		Assert.assertEquals(
+			bulkDocumentItemResponses2.toString(), 2,
+			bulkDocumentItemResponses2.size());
+
+		BulkDocumentItemResponse bulkDocumentItemResponse3 =
+			bulkDocumentItemResponses2.get(0);
+
+		Assert.assertEquals(
+			bulkDocumentItemResponse1.getId(),
+			bulkDocumentItemResponse3.getId());
+
+		BulkDocumentItemResponse bulkDocumentItemResponse4 =
+			bulkDocumentItemResponses2.get(1);
+
+		Assert.assertEquals(
+			bulkDocumentItemResponse2.getId(),
+			bulkDocumentItemResponse4.getId());
+
+		GetResponse getResponse1 = _getDocument(
+			bulkDocumentItemResponse1.getId());
+
+		Assert.assertFalse(getResponse1.isExists());
+
+		GetResponse getResponse2 = _getDocument(
+			bulkDocumentItemResponse2.getId());
+
+		Assert.assertTrue(getResponse2.isExists());
+
+		Map<String, Object> map2 = getResponse2.getSource();
+
+		Assert.assertEquals(Boolean.TRUE.toString(), map2.get(_FIELD_NAME));
+	}
+
 	@Ignore
 	@Test
 	public void testExecuteDeleteByQueryDocumentRequest() {
@@ -263,6 +377,24 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 			RestStatus.CREATED.getStatus(), indexDocumentResponse.getStatus());
 	}
 
+	@Test
+	public void testExecuteIndexDocumentRequestNoUid() {
+		Document document = new DocumentImpl();
+
+		IndexDocumentRequest indexDocumentRequest = new IndexDocumentRequest(
+			_INDEX_NAME, document);
+
+		indexDocumentRequest.setType(_MAPPING_NAME);
+
+		IndexDocumentResponse indexDocumentResponse =
+			_searchEngineAdapter.execute(indexDocumentRequest);
+
+		Assert.assertEquals(
+			RestStatus.CREATED.getStatus(), indexDocumentResponse.getStatus());
+
+		Assert.assertNotNull(indexDocumentResponse.getId());
+	}
+
 	@Ignore
 	@Test
 	public void testExecuteUpdateByQueryDocumentRequest() {
@@ -304,6 +436,42 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 
 		UpdateDocumentRequest updateDocumentRequest = new UpdateDocumentRequest(
 			_INDEX_NAME, id, document);
+
+		updateDocumentRequest.setType(_MAPPING_NAME);
+
+		UpdateDocumentResponse updateDocumentResponse =
+			_searchEngineAdapter.execute(updateDocumentRequest);
+
+		Assert.assertEquals(
+			RestStatus.OK.getStatus(), updateDocumentResponse.getStatus());
+
+		GetResponse getResponse2 = _getDocument(id);
+
+		Map<String, Object> map2 = getResponse2.getSource();
+
+		Assert.assertEquals(Boolean.FALSE.toString(), map2.get(_FIELD_NAME));
+	}
+
+	@Test
+	public void testExecuteUpdateDocumentRequestNoUid() {
+		String documentSource = "{\"" + _FIELD_NAME + "\":\"true\"}";
+		String id = "1";
+
+		_indexDocument(documentSource, id);
+
+		GetResponse getResponse1 = _getDocument(id);
+
+		Map<String, Object> map1 = getResponse1.getSource();
+
+		Assert.assertEquals(Boolean.TRUE.toString(), map1.get(_FIELD_NAME));
+
+		Document document = new DocumentImpl();
+
+		document.addKeyword(Field.UID, "1");
+		document.addKeyword(_FIELD_NAME, false);
+
+		UpdateDocumentRequest updateDocumentRequest = new UpdateDocumentRequest(
+			_INDEX_NAME, null, document);
 
 		updateDocumentRequest.setType(_MAPPING_NAME);
 
