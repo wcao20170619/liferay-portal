@@ -16,6 +16,8 @@ package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.document.DefaultElasticsearchDocumentFactory;
 import com.liferay.portal.search.elasticsearch6.internal.document.ElasticsearchDocumentFactory;
@@ -90,9 +92,7 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 			IndexRequestBuilder indexRequestBuilder =
 				IndexAction.INSTANCE.newRequestBuilder(client);
 
-			Document document = indexDocumentRequest.getDocument();
-
-			indexRequestBuilder.setId(document.getUID());
+			setIdIndex(indexDocumentRequest, indexRequestBuilder);
 
 			indexRequestBuilder.setIndex(indexDocumentRequest.getIndexName());
 
@@ -105,6 +105,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 
 			ElasticsearchDocumentFactory elasticsearchDocumentFactory =
 				new DefaultElasticsearchDocumentFactory();
+
+			Document document = indexDocumentRequest.getDocument();
 
 			String elasticsearchDocument =
 				elasticsearchDocumentFactory.getElasticsearchDocument(document);
@@ -134,9 +136,7 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 			UpdateRequestBuilder updateRequestBuilder =
 				UpdateAction.INSTANCE.newRequestBuilder(client);
 
-			Document document = updateDocumentRequest.getDocument();
-
-			updateRequestBuilder.setId(document.getUID());
+			setIdUpdate(updateDocumentRequest, updateRequestBuilder);
 
 			updateRequestBuilder.setIndex(updateDocumentRequest.getIndexName());
 
@@ -149,6 +149,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 
 			ElasticsearchDocumentFactory elasticsearchDocumentFactory =
 				new DefaultElasticsearchDocumentFactory();
+
+			Document document = updateDocumentRequest.getDocument();
 
 			String elasticsearchDocument =
 				elasticsearchDocumentFactory.getElasticsearchDocument(document);
@@ -164,6 +166,34 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 		}
 		catch (IOException ioe) {
 			throw new SystemException(ioe);
+		}
+	}
+
+	protected void setIdIndex(
+		IndexDocumentRequest indexDocumentRequest,
+		IndexRequestBuilder indexRequestBuilder) {
+
+		Document document = indexDocumentRequest.getDocument();
+
+		Field field = document.getField(Field.UID);
+
+		if (field != null) {
+			String uid = field.getValue();
+
+			if (!Validator.isBlank(uid)) {
+				indexRequestBuilder.setId(uid);
+			}
+		}
+	}
+
+	protected void setIdUpdate(
+		UpdateDocumentRequest updateDocumentRequest,
+		UpdateRequestBuilder updateRequestBuilder) {
+
+		String uid = updateDocumentRequest.getUid();
+
+		if (!Validator.isBlank(uid)) {
+			updateRequestBuilder.setId(uid);
 		}
 	}
 
