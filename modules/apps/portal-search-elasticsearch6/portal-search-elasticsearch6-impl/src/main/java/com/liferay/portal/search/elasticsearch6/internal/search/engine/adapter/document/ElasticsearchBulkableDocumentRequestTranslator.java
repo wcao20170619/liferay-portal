@@ -92,7 +92,9 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 			IndexRequestBuilder indexRequestBuilder =
 				IndexAction.INSTANCE.newRequestBuilder(client);
 
-			setIdIndex(indexDocumentRequest, indexRequestBuilder);
+			Document document = indexDocumentRequest.getDocument();
+
+			setIndexRequestBuilderId(indexRequestBuilder, document);
 
 			indexRequestBuilder.setIndex(indexDocumentRequest.getIndexName());
 
@@ -105,8 +107,6 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 
 			ElasticsearchDocumentFactory elasticsearchDocumentFactory =
 				new DefaultElasticsearchDocumentFactory();
-
-			Document document = indexDocumentRequest.getDocument();
 
 			String elasticsearchDocument =
 				elasticsearchDocumentFactory.getElasticsearchDocument(document);
@@ -136,7 +136,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 			UpdateRequestBuilder updateRequestBuilder =
 				UpdateAction.INSTANCE.newRequestBuilder(client);
 
-			setIdUpdate(updateDocumentRequest, updateRequestBuilder);
+			setUpdateRequestBuilderId(
+				updateRequestBuilder, updateDocumentRequest);
 
 			updateRequestBuilder.setIndex(updateDocumentRequest.getIndexName());
 
@@ -169,11 +170,8 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 		}
 	}
 
-	protected void setIdIndex(
-		IndexDocumentRequest indexDocumentRequest,
-		IndexRequestBuilder indexRequestBuilder) {
-
-		Document document = indexDocumentRequest.getDocument();
+	protected void setIndexRequestBuilderId(
+		IndexRequestBuilder indexRequestBuilder, Document document) {
 
 		Field field = document.getField(Field.UID);
 
@@ -186,15 +184,23 @@ public class ElasticsearchBulkableDocumentRequestTranslator
 		}
 	}
 
-	protected void setIdUpdate(
-		UpdateDocumentRequest updateDocumentRequest,
-		UpdateRequestBuilder updateRequestBuilder) {
+	protected void setUpdateRequestBuilderId(
+		UpdateRequestBuilder updateRequestBuilder,
+		UpdateDocumentRequest updateDocumentRequest) {
 
 		String uid = updateDocumentRequest.getUid();
 
-		if (!Validator.isBlank(uid)) {
-			updateRequestBuilder.setId(uid);
+		if (Validator.isBlank(uid)) {
+			Document document = updateDocumentRequest.getDocument();
+
+			Field field = document.getField(Field.UID);
+
+			if (field != null) {
+				uid = field.getValue();
+			}
 		}
+
+		updateRequestBuilder.setId(uid);
 	}
 
 	@Reference
