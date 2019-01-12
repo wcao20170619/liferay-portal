@@ -16,6 +16,7 @@ package com.liferay.portal.search.elasticsearch6.internal.index.create;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.search.elasticsearch6.internal.field.FieldRegistrySynchronizer;
 import com.liferay.portal.search.elasticsearch6.internal.util.LogUtil;
 
 import java.util.stream.Stream;
@@ -32,8 +33,12 @@ import org.elasticsearch.common.settings.Settings;
  */
 public class CreateIndexRequestImpl implements CreateIndexRequest {
 
-	public CreateIndexRequestImpl(CreateIndexOptions createIndexOptions) {
+	public CreateIndexRequestImpl(
+		CreateIndexOptions createIndexOptions,
+		FieldRegistrySynchronizer fieldRegistrySynchronizer) {
+
 		_createIndexOptions = createIndexOptions;
+		_fieldRegistrySynchronizer = fieldRegistrySynchronizer;
 	}
 
 	@Override
@@ -43,6 +48,8 @@ public class CreateIndexRequestImpl implements CreateIndexRequest {
 		createIndex(
 			_createIndexOptions.getAdminClient(),
 			_createIndexOptions.getIndexName());
+
+		syncFieldRegistry();
 
 		notifyListenersAfterCreateIndex();
 	}
@@ -115,9 +122,16 @@ public class CreateIndexRequestImpl implements CreateIndexRequest {
 				_createIndexOptions));
 	}
 
+	protected void syncFieldRegistry() {
+		if (_fieldRegistrySynchronizer != null) {
+			_fieldRegistrySynchronizer.sync(_createIndexOptions.getIndexName());
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		CreateIndexRequestImpl.class);
 
 	private final CreateIndexOptions _createIndexOptions;
+	private final FieldRegistrySynchronizer _fieldRegistrySynchronizer;
 
 }

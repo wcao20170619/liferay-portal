@@ -14,7 +14,10 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.index.create;
 
+import com.liferay.portal.search.elasticsearch6.internal.field.FieldRegistrySynchronizer;
+
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author André de Oliveira
@@ -25,12 +28,16 @@ public class CreateIndexRequestFactoryImpl
 
 	@Override
 	public CreateIndexRequest create(CreateIndexOptions createIndexOptions) {
-		return new CreateIndexRequestImpl(createIndexOptions);
+		return new CreateIndexRequestImpl(
+			createIndexOptions, fieldRegistrySynchronizer);
 	}
 
 	@Override
 	public CreateIndexOptionsBuilder createOptionsBuilder() {
 		return new CreateIndexOptionsBuilderImpl();
 	}
+
+	@Reference
+	protected FieldRegistrySynchronizer fieldRegistrySynchronizer;
 
 }
