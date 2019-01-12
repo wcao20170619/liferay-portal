@@ -23,21 +23,19 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch6.internal.ElasticsearchIndexingFixture;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch6.internal.connection.IndexCreationHelper;
 import com.liferay.portal.search.elasticsearch6.internal.index.LiferayTypeMappingsConstants;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptions;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.DummyCreateIndexContributor;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 
 import java.util.Arrays;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingAction;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 
 import org.junit.Assert;
@@ -66,23 +64,15 @@ public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
 	protected void assertGeoLocationPointField(final String fieldName)
 		throws Exception {
 
-		final double latitude = randomLatitude();
-		final double longitude = randomLongitude();
+		double latitude = randomLatitude();
+		double longitude = randomLongitude();
 
 		addDocument(
 			DocumentCreationHelpers.singleGeoLocation(
 				fieldName, latitude, longitude));
 
 		Document document = IdempotentRetryAssert.retryAssert(
-			10, TimeUnit.SECONDS,
-			new Callable<Document>() {
-
-				@Override
-				public Document call() throws Exception {
-					return searchOneDocument();
-				}
-
-			});
+			10, TimeUnit.SECONDS, () -> searchOneDocument());
 
 		Field field = document.getField(fieldName);
 
@@ -101,10 +91,11 @@ public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
 
 				setCompanyId(BaseIndexingTestCase.COMPANY_ID);
 				setElasticsearchFixture(elasticsearchFixture);
-				setIndexCreationHelper(
-					new CustomFieldLiferayIndexCreationHelper(
-						elasticsearchFixture));
 				setLiferayMappingsAddedToIndex(true);
+
+				addCreateIndexContributor(
+					new CustomGeoPointFieldCreateIndexContributor(
+						elasticsearchFixture));
 			}
 		};
 	}
@@ -129,29 +120,22 @@ public class GeoLocationPointFieldTest extends BaseIndexingTestCase {
 
 	private static final String _CUSTOM_FIELD = "customField";
 
-	private static class CustomFieldLiferayIndexCreationHelper
-		implements IndexCreationHelper {
+	private static class CustomGeoPointFieldCreateIndexContributor
+		extends DummyCreateIndexContributor {
 
-		public CustomFieldLiferayIndexCreationHelper(
+		public CustomGeoPointFieldCreateIndexContributor(
 			ElasticsearchClientResolver elasticsearchClientResolver) {
 
 			_elasticsearchClientResolver = elasticsearchClientResolver;
 		}
 
 		@Override
-		public void contribute(
-			CreateIndexRequestBuilder createIndexRequestBuilder) {
-		}
-
-		@Override
-		public void contributeIndexSettings(Settings.Builder builder) {
-		}
-
-		@Override
-		public void whenIndexCreated(String indexName) {
+		public void afterCreateIndex(CreateIndexOptions createIndexOptions) {
 			PutMappingRequestBuilder putMappingRequestBuilder =
 				PutMappingAction.INSTANCE.newRequestBuilder(
 					_elasticsearchClientResolver.getClient());
+
+			String indexName = createIndexOptions.getIndexName();
 
 			String source = StringBundler.concat(
 				"{ \"properties\": { \"", _CUSTOM_FIELD, "\" : { \"fields\": ",
