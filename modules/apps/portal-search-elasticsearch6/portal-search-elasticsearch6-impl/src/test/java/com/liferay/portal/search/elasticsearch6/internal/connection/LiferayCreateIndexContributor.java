@@ -16,6 +16,8 @@ package com.liferay.portal.search.elasticsearch6.internal.connection;
 
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.search.elasticsearch6.internal.index.LiferayDocumentTypeFactory;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptions;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.DummyCreateIndexContributor;
 
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.client.AdminClient;
@@ -25,16 +27,25 @@ import org.elasticsearch.common.settings.Settings;
 /**
  * @author André de Oliveira
  */
-public class LiferayIndexCreationHelper implements IndexCreationHelper {
+public class LiferayCreateIndexContributor extends DummyCreateIndexContributor {
 
-	public LiferayIndexCreationHelper(
+	public LiferayCreateIndexContributor(
 		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
 	@Override
-	public void contribute(
+	public void afterCreateIndex(CreateIndexOptions createIndexOptions) {
+		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
+			getLiferayDocumentTypeFactory();
+
+		liferayDocumentTypeFactory.createOptionalDefaultTypeMappings(
+			createIndexOptions.getIndexName());
+	}
+
+	@Override
+	public void contributeRequest(
 		CreateIndexRequestBuilder createIndexRequestBuilder) {
 
 		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
@@ -45,19 +56,14 @@ public class LiferayIndexCreationHelper implements IndexCreationHelper {
 	}
 
 	@Override
-	public void contributeIndexSettings(Settings.Builder builder) {
+	public void contributeSettings(Settings.Builder builder) {
 		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
 			getLiferayDocumentTypeFactory();
 
 		liferayDocumentTypeFactory.createRequiredDefaultAnalyzers(builder);
-	}
 
-	@Override
-	public void whenIndexCreated(String indexName) {
-		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
-			getLiferayDocumentTypeFactory();
-
-		liferayDocumentTypeFactory.createOptionalDefaultTypeMappings(indexName);
+		builder.put("index.number_of_replicas", 0);
+		builder.put("index.number_of_shards", 1);
 	}
 
 	protected LiferayDocumentTypeFactory getLiferayDocumentTypeFactory() {

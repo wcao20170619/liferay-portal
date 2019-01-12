@@ -14,108 +14,108 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.connection;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexContributor;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptions;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptionsBuilder;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequest;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactory;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactoryImpl;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.DummyCreateIndexContributor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.settings.Settings;
-
-import org.mockito.Mockito;
 
 /**
  * @author André de Oliveira
  */
 public class IndexCreator {
 
+	public void addCreateIndexContributor(
+		CreateIndexContributor createIndexContributor) {
+
+		createIndexContributors.add(createIndexContributor);
+	}
+
 	public Index createIndex(IndexName indexName) {
-		IndicesAdminClient indicesAdminClient = getIndicesAdminClient();
+		if (_liferayMappingsAddedToIndex) {
+			addCreateIndexContributor(
+				new LiferayCreateIndexContributor(elasticsearchClientResolver));
+		}
 
-		String name = indexName.getName();
+		CreateIndexRequestFactory createIndexRequestFactory =
+			new CreateIndexRequestFactoryImpl();
 
-		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
-			indicesAdminClient.prepareDelete(name);
+		CreateIndexOptionsBuilder createIndexOptionsBuilder =
+			createIndexRequestFactory.createOptionsBuilder();
 
-		deleteIndexRequestBuilder.setIndicesOptions(
-			IndicesOptions.lenientExpandOpen());
+		CreateIndexRequest createIndexRequest =
+			createIndexRequestFactory.create(
+				createIndexOptionsBuilder.addContributor(
+					new DeleteBeforeCreateIndexContributor()
+				).addContributors(
+					createIndexContributors
+				).adminClient(
+					getAdminClient()
+				).indexName(
+					indexName.getName()
+				).build());
 
-		deleteIndexRequestBuilder.get();
-
-		CreateIndexRequestBuilder createIndexRequestBuilder =
-			indicesAdminClient.prepareCreate(name);
-
-		IndexCreationHelper indexCreationHelper = getIndexCreationHelper();
-
-		indexCreationHelper.contribute(createIndexRequestBuilder);
-
-		Settings.Builder builder = Settings.builder();
-
-		builder.put("index.number_of_replicas", 0);
-		builder.put("index.number_of_shards", 1);
-
-		indexCreationHelper.contributeIndexSettings(builder);
-
-		createIndexRequestBuilder.setSettings(builder);
-
-		createIndexRequestBuilder.get();
-
-		indexCreationHelper.whenIndexCreated(name);
+		createIndexRequest.createIndex();
 
 		return new Index(indexName);
 	}
 
-	protected IndexCreationHelper getIndexCreationHelper() {
-		if (!_liferayMappingsAddedToIndex) {
-			if (_indexCreationHelper != null) {
-				return _indexCreationHelper;
-			}
-
-			return Mockito.mock(IndexCreationHelper.class);
-		}
-
-		LiferayIndexCreationHelper liferayIndexCreationHelper =
-			new LiferayIndexCreationHelper(_elasticsearchClientResolver);
-
-		if (_indexCreationHelper == null) {
-			return liferayIndexCreationHelper;
-		}
-
-		return new IndexCreationHelper() {
-
-			@Override
-			public void contribute(
-				CreateIndexRequestBuilder createIndexRequestBuilder) {
-
-				_indexCreationHelper.contribute(createIndexRequestBuilder);
-
-				liferayIndexCreationHelper.contribute(
-					createIndexRequestBuilder);
-			}
-
-			@Override
-			public void contributeIndexSettings(Settings.Builder builder) {
-				_indexCreationHelper.contributeIndexSettings(builder);
-
-				liferayIndexCreationHelper.contributeIndexSettings(builder);
-			}
-
-			@Override
-			public void whenIndexCreated(String indexName) {
-				_indexCreationHelper.whenIndexCreated(indexName);
-
-				liferayIndexCreationHelper.whenIndexCreated(indexName);
-			}
-
-		};
+	public Collection<CreateIndexContributor> getCreateIndexContributors() {
+		return Collections.unmodifiableCollection(createIndexContributors);
 	}
 
-	protected final IndicesAdminClient getIndicesAdminClient() {
-		Client client = _elasticsearchClientResolver.getClient();
+	public void setLiferayMappingsAddedToIndex(
+		boolean liferayMappingsAddedToIndex) {
 
-		AdminClient adminClient = client.admin();
+		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
+	}
 
-		return adminClient.indices();
+	protected AdminClient getAdminClient() {
+		Client client = elasticsearchClientResolver.getClient();
+
+		return client.admin();
+	}
+
+	protected final List<CreateIndexContributor> createIndexContributors =
+		new ArrayList<>();
+	protected ElasticsearchClientResolver elasticsearchClientResolver;
+	protected JSONFactory jsonFactory;
+
+	private boolean _liferayMappingsAddedToIndex;
+
+	private class DeleteBeforeCreateIndexContributor
+		extends DummyCreateIndexContributor {
+
+		@Override
+		public void beforeCreateIndex(CreateIndexOptions createIndexOptions) {
+			AdminClient adminClient = getAdminClient();
+
+			IndicesAdminClient indicesAdminClient = adminClient.indices();
+
+			DeleteIndexRequestBuilder deleteIndexRequestBuilder =
+				indicesAdminClient.prepareDelete(
+					createIndexOptions.getIndexName());
+
+			deleteIndexRequestBuilder.setIndicesOptions(
+				IndicesOptions.lenientExpandOpen());
+
+			deleteIndexRequestBuilder.get();
+		}
+
 	}
 
 	protected void setElasticsearchClientResolver(
