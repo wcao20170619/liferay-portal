@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.connection;
 
+import com.liferay.portal.search.elasticsearch6.internal.field.FieldRegistrySynchronizer;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexContributor;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptions;
 import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexOptionsBuilder;
@@ -52,7 +53,7 @@ public class IndexCreator {
 		}
 
 		CreateIndexRequestFactory createIndexRequestFactory =
-			new CreateIndexRequestFactoryImpl();
+			createCreateIndexRequestFactory(_fieldRegistrySynchronizer);
 
 		CreateIndexOptionsBuilder createIndexOptionsBuilder =
 			createIndexRequestFactory.createOptionsBuilder();
@@ -78,10 +79,38 @@ public class IndexCreator {
 		return Collections.unmodifiableCollection(_createIndexContributors);
 	}
 
+	protected static CreateIndexRequestFactory createCreateIndexRequestFactory(
+		FieldRegistrySynchronizer fieldRegistrySynchronizer1) {
+
+		return new CreateIndexRequestFactoryImpl() {
+			{
+				fieldRegistrySynchronizer = fieldRegistrySynchronizer1;
+			}
+		};
+	}
+
 	protected AdminClient getAdminClient() {
 		Client client = _elasticsearchClientResolver.getClient();
 
 		return client.admin();
+	}
+
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
+	protected void setFieldRegistrySynchronizer(
+		FieldRegistrySynchronizer fieldRegistrySynchronizer) {
+
+		_fieldRegistrySynchronizer = fieldRegistrySynchronizer;
+	}
+
+	protected void setLiferayMappingsAddedToIndex(
+		boolean liferayMappingsAddedToIndex) {
+
+		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
 	}
 
 	private class DeleteBeforeCreateIndexContributor
@@ -105,22 +134,11 @@ public class IndexCreator {
 
 	}
 
-	protected void setElasticsearchClientResolver(
-		ElasticsearchClientResolver elasticsearchClientResolver) {
-
-		_elasticsearchClientResolver = elasticsearchClientResolver;
-	}
-
-	protected void setLiferayMappingsAddedToIndex(
-		boolean liferayMappingsAddedToIndex) {
-
-		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
-	}
-
 	private final List<CreateIndexContributor> _createIndexContributors =
 		new ArrayList<>();
 
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	private FieldRegistrySynchronizer _fieldRegistrySynchronizer;
 	private boolean _liferayMappingsAddedToIndex;
 
 }
