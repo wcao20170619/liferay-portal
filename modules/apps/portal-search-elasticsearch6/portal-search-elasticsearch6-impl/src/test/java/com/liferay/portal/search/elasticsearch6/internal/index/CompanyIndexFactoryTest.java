@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch6.internal.connection.IndexName;
 import com.liferay.portal.search.elasticsearch6.internal.document.SingleFieldFixture;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactoryImpl;
 import com.liferay.portal.search.elasticsearch6.internal.settings.BaseIndexSettingsContributor;
 import com.liferay.portal.search.elasticsearch6.internal.util.ResourceUtil;
 import com.liferay.portal.search.elasticsearch6.settings.IndexSettingsHelper;
@@ -51,10 +52,10 @@ public class CompanyIndexFactoryTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_companyIndexFactory = createCompanyIndexFactory();
+		_companyIndexFactory = createCompanyIndexFactory(
+			x -> getTestIndexName());
 
-		_elasticsearchFixture = new ElasticsearchFixture(
-			CompanyIndexFactoryTest.class.getSimpleName());
+		_elasticsearchFixture = new ElasticsearchFixture(getClass());
 
 		_elasticsearchFixture.setUp();
 
@@ -271,6 +272,20 @@ public class CompanyIndexFactoryTest {
 	@Rule
 	public TestName testName = new TestName();
 
+	protected static CompanyIndexFactory createCompanyIndexFactory(
+		IndexNameBuilder indexNameBuilder1) {
+
+		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory() {
+			{
+				createIndexRequestFactory = new CreateIndexRequestFactoryImpl();
+				indexNameBuilder = indexNameBuilder1;
+				jsonFactory = new JSONFactoryImpl();
+			}
+		};
+
+		return companyIndexFactory;
+	}
+
 	protected void addIndexSettingsContributor(String mappings) {
 		_companyIndexFactory.addIndexSettingsContributor(
 			new BaseIndexSettingsContributor(1) {
@@ -355,15 +370,6 @@ public class CompanyIndexFactoryTest {
 			getTestIndexName(), _elasticsearchFixture.getIndicesAdminClient());
 	}
 
-	protected CompanyIndexFactory createCompanyIndexFactory() {
-		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory();
-
-		companyIndexFactory.indexNameBuilder = new TestIndexNameBuilder();
-		companyIndexFactory.jsonFactory = new JSONFactoryImpl();
-
-		return companyIndexFactory;
-	}
-
 	protected void createIndices() throws Exception {
 		AdminClient adminClient = _elasticsearchFixture.getAdminClient();
 
@@ -420,15 +426,6 @@ public class CompanyIndexFactoryTest {
 	protected String replaceAnalyzer(String mappings, String analyzer) {
 		return StringUtil.replace(
 			mappings, "kuromoji_liferay_custom", analyzer);
-	}
-
-	protected class TestIndexNameBuilder implements IndexNameBuilder {
-
-		@Override
-		public String getIndexName(long companyId) {
-			return getTestIndexName();
-		}
-
 	}
 
 	private CompanyIndexFactory _companyIndexFactory;
