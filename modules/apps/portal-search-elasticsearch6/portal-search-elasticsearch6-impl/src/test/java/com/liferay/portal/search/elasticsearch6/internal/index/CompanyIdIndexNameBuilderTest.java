@@ -19,11 +19,12 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactory;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactoryImpl;
 
 import java.util.Collections;
 
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.indices.InvalidIndexNameException;
 
 import org.junit.After;
@@ -38,8 +39,26 @@ public class CompanyIdIndexNameBuilderTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(
-			CompanyIdIndexNameBuilderTest.class.getSimpleName());
+		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
+			getClass());
+
+		CompanyIdIndexNameBuilder companyIdIndexNameBuilder =
+			new CompanyIdIndexNameBuilder();
+
+		CreateIndexRequestFactory createIndexRequestFactory1 =
+			new CreateIndexRequestFactoryImpl();
+
+		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory() {
+			{
+				createIndexRequestFactory = createIndexRequestFactory1;
+				indexNameBuilder = companyIdIndexNameBuilder;
+				jsonFactory = new JSONFactoryImpl();
+			}
+		};
+
+		_companyIdIndexNameBuilder = companyIdIndexNameBuilder;
+		_companyIndexFactory = companyIndexFactory;
+		_elasticsearchFixture = elasticsearchFixture;
 
 		_elasticsearchFixture.setUp();
 	}
@@ -107,26 +126,19 @@ public class CompanyIdIndexNameBuilderTest {
 			new String[] {expectedIndexName}, getIndexResponse.indices());
 	}
 
-	protected void createIndices(String indexNamePrefix, long companyId)
-		throws Exception {
+	protected void createIndices(String indexNamePrefix, long companyId) {
+		setIndexNamePrefix(indexNamePrefix);
 
-		final CompanyIdIndexNameBuilder companyIdIndexNameBuilder =
-			new CompanyIdIndexNameBuilder();
-
-		companyIdIndexNameBuilder.setIndexNamePrefix(indexNamePrefix);
-
-		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory() {
-			{
-				indexNameBuilder = companyIdIndexNameBuilder;
-				jsonFactory = new JSONFactoryImpl();
-			}
-		};
-
-		AdminClient adminClient = _elasticsearchFixture.getAdminClient();
-
-		companyIndexFactory.createIndices(adminClient, companyId);
+		_companyIndexFactory.createIndices(
+			_elasticsearchFixture.getAdminClient(), companyId);
 	}
 
+	protected void setIndexNamePrefix(String indexNamePrefix) {
+		_companyIdIndexNameBuilder.setIndexNamePrefix(indexNamePrefix);
+	}
+
+	private CompanyIdIndexNameBuilder _companyIdIndexNameBuilder;
+	private CompanyIndexFactory _companyIndexFactory;
 	private ElasticsearchFixture _elasticsearchFixture;
 
 }
