@@ -25,6 +25,8 @@ import com.liferay.portal.search.elasticsearch6.internal.connection.OperationMod
 import com.liferay.portal.search.elasticsearch6.internal.index.CompanyIdIndexNameBuilder;
 import com.liferay.portal.search.elasticsearch6.internal.index.CompanyIndexFactory;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactory;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexRequestFactoryImpl;
 import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.ElasticsearchEngineAdapterFixture;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 
@@ -166,24 +168,19 @@ public class ElasticsearchSearchEngineTest {
 		deleteSnapshotRequestBuilder.get();
 	}
 
-	protected static CompanyIndexFactory createCompanyIndexFactory() {
+	protected static CompanyIndexFactory createCompanyIndexFactory(
+		CreateIndexRequestFactory createIndexRequestFactory1) {
+
 		return new CompanyIndexFactory() {
 			{
+				createIndexRequestFactory = createIndexRequestFactory1;
 				indexNameBuilder = createIndexNameBuilder();
 				jsonFactory = new JSONFactoryImpl();
 			}
 		};
 	}
 
-	protected static IndexNameBuilder createIndexNameBuilder() {
-		return new CompanyIdIndexNameBuilder() {
-			{
-				setIndexNamePrefix(null);
-			}
-		};
-	}
-
-	protected ElasticsearchConnectionManager
+	protected static ElasticsearchConnectionManager
 		createElasticsearchConnectionManager(
 			EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
 
@@ -196,17 +193,26 @@ public class ElasticsearchSearchEngineTest {
 		return elasticsearchConnectionManager;
 	}
 
-	protected ElasticsearchSearchEngine createElasticsearchSearchEngine(
-		final ElasticsearchConnectionManager elasticsearchConnectionManager,
-		final SearchEngineAdapter searchEngineAdapter) {
+	protected static ElasticsearchSearchEngine createElasticsearchSearchEngine(
+		ElasticsearchConnectionManager elasticsearchConnectionManager,
+		SearchEngineAdapter searchEngineAdapter) {
 
 		return new ElasticsearchSearchEngine() {
 			{
-				setIndexFactory(createCompanyIndexFactory());
+				setIndexFactory(createCompanyIndexFactory(
+					new CreateIndexRequestFactoryImpl()));
 				setIndexNameBuilder(String::valueOf);
 				setElasticsearchConnectionManager(
 					elasticsearchConnectionManager);
 				setSearchEngineAdapter(searchEngineAdapter);
+			}
+		};
+	}
+
+	protected static IndexNameBuilder createIndexNameBuilder() {
+		return new CompanyIdIndexNameBuilder() {
+			{
+				setIndexNamePrefix(null);
 			}
 		};
 	}
