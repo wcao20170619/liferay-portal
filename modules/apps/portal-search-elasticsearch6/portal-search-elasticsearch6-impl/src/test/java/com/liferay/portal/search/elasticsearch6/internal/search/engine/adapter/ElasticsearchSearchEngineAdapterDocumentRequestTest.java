@@ -40,6 +40,7 @@ import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentRe
 import com.liferay.portal.search.engine.adapter.document.UpdateByQueryDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentResponse;
+import com.liferay.portal.search.internal.legacy.document.DocumentBuilderFactoryImpl;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 
 import java.util.List;
@@ -69,9 +70,7 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(
-			ElasticsearchSearchEngineAdapterDocumentRequestTest.class.
-				getSimpleName());
+		_elasticsearchFixture = new ElasticsearchFixture(getClass());
 
 		_elasticsearchFixture.setUp();
 
@@ -555,7 +554,11 @@ public class ElasticsearchSearchEngineAdapterDocumentRequestTest {
 		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		ElasticsearchDocumentFactory elasticsearchDocumentFactory =
-			new DefaultElasticsearchDocumentFactory();
+			new DefaultElasticsearchDocumentFactory() {
+				{
+					setDocumentBuilderFactory(new DocumentBuilderFactoryImpl());
+				}
+			};
 
 		return new ElasticsearchSearchEngineAdapterImpl() {
 			{

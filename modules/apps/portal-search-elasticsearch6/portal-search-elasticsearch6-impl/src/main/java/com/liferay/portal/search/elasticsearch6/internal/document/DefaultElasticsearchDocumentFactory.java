@@ -63,7 +63,7 @@ public class DefaultElasticsearchDocumentFactory
 	public String getElasticsearchDocument(
 		com.liferay.portal.kernel.search.Document legacyDocument) {
 
-		DocumentBuilder documentBuilder = documentBuilderFactory.getBuilder(
+		DocumentBuilder documentBuilder = _documentBuilderFactory.getBuilder(
 			legacyDocument);
 
 		return Strings.toString(
@@ -351,6 +351,13 @@ public class DefaultElasticsearchDocumentFactory
 			localizedName);
 	}
 
+	@Reference
+	protected void setDocumentBuilderFactory(
+		DocumentBuilderFactory documentBuilderFactory) {
+
+		_documentBuilderFactory = documentBuilderFactory;
+	}
+
 	protected XContentBuilder translate(Document document) throws IOException {
 		XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
 
@@ -392,7 +399,6 @@ public class DefaultElasticsearchDocumentFactory
 		return Double.valueOf(value);
 	}
 
-	@Reference
-	protected DocumentBuilderFactory documentBuilderFactory;
+	private DocumentBuilderFactory _documentBuilderFactory;
 
 }

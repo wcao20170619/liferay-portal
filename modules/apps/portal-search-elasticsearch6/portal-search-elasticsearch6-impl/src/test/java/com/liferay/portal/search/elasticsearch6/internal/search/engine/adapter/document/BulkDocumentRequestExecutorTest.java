@@ -25,6 +25,7 @@ import com.liferay.portal.search.engine.adapter.document.BulkableDocumentRequest
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
+import com.liferay.portal.search.internal.legacy.document.DocumentBuilderFactoryImpl;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -45,7 +46,11 @@ public class BulkDocumentRequestExecutorTest {
 			getClass());
 
 		ElasticsearchDocumentFactory elasticsearchDocumentFactory =
-			new DefaultElasticsearchDocumentFactory();
+			new DefaultElasticsearchDocumentFactory() {
+				{
+					setDocumentBuilderFactory(new DocumentBuilderFactoryImpl());
+				}
+			};
 
 		BulkableDocumentRequestTranslator bulkableDocumentRequestTranslator =
 			new ElasticsearchBulkableDocumentRequestTranslator() {

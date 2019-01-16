@@ -25,6 +25,7 @@ import com.liferay.portal.search.elasticsearch6.internal.document.ElasticsearchD
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
+import com.liferay.portal.search.internal.legacy.document.DocumentBuilderFactoryImpl;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 
 import org.elasticsearch.action.bulk.BulkAction;
@@ -173,7 +174,11 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 	protected static ElasticsearchDocumentFactory
 		createElasticsearchDocumentFactory() {
 
-		return new DefaultElasticsearchDocumentFactory();
+		return new DefaultElasticsearchDocumentFactory() {
+			{
+				setDocumentBuilderFactory(new DocumentBuilderFactoryImpl());
+			}
+		};
 	}
 
 	protected void doTestDeleteDocumentRequestTranslation(
