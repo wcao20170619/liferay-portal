@@ -194,6 +194,12 @@ public abstract class BaseGenericSpellCheckIndexWriter
 		}
 	}
 
+	protected void setNGramHolderBuilder(
+		NGramHolderBuilder nGramHolderBuilder) {
+
+		this.nGramHolderBuilder = nGramHolderBuilder;
+	}
+
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
 		policy = ReferencePolicy.DYNAMIC,
