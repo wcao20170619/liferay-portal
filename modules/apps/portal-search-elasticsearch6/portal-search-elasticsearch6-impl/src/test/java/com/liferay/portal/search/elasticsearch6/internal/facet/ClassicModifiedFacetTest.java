@@ -28,15 +28,15 @@ public class ClassicModifiedFacetTest extends BaseClassicModifiedFacetTestCase {
 
 	@Override
 	protected IndexingFixture createIndexingFixture() throws Exception {
-		ElasticsearchFixture elasticsearchFixture1 = new ElasticsearchFixture(
+		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
 			getClass());
 
 		return new ElasticsearchIndexingFixture() {
 			{
-				companyId = BaseIndexingTestCase.COMPANY_ID;
-				elasticsearchFixture = elasticsearchFixture1;
-				facetProcessor = new ModifiedFacetProcessor();
-				indexCreator = new LiferayIndexCreator(elasticsearchFixture1);
+				setCompanyId(BaseIndexingTestCase.COMPANY_ID);
+				setElasticsearchFixture(elasticsearchFixture);
+				setFacetProcessor(new ModifiedFacetProcessor());
+				setIndexCreator(new LiferayIndexCreator(elasticsearchFixture));
 			}
 		};
 	}
