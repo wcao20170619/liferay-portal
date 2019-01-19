@@ -22,12 +22,12 @@ import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
-import com.liferay.portal.search.elasticsearch6.internal.connection.IndexCreationHelper;
 import com.liferay.portal.search.elasticsearch6.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch6.internal.connection.IndexName;
 import com.liferay.portal.search.elasticsearch6.internal.facet.DefaultFacetProcessor;
 import com.liferay.portal.search.elasticsearch6.internal.facet.FacetProcessor;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
+import com.liferay.portal.search.elasticsearch6.internal.index.create.CreateIndexContributor;
 import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.ElasticsearchEngineAdapterFixture;
 import com.liferay.portal.search.elasticsearch6.internal.suggest.ElasticsearchSuggesterTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.suggest.PhraseSuggesterTranslatorImpl;
@@ -38,6 +38,9 @@ import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderF
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.util.DigesterImpl;
 import com.liferay.portal.util.LocalizationImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 
@@ -218,12 +221,20 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		return props;
 	}
 
+	protected void addCreateIndexContributor(
+		CreateIndexContributor createIndexContributor) {
+
+		_createIndexContributors.add(createIndexContributor);
+	}
+
 	protected void createIndex(IndexNameBuilder indexNameBuilder) {
 		IndexCreator indexCreator = new IndexCreator() {
 			{
 				setElasticsearchClientResolver(_elasticsearchFixture);
-				setIndexCreationHelper(_indexCreationHelper);
 				setLiferayMappingsAddedToIndex(_liferayMappingsAddedToIndex);
+
+				_createIndexContributors.forEach(
+					this::addCreateIndexContributor);
 			}
 		};
 
@@ -255,12 +266,6 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		_facetProcessor = facetProcessor;
 	}
 
-	protected void setIndexCreationHelper(
-		IndexCreationHelper indexCreationHelper) {
-
-		_indexCreationHelper = indexCreationHelper;
-	}
-
 	protected void setLiferayMappingsAddedToIndex(
 		boolean liferayMappingsAddedToIndex) {
 
@@ -268,9 +273,10 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 	}
 
 	private long _companyId;
+	private final List<CreateIndexContributor> _createIndexContributors =
+		new ArrayList<>();
 	private ElasticsearchFixture _elasticsearchFixture;
 	private FacetProcessor<SearchRequestBuilder> _facetProcessor;
-	private IndexCreationHelper _indexCreationHelper;
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;
 	private boolean _liferayMappingsAddedToIndex;
