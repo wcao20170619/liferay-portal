@@ -29,15 +29,15 @@ public class ElasticsearchPermissionFilteredPaginationTest
 
 	@Override
 	protected IndexingFixture createIndexingFixture() {
-		ElasticsearchFixture elasticsearchFixture1 = new ElasticsearchFixture(
+		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
 			ElasticsearchPermissionFilteredPaginationTest.class.
 				getSimpleName());
 
 		return new ElasticsearchIndexingFixture() {
 			{
-				companyId = BaseIndexingTestCase.COMPANY_ID;
-				elasticsearchFixture = elasticsearchFixture1;
-				indexCreator = new LiferayIndexCreator(elasticsearchFixture1);
+				setCompanyId(BaseIndexingTestCase.COMPANY_ID);
+				setElasticsearchFixture(elasticsearchFixture);
+				setIndexCreator(new LiferayIndexCreator(elasticsearchFixture));
 			}
 		};
 	}
