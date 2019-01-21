@@ -270,8 +270,8 @@ public class SolrQuerySuggester implements QuerySuggester {
 
 		// See LPS-72507 and LPS-76500
 
-		if (localization != null) {
-			return localization;
+		if (_localization != null) {
+			return _localization;
 		}
 
 		return LocalizationUtil.getLocalization();
@@ -409,7 +409,11 @@ public class SolrQuerySuggester implements QuerySuggester {
 		}
 	}
 
-	protected Localization localization;
+	protected void setLocalization(Localization localization) {
+		_localization = localization;
+	}
+	
+	private Localization _localization;
 
 	private static final long _GLOBAL_GROUP_ID = 0;
 
