@@ -171,8 +171,8 @@ public class JournalArticleMultiLanguageSearchTest {
 		addJournalArticle(
 			new JournalArticleContent() {
 				{
-					defaultLocale = LocaleUtil.US;
-					name = "content";
+					setDefaultLocale(LocaleUtil.US);
+					setName("content");
 					put(LocaleUtil.NETHERLANDS, NL_CONTENT);
 					put(LocaleUtil.US, US_CONTENT);
 				}
@@ -193,8 +193,8 @@ public class JournalArticleMultiLanguageSearchTest {
 		addJournalArticle(
 			new JournalArticleContent() {
 				{
-					defaultLocale = LocaleUtil.US;
-					name = "content";
+					setDefaultLocale(LocaleUtil.US);
+					setName("content");
 					put(LocaleUtil.US, US_CONTENT);
 				}
 			},
@@ -212,8 +212,8 @@ public class JournalArticleMultiLanguageSearchTest {
 		addJournalArticle(
 			new JournalArticleContent() {
 				{
-					defaultLocale = LocaleUtil.NETHERLANDS;
-					name = "content";
+					setDefaultLocale(LocaleUtil.NETHERLANDS);
+					setName("content");				
 					put(LocaleUtil.NETHERLANDS, US_CONTENT);
 				}
 			},
@@ -237,11 +237,12 @@ public class JournalArticleMultiLanguageSearchTest {
 		return _journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _group.getGroupId();
-					journalArticleContent = journalArticleContentParam;
-					journalArticleDescription = journalArticleDescriptionParam;
-					journalArticleTitle = journalArticleTitleParam;
-					userId = _user.getUserId();
+					setGroupId(_group.getGroupId());
+					setJournalArticleContent(journalArticleContentParam);
+					setJournalArticleDescription(
+						journalArticleDescriptionParam);
+					setJournalArticleTitle(journalArticleTitleParam);
+					setUserId(_user.getUserId());
 				}
 			});
 	}
