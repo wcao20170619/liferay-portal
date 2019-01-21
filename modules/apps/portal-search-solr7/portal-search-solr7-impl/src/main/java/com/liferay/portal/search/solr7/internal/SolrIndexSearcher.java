@@ -143,7 +143,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 			if (end == QueryUtil.ALL_POS) {
 				end = GetterUtil.getInteger(
-					props.get(PropsKeys.INDEX_SEARCH_LIMIT));
+					_props.get(PropsKeys.INDEX_SEARCH_LIMIT));
 			}
 			else if (end < 0) {
 				throw new IllegalArgumentException("Invalid end " + end);
@@ -896,11 +896,19 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
+	}
+	
+	private JSONFactory _jsonFactory;
 
-	@Reference
-	protected Props props;
+	@Reference(unbind = "-") 
+	protected void setProps(Props props) {
+		_props = props;
+	}
+	
+	private Props _props;
 
 	@Reference
 	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
