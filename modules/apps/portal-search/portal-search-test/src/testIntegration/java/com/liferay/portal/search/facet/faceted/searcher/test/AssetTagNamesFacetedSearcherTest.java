@@ -163,20 +163,24 @@ public class AssetTagNamesFacetedSearcherTest
 		journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = LocaleUtil.US;
-							name = "content";
+					setGroupId(group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(
+									LocaleUtil.US,
+									RandomTestUtil.randomString());
 
-							put(LocaleUtil.US, RandomTestUtil.randomString());
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.US, title);
-						}
-					};
+								setDefaultLocale(LocaleUtil.US);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.US, title);
+							}
+						});
 				}
 			});
 	}
