@@ -193,7 +193,7 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		Group group = _userSearchFixture.addGroup(
 			new GroupBlueprint() {
 				{
-					defaultLocale = locale;
+					setDefaultLocale(locale);
 				}
 			});
 
@@ -204,20 +204,22 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _jpGroup.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = LocaleUtil.JAPAN;
-							name = "content";
+					setGroupId(_jpGroup.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(LocaleUtil.JAPAN, content);
 
-							put(LocaleUtil.JAPAN, content);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.JAPAN, title);
-						}
-					};
+								setDefaultLocale(LocaleUtil.JAPAN);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.JAPAN, title);
+							}
+						});
 				}
 			});
 	}
@@ -226,20 +228,22 @@ public class JournalArticleMultiLanguageSearchGroupIdsTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					groupId = _usGroup.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = LocaleUtil.US;
-							name = "content";
+					setGroupId(_usGroup.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(LocaleUtil.US, content);
 
-							put(LocaleUtil.US, content);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(LocaleUtil.US, title);
-						}
-					};
+								setDefaultLocale(LocaleUtil.US);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(LocaleUtil.US, title);
+							}
+						});
 				}
 			});
 	}
