@@ -80,7 +80,7 @@ public class DefaultFacetProcessor implements FacetProcessor<SolrQuery> {
 			sortValue = "asc";
 		}
 
-		JSONObject sortJSONObject = jsonFactory.createJSONObject();
+		JSONObject sortJSONObject = _jsonFactory.createJSONObject();
 
 		sortJSONObject.put(sortParam, sortValue);
 
@@ -88,7 +88,7 @@ public class DefaultFacetProcessor implements FacetProcessor<SolrQuery> {
 	}
 
 	protected JSONObject getFacetParameters(Facet facet) {
-		JSONObject jsonObject = jsonFactory.createJSONObject();
+		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
 		jsonObject.put("field", facet.getFieldName());
 
@@ -106,7 +106,11 @@ public class DefaultFacetProcessor implements FacetProcessor<SolrQuery> {
 		return jsonObject;
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
+	@Reference(unbind = "-")
+	protected void setJSONFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
+	}
+
+	private JSONFactory _jsonFactory;
 
 }

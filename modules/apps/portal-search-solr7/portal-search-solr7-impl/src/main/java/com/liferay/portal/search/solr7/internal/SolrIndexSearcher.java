@@ -19,7 +19,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
-import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -143,7 +142,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 			if (end == QueryUtil.ALL_POS) {
 				end = GetterUtil.getInteger(
-					props.get(PropsKeys.INDEX_SEARCH_LIMIT));
+					_props.get(PropsKeys.INDEX_SEARCH_LIMIT));
 			}
 			else if (end < 0) {
 				throw new IllegalArgumentException("Invalid end " + end);
@@ -785,9 +784,28 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		_groupByTranslator = groupByTranslator;
 	}
 
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
+
 	@Reference(target = "(search.engine.impl=Solr)", unbind = "-")
 	protected void setQueryTranslator(QueryTranslator<String> queryTranslator) {
 		_queryTranslator = queryTranslator;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchRequestBuilderFactory(
+		SearchRequestBuilderFactory searchRequestBuilderFactory) {
+
+		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchResponseBuilderFactory(
+		SearchResponseBuilderFactory searchResponseBuilderFactory) {
+
+		_searchResponseBuilderFactory = searchResponseBuilderFactory;
 	}
 
 	@Reference(unbind = "-")
@@ -896,18 +914,6 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 		}
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	@Reference
-	protected Props props;
-
-	@Reference
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
-
-	@Reference
-	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
-
 	private void _add(
 		Collection<String> filterQueries, Filter filter,
 		SearchContext searchContext) {
@@ -929,14 +935,14 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 	private SearchRequestBuilder _getSearchRequestBuilder(
 		SearchContext searchContext) {
 
-		return searchRequestBuilderFactory.getSearchRequestBuilder(
+		return _searchRequestBuilderFactory.getSearchRequestBuilder(
 			searchContext);
 	}
 
 	private SearchResponseBuilder _getSearchResponseBuilder(
 		SearchContext searchContext) {
 
-		return searchResponseBuilderFactory.getSearchResponseBuilder(
+		return _searchResponseBuilderFactory.getSearchResponseBuilder(
 			searchContext);
 	}
 
@@ -949,7 +955,10 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 	private FilterTranslator<String> _filterTranslator;
 	private GroupByTranslator _groupByTranslator;
 	private boolean _logExceptionsOnly;
+	private Props _props;
 	private QueryTranslator<String> _queryTranslator;
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	private SearchResponseBuilderFactory _searchResponseBuilderFactory;
 	private SolrClientManager _solrClientManager;
 	private volatile SolrConfiguration _solrConfiguration;
 	private StatsTranslator _statsTranslator;
