@@ -193,7 +193,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 	protected FacetProcessor createFacetProcessor() {
 		return new DefaultFacetProcessor() {
 			{
-				jsonFactory = _jsonFactory;
+				setJSONFactory(_jsonFactory);
 			}
 		};
 	}
@@ -203,8 +203,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		return new SolrIndexSearcher() {
 			{
-				jsonFactory = _jsonFactory;
-				props = createProps();
+				setJSONFactory(_jsonFactory);
+				setProps(createProps());
 				searchRequestBuilderFactory =
 					new SearchRequestBuilderFactoryImpl();
 				searchResponseBuilderFactory =
@@ -288,7 +288,7 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		return new SolrQuerySuggester() {
 			{
-				localization = _localization;
+				setLocalization(_localization);
 
 				setNGramQueryBuilder(createNGramQueryBuilder());
 				setSolrClientManager(solrClientManager);
@@ -302,8 +302,8 @@ public class SolrIndexingFixture implements IndexingFixture {
 
 		return new SolrSpellCheckIndexWriter() {
 			{
-				digester = createDigester();
-				nGramHolderBuilder = new NGramHolderBuilderImpl();
+				setDigester(createDigester());
+				setNGramHolderBuilder(new NGramHolderBuilderImpl());
 
 				setSolrClientManager(solrClientManager);
 				setSolrUpdateDocumentCommand(solrUpdateDocumentCommand);
