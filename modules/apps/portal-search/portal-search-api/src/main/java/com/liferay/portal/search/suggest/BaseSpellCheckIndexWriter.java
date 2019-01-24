@@ -173,8 +173,8 @@ public abstract class BaseSpellCheckIndexWriter
 
 		// See LPS-72507 and LPS-76500
 
-		if (digester != null) {
-			return digester;
+		if (_digester != null) {
+			return _digester;
 		}
 
 		return DigesterUtil.getDigester();
@@ -199,7 +199,7 @@ public abstract class BaseSpellCheckIndexWriter
 
 	protected String[] getSupportedLocales() {
 		return StringUtil.split(
-			props.get(PropsKeys.INDEX_SEARCH_SPELL_CHECKER_SUPPORTED_LOCALES));
+			_props.get(PropsKeys.INDEX_SEARCH_SPELL_CHECKER_SUPPORTED_LOCALES));
 	}
 
 	protected String getUID(
@@ -307,17 +307,17 @@ public abstract class BaseSpellCheckIndexWriter
 			String keywordFieldName, String typeFieldValue, int maxNGramLength)
 		throws Exception {
 
-		String[] dictionaryFileNames = props.getArray(
+		String[] dictionaryFileNames = _props.getArray(
 			propsKey, new Filter(languageId));
 
 		indexKeywords(
 			searchContext, 0, languageId, dictionaryFileNames, keywordFieldName,
 			typeFieldValue, maxNGramLength);
 
-		List<Group> groups = groupLocalService.getLiveGroups();
+		List<Group> groups = _groupLocalService.getLiveGroups();
 
 		for (Group group : groups) {
-			String[] groupDictionaryFileNames = props.getArray(
+			String[] groupDictionaryFileNames = _props.getArray(
 				propsKey,
 				new Filter(languageId, String.valueOf(group.getGroupId())));
 
@@ -332,17 +332,26 @@ public abstract class BaseSpellCheckIndexWriter
 		}
 	}
 
-	protected Digester digester;
+	protected void setDigester(Digester digester) {
+		_digester = digester;
+	}
 
-	@Reference
-	protected GroupLocalService groupLocalService;
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
-	@Reference
-	protected Props props;
+	@Reference(unbind = "-")
+	protected void setProps(Props props) {
+		_props = props;
+	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseSpellCheckIndexWriter.class);
 
+	private Digester _digester;
+	private GroupLocalService _groupLocalService;
+	private Props _props;
 	private int _querySuggestionMaxNGramLength = 50;
 
 }
