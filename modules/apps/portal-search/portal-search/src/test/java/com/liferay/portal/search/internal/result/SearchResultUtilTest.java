@@ -26,8 +26,8 @@ import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.SummaryFactory;
 import com.liferay.portal.kernel.search.result.SearchResultTranslator;
-import com.liferay.portal.kernel.search.test.BaseSearchResultUtilTestCase;
-import com.liferay.portal.kernel.search.test.SearchTestUtil;
+import com.liferay.portal.search.test.util.BaseSearchResultUtilTestCase;
+import com.liferay.portal.search.test.util.SearchTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 
 import java.util.List;
