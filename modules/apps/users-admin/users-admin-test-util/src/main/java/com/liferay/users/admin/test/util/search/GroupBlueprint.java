@@ -22,9 +22,13 @@ import java.util.Locale;
 public class GroupBlueprint {
 
 	public Locale getDefaultLocale() {
-		return defaultLocale;
+		return _defaultLocale;
 	}
 
-	protected Locale defaultLocale;
+	protected void setDefaultLocale(Locale defaultLocale) {
+		_defaultLocale = defaultLocale;
+	}
+
+	private Locale _defaultLocale;
 
 }

@@ -168,20 +168,22 @@ public class JournalArticleIndexerSummaryTest {
 			_journalArticleSearchFixture.addArticle(
 				new JournalArticleBlueprint() {
 					{
-						groupId = _group.getGroupId();
-						journalArticleContent = new JournalArticleContent() {
-							{
-								name = "content";
-								defaultLocale = LocaleUtil.US;
+						setGroupId(_group.getGroupId());
+						setJournalArticleContent(
+							new JournalArticleContent() {
+								{
+									put(LocaleUtil.US, content);
 
-								put(LocaleUtil.US, content);
-							}
-						};
-						journalArticleTitle = new JournalArticleTitle() {
-							{
-								put(LocaleUtil.US, title);
-							}
-						};
+									setDefaultLocale(LocaleUtil.US);
+									setName("content");
+								}
+							});
+						setJournalArticleTitle(
+							new JournalArticleTitle() {
+								{
+									put(LocaleUtil.US, title);
+								}
+							});
 					}
 				}));
 	}

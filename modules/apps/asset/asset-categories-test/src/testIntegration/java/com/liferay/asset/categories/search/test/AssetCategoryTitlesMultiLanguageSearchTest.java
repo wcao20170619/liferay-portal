@@ -125,7 +125,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		Group group = _userSearchFixture.addGroup(
 			new GroupBlueprint() {
 				{
-					defaultLocale = locale;
+					setDefaultLocale(locale);
 				}
 			});
 
@@ -135,24 +135,25 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					assetCategoryIds = new long[] {
-						assetCategory.getCategoryId()
-					};
-					groupId = group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = locale;
-							name = "content";
+					setAssetCategoryIds(
+						new long[] {assetCategory.getCategoryId()});
+					setGroupId(group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(locale, journalArticleContentString);
 
-							put(locale, journalArticleContentString);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(locale, journalArticleTitleString);
-						}
-					};
-					userId = _user.getUserId();
+								setDefaultLocale(locale);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(locale, journalArticleTitleString);
+							}
+						});
+					setUserId(_user.getUserId());
 				}
 			});
 
@@ -170,7 +171,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		Group group = _userSearchFixture.addGroup(
 			new GroupBlueprint() {
 				{
-					defaultLocale = locale;
+					setDefaultLocale(locale);
 				}
 			});
 
@@ -180,23 +181,25 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					assetCategoryIds = new long[] {
-						assetCategory.getCategoryId()
-					};
-					groupId = group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = locale;
-							name = "content";
-							put(locale, journalArticleContentString);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(locale, journalArticleTitleString);
-						}
-					};
-					userId = _user.getUserId();
+					setAssetCategoryIds(
+						new long[] {assetCategory.getCategoryId()});
+					setGroupId(group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(locale, journalArticleContentString);
+
+								setDefaultLocale(locale);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(locale, journalArticleTitleString);
+							}
+						});
+					setUserId(_user.getUserId());
 				}
 			});
 
@@ -217,7 +220,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		Group group = _userSearchFixture.addGroup(
 			new GroupBlueprint() {
 				{
-					defaultLocale = locale;
+					setDefaultLocale(locale);
 				}
 			});
 
@@ -230,23 +233,25 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					assetCategoryIds = new long[] {
-						assetCategory1.getCategoryId()
-					};
-					groupId = group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = locale;
-							name = "content";
-							put(locale, journalArticleContentString1);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(locale, journalArticleTitleString1);
-						}
-					};
-					userId = _user.getUserId();
+					setAssetCategoryIds(
+						new long[] {assetCategory1.getCategoryId()});
+					setGroupId(group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(locale, journalArticleContentString1);
+
+								setDefaultLocale(locale);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(locale, journalArticleTitleString1);
+							}
+						});
+					setUserId(_user.getUserId());
 				}
 			});
 
@@ -256,23 +261,25 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
-					assetCategoryIds = new long[] {
-						assetCategory2.getCategoryId()
-					};
-					groupId = group.getGroupId();
-					journalArticleContent = new JournalArticleContent() {
-						{
-							defaultLocale = locale;
-							name = "content";
-							put(locale, journalArticleContentString2);
-						}
-					};
-					journalArticleTitle = new JournalArticleTitle() {
-						{
-							put(locale, journalArticleTitleString2);
-						}
-					};
-					userId = _user.getUserId();
+					setAssetCategoryIds(
+						new long[] {assetCategory2.getCategoryId()});
+					setGroupId(group.getGroupId());
+					setJournalArticleContent(
+						new JournalArticleContent() {
+							{
+								put(locale, journalArticleContentString2);
+
+								setDefaultLocale(locale);
+								setName("content");
+							}
+						});
+					setJournalArticleTitle(
+						new JournalArticleTitle() {
+							{
+								put(locale, journalArticleTitleString2);
+							}
+						});
+					setUserId(_user.getUserId());
 				}
 			});
 

@@ -44,7 +44,7 @@ public class AggregationFilteringTest extends BaseAggregationFilteringTestCase {
 		compositeFacetProcessor.setDefaultFacetProcessor(
 			new DefaultFacetProcessor() {
 				{
-					jsonFactory = _jsonFactory;
+					setJSONFactory(_jsonFactory);
 				}
 			});
 
