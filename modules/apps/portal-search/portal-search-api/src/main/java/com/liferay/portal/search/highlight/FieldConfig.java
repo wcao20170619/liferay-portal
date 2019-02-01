@@ -12,13 +12,38 @@
  * details.
  */
 
-package com.liferay.portal.search.significance;
+package com.liferay.portal.search.highlight;
 
 import aQute.bnd.annotation.ProviderType;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class JLHScoreSignifanceHeuristic implements SignificanceHeuristic {
+public interface FieldConfig {
+
+	public String getField();
+
+	public Integer getFragmentOffset();
+
+	public Integer getFragmentSize();
+
+	public Integer getNumFragments();
+
+	@ProviderType
+	public interface Builder {
+
+		public FieldConfig build();
+
+		public Builder field(String field);
+
+		public Builder fragmentOffset(Integer fragmentOffset);
+
+		public Builder fragmentSize(Integer fragmentSize);
+
+		public Builder numFragments(Integer numFragments);
+
+	}
+
 }

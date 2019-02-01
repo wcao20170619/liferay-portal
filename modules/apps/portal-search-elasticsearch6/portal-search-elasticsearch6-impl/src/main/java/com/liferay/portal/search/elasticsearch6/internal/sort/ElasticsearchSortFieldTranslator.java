@@ -16,14 +16,15 @@ package com.liferay.portal.search.elasticsearch6.internal.sort;
 
 import com.liferay.portal.search.elasticsearch6.internal.geolocation.DistanceUnitTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.geolocation.GeoDistanceTypeTranslator;
+import com.liferay.portal.search.elasticsearch6.internal.query.QueryToQueryBuilderTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.script.ScriptTranslator;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
-import com.liferay.portal.search.query.QueryTranslator;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.GeoDistanceSort;
 import com.liferay.portal.search.sort.NestedSort;
 import com.liferay.portal.search.sort.ScoreSort;
 import com.liferay.portal.search.sort.ScriptSort;
+import com.liferay.portal.search.sort.ScriptSortType;
 import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortFieldTranslator;
 import com.liferay.portal.search.sort.SortMode;
@@ -34,7 +35,6 @@ import java.util.List;
 
 import org.elasticsearch.common.geo.GeoDistance;
 import org.elasticsearch.common.geo.GeoPoint;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.GeoDistanceSortBuilder;
@@ -142,9 +142,7 @@ public class ElasticsearchSortFieldTranslator
 		ScriptSortBuilder.ScriptSortType scriptSortType =
 			ScriptSortBuilder.ScriptSortType.NUMBER;
 
-		if (scriptSort.getScriptSortType() ==
-				ScriptSort.ScriptSortType.STRING) {
-
+		if (scriptSort.getScriptSortType() == ScriptSortType.STRING) {
 			scriptSortType = ScriptSortBuilder.ScriptSortType.STRING;
 		}
 
@@ -165,11 +163,11 @@ public class ElasticsearchSortFieldTranslator
 		return scriptSortBuilder;
 	}
 
-	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
-	protected void setQueryTranslator(
-		QueryTranslator<QueryBuilder> queryTranslator) {
+	@Reference(unbind = "-")
+	protected void setQueryToQueryBuilderTranslator(
+		QueryToQueryBuilderTranslator queryToQueryBuilderTranslator) {
 
-		_queryTranslator = queryTranslator;
+		_queryToQueryBuilderTranslator = queryToQueryBuilderTranslator;
 	}
 
 	protected NestedSortBuilder translate(NestedSort nestedSort) {
@@ -177,19 +175,19 @@ public class ElasticsearchSortFieldTranslator
 			nestedSort.getPath());
 
 		if (nestedSort.getFilterQuery() != null) {
-			QueryBuilder queryBuilder = _queryTranslator.translate(
-				nestedSort.getFilterQuery());
-
-			nestedSortBuilder.setFilter(queryBuilder);
+			nestedSortBuilder.setFilter(
+				_queryToQueryBuilderTranslator.translate(
+					nestedSort.getFilterQuery()));
 		}
 
 		if (nestedSort.getNestedSort() != null) {
-			NestedSort childNestedSort = nestedSort.getNestedSort();
-
-			nestedSortBuilder.setNestedSort(translate(childNestedSort));
+			nestedSortBuilder.setNestedSort(
+				translate(nestedSort.getNestedSort()));
 		}
 
-		nestedSortBuilder.setMaxChildren(nestedSort.getMaxChildren());
+		if (nestedSort.getMaxChildren() != null) {
+			nestedSortBuilder.setMaxChildren(nestedSort.getMaxChildren());
+		}
 
 		return nestedSortBuilder;
 	}
@@ -237,7 +235,7 @@ public class ElasticsearchSortFieldTranslator
 		new DistanceUnitTranslator();
 	private final GeoDistanceTypeTranslator _geoDistanceTypeTranslator =
 		new GeoDistanceTypeTranslator();
-	private QueryTranslator<QueryBuilder> _queryTranslator;
+	private QueryToQueryBuilderTranslator _queryToQueryBuilderTranslator;
 	private final ScriptTranslator _scriptTranslator = new ScriptTranslator();
 
 }

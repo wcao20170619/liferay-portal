@@ -15,8 +15,9 @@
 package com.liferay.portal.search.elasticsearch6.internal.highlight;
 
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.search.elasticsearch6.internal.query.QueryToQueryBuilderTranslator;
+import com.liferay.portal.search.highlight.FieldConfig;
 import com.liferay.portal.search.highlight.Highlight;
-import com.liferay.portal.search.query.QueryTranslator;
 
 import java.util.List;
 
@@ -29,51 +30,20 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 public class HighlightTranslator {
 
 	public HighlightBuilder translate(
-		Highlight highlight, QueryTranslator<QueryBuilder> queryTranslator) {
+		Highlight highlight, QueryToQueryBuilderTranslator queryTranslator) {
 
 		HighlightBuilder highlightBuilder = new HighlightBuilder();
 
-		List<Highlight.FieldConfig> fieldConfigs = highlight.getFieldConfigs();
+		List<FieldConfig> fieldConfigs = highlight.getFieldConfigs();
 
 		fieldConfigs.forEach(
-			fieldConfig -> {
-				HighlightBuilder.Field field = new HighlightBuilder.Field(
-					fieldConfig.getField());
+			fieldConfig -> highlightBuilder.field(translate(fieldConfig)));
 
-				if (fieldConfig.getFragmentOffset() != null) {
-					field.fragmentOffset(fieldConfig.getFragmentOffset());
-				}
-
-				if (fieldConfig.getFragmentSize() != null) {
-					field.fragmentSize(fieldConfig.getFragmentSize());
-				}
-
-				if (fieldConfig.getNumFragments() != null) {
-					field.numOfFragments(fieldConfig.getNumFragments());
-				}
-
-				highlightBuilder.field(field);
-			});
-
-		if (highlight.getForceSource() != null) {
-			highlightBuilder.forceSource(highlight.getForceSource());
-		}
-
-		if (highlight.getFragmenter() != null) {
-			highlightBuilder.fragmenter(highlight.getFragmenter());
-		}
-
-		if (highlight.getFragmentSize() != null) {
-			highlightBuilder.fragmentSize(highlight.getFragmentSize());
-		}
-
-		if (highlight.getHighlighterType() != null) {
-			highlightBuilder.highlighterType(highlight.getHighlighterType());
-		}
-
-		if (highlight.getHighlightFilter() != null) {
-			highlightBuilder.highlightFilter(highlight.getHighlightFilter());
-		}
+		highlightBuilder.forceSource(highlight.getForceSource());
+		highlightBuilder.fragmenter(highlight.getFragmenter());
+		highlightBuilder.fragmentSize(highlight.getFragmentSize());
+		highlightBuilder.highlighterType(highlight.getHighlighterType());
+		highlightBuilder.highlightFilter(highlight.getHighlightFilter());
 
 		if (highlight.getHighlightQuery() != null) {
 			QueryBuilder highlightQueryBuilder = queryTranslator.translate(
@@ -82,13 +52,8 @@ public class HighlightTranslator {
 			highlightBuilder.highlightQuery(highlightQueryBuilder);
 		}
 
-		if (highlight.getHighlighterType() != null) {
-			highlightBuilder.highlighterType(highlight.getHighlighterType());
-		}
-
-		if (highlight.getNumOfFragments() != null) {
-			highlightBuilder.numOfFragments(highlight.getNumOfFragments());
-		}
+		highlightBuilder.highlighterType(highlight.getHighlighterType());
+		highlightBuilder.numOfFragments(highlight.getNumOfFragments());
 
 		List<String> preTags = highlight.getPreTags();
 
@@ -104,12 +69,23 @@ public class HighlightTranslator {
 				postTags.toArray(new String[postTags.size()]));
 		}
 
-		if (highlight.getRequireFieldMatch() != null) {
-			highlightBuilder.requireFieldMatch(
-				highlight.getRequireFieldMatch());
-		}
+		highlightBuilder.requireFieldMatch(highlight.getRequireFieldMatch());
 
 		return highlightBuilder;
+	}
+
+	protected HighlightBuilder.Field translate(FieldConfig fieldConfig) {
+		HighlightBuilder.Field field = new HighlightBuilder.Field(
+			fieldConfig.getField());
+
+		if (fieldConfig.getFragmentOffset() != null) {
+			field.fragmentOffset(fieldConfig.getFragmentOffset());
+		}
+
+		field.fragmentSize(fieldConfig.getFragmentSize());
+		field.numOfFragments(fieldConfig.getNumFragments());
+
+		return field;
 	}
 
 }

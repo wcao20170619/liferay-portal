@@ -171,7 +171,7 @@ public abstract class BaseStringQueryTestCase extends BaseIndexingTestCase {
 				searchSearchRequest.setQuery(stringQuery);
 				searchSearchRequest.setSize(30);
 
-				FieldSort fieldSort = new FieldSort(Field.USER_NAME);
+				FieldSort fieldSort = sorts.field(Field.USER_NAME);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

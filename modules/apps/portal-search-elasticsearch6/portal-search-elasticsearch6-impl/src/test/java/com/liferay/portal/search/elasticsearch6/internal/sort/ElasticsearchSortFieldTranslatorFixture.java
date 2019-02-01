@@ -14,9 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.sort;
 
-import com.liferay.portal.search.query.QueryTranslator;
-
-import org.elasticsearch.index.query.QueryBuilder;
+import com.liferay.portal.search.elasticsearch6.internal.query.QueryToQueryBuilderTranslator;
 
 /**
  * @author Michael C. Han
@@ -24,12 +22,13 @@ import org.elasticsearch.index.query.QueryBuilder;
 public class ElasticsearchSortFieldTranslatorFixture {
 
 	public ElasticsearchSortFieldTranslatorFixture(
-		QueryTranslator<QueryBuilder> queryTranslator) {
+		QueryToQueryBuilderTranslator queryToQueryBuilderTranslator) {
 
 		_elasticsearchSortFieldTranslator =
 			new ElasticsearchSortFieldTranslator() {
 				{
-					setQueryTranslator(queryTranslator);
+					setQueryToQueryBuilderTranslator(
+						queryToQueryBuilderTranslator);
 				}
 			};
 	}

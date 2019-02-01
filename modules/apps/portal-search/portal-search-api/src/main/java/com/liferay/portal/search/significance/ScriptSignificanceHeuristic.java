@@ -16,10 +16,24 @@ package com.liferay.portal.search.significance;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.script.Script;
+
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class PercentageScoreSignifanceHeuristic
-	implements SignificanceHeuristic {
+public interface ScriptSignificanceHeuristic extends SignificanceHeuristic {
+
+	public Script getScript();
+
+	@ProviderType
+	public interface Builder {
+
+		public ScriptSignificanceHeuristic build();
+
+		public Builder script(Script script);
+
+	}
+
 }

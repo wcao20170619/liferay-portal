@@ -12,21 +12,28 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.internal.significance;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.search.significance.JLHScoreSignificanceHeuristic;
 
 /**
- * @author Michael C. Han
  * @author André de Oliveira
  */
-@ProviderType
-public interface HighlightField {
+public class JLHScoreSignificanceHeuristicImpl
+	implements JLHScoreSignificanceHeuristic {
 
-	public List<String> getFragments();
+	public static class Builder
+		implements JLHScoreSignificanceHeuristic.Builder {
 
-	public String getName();
+		@Override
+		public JLHScoreSignificanceHeuristic build() {
+			return _jlhScoreSignificanceHeuristicImpl;
+		}
+
+		private static final JLHScoreSignificanceHeuristicImpl
+			_jlhScoreSignificanceHeuristicImpl =
+				new JLHScoreSignificanceHeuristicImpl();
+
+	}
 
 }

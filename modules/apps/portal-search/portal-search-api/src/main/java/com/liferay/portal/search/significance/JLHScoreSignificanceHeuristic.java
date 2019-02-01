@@ -18,14 +18,16 @@ import aQute.bnd.annotation.ProviderType;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class ChiSquareSignifanceHeuristic extends NxySignificanceHeuristic {
+public interface JLHScoreSignificanceHeuristic extends SignificanceHeuristic {
 
-	public ChiSquareSignifanceHeuristic(
-		boolean backgroundIsSuperset, boolean includeNegatives) {
+	@ProviderType
+	public interface Builder {
 
-		super(backgroundIsSuperset, includeNegatives);
+		public JLHScoreSignificanceHeuristic build();
+
 	}
 
 }

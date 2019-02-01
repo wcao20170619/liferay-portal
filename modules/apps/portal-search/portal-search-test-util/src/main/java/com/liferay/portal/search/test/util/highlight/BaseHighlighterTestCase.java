@@ -22,6 +22,7 @@ import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.internal.highlight.HighlightImpl;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
@@ -53,9 +54,9 @@ public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
 
 		Query query = queries.string(fieldName.concat(":alpha"));
 
-		Highlight highlight = new Highlight();
+		Highlight highlight = new HighlightImpl();
 
-		highlight.addFieldConfigs(fieldName);
+		highlight.addFields(fieldName);
 		highlight.addPreTags("[H]");
 		highlight.addPostTags("[/H]");
 

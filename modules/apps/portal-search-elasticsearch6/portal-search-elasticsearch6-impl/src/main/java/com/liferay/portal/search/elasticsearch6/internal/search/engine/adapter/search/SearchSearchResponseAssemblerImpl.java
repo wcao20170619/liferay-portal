@@ -167,8 +167,6 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchSearchHits,
 			searchSearchRequest.getAlternateUidFieldName());
 
-		searchHits.setTotalHits(elasticsearchSearchHits.totalHits);
-
 		searchSearchResponse.setSearchHits(searchHits);
 	}
 

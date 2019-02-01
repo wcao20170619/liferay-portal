@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.portal.search.significance;
+package com.liferay.portal.search.sort;
 
 import aQute.bnd.annotation.ProviderType;
 
@@ -20,25 +20,8 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public abstract class NxySignificanceHeuristic
-	implements SignificanceHeuristic {
+public enum ScriptSortType {
 
-	public NxySignificanceHeuristic(
-		boolean backgroundIsSuperset, boolean includeNegatives) {
-
-		_backgroundIsSuperset = backgroundIsSuperset;
-		_includeNegatives = includeNegatives;
-	}
-
-	public boolean isBackgroundIsSuperset() {
-		return _backgroundIsSuperset;
-	}
-
-	public boolean isIncludeNegatives() {
-		return _includeNegatives;
-	}
-
-	private final boolean _backgroundIsSuperset;
-	private final boolean _includeNegatives;
+	NUMBER, STRING
 
 }

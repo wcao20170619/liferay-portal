@@ -12,21 +12,29 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.significance;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.List;
-
 /**
- * @author Michael C. Han
  * @author André de Oliveira
  */
 @ProviderType
-public interface HighlightField {
+public interface ChiSquareSignificanceHeuristic extends SignificanceHeuristic {
 
-	public List<String> getFragments();
+	public boolean isBackgroundIsSuperset();
 
-	public String getName();
+	public boolean isIncludeNegatives();
+
+	@ProviderType
+	public interface Builder {
+
+		public Builder backgroundIsSuperset(boolean backgroundIsSuperset);
+
+		public ChiSquareSignificanceHeuristic build();
+
+		public Builder includeNegatives(boolean includeNegatives);
+
+	}
 
 }

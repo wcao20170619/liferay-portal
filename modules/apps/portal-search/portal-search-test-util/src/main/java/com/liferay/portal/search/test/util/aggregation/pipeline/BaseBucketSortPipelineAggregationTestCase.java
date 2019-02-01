@@ -62,7 +62,7 @@ public abstract class BaseBucketSortPipelineAggregationTestCase
 		BucketSortPipelineAggregation bucketSortPipelineAggregation =
 			new BucketSortPipelineAggregationImpl("bucket_sort");
 
-		FieldSort fieldSort = new FieldSort("sum");
+		FieldSort fieldSort = sorts.field("sum");
 
 		fieldSort.setSortOrder(SortOrder.ASC);
 
@@ -114,7 +114,7 @@ public abstract class BaseBucketSortPipelineAggregationTestCase
 		BucketSortPipelineAggregation bucketSortPipelineAggregation =
 			new BucketSortPipelineAggregationImpl("bucket_sort");
 
-		FieldSort fieldSort = new FieldSort("sum");
+		FieldSort fieldSort = sorts.field("sum");
 
 		fieldSort.setSortOrder(SortOrder.DESC);
 

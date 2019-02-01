@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
+import com.liferay.portal.search.elasticsearch6.internal.highlight.HighlightFieldImpl;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
@@ -40,19 +41,18 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.SearchHit elasticsearchSearchHit,
 		String alternateUidFieldName) {
 
-		SearchHit searchHit = new SearchHit();
+		SearchHit.Builder builder = new SearchHitImpl.Builder();
 
-		searchHit.setId(elasticsearchSearchHit.getId());
+		builder.id(elasticsearchSearchHit.getId());
 
 		if (elasticsearchSearchHit.getExplanation() != null) {
 			Explanation explanation = elasticsearchSearchHit.getExplanation();
 
-			searchHit.setExplanation(explanation.toString());
+			builder.explanation(explanation.toString());
 		}
 
 		if (elasticsearchSearchHit.getMatchedQueries() != null) {
-			searchHit.setMatchedQueries(
-				elasticsearchSearchHit.getMatchedQueries());
+			builder.matchedQueries(elasticsearchSearchHit.getMatchedQueries());
 		}
 
 		Map<String, DocumentField> documentFieldsMap =
@@ -60,7 +60,7 @@ public class SearchHitsTranslator {
 
 		Document document = new Document();
 
-		searchHit.setDocument(document);
+		builder.document(document);
 
 		if (MapUtil.isNotEmpty(documentFieldsMap)) {
 			documentFieldsMap.forEach(
@@ -97,7 +97,7 @@ public class SearchHitsTranslator {
 		Map<String, Object> sourceMap = elasticsearchSearchHit.getSourceAsMap();
 
 		if (MapUtil.isNotEmpty(sourceMap)) {
-			sourceMap.forEach(searchHit::addSource);
+			sourceMap.forEach(builder::addSource);
 		}
 
 		populateUID(document, alternateUidFieldName);
@@ -111,24 +111,15 @@ public class SearchHitsTranslator {
 		if (MapUtil.isNotEmpty(highlightFieldsMap)) {
 			highlightFieldsMap.forEach(
 				(fieldName, elasticsearchHighlightField) -> {
-					HighlightField highlightField = new HighlightField(
-						elasticsearchHighlightField.getName());
-
-					Text[] fragments =
-						elasticsearchHighlightField.getFragments();
-
-					for (final Text fragment : fragments) {
-						highlightField.addFragment(fragment.string());
-					}
-
-					searchHit.addHighlightField(highlightField);
+					builder.addHighlightField(
+						translate(elasticsearchHighlightField));
 				});
 		}
 
-		searchHit.setScore(elasticsearchSearchHit.getScore());
-		searchHit.setVersion(elasticsearchSearchHit.getVersion());
+		builder.score(elasticsearchSearchHit.getScore());
+		builder.version(elasticsearchSearchHit.getVersion());
 
-		return searchHit;
+		return builder.build();
 	}
 
 	public SearchHits translate(
@@ -141,11 +132,10 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits,
 		String alternateUidFieldName) {
 
-		SearchHits searchHits = new SearchHits();
+		SearchHits.Builder builder = new SearchHitsImpl.Builder();
 
-		searchHits.setTotalHits(elasticsearchSearchHits.totalHits);
-
-		searchHits.setMaxScore(elasticsearchSearchHits.getMaxScore());
+		builder.maxScore(elasticsearchSearchHits.getMaxScore());
+		builder.totalHits(elasticsearchSearchHits.totalHits);
 
 		org.elasticsearch.search.SearchHit[] elasticsearchSearchHitArray =
 			elasticsearchSearchHits.getHits();
@@ -156,10 +146,10 @@ public class SearchHitsTranslator {
 			SearchHit searchHit = translate(
 				elasticsearchSearchHit, alternateUidFieldName);
 
-			searchHits.addSearchHit(searchHit);
+			builder.addSearchHit(searchHit);
 		}
 
-		return searchHits;
+		return builder.build();
 	}
 
 	protected void populateUID(
@@ -184,6 +174,20 @@ public class SearchHitsTranslator {
 
 			document.addField(newUidField);
 		}
+	}
+
+	protected HighlightField translate(
+		org.elasticsearch.search.fetch.subphase.highlight.HighlightField
+			elasticsearchHighlightField) {
+
+		HighlightFieldImpl highlightField = new HighlightFieldImpl(
+			elasticsearchHighlightField.getName());
+
+		for (Text fragment : elasticsearchHighlightField.getFragments()) {
+			highlightField.addFragment(fragment.string());
+		}
+
+		return highlightField;
 	}
 
 	private static final String _GEOPOINT_SUFFIX = ".geopoint";

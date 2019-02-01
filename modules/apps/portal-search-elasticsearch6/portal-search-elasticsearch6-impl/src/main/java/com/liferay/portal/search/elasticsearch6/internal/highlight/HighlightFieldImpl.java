@@ -12,21 +12,37 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.elasticsearch6.internal.highlight;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.search.highlight.HighlightField;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  * @author André de Oliveira
  */
-@ProviderType
-public interface HighlightField {
+public class HighlightFieldImpl implements HighlightField {
 
-	public List<String> getFragments();
+	public HighlightFieldImpl(String name) {
+		_name = name;
+	}
 
-	public String getName();
+	public void addFragment(String fragment) {
+		_fragments.add(fragment);
+	}
+
+	public List<String> getFragments() {
+		return Collections.unmodifiableList(_fragments);
+	}
+
+	public String getName() {
+		return _name;
+	}
+
+	private final List<String> _fragments = new ArrayList<>();
+	private final String _name;
 
 }

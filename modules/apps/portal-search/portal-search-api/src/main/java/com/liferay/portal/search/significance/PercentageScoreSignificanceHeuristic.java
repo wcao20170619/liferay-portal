@@ -12,21 +12,23 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.significance;
 
 import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
 
 /**
  * @author Michael C. Han
  * @author André de Oliveira
  */
 @ProviderType
-public interface HighlightField {
+public interface PercentageScoreSignificanceHeuristic
+	extends SignificanceHeuristic {
 
-	public List<String> getFragments();
+	@ProviderType
+	public interface Builder {
 
-	public String getName();
+		public PercentageScoreSignificanceHeuristic build();
+
+	}
 
 }

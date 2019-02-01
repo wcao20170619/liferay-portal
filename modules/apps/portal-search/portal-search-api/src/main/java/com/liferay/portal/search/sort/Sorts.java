@@ -12,21 +12,21 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.sort;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.search.script.Script;
 
 /**
- * @author Michael C. Han
  * @author André de Oliveira
  */
-@ProviderType
-public interface HighlightField {
+public interface Sorts {
 
-	public List<String> getFragments();
+	public FieldSort field(String field);
 
-	public String getName();
+	public GeoDistanceSort geoDistance(String field);
+
+	public ScoreSort score();
+
+	public ScriptSort script(Script script, ScriptSortType scriptSortType);
 
 }

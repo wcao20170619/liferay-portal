@@ -16,22 +16,22 @@ package com.liferay.portal.search.significance;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.search.script.Script;
-
 /**
- * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class ScriptSignifanceHeuristic implements SignificanceHeuristic {
+public interface SignificanceHeuristicBuilders {
 
-	public ScriptSignifanceHeuristic(Script script) {
-		_script = script;
-	}
+	public ChiSquareSignificanceHeuristic.Builder chiSquare();
 
-	public Script getScript() {
-		return _script;
-	}
+	public GNDSignificanceHeuristic.Builder gnd();
 
-	private final Script _script;
+	public JLHScoreSignificanceHeuristic.Builder jlhScore();
+
+	public MutualInformationSignificanceHeuristic.Builder mutualInformation();
+
+	public PercentageScoreSignificanceHeuristic.Builder percentageScore();
+
+	public ScriptSignificanceHeuristic.Builder script();
 
 }

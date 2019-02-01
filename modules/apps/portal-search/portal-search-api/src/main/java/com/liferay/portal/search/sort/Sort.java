@@ -18,20 +18,11 @@ import aQute.bnd.annotation.ProviderType;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public abstract class Sort {
+public interface Sort {
 
-	public abstract <T> T accept(SortVisitor<T> sortVisitor);
-
-	public SortOrder getSortOrder() {
-		return _sortOrder;
-	}
-
-	public void setSortOrder(SortOrder sortOrder) {
-		_sortOrder = sortOrder;
-	}
-
-	private SortOrder _sortOrder = SortOrder.ASC;
+	public <T> T accept(SortVisitor<T> sortVisitor);
 
 }

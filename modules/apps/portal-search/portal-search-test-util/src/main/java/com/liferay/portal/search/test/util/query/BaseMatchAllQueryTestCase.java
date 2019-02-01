@@ -55,7 +55,7 @@ public abstract class BaseMatchAllQueryTestCase extends BaseIndexingTestCase {
 				searchSearchRequest.setQuery(matchAllQuery);
 				searchSearchRequest.setSize(30);
 
-				FieldSort fieldSort = new FieldSort(Field.PRIORITY);
+				FieldSort fieldSort = sorts.field(Field.PRIORITY);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

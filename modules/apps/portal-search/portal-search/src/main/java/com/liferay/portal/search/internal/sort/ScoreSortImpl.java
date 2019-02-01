@@ -12,21 +12,23 @@
  * details.
  */
 
-package com.liferay.portal.search.highlight;
+package com.liferay.portal.search.internal.sort;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.List;
+import com.liferay.portal.search.sort.ScoreSort;
+import com.liferay.portal.search.sort.SortVisitor;
 
 /**
  * @author Michael C. Han
  * @author André de Oliveira
  */
 @ProviderType
-public interface HighlightField {
+public class ScoreSortImpl extends SortImpl implements ScoreSort {
 
-	public List<String> getFragments();
-
-	public String getName();
+	@Override
+	public <T> T accept(SortVisitor<T> sortVisitor) {
+		return sortVisitor.visit(this);
+	}
 
 }

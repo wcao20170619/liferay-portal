@@ -18,170 +18,59 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.search.query.Query;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class Highlight {
+public interface Highlight {
 
-	public void addFieldConfig(
-		String field, Integer fragmentSize, Integer numFragments,
-		Integer fragmentOffset) {
+	public void addFieldConfig(FieldConfig fieldConfig);
 
-		FieldConfig fieldConfig = new FieldConfig(field);
+	public void addFields(String... fields);
 
-		fieldConfig.setFragmentOffset(fragmentOffset);
-		fieldConfig.setFragmentSize(fragmentSize);
-		fieldConfig.setNumFragments(numFragments);
+	public void addPostTags(String... postTags);
 
-		_fieldConfigs.add(fieldConfig);
-	}
+	public void addPreTags(String... preTags);
 
-	public void addFieldConfigs(String... fields) {
-		for (final String field : fields) {
-			_fieldConfigs.add(new FieldConfig(field));
-		}
-	}
+	public List<FieldConfig> getFieldConfigs();
 
-	public void addPostTags(String... postTags) {
-		Collections.addAll(_postTags, postTags);
-	}
+	public Boolean getForceSource();
 
-	public void addPreTags(String... preTags) {
-		Collections.addAll(_preTags, preTags);
-	}
+	public String getFragmenter();
 
-	public List<FieldConfig> getFieldConfigs() {
-		return Collections.unmodifiableList(_fieldConfigs);
-	}
+	public Integer getFragmentSize();
 
-	public Boolean getForceSource() {
-		return _forceSource;
-	}
+	public String getHighlighterType();
 
-	public String getFragmenter() {
-		return _fragmenter;
-	}
+	public Boolean getHighlightFilter();
 
-	public Integer getFragmentSize() {
-		return _fragmentSize;
-	}
+	public Query getHighlightQuery();
 
-	public String getHighlighterType() {
-		return _highlighterType;
-	}
+	public Integer getNumOfFragments();
 
-	public Boolean getHighlightFilter() {
-		return _highlightFilter;
-	}
+	public List<String> getPostTags();
 
-	public Query getHighlightQuery() {
-		return _highlightQuery;
-	}
+	public List<String> getPreTags();
 
-	public Integer getNumOfFragments() {
-		return _numOfFragments;
-	}
+	public Boolean getRequireFieldMatch();
 
-	public List<String> getPostTags() {
-		return Collections.unmodifiableList(_postTags);
-	}
+	public void setForceSource(Boolean forceSource);
 
-	public List<String> getPreTags() {
-		return Collections.unmodifiableList(_preTags);
-	}
+	public void setFragmenter(String fragmenter);
 
-	public Boolean getRequireFieldMatch() {
-		return _requireFieldMatch;
-	}
+	public void setFragmentSize(Integer fragmentSize);
 
-	public void setForceSource(Boolean forceSource) {
-		_forceSource = forceSource;
-	}
+	public void setHighlighterType(String highlighterType);
 
-	public void setFragmenter(String fragmenter) {
-		_fragmenter = fragmenter;
-	}
+	public void setHighlightFilter(Boolean highlightFilter);
 
-	public void setFragmentSize(Integer fragmentSize) {
-		_fragmentSize = fragmentSize;
-	}
+	public void setHighlightQuery(Query highlightQuery);
 
-	public void setHighlighterType(String highlighterType) {
-		_highlighterType = highlighterType;
-	}
+	public void setNumOfFragments(Integer numOfFragments);
 
-	public void setHighlightFilter(Boolean highlightFilter) {
-		_highlightFilter = highlightFilter;
-	}
-
-	public void setHighlightQuery(Query highlightQuery) {
-		_highlightQuery = highlightQuery;
-	}
-
-	public void setNumOfFragments(Integer numOfFragments) {
-		_numOfFragments = numOfFragments;
-	}
-
-	public void setRequireFieldMatch(Boolean requireFieldMatch) {
-		_requireFieldMatch = requireFieldMatch;
-	}
-
-	public static class FieldConfig {
-
-		public FieldConfig(String field) {
-			_field = field;
-		}
-
-		public String getField() {
-			return _field;
-		}
-
-		public Integer getFragmentOffset() {
-			return _fragmentOffset;
-		}
-
-		public Integer getFragmentSize() {
-			return _fragmentSize;
-		}
-
-		public Integer getNumFragments() {
-			return _numFragments;
-		}
-
-		public void setFragmentOffset(Integer fragmentOffset) {
-			_fragmentOffset = fragmentOffset;
-		}
-
-		public void setFragmentSize(Integer fragmentSize) {
-			_fragmentSize = fragmentSize;
-		}
-
-		public void setNumFragments(Integer numFragments) {
-			_numFragments = numFragments;
-		}
-
-		private final String _field;
-		private Integer _fragmentOffset;
-		private Integer _fragmentSize;
-		private Integer _numFragments;
-
-	}
-
-	private final List<FieldConfig> _fieldConfigs = new ArrayList<>();
-	private Boolean _forceSource;
-	private String _fragmenter;
-	private Integer _fragmentSize;
-	private String _highlighterType;
-	private Boolean _highlightFilter;
-	private Query _highlightQuery;
-	private Integer _numOfFragments;
-	private final List<String> _postTags = new ArrayList<>();
-	private final List<String> _preTags = new ArrayList<>();
-	private Boolean _requireFieldMatch;
+	public void setRequireFieldMatch(Boolean requireFieldMatch);
 
 }

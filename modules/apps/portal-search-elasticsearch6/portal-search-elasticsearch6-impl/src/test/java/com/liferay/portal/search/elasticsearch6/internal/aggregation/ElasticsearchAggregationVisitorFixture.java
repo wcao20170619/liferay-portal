@@ -169,7 +169,7 @@ public class ElasticsearchAggregationVisitorFixture {
 		elasticsearchAggregationVisitor.setTopHitsAggregationTranslator(
 			new TopHitsAggregationTranslatorImpl() {
 				{
-					setQueryTranslator(
+					setQueryToQueryBuilderTranslator(
 						elasticsearchQueryTranslatorFixture.
 							getElasticsearchQueryTranslator());
 					setSortFieldTranslator(

@@ -12,21 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.search.significance;
+package com.liferay.portal.search.internal.sort;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.sort.Sort;
+import com.liferay.portal.search.sort.SortOrder;
+import com.liferay.portal.search.sort.SortVisitor;
+
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class MutualInformationSignifanceHeuristic
-	extends NxySignificanceHeuristic {
+public abstract class SortImpl implements Sort {
 
-	public MutualInformationSignifanceHeuristic(
-		boolean backgroundIsSuperset, boolean includeNegatives) {
+	public abstract <T> T accept(SortVisitor<T> sortVisitor);
 
-		super(backgroundIsSuperset, includeNegatives);
+	public SortOrder getSortOrder() {
+		return _sortOrder;
 	}
+
+	public void setSortOrder(SortOrder sortOrder) {
+		_sortOrder = sortOrder;
+	}
+
+	private SortOrder _sortOrder = SortOrder.ASC;
 
 }
