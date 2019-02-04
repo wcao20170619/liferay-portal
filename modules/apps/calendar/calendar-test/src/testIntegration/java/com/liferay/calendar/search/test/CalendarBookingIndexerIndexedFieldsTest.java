@@ -20,6 +20,7 @@ import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -38,7 +39,9 @@ import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -225,28 +228,21 @@ public class CalendarBookingIndexerIndexedFieldsTest
 		map.put(Field.TITLE + "_en_US", title);
 
 		map.put("localized_title", title);
-		map.put("localized_title_ca_ES", title);
-		map.put("localized_title_ca_ES_sortable", title);
-		map.put("localized_title_de_DE", title);
-		map.put("localized_title_de_DE_sortable", title);
-		map.put("localized_title_en_US", title);
-		map.put("localized_title_en_US_sortable", title);
-		map.put("localized_title_es_ES", title);
-		map.put("localized_title_es_ES_sortable", title);
-		map.put("localized_title_fi_FI", title);
-		map.put("localized_title_fi_FI_sortable", title);
-		map.put("localized_title_fr_FR", title);
-		map.put("localized_title_fr_FR_sortable", title);
-		map.put("localized_title_iw_IL", title);
-		map.put("localized_title_iw_IL_sortable", title);
-		map.put("localized_title_ja_JP", title);
-		map.put("localized_title_ja_JP_sortable", title);
-		map.put("localized_title_nl_NL", title);
-		map.put("localized_title_nl_NL_sortable", title);
-		map.put("localized_title_pt_BR", title);
-		map.put("localized_title_pt_BR_sortable", title);
-		map.put("localized_title_zh_CN", title);
-		map.put("localized_title_zh_CN_sortable", title);
+
+		Set<Locale> locales = LanguageUtil.getAvailableLocales();
+
+		locales.forEach(
+			locale -> {
+				String mapKey =
+					"localized_title_" + locale.getLanguage() + "_" +
+						locale.getCountry();
+
+				String mapKeySortable = mapKey + "_sortable";
+
+				map.put(mapKey, title);
+
+				map.put(mapKeySortable, title);
+			});
 	}
 
 	protected void populateTranslatedTitle(
