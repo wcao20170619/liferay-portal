@@ -31,6 +31,13 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.AggregationResult;
+import com.liferay.portal.search.aggregation.Aggregations;
+import com.liferay.portal.search.aggregation.HierarchicalAggregationResult;
+import com.liferay.portal.search.aggregation.bucket.Bucket;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
+import com.liferay.portal.search.internal.aggregation.AggregationsImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderImpl;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -251,6 +258,8 @@ public abstract class BaseIndexingTestCase {
 
 	protected static final long GROUP_ID = RandomTestUtil.randomLong();
 
+	protected final Aggregations aggregations = new AggregationsImpl();
+
 	protected class IndexingTestHelper {
 
 		public IndexingTestHelper() {
@@ -283,6 +292,32 @@ public abstract class BaseIndexingTestCase {
 
 		public void defineRequest(Consumer<SearchRequestBuilder> consumer) {
 			consumer.accept(_searchRequestBuilder);
+		}
+
+		public <AR extends AggregationResult> AR getAggregationResult(
+			Aggregation aggregation) {
+
+			return getAggregationResult(aggregation.getName());
+		}
+
+		public <AR extends AggregationResult> AR getAggregationResult(
+			PipelineAggregation pipelineAggregation) {
+
+			return getAggregationResult(pipelineAggregation.getName());
+		}
+
+		public <AR extends AggregationResult> AR getChildAggregationResult(
+			Bucket bucket, Aggregation aggregation) {
+
+			return (AR)bucket.getChildAggregationResult(aggregation.getName());
+		}
+
+		public <AR extends AggregationResult> AR getChildAggregationResult(
+			HierarchicalAggregationResult aggregationResult,
+			Aggregation aggregation) {
+
+			return (AR)aggregationResult.getChildAggregationResult(
+				aggregation.getName());
 		}
 
 		public String getQueryString() {
@@ -345,6 +380,17 @@ public abstract class BaseIndexingTestCase {
 
 		public void verifyResponse(Consumer<SearchResponse> consumer) {
 			consumer.accept(_searchResponse);
+		}
+
+		protected <AR extends AggregationResult> AR getAggregationResult(
+			String name) {
+
+			AggregationResult aggregationResult =
+				_searchResponse.getAggregationResult(name);
+
+			Assert.assertNotNull(aggregationResult);
+
+			return (AR)aggregationResult;
 		}
 
 		protected Query getQuery() {
