@@ -16,6 +16,7 @@ package com.liferay.portal.search.engine.adapter.search;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.stats.StatsResponse;
 
 import java.util.Collections;
@@ -28,8 +29,17 @@ import java.util.Map;
 @ProviderType
 public abstract class BaseSearchResponse implements SearchResponse {
 
+	public void addAggregationResult(AggregationResult aggregationResult) {
+		_aggregationResultsMap.put(
+			aggregationResult.getName(), aggregationResult);
+	}
+
 	public void addStatsResponse(StatsResponse statsResponse) {
 		_statsResponseMap.put(statsResponse.getField(), statsResponse);
+	}
+
+	public Map<String, AggregationResult> getAggregationResultsMap() {
+		return Collections.unmodifiableMap(_aggregationResultsMap);
 	}
 
 	public long getCount() {
@@ -92,6 +102,8 @@ public abstract class BaseSearchResponse implements SearchResponse {
 		_timedOut = timedOut;
 	}
 
+	private final Map<String, AggregationResult> _aggregationResultsMap =
+		new LinkedHashMap<>();
 	private long _count;
 	private Map<String, String> _executionProfile;
 	private long _executionTime;
