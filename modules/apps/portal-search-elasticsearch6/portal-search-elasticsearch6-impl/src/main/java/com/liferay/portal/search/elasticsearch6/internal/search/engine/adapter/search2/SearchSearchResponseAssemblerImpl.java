@@ -22,9 +22,11 @@ import com.liferay.portal.search.aggregation.AggregationResults;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.AggregationResultTranslatorFactory;
+import com.liferay.portal.search.elasticsearch6.internal.aggregation.CustomAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.ElasticsearchAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.ElasticsearchAggregationResultsTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.PipelineAggregationResultTranslatorFactory;
+import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.CustomPipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.ElasticsearchPipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslator;
 import com.liferay.portal.search.engine.adapter.search2.SearchSearchRequest;
@@ -85,7 +87,9 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation) {
 
 		return new ElasticsearchAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			_customAggregationResultTranslator,
+			_customPipelineAggregationResultTranslator);
 	}
 
 	@Override
@@ -95,7 +99,24 @@ public class SearchSearchResponseAssemblerImpl
 				elasticsearchAggregation) {
 
 		return new ElasticsearchPipelineAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			_customPipelineAggregationResultTranslator);
+	}
+
+	@Reference(unbind = "-")
+	public void setCustomAggregationResultTranslator(
+		CustomAggregationResultTranslator customAggregationResultTranslator) {
+
+		_customAggregationResultTranslator = customAggregationResultTranslator;
+	}
+
+	@Reference(unbind = "-")
+	public void setCustomPipelineAggregationResultTranslator(
+		CustomPipelineAggregationResultTranslator
+			customPipelineAggregationResultTranslator) {
+
+		_customPipelineAggregationResultTranslator =
+			customPipelineAggregationResultTranslator;
 	}
 
 	protected void addAggregations(
@@ -111,10 +132,10 @@ public class SearchSearchResponseAssemblerImpl
 		}
 
 		Map<String, Aggregation> aggregationMap =
-			searchSearchRequest.getAggregations();
+			searchSearchRequest.getAggregationsMap();
 
 		Map<String, PipelineAggregation> pipelineAggregationMap =
-			searchSearchRequest.getPipelineAggregations();
+			searchSearchRequest.getPipelineAggregationsMap();
 
 		ElasticsearchAggregationResultsTranslator
 			elasticsearchAggregationResultsTranslator =
@@ -139,6 +160,10 @@ public class SearchSearchResponseAssemblerImpl
 	private AggregationResults _aggregationResults;
 	private final CommonSearchResponseAssembler _commonSearchResponseAssembler =
 		new CommonSearchResponseAssemblerImpl();
+	private CustomAggregationResultTranslator
+		_customAggregationResultTranslator;
+	private CustomPipelineAggregationResultTranslator
+		_customPipelineAggregationResultTranslator;
 	private final SearchHitsTranslator _searchHitsTranslator =
 		new SearchHitsTranslator();
 
