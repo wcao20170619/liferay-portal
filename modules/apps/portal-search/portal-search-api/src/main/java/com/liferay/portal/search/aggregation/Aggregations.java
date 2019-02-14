@@ -18,6 +18,7 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.search.aggregation.bucket.DateHistogramAggregation;
 import com.liferay.portal.search.aggregation.bucket.DateRangeAggregation;
+import com.liferay.portal.search.aggregation.bucket.FilterAggregation;
 import com.liferay.portal.search.aggregation.bucket.GeoHashGridAggregation;
 import com.liferay.portal.search.aggregation.bucket.GlobalAggregation;
 import com.liferay.portal.search.aggregation.bucket.HistogramAggregation;
@@ -27,12 +28,14 @@ import com.liferay.portal.search.aggregation.bucket.TermsAggregation;
 import com.liferay.portal.search.aggregation.metrics.AvgAggregation;
 import com.liferay.portal.search.aggregation.metrics.CardinalityAggregation;
 import com.liferay.portal.search.aggregation.metrics.ExtendedStatsAggregation;
+import com.liferay.portal.search.aggregation.metrics.GeoBoundsAggregation;
 import com.liferay.portal.search.aggregation.metrics.MaxAggregation;
 import com.liferay.portal.search.aggregation.metrics.MinAggregation;
 import com.liferay.portal.search.aggregation.metrics.PercentileRanksAggregation;
 import com.liferay.portal.search.aggregation.metrics.PercentilesAggregation;
 import com.liferay.portal.search.aggregation.metrics.StatsAggregation;
 import com.liferay.portal.search.aggregation.metrics.SumAggregation;
+import com.liferay.portal.search.aggregation.metrics.TopHitsAggregation;
 import com.liferay.portal.search.aggregation.metrics.ValueCountAggregation;
 import com.liferay.portal.search.aggregation.pipeline.AvgBucketPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.CumulativeSumPipelineAggregation;
@@ -44,6 +47,7 @@ import com.liferay.portal.search.aggregation.pipeline.PercentilesBucketPipelineA
 import com.liferay.portal.search.aggregation.pipeline.SerialDiffPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.StatsBucketPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.SumBucketPipelineAggregation;
+import com.liferay.portal.search.query.Query;
 
 /**
  * @author André de Oliveira
@@ -72,6 +76,10 @@ public interface Aggregations {
 
 	public ExtendedStatsBucketPipelineAggregation extendedStatsBucket(
 		String name, String bucketsPath);
+
+	public FilterAggregation filter(String name, Query query);
+
+	public GeoBoundsAggregation geoBounds(String name, String field);
 
 	public GeoHashGridAggregation geoHashGrid(String name, String field);
 
@@ -115,6 +123,8 @@ public interface Aggregations {
 		String name, String bucketsPath);
 
 	public TermsAggregation terms(String name, String field);
+
+	public TopHitsAggregation topHits(String name);
 
 	public ValueCountAggregation valueCount(String name, String field);
 
