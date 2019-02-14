@@ -24,6 +24,7 @@ import com.liferay.portal.search.aggregation.pipeline.BucketSelectorPipelineAggr
 import com.liferay.portal.search.aggregation.pipeline.BucketSortPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.CumulativeSumPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.CumulativeSumPipelineAggregationResult;
+import com.liferay.portal.search.aggregation.pipeline.CustomPipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.DerivativePipelineAggregation;
 import com.liferay.portal.search.aggregation.pipeline.DerivativePipelineAggregationResult;
 import com.liferay.portal.search.aggregation.pipeline.ExtendedStatsBucketPipelineAggregation;
@@ -60,10 +61,14 @@ public class ElasticsearchPipelineAggregationResultTranslator
 
 	public ElasticsearchPipelineAggregationResultTranslator(
 		Aggregation elasticsearchAggregation,
-		AggregationResults aggregationResults) {
+		AggregationResults aggregationResults,
+		CustomPipelineAggregationResultTranslator
+			customPipelineAggregationResultTranslator) {
 
 		_elasticsearchAggregation = elasticsearchAggregation;
 		_aggregationResults = aggregationResults;
+		_customPipelineAggregationResultTranslator =
+			customPipelineAggregationResultTranslator;
 	}
 
 	@Override
@@ -110,6 +115,14 @@ public class ElasticsearchPipelineAggregationResultTranslator
 
 		return _aggregationResults.cumulativeSum(
 			simpleValue.getName(), simpleValue.value());
+	}
+
+	@Override
+	public AggregationResult visit(
+		CustomPipelineAggregation customPipelineAggregation) {
+
+		return _customPipelineAggregationResultTranslator.translate(
+			customPipelineAggregation, _elasticsearchAggregation, this);
 	}
 
 	@Override
@@ -234,6 +247,8 @@ public class ElasticsearchPipelineAggregationResultTranslator
 	}
 
 	private final AggregationResults _aggregationResults;
+	private final CustomPipelineAggregationResultTranslator
+		_customPipelineAggregationResultTranslator;
 	private final Aggregation _elasticsearchAggregation;
 
 }

@@ -18,6 +18,7 @@ import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.aggregation.AggregationResultTranslator;
 import com.liferay.portal.search.aggregation.AggregationResults;
+import com.liferay.portal.search.aggregation.CustomAggregation;
 import com.liferay.portal.search.aggregation.bucket.Bucket;
 import com.liferay.portal.search.aggregation.bucket.BucketAggregationResult;
 import com.liferay.portal.search.aggregation.bucket.ChildrenAggregation;
@@ -87,6 +88,7 @@ import com.liferay.portal.search.aggregation.metrics.WeightedAvgAggregation;
 import com.liferay.portal.search.aggregation.metrics.WeightedAvgAggregationResult;
 import com.liferay.portal.search.aggregation.pipeline.PercentilesBucketPipelineAggregationResult;
 import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationResultTranslator;
+import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.CustomPipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.ElasticsearchPipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslator;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
@@ -137,10 +139,16 @@ public class ElasticsearchAggregationResultTranslator
 	public ElasticsearchAggregationResultTranslator(
 		org.elasticsearch.search.aggregations.Aggregation
 			elasticsearchAggregation,
-		AggregationResults aggregationResults) {
+		AggregationResults aggregationResults,
+		CustomAggregationResultTranslator customAggregationResultTranslator,
+		CustomPipelineAggregationResultTranslator
+			customPipelineAggregationResultTranslator) {
 
 		_elasticsearchAggregation = elasticsearchAggregation;
 		_aggregationResults = aggregationResults;
+		_customAggregationResultTranslator = customAggregationResultTranslator;
+		_customPipelineAggregationResultTranslator =
+			customPipelineAggregationResultTranslator;
 	}
 
 	@Override
@@ -149,7 +157,9 @@ public class ElasticsearchAggregationResultTranslator
 			elasticsearchAggregation) {
 
 		return new ElasticsearchAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			_customAggregationResultTranslator,
+			_customPipelineAggregationResultTranslator);
 	}
 
 	@Override
@@ -159,7 +169,8 @@ public class ElasticsearchAggregationResultTranslator
 				elasticsearchAggregation) {
 
 		return new ElasticsearchPipelineAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			_customPipelineAggregationResultTranslator);
 	}
 
 	@Override
@@ -194,6 +205,14 @@ public class ElasticsearchAggregationResultTranslator
 				children.getAggregations(), childrenAggregation));
 
 		return childrenAggregationResult;
+	}
+
+	@Override
+	public AggregationResult visit(CustomAggregation customAggregation) {
+		return _customAggregationResultTranslator.translate(
+			customAggregation, _elasticsearchAggregation, this,
+			createPipelineAggregationResultTranslator(
+				_elasticsearchAggregation));
 	}
 
 	@Override
@@ -630,6 +649,10 @@ public class ElasticsearchAggregationResultTranslator
 	}
 
 	private final AggregationResults _aggregationResults;
+	private final CustomAggregationResultTranslator
+		_customAggregationResultTranslator;
+	private final CustomPipelineAggregationResultTranslator
+		_customPipelineAggregationResultTranslator;
 	private final org.elasticsearch.search.aggregations.Aggregation
 		_elasticsearchAggregation;
 	private final SearchHitsTranslator _searchHitsTranslator =
