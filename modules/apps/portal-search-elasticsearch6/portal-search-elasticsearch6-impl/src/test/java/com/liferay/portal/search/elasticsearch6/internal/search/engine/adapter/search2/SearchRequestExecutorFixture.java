@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.search2;
 
+import com.liferay.portal.search.elasticsearch6.internal.aggregation.CustomAggregationsFixture;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.ElasticsearchAggregationVisitorFixture;
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.ElasticsearchPipelineAggregationVisitorFixture;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchClientResolver;
@@ -39,6 +40,9 @@ public class SearchRequestExecutorFixture {
 
 		SearchSearchResponseAssemblerImpl searchSearchResponseAssembler =
 			createSearchSearchResponseAssembler();
+
+		CustomAggregationsFixture.injectCustomAggregations(
+			searchSearchResponseAssembler);
 
 		return new ElasticsearchSearchRequestExecutor() {
 			{
