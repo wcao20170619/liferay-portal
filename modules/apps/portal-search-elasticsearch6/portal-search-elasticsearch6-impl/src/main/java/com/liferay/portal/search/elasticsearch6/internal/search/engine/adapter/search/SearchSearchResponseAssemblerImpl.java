@@ -76,7 +76,7 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation) {
 
 		return new ElasticsearchAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults, null, null);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class SearchSearchResponseAssemblerImpl
 				elasticsearchAggregation) {
 
 		return new ElasticsearchPipelineAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults, null);
 	}
 
 	protected void addAggregations(
