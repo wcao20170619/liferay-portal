@@ -17,9 +17,12 @@ package com.liferay.portal.search.searcher;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.search.aggregation.Aggregation;
+import com.liferay.portal.search.aggregation.pipeline.PipelineAggregation;
 import com.liferay.portal.search.stats.StatsRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Holds parameters to be used when performing a search.
@@ -30,6 +33,10 @@ import java.util.List;
  */
 @ProviderType
 public interface SearchRequest {
+
+	public Map<String, Aggregation> getAggregationsMap();
+
+	public Map<String, PipelineAggregation> getPipelineAggregationsMap();
 
 	/**
 	 * Provides a secondary query to reorder the top documents returned.

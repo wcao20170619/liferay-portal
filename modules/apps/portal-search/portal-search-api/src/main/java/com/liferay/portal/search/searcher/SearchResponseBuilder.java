@@ -16,6 +16,7 @@ package com.liferay.portal.search.searcher;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.stats.StatsResponse;
 
 import java.util.Map;
@@ -33,6 +34,9 @@ import java.util.Map;
  */
 @ProviderType
 public interface SearchResponseBuilder {
+
+	public SearchResponseBuilder aggregationResultsMap(
+		Map<String, AggregationResult> aggregationResultsMap);
 
 	/**
 	 * Builds the search response.
