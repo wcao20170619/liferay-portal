@@ -16,6 +16,7 @@ package com.liferay.portal.search.internal.legacy.searcher;
 
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.aggregation.AggregationResult;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
 import com.liferay.portal.search.stats.StatsResponse;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,6 +35,17 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 	public SearchResponseBuilderImpl(SearchContext searchContext) {
 		_searchContext = searchContext;
+	}
+
+	@Override
+	public SearchResponseBuilder aggregationResultsMap(
+		Map<String, AggregationResult> aggregationResultsMap) {
+
+		_searchContext.setAttribute(
+			_AGGREGATION_RESULTS_MAP,
+			new LinkedHashMap<>(aggregationResultsMap));
+
+		return this;
 	}
 
 	@Override
@@ -67,6 +80,32 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 	public class SearchResponseImpl implements SearchResponse {
 
 		@Override
+		public AggregationResult getAggregationResult(String name) {
+			Map<String, AggregationResult> map =
+				(Map<String, AggregationResult>)
+					_searchContext.getAttribute(_AGGREGATION_RESULTS_MAP);
+
+			if (map != null) {
+				return map.get(name);
+			}
+
+			return null;
+		}
+
+		@Override
+		public Map<String, AggregationResult> getAggregationResultsMap() {
+			Map<String, AggregationResult> map =
+				(Map<String, AggregationResult>)
+					_searchContext.getAttribute(_AGGREGATION_RESULTS_MAP);
+
+			if (map != null) {
+				return map;
+			}
+
+			return Collections.emptyMap();
+		}
+
+		@Override
 		public String getRequestString() {
 			return GetterUtil.getString(
 				_searchContext.getAttribute(_REQUEST_STRING));
@@ -91,6 +130,9 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 		}
 
 	}
+
+	private static final String _AGGREGATION_RESULTS_MAP =
+		"aggregation.results.map";
 
 	private static final String _QUERY_STRING = "queryString";
 
