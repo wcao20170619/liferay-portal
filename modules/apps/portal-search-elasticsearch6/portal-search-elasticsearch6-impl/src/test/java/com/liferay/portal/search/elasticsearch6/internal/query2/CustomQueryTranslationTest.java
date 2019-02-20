@@ -14,8 +14,9 @@
 
 package com.liferay.portal.search.elasticsearch6.internal.query2;
 
-import com.liferay.portal.search.query.BaseQueryImpl;
+import com.liferay.portal.search.internal.query.CustomQueryImpl;
 import com.liferay.portal.search.query.CustomQuery;
+import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.QueryTranslator;
 import com.liferay.portal.search.query.QueryVisitor;
 import com.liferay.portal.search.spi.query.CustomQueryTranslatorContributor;
@@ -75,19 +76,35 @@ public class CustomQueryTranslationTest {
 			registerCustomQueryTranslatorContributor(
 				customQueryTranslatorContributor);
 
-		CustomQuery customQuery = new CustomQuery(new CustomTestQuery());
+		CustomQuery customQuery = new CustomQueryImpl(new CustomTestQuery());
 
 		QueryBuilder queryBuilder = _queryTranslator.translate(customQuery);
 
 		Assert.assertSame(customQueryBuilder, queryBuilder);
 	}
 
-	public class CustomTestQuery extends BaseQueryImpl {
+	public class CustomTestQuery implements Query {
 
 		@Override
 		public <T> T accept(QueryVisitor<T> queryVisitor) {
 			return null;
 		}
+
+		@Override
+		public Float getBoost() {
+			return null;
+		}
+
+		@Override
+		public boolean isDefaultBoost() {
+			return false;
+		}
+
+		@Override
+		public void setBoost(Float boost) {
+		}
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
