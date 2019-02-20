@@ -16,48 +16,20 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.ArrayUtil;
-
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class IdsQuery extends BaseQueryImpl implements Query {
+public interface IdsQuery extends Query {
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public void addIds(String... ids);
 
-	public void addIds(String... ids) {
-		if (ArrayUtil.isEmpty(ids)) {
-			return;
-		}
+	public void addTypes(String... types);
 
-		Collections.addAll(_ids, ids);
-	}
+	public Set<String> getIds();
 
-	public void addTypes(String... types) {
-		if (ArrayUtil.isEmpty(types)) {
-			return;
-		}
-
-		Collections.addAll(_types, types);
-	}
-
-	public Set<String> getIds() {
-		return Collections.unmodifiableSet(_ids);
-	}
-
-	public Set<String> getTypes() {
-		return Collections.unmodifiableSet(_types);
-	}
-
-	private final Set<String> _ids = new HashSet<>();
-	private final Set<String> _types = new HashSet<>();
+	public Set<String> getTypes();
 
 }

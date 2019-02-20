@@ -20,54 +20,22 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class MatchPhrasePrefixQuery extends BaseQueryImpl implements Query {
+public interface MatchPhrasePrefixQuery extends Query {
 
-	public MatchPhrasePrefixQuery(String field, Object value) {
-		_field = field;
-		_value = value;
-	}
+	public String getAnalyzer();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getField();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public Integer getMaxExpansions();
 
-	public String getField() {
-		return _field;
-	}
+	public Integer getSlop();
 
-	public Integer getMaxExpansions() {
-		return _maxExpansions;
-	}
+	public Object getValue();
 
-	public Integer getSlop() {
-		return _slop;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public Object getValue() {
-		return _value;
-	}
+	public void setMaxExpansions(Integer maxExpansions);
 
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setMaxExpansions(Integer maxExpansions) {
-		_maxExpansions = maxExpansions;
-	}
-
-	public void setSlop(Integer slop) {
-		_slop = slop;
-	}
-
-	private String _analyzer;
-	private final String _field;
-	private Integer _maxExpansions;
-	private Integer _slop;
-	private final Object _value;
+	public void setSlop(Integer slop);
 
 }

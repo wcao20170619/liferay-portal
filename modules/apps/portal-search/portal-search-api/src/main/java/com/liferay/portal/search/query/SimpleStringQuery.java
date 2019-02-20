@@ -16,10 +16,6 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -35,136 +31,51 @@ import java.util.Map;
  * @author Michael C. Han
  */
 @ProviderType
-public class SimpleStringQuery extends BaseQueryImpl implements Query {
+public interface SimpleStringQuery extends Query {
 
-	public SimpleStringQuery(String query) {
-		_query = query;
-	}
+	public void addField(String field, float boost);
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public void addFields(String... fields);
 
-	public void addField(String field, float boost) {
-		_fieldBoostMap.put(field, boost);
-	}
+	public String getAnalyzer();
 
-	public void addFields(String... fields) {
-		for (String field : fields) {
-			_fieldBoostMap.put(field, BOOST_DEFAULT);
-		}
-	}
+	public Boolean getAnalyzeWildcard();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public Boolean getAutoGenerateSynonymsPhraseQuery();
 
-	public Boolean getAnalyzeWildcard() {
-		return _analyzeWildcard;
-	}
+	public Operator getDefaultOperator();
 
-	public Boolean getAutoGenerateSynonymsPhraseQuery() {
-		return _autoGenerateSynonymsPhraseQuery;
-	}
+	public Map<String, Float> getFieldBoostMap();
 
-	public Operator getDefaultOperator() {
-		return _defaultOperator;
-	}
+	public Integer getFuzzyMaxExpansions();
 
-	public Map<String, Float> getFieldBoostMap() {
-		return Collections.unmodifiableMap(_fieldBoostMap);
-	}
+	public Integer getFuzzyPrefixLength();
 
-	public Integer getFuzzyMaxExpansions() {
-		return _fuzzyMaxExpansions;
-	}
+	public Boolean getFuzzyTranspositions();
 
-	public Integer getFuzzyPrefixLength() {
-		return _fuzzyPrefixLength;
-	}
+	public Boolean getLenient();
 
-	public Boolean getFuzzyTranspositions() {
-		return _fuzzyTranspositions;
-	}
+	public String getQuery();
 
-	public Boolean getLenient() {
-		return _lenient;
-	}
+	public String getQuoteFieldSuffix();
 
-	public String getQuery() {
-		return _query;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public String getQuoteFieldSuffix() {
-		return _quoteFieldSuffix;
-	}
-
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setAnalyzeWildcard(Boolean analyzeWildcard) {
-		_analyzeWildcard = analyzeWildcard;
-	}
+	public void setAnalyzeWildcard(Boolean analyzeWildcard);
 
 	public void setAutoGenerateSynonymsPhraseQuery(
-		Boolean autoGenerateSynonymsPhraseQuery) {
+		Boolean autoGenerateSynonymsPhraseQuery);
 
-		_autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery;
-	}
+	public void setDefaultOperator(Operator defaultOperator);
 
-	public void setDefaultOperator(Operator defaultOperator) {
-		_defaultOperator = defaultOperator;
-	}
+	public void setFuzzyMaxExpansions(Integer fuzzyMaxExpansions);
 
-	public void setFuzzyMaxExpansions(Integer fuzzyMaxExpansions) {
-		_fuzzyMaxExpansions = fuzzyMaxExpansions;
-	}
+	public void setFuzzyPrefixLength(Integer fuzzyPrefixLength);
 
-	public void setFuzzyPrefixLength(Integer fuzzyPrefixLength) {
-		_fuzzyPrefixLength = fuzzyPrefixLength;
-	}
+	public void setFuzzyTranspositions(Boolean fuzzyTranspositions);
 
-	public void setFuzzyTranspositions(Boolean fuzzyTranspositions) {
-		_fuzzyTranspositions = fuzzyTranspositions;
-	}
+	public void setLenient(Boolean lenient);
 
-	public void setLenient(Boolean lenient) {
-		_lenient = lenient;
-	}
-
-	public void setQuoteFieldSuffix(String quoteFieldSuffix) {
-		_quoteFieldSuffix = quoteFieldSuffix;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", query=");
-		sb.append(_query);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private String _analyzer;
-	private Boolean _analyzeWildcard;
-	private Boolean _autoGenerateSynonymsPhraseQuery;
-	private Operator _defaultOperator;
-	private Map<String, Float> _fieldBoostMap = new HashMap<>();
-	private Integer _fuzzyMaxExpansions;
-	private Integer _fuzzyPrefixLength;
-	private Boolean _fuzzyTranspositions;
-	private Boolean _lenient;
-	private final String _query;
-	private String _quoteFieldSuffix;
+	public void setQuoteFieldSuffix(String quoteFieldSuffix);
 
 }

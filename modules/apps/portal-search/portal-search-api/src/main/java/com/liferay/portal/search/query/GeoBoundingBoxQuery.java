@@ -24,69 +24,26 @@ import com.liferay.portal.search.query.geolocation.GeoValidationMethod;
  * @author Michael C. Han
  */
 @ProviderType
-public class GeoBoundingBoxQuery extends BaseQueryImpl implements Query {
+public interface GeoBoundingBoxQuery extends Query {
 
-	public GeoBoundingBoxQuery(
-		String field, GeoLocationPoint topLeftGeoLocationPoint,
-		GeoLocationPoint bottomRightGeoLocationPoint) {
+	public GeoLocationPoint getBottomRightGeoLocationPoint();
 
-		_field = field;
-		_topLeftGeoLocationPoint = topLeftGeoLocationPoint;
-		_bottomRightGeoLocationPoint = bottomRightGeoLocationPoint;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public GeoExecType getGeoExecType();
 
-	public GeoLocationPoint getBottomRightGeoLocationPoint() {
-		return _bottomRightGeoLocationPoint;
-	}
+	public GeoValidationMethod getGeoValidationMethod();
 
-	public String getField() {
-		return _field;
-	}
+	public Boolean getIgnoreUnmapped();
 
-	public GeoExecType getGeoExecType() {
-		return _geoExecType;
-	}
+	public int getSortOrder();
 
-	public GeoValidationMethod getGeoValidationMethod() {
-		return _geoValidationMethod;
-	}
+	public GeoLocationPoint getTopLeftGeoLocationPoint();
 
-	public Boolean getIgnoreUnmapped() {
-		return _ignoreUnmapped;
-	}
+	public void setGeoExecType(GeoExecType geoExecType);
 
-	public int getSortOrder() {
-		return 120;
-	}
+	public void setGeoValidationMethod(GeoValidationMethod geoValidationMethod);
 
-	public GeoLocationPoint getTopLeftGeoLocationPoint() {
-		return _topLeftGeoLocationPoint;
-	}
-
-	public void setGeoExecType(GeoExecType geoExecType) {
-		_geoExecType = geoExecType;
-	}
-
-	public void setGeoValidationMethod(
-		GeoValidationMethod geoValidationMethod) {
-
-		_geoValidationMethod = geoValidationMethod;
-	}
-
-	public void setIgnoreUnmapped(Boolean ignoreUnmapped) {
-		_ignoreUnmapped = ignoreUnmapped;
-	}
-
-	private final GeoLocationPoint _bottomRightGeoLocationPoint;
-	private final String _field;
-	private GeoExecType _geoExecType;
-	private GeoValidationMethod _geoValidationMethod;
-	private Boolean _ignoreUnmapped;
-	private final GeoLocationPoint _topLeftGeoLocationPoint;
+	public void setIgnoreUnmapped(Boolean ignoreUnmapped);
 
 }

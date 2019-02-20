@@ -16,66 +16,20 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.TimeZoneUtil;
-
 import java.util.TimeZone;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class DateRangeTermQuery extends RangeTermQuery {
+public interface DateRangeTermQuery extends RangeTermQuery {
 
-	public DateRangeTermQuery(
-		String field, boolean includesLower, boolean includesUpper,
-		String startDate, String endDate) {
+	public String getDateFormat();
 
-		super(field, includesLower, includesUpper, startDate, endDate);
-	}
+	public TimeZone getTimeZone();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public void setDateFormat(String dateFormat);
 
-	public String getDateFormat() {
-		return _dateFormat;
-	}
-
-	@Override
-	public int getSortOrder() {
-		return 25;
-	}
-
-	public TimeZone getTimeZone() {
-		return _timeZone;
-	}
-
-	public void setDateFormat(String dateFormat) {
-		_dateFormat = dateFormat;
-	}
-
-	public void setTimeZone(TimeZone timeZone) {
-		_timeZone = timeZone;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{(");
-		sb.append(super.toString());
-		sb.append("), ");
-		sb.append(_dateFormat);
-		sb.append(", ");
-		sb.append(_timeZone);
-		sb.append(")}");
-
-		return sb.toString();
-	}
-
-	private String _dateFormat = "yyyyMMddHHmmss";
-	private TimeZone _timeZone = TimeZoneUtil.getDefault();
+	public void setTimeZone(TimeZone timeZone);
 
 }

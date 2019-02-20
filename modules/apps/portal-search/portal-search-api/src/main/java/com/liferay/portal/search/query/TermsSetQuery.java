@@ -16,71 +16,30 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.search.script.Script;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class TermsSetQuery extends BaseQueryImpl implements Query {
+public interface TermsSetQuery extends Query {
 
-	public TermsSetQuery(String fieldName, List<Object> values) {
-		_fieldName = fieldName;
-		_values = values;
-	}
+	public String getFieldName();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getMinimumShouldMatchField();
 
-	public String getFieldName() {
-		return _fieldName;
-	}
+	public Script getMinimumShouldMatchScript();
 
-	public String getMinimumShouldMatchField() {
-		return _minimumShouldMatchField;
-	}
+	public List<Object> getValues();
 
-	public Script getMinimumShouldMatchScript() {
-		return _minimumShouldMatchScript;
-	}
+	public Boolean isCached();
 
-	public List<Object> getValues() {
-		return Collections.unmodifiableList(_values);
-	}
+	public void setCached(Boolean cached);
 
-	public Boolean isCached() {
-		return _cached;
-	}
+	public String setMinimumShouldMatchField(String minimumShouldMatchField);
 
-	public void setCached(Boolean cached) {
-		_cached = cached;
-	}
-
-	public String setMinimumShouldMatchField(String minimumShouldMatchField) {
-		return _minimumShouldMatchField = minimumShouldMatchField;
-	}
-
-	public void setMinimumShouldMatchScript(Script minimumShouldMatchScript) {
-		_minimumShouldMatchScript = minimumShouldMatchScript;
-	}
-
-	@Override
-	public String toString() {
-		return StringBundler.concat(
-			"{(", _fieldName, "=", _values, "), (minimum_should_match_field=",
-			_minimumShouldMatchField, ")}");
-	}
-
-	private Boolean _cached = Boolean.TRUE;
-	private final String _fieldName;
-	private String _minimumShouldMatchField;
-	private Script _minimumShouldMatchScript;
-	private final List<Object> _values;
+	public void setMinimumShouldMatchScript(Script minimumShouldMatchScript);
 
 }

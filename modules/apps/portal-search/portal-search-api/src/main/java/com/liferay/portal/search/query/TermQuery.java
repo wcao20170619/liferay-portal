@@ -16,52 +16,14 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Brian Wing Shun Chan
  */
 @ProviderType
-public class TermQuery extends BaseQueryImpl implements Query {
+public interface TermQuery extends Query {
 
-	public TermQuery(String field, Object value) {
-		_field = field;
-		_value = value;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public String getField() {
-		return _field;
-	}
-
-	public Object getValue() {
-		return _value;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", field=");
-		sb.append(_field);
-		sb.append(", value=");
-		sb.append(_value);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
-	private final Object _value;
+	public Object getValue();
 
 }

@@ -20,21 +20,8 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class ConstantScoreQuery extends BaseQueryImpl implements Query {
+public interface ConstantScoreQuery extends Query {
 
-	public ConstantScoreQuery(Query query) {
-		_query = query;
-	}
-
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public Query getQuery() {
-		return _query;
-	}
-
-	private final Query _query;
+	public Query getQuery();
 
 }

@@ -20,36 +20,14 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class BoostingQuery extends BaseQueryImpl implements Query {
+public interface BoostingQuery extends Query {
 
-	public BoostingQuery(Query positiveQuery, Query negativeQuery) {
-		_positiveQuery = positiveQuery;
-		_negativeQuery = negativeQuery;
-	}
+	public Float getNegativeBoost();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public Query getNegativeQuery();
 
-	public Float getNegativeBoost() {
-		return _negativeBoost;
-	}
+	public Query getPositiveQuery();
 
-	public Query getNegativeQuery() {
-		return _negativeQuery;
-	}
-
-	public Query getPositiveQuery() {
-		return _positiveQuery;
-	}
-
-	public void setNegativeBoost(Float negativeBoost) {
-		_negativeBoost = negativeBoost;
-	}
-
-	private Float _negativeBoost;
-	private final Query _negativeQuery;
-	private final Query _positiveQuery;
+	public void setNegativeBoost(Float negativeBoost);
 
 }

@@ -16,99 +16,33 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class RangeTermQuery extends BaseQueryImpl {
+public interface RangeTermQuery extends Query {
 
-	public RangeTermQuery(
-		String field, boolean includesLower, boolean includesUpper) {
+	public String getField();
 
-		_field = field;
-		_includesLower = includesLower;
-		_includesUpper = includesUpper;
+	public Object getLowerBound();
 
-		setOperators(includesLower, includesUpper);
-	}
+	public Operator getLowerBoundOperator();
 
-	public RangeTermQuery(
-		String field, boolean includesLower, boolean includesUpper,
-		Object lowerBound, Object upperBound) {
+	public int getSortOrder();
 
-		_field = field;
-		_includesLower = includesLower;
-		_includesUpper = includesUpper;
-		_lowerBound = lowerBound;
-		_upperBound = upperBound;
+	public Object getUpperBound();
 
-		setOperators(includesLower, includesUpper);
-	}
+	public Operator getUpperBoundOperator();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public boolean isIncludesLower();
 
-	public String getField() {
-		return _field;
-	}
+	public boolean isIncludesUpper();
 
-	public Object getLowerBound() {
-		return _lowerBound;
-	}
+	public void setLowerBound(Object lowerBound);
 
-	public Operator getLowerBoundOperator() {
-		return _lowerBoundOperator;
-	}
-
-	public int getSortOrder() {
-		return 20;
-	}
-
-	public Object getUpperBound() {
-		return _upperBound;
-	}
-
-	public Operator getUpperBoundOperator() {
-		return _upperBoundOperator;
-	}
-
-	public boolean isIncludesLower() {
-		return _includesLower;
-	}
-
-	public boolean isIncludesUpper() {
-		return _includesUpper;
-	}
-
-	public void setLowerBound(Object lowerBound) {
-		_lowerBound = lowerBound;
-	}
-
-	public void setUpperBound(Object upperBound) {
-		_upperBound = upperBound;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("{(");
-		sb.append(_lowerBound);
-		sb.append(_lowerBoundOperator);
-		sb.append(_field);
-		sb.append(_upperBoundOperator);
-		sb.append(_upperBound);
-		sb.append("), ");
-		sb.append(super.toString());
-		sb.append("}");
-
-		return sb.toString();
-	}
+	public void setUpperBound(Object upperBound);
 
 	public enum Operator {
 
@@ -135,29 +69,5 @@ public class RangeTermQuery extends BaseQueryImpl {
 		}
 
 	}
-
-	protected void setOperators(boolean includesLower, boolean includesUpper) {
-		if (includesLower) {
-			_lowerBoundOperator = Operator.GTE;
-		}
-		else {
-			_lowerBoundOperator = Operator.GT;
-		}
-
-		if (includesUpper) {
-			_upperBoundOperator = Operator.LTE;
-		}
-		else {
-			_upperBoundOperator = Operator.LT;
-		}
-	}
-
-	private final String _field;
-	private final boolean _includesLower;
-	private final boolean _includesUpper;
-	private Object _lowerBound;
-	private Operator _lowerBoundOperator;
-	private Object _upperBound;
-	private Operator _upperBoundOperator;
 
 }

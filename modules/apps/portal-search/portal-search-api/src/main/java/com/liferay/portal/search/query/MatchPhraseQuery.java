@@ -20,45 +20,18 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class MatchPhraseQuery extends BaseQueryImpl implements Query {
+public interface MatchPhraseQuery extends Query {
 
-	public MatchPhraseQuery(String field, Object value) {
-		_field = field;
-		_value = value;
-	}
+	public String getAnalyzer();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getField();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public Integer getSlop();
 
-	public String getField() {
-		return _field;
-	}
+	public Object getValue();
 
-	public Integer getSlop() {
-		return _slop;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public Object getValue() {
-		return _value;
-	}
-
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setSlop(Integer slop) {
-		_slop = slop;
-	}
-
-	private String _analyzer;
-	private final String _field;
-	private Integer _slop;
-	private final Object _value;
+	public void setSlop(Integer slop);
 
 }

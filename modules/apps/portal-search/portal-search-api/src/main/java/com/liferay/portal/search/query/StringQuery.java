@@ -16,8 +16,6 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * Provides support for parsing raw, human readable query syntax. No
  * transformation is made on user input.
@@ -31,202 +29,81 @@ import com.liferay.petra.string.StringBundler;
  * @author Bruno Farache
  */
 @ProviderType
-public class StringQuery extends BaseQueryImpl implements Query {
+public interface StringQuery extends Query {
 
-	public StringQuery(String query) {
-		_query = query;
-	}
+	public Boolean getAllowLeadingWildcard();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getAnalyzer();
 
-	public Boolean getAllowLeadingWildcard() {
-		return _allowLeadingWildcard;
-	}
+	public Boolean getAnalyzeWildcard();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public Boolean getAutoGenerateSynonymsPhraseQuery();
 
-	public Boolean getAnalyzeWildcard() {
-		return _analyzeWildcard;
-	}
+	public String getDefaultField();
 
-	public Boolean getAutoGenerateSynonymsPhraseQuery() {
-		return _autoGenerateSynonymsPhraseQuery;
-	}
+	public Operator getDefaultOperator();
 
-	public String getDefaultField() {
-		return _defaultField;
-	}
+	public Boolean getEnablePositionIncrements();
 
-	public Operator getDefaultOperator() {
-		return _defaultOperator;
-	}
+	public Float getFuzziness();
 
-	public Boolean getEnablePositionIncrements() {
-		return _enablePositionIncrements;
-	}
+	public Integer getFuzzyMaxExpansions();
 
-	public Float getFuzziness() {
-		return _fuzziness;
-	}
+	public Integer getFuzzyPrefixLength();
 
-	public Integer getFuzzyMaxExpansions() {
-		return _fuzzyMaxExpansions;
-	}
+	public Boolean getFuzzyTranspositions();
 
-	public Integer getFuzzyPrefixLength() {
-		return _fuzzyPrefixLength;
-	}
+	public Boolean getLenient();
 
-	public Boolean getFuzzyTranspositions() {
-		return _fuzzyTranspositions;
-	}
+	public Integer getMaxDeterminedStates();
 
-	public Boolean getLenient() {
-		return _lenient;
-	}
+	public Integer getPhraseSlop();
 
-	public Integer getMaxDeterminedStates() {
-		return _maxDeterminedStates;
-	}
+	public String getQuery();
 
-	public Integer getPhraseSlop() {
-		return _phraseSlop;
-	}
+	public String getQuoteAnalyzer();
 
-	public String getQuery() {
-		return _query;
-	}
+	public String getQuoteFieldSuffix();
 
-	public String getQuoteAnalyzer() {
-		return _quoteAnalyzer;
-	}
+	public String getRewrite();
 
-	public String getQuoteFieldSuffix() {
-		return _quoteFieldSuffix;
-	}
+	public String getTimeZone();
 
-	public String getRewrite() {
-		return _rewrite;
-	}
+	public void setAllowLeadingWildcard(Boolean allowLeadingWildcard);
 
-	public String getTimeZone() {
-		return _timeZone;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public void setAllowLeadingWildcard(Boolean allowLeadingWildcard) {
-		_allowLeadingWildcard = allowLeadingWildcard;
-	}
-
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setAnalyzeWildcard(Boolean analyzeWildcard) {
-		_analyzeWildcard = analyzeWildcard;
-	}
+	public void setAnalyzeWildcard(Boolean analyzeWildcard);
 
 	public void setAutoGenerateSynonymsPhraseQuery(
-		Boolean autoGenerateSynonymsPhraseQuery) {
+		Boolean autoGenerateSynonymsPhraseQuery);
 
-		_autoGenerateSynonymsPhraseQuery = autoGenerateSynonymsPhraseQuery;
-	}
+	public void setDefaultField(String defaultField);
 
-	public void setDefaultField(String defaultField) {
-		_defaultField = defaultField;
-	}
+	public void setDefaultOperator(Operator defaultOperator);
 
-	public void setDefaultOperator(Operator defaultOperator) {
-		_defaultOperator = defaultOperator;
-	}
+	public void setEnablePositionIncrements(Boolean enablePositionIncrements);
 
-	public void setEnablePositionIncrements(Boolean enablePositionIncrements) {
-		_enablePositionIncrements = enablePositionIncrements;
-	}
+	public void setFuzziness(Float fuzziness);
 
-	public void setFuzziness(Float fuzziness) {
-		_fuzziness = fuzziness;
-	}
+	public void setFuzzyMaxExpansions(Integer fuzzyMaxExpansions);
 
-	public void setFuzzyMaxExpansions(Integer fuzzyMaxExpansions) {
-		_fuzzyMaxExpansions = fuzzyMaxExpansions;
-	}
+	public void setFuzzyPrefixLength(Integer fuzzyPrefixLength);
 
-	public void setFuzzyPrefixLength(Integer fuzzyPrefixLength) {
-		_fuzzyPrefixLength = fuzzyPrefixLength;
-	}
+	public void setFuzzyTranspositions(Boolean fuzzyTranspositions);
 
-	public void setFuzzyTranspositions(Boolean fuzzyTranspositions) {
-		_fuzzyTranspositions = fuzzyTranspositions;
-	}
+	public void setLenient(Boolean lenient);
 
-	public void setLenient(Boolean lenient) {
-		_lenient = lenient;
-	}
+	public void setMaxDeterminedStates(Integer maxDeterminedStates);
 
-	public void setMaxDeterminedStates(Integer maxDeterminedStates) {
-		_maxDeterminedStates = maxDeterminedStates;
-	}
+	public void setPhraseSlop(Integer phraseSlop);
 
-	public void setPhraseSlop(Integer phraseSlop) {
-		_phraseSlop = phraseSlop;
-	}
+	public void setQuoteAnalyzer(String quoteAnalyzer);
 
-	public void setQuoteAnalyzer(String quoteAnalyzer) {
-		_quoteAnalyzer = quoteAnalyzer;
-	}
+	public void setQuoteFieldSuffix(String quoteFieldSuffix);
 
-	public void setQuoteFieldSuffix(String quoteFieldSuffix) {
-		_quoteFieldSuffix = quoteFieldSuffix;
-	}
+	public void setRewrite(String rewrite);
 
-	public void setRewrite(String rewrite) {
-		_rewrite = rewrite;
-	}
-
-	public void setTimeZone(String timeZone) {
-		_timeZone = timeZone;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", query=");
-		sb.append(_query);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private Boolean _allowLeadingWildcard;
-	private String _analyzer;
-	private Boolean _analyzeWildcard;
-	private Boolean _autoGenerateSynonymsPhraseQuery;
-	private String _defaultField;
-	private Operator _defaultOperator;
-	private Boolean _enablePositionIncrements;
-	private Float _fuzziness;
-	private Integer _fuzzyMaxExpansions;
-	private Integer _fuzzyPrefixLength;
-	private Boolean _fuzzyTranspositions;
-	private Boolean _lenient;
-	private Integer _maxDeterminedStates;
-	private Integer _phraseSlop;
-	private final String _query;
-	private String _quoteAnalyzer;
-	private String _quoteFieldSuffix;
-	private String _rewrite;
-	private String _timeZone;
+	public void setTimeZone(String timeZone);
 
 }

@@ -16,322 +16,98 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class MoreLikeThisQuery extends BaseQueryImpl {
+public interface MoreLikeThisQuery extends Query {
 
-	public MoreLikeThisQuery(List<String> likeTexts) {
-		_likeTexts.addAll(likeTexts);
-	}
-
-	public MoreLikeThisQuery(String... likeTexts) {
-		Collections.addAll(_likeTexts, likeTexts);
-	}
-
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public void addDocumentIdentifier(DocumentIdentifier documentIdentifier) {
-		_documentIdentifiers.add(documentIdentifier);
-	}
+	public void addDocumentIdentifier(DocumentIdentifier documentIdentifier);
 
 	public void addDocumentIdentifiers(
-		Collection<DocumentIdentifier> documentIdentifiers) {
-
-		_documentIdentifiers.addAll(documentIdentifiers);
-	}
+		Collection<DocumentIdentifier> documentIdentifiers);
 
 	public void addDocumentIdentifiers(
-		DocumentIdentifier... documentIdentifiers) {
+		DocumentIdentifier... documentIdentifiers);
 
-		Collections.addAll(_documentIdentifiers, documentIdentifiers);
-	}
+	public void addLikeText(String likeText);
 
-	public void addLikeText(String likeText) {
-		_likeTexts.add(likeText);
-	}
+	public void addLikeTexts(Collection<String> likeTexts);
 
-	public void addLikeTexts(Collection<String> likeTexts) {
-		_likeTexts.addAll(likeTexts);
-	}
+	public void addLikeTexts(String... likeTexts);
 
-	public void addLikeTexts(String... likeTexts) {
-		Collections.addAll(_likeTexts, likeTexts);
-	}
+	public void addStopWord(String stopWord);
 
-	public void addStopWord(String stopWord) {
-		_stopWords.add(stopWord);
-	}
+	public void addStopWords(Collection<String> stopWords);
 
-	public void addStopWords(Collection<String> stopWords) {
-		_stopWords.addAll(stopWords);
-	}
+	public void addStopWords(String... stopWords);
 
-	public void addStopWords(String... stopWords) {
-		Collections.addAll(_stopWords, stopWords);
-	}
+	public String getAnalyzer();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public Set<DocumentIdentifier> getDocumentIdentifiers();
 
-	public Set<DocumentIdentifier> getDocumentIdentifiers() {
-		return Collections.unmodifiableSet(_documentIdentifiers);
-	}
+	public List<String> getLikeTexts();
 
-	public List<String> getLikeTexts() {
-		return Collections.unmodifiableList(_likeTexts);
-	}
+	public Integer getMaxDocFrequency();
 
-	public Integer getMaxDocFrequency() {
-		return _maxDocFrequency;
-	}
+	public Integer getMaxQueryTerms();
 
-	public Integer getMaxQueryTerms() {
-		return _maxQueryTerms;
-	}
+	public Integer getMaxWordLength();
 
-	public Integer getMaxWordLength() {
-		return _maxWordLength;
-	}
+	public Integer getMinDocFrequency();
 
-	public Integer getMinDocFrequency() {
-		return _minDocFrequency;
-	}
+	public String getMinShouldMatch();
 
-	public String getMinShouldMatch() {
-		return _minShouldMatch;
-	}
+	public Integer getMinTermFrequency();
 
-	public Integer getMinTermFrequency() {
-		return _minTermFrequency;
-	}
+	public Integer getMinWordLength();
 
-	public Integer getMinWordLength() {
-		return _minWordLength;
-	}
+	public Set<String> getStopWords();
 
-	public Set<String> getStopWords() {
-		return Collections.unmodifiableSet(_stopWords);
-	}
+	public Float getTermBoost();
 
-	public Float getTermBoost() {
-		return _termBoost;
-	}
+	public String getType();
 
-	public String getType() {
-		return _type;
-	}
+	public boolean isDocumentUIDsEmpty();
 
-	public boolean isDocumentUIDsEmpty() {
-		return _documentIdentifiers.isEmpty();
-	}
+	public boolean isFieldsEmpty();
 
-	public boolean isFieldsEmpty() {
-		return _likeTexts.isEmpty();
-	}
+	public Boolean isIncludeInput();
 
-	public Boolean isIncludeInput() {
-		return _includeInput;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
+	public void setIncludeInput(Boolean includeInput);
 
-	public void setIncludeInput(Boolean includeInput) {
-		_includeInput = includeInput;
-	}
+	public void setMaxDocFrequency(Integer maxDocFrequency);
 
-	public void setMaxDocFrequency(Integer maxDocFrequency) {
-		_maxDocFrequency = maxDocFrequency;
-	}
+	public void setMaxQueryTerms(Integer maxQueryTerms);
 
-	public void setMaxQueryTerms(Integer maxQueryTerms) {
-		_maxQueryTerms = maxQueryTerms;
-	}
+	public void setMaxWordLength(Integer maxWordLength);
 
-	public void setMaxWordLength(Integer maxWordLength) {
-		_maxWordLength = maxWordLength;
-	}
+	public void setMinDocFrequency(Integer minDocFrequency);
 
-	public void setMinDocFrequency(Integer minDocFrequency) {
-		_minDocFrequency = minDocFrequency;
-	}
+	public void setMinShouldMatch(String minShouldMatch);
 
-	public void setMinShouldMatch(String minShouldMatch) {
-		_minShouldMatch = minShouldMatch;
-	}
+	public void setMinTermFrequency(Integer minTermFrequency);
 
-	public void setMinTermFrequency(Integer minTermFrequency) {
-		_minTermFrequency = minTermFrequency;
-	}
+	public void setMinWordLength(Integer minWordLength);
 
-	public void setMinWordLength(Integer minWordLength) {
-		_minWordLength = minWordLength;
-	}
+	public void setTermBoost(Float termBoost);
 
-	public void setTermBoost(Float termBoost) {
-		_termBoost = termBoost;
-	}
+	public void setType(String type);
 
-	public void setType(String type) {
-		_type = type;
-	}
+	public interface DocumentIdentifier {
 
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(33);
+		public String getId();
 
-		sb.append("{analyzer=");
-		sb.append(_analyzer);
-		sb.append(", className=");
+		public String getIndex();
 
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", documentIdentifiers=");
-		sb.append(_documentIdentifiers);
-		sb.append(", fields=");
-		sb.append(_likeTexts);
-		sb.append(", includeInput=");
-		sb.append(_includeInput);
-		sb.append(", likeTexts=");
-		sb.append(_likeTexts);
-		sb.append(", maxDocFrequency=");
-		sb.append(_maxDocFrequency);
-		sb.append(", maxQueryTerms=");
-		sb.append(_maxQueryTerms);
-		sb.append(", maxWordLength=");
-		sb.append(_maxWordLength);
-		sb.append(", minDocFrequency=");
-		sb.append(_minDocFrequency);
-		sb.append(", minShouldMatch=");
-		sb.append(_minShouldMatch);
-		sb.append(", minTermFrequency=");
-		sb.append(_minTermFrequency);
-		sb.append(", minWordLength=");
-		sb.append(_minWordLength);
-		sb.append(", stopWords=");
-		sb.append(_stopWords);
-		sb.append(", termBoost=");
-		sb.append(_termBoost);
-		sb.append(", type=");
-		sb.append(_type);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	public class DocumentIdentifier {
-
-		public DocumentIdentifier(String index, String id) {
-			_index = index;
-			_id = id;
-			_type = null;
-		}
-
-		public DocumentIdentifier(String index, String type, String id) {
-			_index = index;
-			_type = type;
-			_id = id;
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			if (this == object) {
-				return true;
-			}
-
-			if ((object == null) || (getClass() != object.getClass())) {
-				return false;
-			}
-
-			DocumentIdentifier documentIdentifier = (DocumentIdentifier)object;
-
-			if (Objects.equals(_index, documentIdentifier._index) &&
-				Objects.equals(_type, documentIdentifier._type) &&
-				Objects.equals(_id, documentIdentifier._id)) {
-
-				return true;
-			}
-
-			return false;
-		}
-
-		public String getId() {
-			return _id;
-		}
-
-		public String getIndex() {
-			return _index;
-		}
-
-		public String getType() {
-			return _type;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(_index, _type, _id);
-		}
-
-		@Override
-		public String toString() {
-			StringBundler sb = new StringBundler(9);
-
-			sb.append("{className=");
-
-			Class<?> clazz = getClass();
-
-			sb.append(clazz.getSimpleName());
-
-			sb.append(", id=");
-			sb.append(_id);
-			sb.append(", index=");
-			sb.append(_index);
-			sb.append(", type=");
-			sb.append(_type);
-			sb.append("}");
-
-			return sb.toString();
-		}
-
-		private final String _id;
-		private final String _index;
-		private final String _type;
+		public String getType();
 
 	}
-
-	private String _analyzer;
-	private final Set<DocumentIdentifier> _documentIdentifiers =
-		new HashSet<>();
-	private Boolean _includeInput;
-	private final List<String> _likeTexts = new ArrayList<>();
-	private Integer _maxDocFrequency;
-	private Integer _maxQueryTerms;
-	private Integer _maxWordLength;
-	private Integer _minDocFrequency;
-	private String _minShouldMatch;
-	private Integer _minTermFrequency;
-	private Integer _minWordLength;
-	private final Set<String> _stopWords = new HashSet<>();
-	private Float _termBoost;
-	private String _type;
 
 }

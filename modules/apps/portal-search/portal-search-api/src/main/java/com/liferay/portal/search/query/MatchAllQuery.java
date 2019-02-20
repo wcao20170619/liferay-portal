@@ -20,18 +20,5 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class MatchAllQuery extends BaseQueryImpl {
-
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	@Override
-	public String toString() {
-		Class<?> clazz = getClass();
-
-		return "{className=" + clazz.getSimpleName() + "}";
-	}
-
+public interface MatchAllQuery extends Query {
 }

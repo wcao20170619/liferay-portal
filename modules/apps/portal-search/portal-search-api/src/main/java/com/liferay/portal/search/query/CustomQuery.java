@@ -14,24 +14,14 @@
 
 package com.liferay.portal.search.query;
 
+import aQute.bnd.annotation.ProviderType;
+
 /**
  * @author Michael C. Han
  */
-public class CustomQuery extends BaseQueryImpl {
+@ProviderType
+public interface CustomQuery extends Query {
 
-	public CustomQuery(Query delegate) {
-		_delegate = delegate;
-	}
-
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public Query getDelegate() {
-		return _delegate;
-	}
-
-	private final Query _delegate;
+	public Query getDelegate();
 
 }

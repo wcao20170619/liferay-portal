@@ -24,60 +24,22 @@ import com.liferay.portal.search.query.geolocation.GeoValidationMethod;
  * @author Michael C. Han
  */
 @ProviderType
-public class GeoDistanceQuery extends BaseQueryImpl implements Query {
+public interface GeoDistanceQuery extends Query {
 
-	public GeoDistanceQuery(
-		String field, GeoLocationPoint pinGeoLocationPoint,
-		GeoDistance geoDistance) {
+	public String getField();
 
-		_field = field;
-		_pinGeoLocationPoint = pinGeoLocationPoint;
-		_geoDistance = geoDistance;
-	}
+	public GeoDistance getGeoDistance();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public GeoValidationMethod getGeoValidationMethod();
 
-	public String getField() {
-		return _field;
-	}
+	public Boolean getIgnoreUnmapped();
 
-	public GeoDistance getGeoDistance() {
-		return _geoDistance;
-	}
+	public GeoLocationPoint getPinGeoLocationPoint();
 
-	public GeoValidationMethod getGeoValidationMethod() {
-		return _geoValidationMethod;
-	}
+	public int getSortOrder();
 
-	public Boolean getIgnoreUnmapped() {
-		return _ignoreUnmapped;
-	}
+	public void setGeoValidationMethod(GeoValidationMethod geoValidationMethod);
 
-	public GeoLocationPoint getPinGeoLocationPoint() {
-		return _pinGeoLocationPoint;
-	}
-
-	public int getSortOrder() {
-		return 100;
-	}
-
-	public void setGeoValidationMethod(
-		GeoValidationMethod geoValidationMethod) {
-
-		_geoValidationMethod = geoValidationMethod;
-	}
-
-	public void setIgnoreUnmapped(Boolean ignoreUnmapped) {
-		_ignoreUnmapped = ignoreUnmapped;
-	}
-
-	private final String _field;
-	private final GeoDistance _geoDistance;
-	private GeoValidationMethod _geoValidationMethod;
-	private Boolean _ignoreUnmapped;
-	private final GeoLocationPoint _pinGeoLocationPoint;
+	public void setIgnoreUnmapped(Boolean ignoreUnmapped);
 
 }

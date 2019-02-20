@@ -16,63 +16,18 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class WildcardQuery extends BaseQueryImpl implements Query {
+public interface WildcardQuery extends Query {
 
-	public WildcardQuery(String field, String value) {
-		_field = field;
-		_value = value;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getRewrite();
 
-	public String getField() {
-		return _field;
-	}
+	public String getValue();
 
-	public String getRewrite() {
-		return _rewrite;
-	}
-
-	public String getValue() {
-		return _value;
-	}
-
-	public void setRewrite(String rewrite) {
-		_rewrite = rewrite;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", field=");
-		sb.append(_field);
-		sb.append(", rewrite=");
-		sb.append(_rewrite);
-		sb.append(", value=");
-		sb.append(_value);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
-	private String _rewrite;
-	private final String _value;
+	public void setRewrite(String rewrite);
 
 }

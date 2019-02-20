@@ -16,11 +16,6 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,213 +23,75 @@ import java.util.Set;
  * @author Michael C. Han
  */
 @ProviderType
-public class MultiMatchQuery extends BaseQueryImpl {
+public interface MultiMatchQuery extends Query {
 
-	public MultiMatchQuery(Object value, Set<String> fields) {
-		_value = value;
+	public String getAnalyzer();
 
-		_fields.addAll(fields);
-	}
+	public Float getCutOffFrequency();
 
-	public MultiMatchQuery(Object value, String... fields) {
-		_value = value;
+	public Set<String> getFields();
 
-		Collections.addAll(_fields, fields);
-	}
+	public Map<String, Float> getFieldsBoosts();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getFuzziness();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public MatchQuery.RewriteMethod getFuzzyRewriteMethod();
 
-	public Float getCutOffFrequency() {
-		return _cutOffFrequency;
-	}
+	public Integer getMaxExpansions();
 
-	public Set<String> getFields() {
-		return _fields;
-	}
+	public String getMinShouldMatch();
 
-	public Map<String, Float> getFieldsBoosts() {
-		return _fieldsBoosts;
-	}
+	public Operator getOperator();
 
-	public String getFuzziness() {
-		return _fuzziness;
-	}
+	public Integer getPrefixLength();
 
-	public MatchQuery.RewriteMethod getFuzzyRewriteMethod() {
-		return _fuzzyRewriteMethod;
-	}
+	public Integer getSlop();
 
-	public Integer getMaxExpansions() {
-		return _maxExpansions;
-	}
+	public Float getTieBreaker();
 
-	public String getMinShouldMatch() {
-		return _minShouldMatch;
-	}
+	public Type getType();
 
-	public Operator getOperator() {
-		return _operator;
-	}
+	public Object getValue();
 
-	public Integer getPrefixLength() {
-		return _prefixLength;
-	}
+	public MatchQuery.ZeroTermsQuery getZeroTermsQuery();
 
-	public Integer getSlop() {
-		return _slop;
-	}
+	public boolean isFieldBoostsEmpty();
 
-	public Float getTieBreaker() {
-		return _tieBreaker;
-	}
+	public boolean isFieldsEmpty();
 
-	public Type getType() {
-		return _type;
-	}
+	public Boolean isLenient();
 
-	public Object getValue() {
-		return _value;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public MatchQuery.ZeroTermsQuery getZeroTermsQuery() {
-		return _zeroTermsQuery;
-	}
+	public void setCutOffFrequency(Float cutOffFrequency);
 
-	public boolean isFieldBoostsEmpty() {
-		return _fieldsBoosts.isEmpty();
-	}
-
-	public boolean isFieldsEmpty() {
-		return _fields.isEmpty();
-	}
-
-	public Boolean isLenient() {
-		return _lenient;
-	}
-
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setCutOffFrequency(Float cutOffFrequency) {
-		_cutOffFrequency = cutOffFrequency;
-	}
-
-	public void setFuzziness(String fuzziness) {
-		_fuzziness = fuzziness;
-	}
+	public void setFuzziness(String fuzziness);
 
 	public void setFuzzyRewriteMethod(
-		MatchQuery.RewriteMethod fuzzyRewriteMethod) {
+		MatchQuery.RewriteMethod fuzzyRewriteMethod);
 
-		_fuzzyRewriteMethod = fuzzyRewriteMethod;
-	}
+	public void setLenient(Boolean lenient);
 
-	public void setLenient(Boolean lenient) {
-		_lenient = lenient;
-	}
+	public void setMaxExpansions(Integer maxExpansions);
 
-	public void setMaxExpansions(Integer maxExpansions) {
-		_maxExpansions = maxExpansions;
-	}
+	public void setMinShouldMatch(String minShouldMatch);
 
-	public void setMinShouldMatch(String minShouldMatch) {
-		_minShouldMatch = minShouldMatch;
-	}
+	public void setOperator(Operator operator);
 
-	public void setOperator(Operator operator) {
-		_operator = operator;
-	}
+	public void setPrefixLength(Integer prefixLength);
 
-	public void setPrefixLength(Integer prefixLength) {
-		_prefixLength = prefixLength;
-	}
+	public void setSlop(Integer slop);
 
-	public void setSlop(Integer slop) {
-		_slop = slop;
-	}
+	public void setTieBreaker(Float tieBreaker);
 
-	public void setTieBreaker(Float tieBreaker) {
-		_tieBreaker = tieBreaker;
-	}
+	public void setType(Type type);
 
-	public void setType(Type type) {
-		_type = type;
-	}
-
-	public void setZeroTermsQuery(MatchQuery.ZeroTermsQuery zeroTermsQuery) {
-		_zeroTermsQuery = zeroTermsQuery;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(29);
-
-		sb.append("{analyzer=");
-		sb.append(_analyzer);
-		sb.append(", className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", cutOffFrequency=");
-		sb.append(_cutOffFrequency);
-		sb.append(", fields=");
-		sb.append(_fields);
-		sb.append(", fuzziness=");
-		sb.append(_fuzziness);
-		sb.append(", lenient=");
-		sb.append(_lenient);
-		sb.append(", maxExpansions=");
-		sb.append(_maxExpansions);
-		sb.append(", minShouldMatch=");
-		sb.append(_minShouldMatch);
-		sb.append(", operator=");
-		sb.append(_operator);
-		sb.append(", prefixLength=");
-		sb.append(_prefixLength);
-		sb.append(", slop=");
-		sb.append(_slop);
-		sb.append(", tieBreaker=");
-		sb.append(_tieBreaker);
-		sb.append(", type=");
-		sb.append(_type);
-		sb.append(", value=");
-		sb.append(_value);
-		sb.append("}");
-
-		return sb.toString();
-	}
+	public void setZeroTermsQuery(MatchQuery.ZeroTermsQuery zeroTermsQuery);
 
 	public enum Type {
 
 		BEST_FIELDS, CROSS_FIELDS, MOST_FIELDS, PHRASE, PHRASE_PREFIX
 
 	}
-
-	private String _analyzer;
-	private Float _cutOffFrequency;
-	private final Set<String> _fields = new HashSet<>();
-	private final Map<String, Float> _fieldsBoosts = new HashMap<>();
-	private String _fuzziness;
-	private MatchQuery.RewriteMethod _fuzzyRewriteMethod;
-	private Boolean _lenient;
-	private Integer _maxExpansions;
-	private String _minShouldMatch;
-	private Operator _operator;
-	private Integer _prefixLength;
-	private Integer _slop;
-	private Float _tieBreaker;
-	private Type _type;
-	private final Object _value;
-	private MatchQuery.ZeroTermsQuery _zeroTermsQuery;
 
 }

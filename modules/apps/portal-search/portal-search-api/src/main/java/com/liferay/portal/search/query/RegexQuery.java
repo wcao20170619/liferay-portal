@@ -16,13 +16,11 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class RegexQuery extends BaseQueryImpl implements Query {
+public interface RegexQuery extends Query {
 
 	public static final int ALL_SYNTAX_FLAG = 0xffff;
 
@@ -40,76 +38,21 @@ public class RegexQuery extends BaseQueryImpl implements Query {
 
 	public static final int NONE_SYNTAX_FLAG = 0;
 
-	public RegexQuery(String field, String regex) {
-		_field = field;
-		_regex = regex;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public Integer getMaxDeterminedStates();
 
-	public String getField() {
-		return _field;
-	}
+	public String getRegex();
 
-	public Integer getMaxDeterminedStates() {
-		return _maxDeterminedStates;
-	}
+	public Integer getRegexFlags();
 
-	public String getRegex() {
-		return _regex;
-	}
+	public String getRewrite();
 
-	public Integer getRegexFlags() {
-		return _regexFlags;
-	}
+	public void setMaxDeterminedStates(Integer maxDeterminedStates);
 
-	public String getRewrite() {
-		return _rewrite;
-	}
+	public void setRegexFlags(RegexFlag... regexFlags);
 
-	public void setMaxDeterminedStates(Integer maxDeterminedStates) {
-		_maxDeterminedStates = maxDeterminedStates;
-	}
-
-	public void setRegexFlags(RegexFlag... regexFlags) {
-		if (regexFlags == null) {
-			return;
-		}
-
-		int value = 0;
-
-		for (RegexFlag regexFlag : regexFlags) {
-			value |= regexFlag.getValue();
-		}
-
-		_regexFlags = value;
-	}
-
-	public void setRewrite(String rewrite) {
-		_rewrite = rewrite;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", field=");
-		sb.append(_field);
-		sb.append(", _regex=");
-		sb.append(_regex);
-		sb.append("}");
-
-		return sb.toString();
-	}
+	public void setRewrite(String rewrite);
 
 	public enum RegexFlag {
 
@@ -129,11 +72,5 @@ public class RegexQuery extends BaseQueryImpl implements Query {
 		private final int _value;
 
 	}
-
-	private final String _field;
-	private Integer _maxDeterminedStates;
-	private final String _regex;
-	private Integer _regexFlags;
-	private String _rewrite;
 
 }

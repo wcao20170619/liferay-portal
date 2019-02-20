@@ -20,83 +20,35 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class CommonTermsQuery extends BaseQueryImpl implements Query {
+public interface CommonTermsQuery extends Query {
 
-	public CommonTermsQuery(String field, String text) {
-		_field = field;
-		_text = text;
-	}
+	public String getAnalyzer();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public Float getCutoffFrequency();
 
-	public String getAnalyzer() {
-		return _analyzer;
-	}
+	public String getField();
 
-	public Float getCutoffFrequency() {
-		return _cutoffFrequency;
-	}
+	public String getHighFreqMinimumShouldMatch();
 
-	public String getField() {
-		return _field;
-	}
+	public Operator getHighFreqOperator();
 
-	public String getHighFreqMinimumShouldMatch() {
-		return _highFreqMinimumShouldMatch;
-	}
+	public String getLowFreqMinimumShouldMatch();
 
-	public Operator getHighFreqOperator() {
-		return _highFreqOperator;
-	}
+	public Operator getLowFreqOperator();
 
-	public String getLowFreqMinimumShouldMatch() {
-		return _lowFreqMinimumShouldMatch;
-	}
+	public String getText();
 
-	public Operator getLowFreqOperator() {
-		return _lowFreqOperator;
-	}
+	public void setAnalyzer(String analyzer);
 
-	public String getText() {
-		return _text;
-	}
-
-	public void setAnalyzer(String analyzer) {
-		_analyzer = analyzer;
-	}
-
-	public void setCutoffFrequency(Float cutoffFrequency) {
-		_cutoffFrequency = cutoffFrequency;
-	}
+	public void setCutoffFrequency(Float cutoffFrequency);
 
 	public void setHighFreqMinimumShouldMatch(
-		String highFreqMinimumShouldMatch) {
+		String highFreqMinimumShouldMatch);
 
-		_highFreqMinimumShouldMatch = highFreqMinimumShouldMatch;
-	}
+	public void setHighFreqOperator(Operator highFreqOperator);
 
-	public void setHighFreqOperator(Operator highFreqOperator) {
-		_highFreqOperator = highFreqOperator;
-	}
+	public void setLowFreqMinimumShouldMatch(String lowFreqMinimumShouldMatch);
 
-	public void setLowFreqMinimumShouldMatch(String lowFreqMinimumShouldMatch) {
-		_lowFreqMinimumShouldMatch = lowFreqMinimumShouldMatch;
-	}
-
-	public void setLowFreqOperator(Operator lowFreqOperator) {
-		_lowFreqOperator = lowFreqOperator;
-	}
-
-	private String _analyzer;
-	private Float _cutoffFrequency;
-	private final String _field;
-	private String _highFreqMinimumShouldMatch;
-	private Operator _highFreqOperator = Operator.OR;
-	private String _lowFreqMinimumShouldMatch;
-	private Operator _lowFreqOperator = Operator.OR;
-	private final String _text;
+	public void setLowFreqOperator(Operator lowFreqOperator);
 
 }

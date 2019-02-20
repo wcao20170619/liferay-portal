@@ -16,63 +16,20 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class TermsQuery extends BaseQueryImpl implements Query {
+public interface TermsQuery extends Query {
 
-	public TermsQuery(String field) {
-		_field = field;
-	}
+	public void addValue(Object value);
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public void addValues(Object... values);
 
-	public void addValue(Object value) {
-		_values.add(value);
-	}
+	public String getField();
 
-	public void addValues(Object... values) {
-		Collections.addAll(_values, values);
-	}
+	public String[] getValues();
 
-	public String getField() {
-		return _field;
-	}
-
-	public String[] getValues() {
-		return _values.toArray(new String[_values.size()]);
-	}
-
-	public boolean isEmpty() {
-		return _values.isEmpty();
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{(");
-		sb.append(_field);
-		sb.append("=");
-		sb.append(_values);
-		sb.append("), ");
-		sb.append(super.toString());
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
-	private final Set<Object> _values = new HashSet<>();
+	public boolean isEmpty();
 
 }

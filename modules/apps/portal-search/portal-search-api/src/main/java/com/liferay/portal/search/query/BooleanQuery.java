@@ -16,11 +16,6 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.util.ArrayUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,133 +23,35 @@ import java.util.List;
  * @author Hugo Huijser
  */
 @ProviderType
-public class BooleanQuery extends BaseQueryImpl implements Query {
+public interface BooleanQuery extends Query {
+
+	public BooleanQuery addFilterQueryClauses(Query... clauses);
+
+	public BooleanQuery addMustNotQueryClauses(Query... clauses);
+
+	public BooleanQuery addMustQueryClauses(Query... clauses);
+
+	public BooleanQuery addShouldQueryClauses(Query... clauses);
+
+	public Boolean getAdjustPureNegative();
+
+	public List<Query> getFilterQueryClauses();
+
+	public Integer getMinimumShouldMatch();
+
+	public List<Query> getMustNotQueryClauses();
+
+	public List<Query> getMustQueryClauses();
+
+	public List<Query> getShouldQueryClauses();
+
+	public boolean hasClauses();
+
+	public void setAdjustPureNegative(Boolean adjustPureNegative);
+
+	public void setMinimumShouldMatch(Integer minimumShouldMatch);
 
 	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public BooleanQuery addFilterQueryClauses(Query... clauses) {
-		if (ArrayUtil.isEmpty(clauses)) {
-			return this;
-		}
-
-		Collections.addAll(_filterQueryClauses, clauses);
-
-		return this;
-	}
-
-	public BooleanQuery addMustNotQueryClauses(Query... clauses) {
-		if (ArrayUtil.isEmpty(clauses)) {
-			return this;
-		}
-
-		Collections.addAll(_mustNotQueryClauses, clauses);
-
-		return this;
-	}
-
-	public BooleanQuery addMustQueryClauses(Query... clauses) {
-		if (ArrayUtil.isEmpty(clauses)) {
-			return this;
-		}
-
-		Collections.addAll(_mustQueryClauses, clauses);
-
-		return this;
-	}
-
-	public BooleanQuery addShouldQueryClauses(Query... clauses) {
-		if (ArrayUtil.isEmpty(clauses)) {
-			return this;
-		}
-
-		Collections.addAll(_shouldQueryClauses, clauses);
-
-		return this;
-	}
-
-	public Boolean getAdjustPureNegative() {
-		return _adjustPureNegative;
-	}
-
-	public List<Query> getFilterQueryClauses() {
-		return Collections.unmodifiableList(_filterQueryClauses);
-	}
-
-	public Integer getMinimumShouldMatch() {
-		return _minimumShouldMatch;
-	}
-
-	public List<Query> getMustNotQueryClauses() {
-		return Collections.unmodifiableList(_mustNotQueryClauses);
-	}
-
-	public List<Query> getMustQueryClauses() {
-		return Collections.unmodifiableList(_mustQueryClauses);
-	}
-
-	public List<Query> getShouldQueryClauses() {
-		return Collections.unmodifiableList(_shouldQueryClauses);
-	}
-
-	public boolean hasClauses() {
-		if (!_filterQueryClauses.isEmpty()) {
-			return true;
-		}
-
-		if (!_mustQueryClauses.isEmpty()) {
-			return true;
-		}
-
-		if (!_mustNotQueryClauses.isEmpty()) {
-			return true;
-		}
-
-		if (!_shouldQueryClauses.isEmpty()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	public void setAdjustPureNegative(Boolean adjustPureNegative) {
-		_adjustPureNegative = adjustPureNegative;
-	}
-
-	public void setMinimumShouldMatch(Integer minimumShouldMatch) {
-		_minimumShouldMatch = minimumShouldMatch;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(11);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", filterQueryClauses=");
-		sb.append(_filterQueryClauses);
-		sb.append(", mustQueryClauses=");
-		sb.append(_mustQueryClauses);
-		sb.append(", mustNotQueryClauses=");
-		sb.append(_mustNotQueryClauses);
-		sb.append(", shouldQueryClauses=");
-		sb.append(_shouldQueryClauses);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private Boolean _adjustPureNegative;
-	private final List<Query> _filterQueryClauses = new ArrayList<>();
-	private Integer _minimumShouldMatch;
-	private final List<Query> _mustNotQueryClauses = new ArrayList<>();
-	private final List<Query> _mustQueryClauses = new ArrayList<>();
-	private final List<Query> _shouldQueryClauses = new ArrayList<>();
+	public String toString();
 
 }

@@ -16,59 +16,18 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class PrefixQuery extends BaseQueryImpl implements Query {
+public interface PrefixQuery extends Query {
 
-	public PrefixQuery(String field, String prefix) {
-		_field = field;
-		_prefix = prefix;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public String getPrefix();
 
-	public String getField() {
-		return _field;
-	}
+	public String getRewrite();
 
-	public String getPrefix() {
-		return _prefix;
-	}
-
-	public String getRewrite() {
-		return _rewrite;
-	}
-
-	public void setRewrite(String rewrite) {
-		_rewrite = rewrite;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(9);
-
-		sb.append("{(");
-		sb.append(_field);
-		sb.append("=");
-		sb.append(_prefix);
-		sb.append(", _rewrite=");
-		sb.append(_rewrite);
-		sb.append("), ");
-		sb.append(super.toString());
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
-	private final String _prefix;
-	private String _rewrite;
+	public void setRewrite(String rewrite);
 
 }

@@ -16,116 +16,38 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class FuzzyQuery extends BaseQueryImpl {
+public interface FuzzyQuery extends Query {
 
-	public FuzzyQuery(String field, String value) {
-		_field = field;
-		_value = value;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public Float getFuzziness();
 
-	public String getField() {
-		return _field;
-	}
+	public Integer getMaxEdits();
 
-	public Float getFuzziness() {
-		return _fuzziness;
-	}
+	public Integer getMaxExpansions();
 
-	public Integer getMaxEdits() {
-		return _maxEdits;
-	}
+	public Integer getPrefixLength();
 
-	public Integer getMaxExpansions() {
-		return _maxExpansions;
-	}
+	public String getRewrite();
 
-	public Integer getPrefixLength() {
-		return _prefixLength;
-	}
+	public Boolean getTranspositions();
 
-	public String getRewrite() {
-		return _rewrite;
-	}
+	public String getValue();
 
-	public Boolean getTranspositions() {
-		return _transpositions;
-	}
+	public void setFuzziness(Float fuzziness);
 
-	public String getValue() {
-		return _value;
-	}
+	public void setMaxEdits(Integer maxEdits);
 
-	public void setFuzziness(Float fuzziness) {
-		_fuzziness = fuzziness;
-	}
+	public void setMaxExpansions(Integer maxExpansions);
 
-	public void setMaxEdits(Integer maxEdits) {
-		_maxEdits = maxEdits;
-	}
+	public void setPrefixLength(Integer prefixLength);
 
-	public void setMaxExpansions(Integer maxExpansions) {
-		_maxExpansions = maxExpansions;
-	}
+	public void setRewrite(String rewrite);
 
-	public void setPrefixLength(Integer prefixLength) {
-		_prefixLength = prefixLength;
-	}
-
-	public void setRewrite(String rewrite) {
-		_rewrite = rewrite;
-	}
-
-	public void setTranspositions(Boolean transpositions) {
-		_transpositions = transpositions;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(17);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", field=");
-		sb.append(_field);
-		sb.append(", fuzziness=");
-		sb.append(_fuzziness);
-		sb.append(", maxEdits=");
-		sb.append(_maxEdits);
-		sb.append(", maxExpansions=");
-		sb.append(_maxExpansions);
-		sb.append(", prefixLength=");
-		sb.append(_prefixLength);
-		sb.append(", transpositions=");
-		sb.append(_transpositions);
-		sb.append(", value=");
-		sb.append(_value);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
-	private Float _fuzziness;
-	private Integer _maxEdits;
-	private Integer _maxExpansions;
-	private Integer _prefixLength;
-	private String _rewrite;
-	private Boolean _transpositions;
-	private final String _value;
+	public void setTranspositions(Boolean transpositions);
 
 }

@@ -16,44 +16,14 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.portal.kernel.util.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class ExistsQuery extends BaseQueryImpl implements Query {
+public interface ExistsQuery extends Query {
 
-	public ExistsQuery(String field) {
-		_field = field;
-	}
+	public String getField();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public String getField() {
-		return _field;
-	}
-
-	public int getSortOrder() {
-		return 1;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(5);
-
-		sb.append("{(");
-		sb.append(_field);
-		sb.append("), ");
-		sb.append(super.toString());
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _field;
+	public int getSortOrder();
 
 }

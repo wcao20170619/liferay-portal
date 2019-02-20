@@ -24,53 +24,19 @@ import com.liferay.portal.search.query.geolocation.ShapeRelation;
  * @author Michael C. Han
  */
 @ProviderType
-public class GeoDistanceRangeQuery extends RangeTermQuery {
+public interface GeoDistanceRangeQuery extends RangeTermQuery {
 
-	public GeoDistanceRangeQuery(
-		String field, boolean includesLower, boolean includesUpper,
-		GeoDistance lowerBoundGeoDistance, GeoLocationPoint pinGeoLocationPoint,
-		GeoDistance upperBoundGeoDistance) {
+	public GeoDistance getLowerBoundGeoDistance();
 
-		super(field, includesLower, includesUpper);
+	public GeoLocationPoint getPinGeoLocationPoint();
 
-		_lowerBoundGeoDistance = lowerBoundGeoDistance;
-		_pinGeoLocationPoint = pinGeoLocationPoint;
-		_upperBoundGeoDistance = upperBoundGeoDistance;
-	}
+	public ShapeRelation getShapeRelation();
 
 	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public int getSortOrder();
 
-	public GeoDistance getLowerBoundGeoDistance() {
-		return _lowerBoundGeoDistance;
-	}
+	public GeoDistance getUpperBoundGeoDistance();
 
-	public GeoLocationPoint getPinGeoLocationPoint() {
-		return _pinGeoLocationPoint;
-	}
-
-	public ShapeRelation getShapeRelation() {
-		return _shapeRelation;
-	}
-
-	@Override
-	public int getSortOrder() {
-		return 110;
-	}
-
-	public GeoDistance getUpperBoundGeoDistance() {
-		return _upperBoundGeoDistance;
-	}
-
-	public void setShapeRelation(ShapeRelation shapeRelation) {
-		_shapeRelation = shapeRelation;
-	}
-
-	private final GeoDistance _lowerBoundGeoDistance;
-	private final GeoLocationPoint _pinGeoLocationPoint;
-	private ShapeRelation _shapeRelation;
-	private final GeoDistance _upperBoundGeoDistance;
+	public void setShapeRelation(ShapeRelation shapeRelation);
 
 }

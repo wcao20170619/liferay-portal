@@ -22,21 +22,8 @@ import com.liferay.portal.search.script.Script;
  * @author Michael C. Han
  */
 @ProviderType
-public class ScriptQuery extends BaseQueryImpl implements Query {
+public interface ScriptQuery extends Query {
 
-	public ScriptQuery(Script script) {
-		_script = script;
-	}
-
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public Script getScript() {
-		return _script;
-	}
-
-	private final Script _script;
+	public Script getScript();
 
 }

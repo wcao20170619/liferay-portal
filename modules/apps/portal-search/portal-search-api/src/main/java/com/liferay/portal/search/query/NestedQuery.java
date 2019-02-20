@@ -16,52 +16,14 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class NestedQuery extends BaseQueryImpl {
+public interface NestedQuery extends Query {
 
-	public NestedQuery(String path, Query query) {
-		_path = path;
-		_query = query;
-	}
+	public String getPath();
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
-
-	public String getPath() {
-		return _path;
-	}
-
-	public Query getQuery() {
-		return _query;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", path=");
-		sb.append(_path);
-		sb.append(", query=");
-		sb.append(_query);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final String _path;
-	private final Query _query;
+	public Query getQuery();
 
 }

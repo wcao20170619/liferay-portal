@@ -16,59 +16,20 @@ package com.liferay.portal.search.query;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class DisMaxQuery extends BaseQueryImpl {
+public interface DisMaxQuery extends Query {
 
-	@Override
-	public <T> T accept(QueryVisitor<T> queryVisitor) {
-		return queryVisitor.visit(this);
-	}
+	public void addQuery(Query query);
 
-	public void addQuery(Query query) {
-		_queries.add(query);
-	}
+	public Set<Query> getQueries();
 
-	public Set<Query> getQueries() {
-		return Collections.unmodifiableSet(_queries);
-	}
+	public Float getTieBreaker();
 
-	public Float getTieBreaker() {
-		return _tieBreaker;
-	}
-
-	public void setTieBreaker(Float tieBreaker) {
-		_tieBreaker = tieBreaker;
-	}
-
-	@Override
-	public String toString() {
-		StringBundler sb = new StringBundler(7);
-
-		sb.append("{className=");
-
-		Class<?> clazz = getClass();
-
-		sb.append(clazz.getSimpleName());
-
-		sb.append(", queries=");
-		sb.append(_queries);
-		sb.append(", tieBreaker=");
-		sb.append(_tieBreaker);
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	private final Set<Query> _queries = new HashSet<>();
-	private Float _tieBreaker;
+	public void setTieBreaker(Float tieBreaker);
 
 }
