@@ -25,7 +25,7 @@ import com.liferay.portal.search.query.TermsSetQuery;
 import com.liferay.portal.search.script.Script;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseTermsSetQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseTermsSetQueryTestCase extends BaseQueryTestCase {
 
 	@Override
 	public void setUp() throws Exception {
@@ -64,16 +64,14 @@ public abstract class BaseTermsSetQueryTestCase extends BaseIndexingTestCase {
 
 				setIndexNames("_all");
 
-				setQuery(
-					new TermsSetQuery(
+				TermsSetQuery termsSetQuery =
+					(TermsSetQuery)queries.termsSetQuery(
 						Field.USER_NAME,
-						Arrays.asList("SomeUser2", "SomeUser3", "SomeUser4")) {
+						Arrays.asList("SomeUser2", "SomeUser3", "SomeUser4"));
 
-						{
-							setMinimumShouldMatchField(Field.PRIORITY);
-						}
+				termsSetQuery.setMinimumShouldMatchField(Field.PRIORITY);
 
-					});
+				setQuery(termsSetQuery);
 			}
 		};
 
@@ -101,16 +99,14 @@ public abstract class BaseTermsSetQueryTestCase extends BaseIndexingTestCase {
 					"painless",
 					"Math.min(params.num_terms, doc['priority'].value)");
 
-				setQuery(
-					new TermsSetQuery(
+				TermsSetQuery termsSetQuery =
+					(TermsSetQuery)queries.termsSetQuery(
 						Field.USER_NAME,
-						Arrays.asList("SomeUser2", "SomeUser3", "SomeUser4")) {
+						Arrays.asList("SomeUser2", "SomeUser3", "SomeUser4"));
 
-						{
-							setMinimumShouldMatchScript(script);
-						}
+				termsSetQuery.setMinimumShouldMatchScript(script);
 
-					});
+				setQuery(termsSetQuery);
 			}
 		};
 

@@ -22,8 +22,7 @@ import com.liferay.portal.search.aggregation.metrics.SumAggregation;
 import com.liferay.portal.search.aggregation.metrics.SumAggregationResult;
 import com.liferay.portal.search.internal.aggregation.metrics.SumAggregationImpl;
 import com.liferay.portal.search.query.Query;
-import com.liferay.portal.search.query.TermQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.Map;
 
@@ -33,8 +32,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseFilterAggregationTestCase
-	extends BaseIndexingTestCase {
+public abstract class BaseFilterAggregationTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testFilter() throws Exception {
@@ -74,7 +72,7 @@ public abstract class BaseFilterAggregationTestCase
 				document.addNumber(Field.PRIORITY, 7);
 			});
 
-		Query termQuery = new TermQuery(Field.USER_NAME, "SomeUser1");
+		Query termQuery = queries.termQuery(Field.USER_NAME, "SomeUser1");
 
 		FilterAggregation filterAggregation = aggregations.filter(
 			"filter", termQuery);

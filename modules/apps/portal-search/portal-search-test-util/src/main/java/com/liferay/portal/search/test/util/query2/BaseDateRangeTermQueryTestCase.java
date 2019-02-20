@@ -25,7 +25,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.DateRangeTermQuery;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.text.DateFormat;
@@ -45,8 +45,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseDateRangeTermQueryTestCase
-	extends BaseIndexingTestCase {
+public abstract class BaseDateRangeTermQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testDateRangeTermQuery() {
@@ -60,8 +59,10 @@ public abstract class BaseDateRangeTermQueryTestCase
 
 		assertSearch(
 			indexingTestHelper -> {
-				DateRangeTermQuery dateRangeTermQuery = new DateRangeTermQuery(
-					Field.EXPIRATION_DATE, true, true, "20170101", "20181231");
+				DateRangeTermQuery dateRangeTermQuery =
+					(DateRangeTermQuery)queries.dateRangeTermQuery(
+						Field.EXPIRATION_DATE, true, true, "20170101",
+						"20181231");
 
 				dateRangeTermQuery.setDateFormat("yyyyMMdd");
 

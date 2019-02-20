@@ -21,7 +21,7 @@ import com.liferay.portal.search.engine.adapter.search2.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.MatchQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseMatchQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseMatchQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testMatchQuery() {
@@ -57,7 +57,8 @@ public abstract class BaseMatchQueryTestCase extends BaseIndexingTestCase {
 	protected void assertSearch(Object value, List<String> expectedValues) {
 		assertSearch(
 			indexingTestHelper -> {
-				MatchQuery matchQuery = new MatchQuery(_FIELD_NAME, value);
+				MatchQuery matchQuery = (MatchQuery)queries.matchQuery(
+					_FIELD_NAME, value);
 
 				SearchSearchRequest searchSearchRequest =
 					new SearchSearchRequest();

@@ -21,7 +21,7 @@ import com.liferay.portal.search.engine.adapter.search2.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.MatchPhrasePrefixQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import org.junit.Test;
  * @author Michael C. Han
  */
 public abstract class BaseMatchPhrasePrefixQueryTestCase
-	extends BaseIndexingTestCase {
+	extends BaseQueryTestCase {
 
 	@Test
 	public void testMatchPhrasePrefix() {
@@ -58,7 +58,8 @@ public abstract class BaseMatchPhrasePrefixQueryTestCase
 		assertSearch(
 			indexingTestHelper -> {
 				MatchPhrasePrefixQuery matchPhrasePrefixQuery =
-					new MatchPhrasePrefixQuery(_FIELD_NAME, value);
+					(MatchPhrasePrefixQuery)queries.matchPhrasePrefixQuery(
+						_FIELD_NAME, value);
 
 				SearchSearchRequest searchSearchRequest =
 					new SearchSearchRequest();

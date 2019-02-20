@@ -24,7 +24,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.IdsQuery;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseIdsQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseIdsQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testIdsQuery() {
@@ -71,7 +71,7 @@ public abstract class BaseIdsQueryTestCase extends BaseIndexingTestCase {
 
 		assertSearch(
 			indexingTestHelper -> {
-				IdsQuery idsQuery = new IdsQuery();
+				IdsQuery idsQuery = (IdsQuery)queries.idsQuery();
 
 				idsQuery.addIds("1", "5");
 

@@ -22,7 +22,7 @@ import com.liferay.portal.search.engine.adapter.search2.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.ExistsQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseExistsQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseExistsQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testExistsQuery() {
@@ -50,7 +50,8 @@ public abstract class BaseExistsQueryTestCase extends BaseIndexingTestCase {
 
 		assertSearch(
 			indexingTestHelper -> {
-				ExistsQuery existsQuery = new ExistsQuery(Field.USER_NAME);
+				ExistsQuery existsQuery = (ExistsQuery)queries.existsQuery(
+					Field.USER_NAME);
 
 				SearchSearchRequest searchSearchRequest =
 					new SearchSearchRequest();

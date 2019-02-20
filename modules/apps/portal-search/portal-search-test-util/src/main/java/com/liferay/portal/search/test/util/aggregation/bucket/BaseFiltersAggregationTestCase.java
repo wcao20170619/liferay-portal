@@ -24,8 +24,7 @@ import com.liferay.portal.search.aggregation.metrics.SumAggregationResult;
 import com.liferay.portal.search.internal.aggregation.bucket.FiltersAggregationImpl;
 import com.liferay.portal.search.internal.aggregation.metrics.SumAggregationImpl;
 import com.liferay.portal.search.query.Query;
-import com.liferay.portal.search.query.TermQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.Map;
 
@@ -35,8 +34,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseFiltersAggregationTestCase
-	extends BaseIndexingTestCase {
+public abstract class BaseFiltersAggregationTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testFilter() throws Exception {
@@ -79,11 +77,11 @@ public abstract class BaseFiltersAggregationTestCase
 		FiltersAggregation filtersAggregation = new FiltersAggregationImpl(
 			"filter", Field.USER_NAME);
 
-		Query someUser1Query = new TermQuery(Field.USER_NAME, "SomeUser1");
+		Query someUser1Query = queries.termQuery(Field.USER_NAME, "SomeUser1");
 
 		filtersAggregation.addKeyedQuery("SomeUser1", someUser1Query);
 
-		Query someUser2Query = new TermQuery(Field.USER_NAME, "SomeUser2");
+		Query someUser2Query = queries.termQuery(Field.USER_NAME, "SomeUser2");
 
 		filtersAggregation.addKeyedQuery("SomeUser2", someUser2Query);
 

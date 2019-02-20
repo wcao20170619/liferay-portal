@@ -22,7 +22,7 @@ import com.liferay.portal.search.engine.adapter.search2.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.TermQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseTermQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseTermQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testTermQuery() {
@@ -69,7 +69,7 @@ public abstract class BaseTermQueryTestCase extends BaseIndexingTestCase {
 
 		assertSearch(
 			indexingTestHelper -> {
-				TermQuery termQuery = new TermQuery(
+				TermQuery termQuery = (TermQuery)queries.termQuery(
 					Field.USER_NAME, "SomeUser5");
 
 				SearchSearchRequest searchSearchRequest =

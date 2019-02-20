@@ -24,7 +24,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.SimpleStringQuery;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.List;
@@ -35,8 +35,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseSimpleStringQueryTestCase
-	extends BaseIndexingTestCase {
+public abstract class BaseSimpleStringQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testSimpleStringQuery() {
@@ -54,8 +53,9 @@ public abstract class BaseSimpleStringQueryTestCase
 
 		assertSearch(
 			indexingTestHelper -> {
-				SimpleStringQuery simpleStringQuery = new SimpleStringQuery(
-					"(SomeUser* | OtherUser*)");
+				SimpleStringQuery simpleStringQuery =
+					(SimpleStringQuery)queries.simpleStringQuery(
+						"(SomeUser* | OtherUser*)");
 
 				simpleStringQuery.addField(Field.USER_NAME, 1.0F);
 

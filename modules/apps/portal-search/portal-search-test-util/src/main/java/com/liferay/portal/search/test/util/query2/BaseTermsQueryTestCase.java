@@ -24,7 +24,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.TermsQuery;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseTermsQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseTermsQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testTermsQuery() {
@@ -71,7 +71,8 @@ public abstract class BaseTermsQueryTestCase extends BaseIndexingTestCase {
 
 		assertSearch(
 			indexingTestHelper -> {
-				TermsQuery termsQuery = new TermsQuery(Field.USER_NAME);
+				TermsQuery termsQuery = (TermsQuery)queries.termsQuery(
+					Field.USER_NAME);
 
 				termsQuery.addValues("SomeUser3", "SomeUser4");
 

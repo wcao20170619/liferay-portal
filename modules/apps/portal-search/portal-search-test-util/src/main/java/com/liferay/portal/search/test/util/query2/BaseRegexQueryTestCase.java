@@ -24,7 +24,7 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.RegexQuery;
 import com.liferay.portal.search.sort.FieldSort;
 import com.liferay.portal.search.sort.SortOrder;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.List;
@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseRegexQueryTestCase extends BaseIndexingTestCase {
+public abstract class BaseRegexQueryTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testRegexQuery() {
@@ -65,7 +65,7 @@ public abstract class BaseRegexQueryTestCase extends BaseIndexingTestCase {
 
 		assertSearch(
 			indexingTestHelper -> {
-				RegexQuery regexQuery = new RegexQuery(
+				RegexQuery regexQuery = (RegexQuery)queries.regexQuery(
 					Field.USER_NAME, "OtherUser<0-9>");
 
 				regexQuery.setRegexFlags(RegexQuery.RegexFlag.INTERVAL);

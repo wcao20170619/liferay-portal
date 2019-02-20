@@ -23,8 +23,7 @@ import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.Query;
-import com.liferay.portal.search.query.StringQuery;
-import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
+import com.liferay.portal.search.test.util.BaseQueryTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Michael C. Han
  */
-public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
+public abstract class BaseHighlighterTestCase extends BaseQueryTestCase {
 
 	@Test
 	public void testHighlight() {
@@ -52,7 +51,7 @@ public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
 				"alpha beta gamma alpha eta theta alpha zeta eta alpha iota",
 				"alpha beta gamma delta epsilon zeta eta theta iota alpha"));
 
-		Query query = new StringQuery(fieldName.concat(":alpha"));
+		Query query = queries.stringQuery(fieldName.concat(":alpha"));
 
 		Highlight highlight = new Highlight();
 
