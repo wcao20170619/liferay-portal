@@ -19,7 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.analysis.KeywordTokenizer;
 import com.liferay.portal.search.query.BooleanQuery;
-import com.liferay.portal.search.query.MatchQuery;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 
 import java.util.ArrayList;
@@ -30,12 +30,15 @@ import java.util.List;
  */
 public class FullTextQueryBuilder {
 
-	public FullTextQueryBuilder(KeywordTokenizer keywordTokenizer) {
+	public FullTextQueryBuilder(
+		KeywordTokenizer keywordTokenizer, Queries queries) {
+
 		_keywordTokenizer = keywordTokenizer;
+		_queries = queries;
 	}
 
 	public Query build(String field, String keywords) {
-		BooleanQuery booleanQueryImpl = new BooleanQuery();
+		BooleanQuery booleanQuery = (BooleanQuery)_queries.booleanQuery();
 
 		List<String> tokens = _keywordTokenizer.tokenize(keywords);
 
@@ -52,20 +55,18 @@ public class FullTextQueryBuilder {
 		}
 
 		for (String phrase : phrases) {
-			booleanQueryImpl.addMustQueryClauses(
-				createPhraseQuery(field, phrase));
+			booleanQuery.addMustQueryClauses(createPhraseQuery(field, phrase));
 		}
 
 		if (!words.isEmpty()) {
 			addSentenceQueries(
-				field, StringUtil.merge(words, StringPool.SPACE),
-				booleanQueryImpl);
+				field, StringUtil.merge(words, StringPool.SPACE), booleanQuery);
 		}
 
-		booleanQueryImpl.addShouldQueryClauses(
+		booleanQuery.addShouldQueryClauses(
 			createExactMatchQuery(field, keywords));
 
-		return booleanQueryImpl;
+		return booleanQuery;
 	}
 
 	public void setAutocomplete(boolean autocomplete) {
@@ -92,7 +93,7 @@ public class FullTextQueryBuilder {
 	}
 
 	protected Query createAutocompleteQuery(String field, String value) {
-		PhraseQueryBuilder builder = new PhraseQueryBuilder();
+		PhraseQueryBuilder builder = new PhraseQueryBuilder(_queries);
 
 		builder.setPrefix(true);
 
@@ -100,7 +101,7 @@ public class FullTextQueryBuilder {
 	}
 
 	protected Query createExactMatchQuery(String field, String keywords) {
-		PhraseQueryBuilder builder = new PhraseQueryBuilder();
+		PhraseQueryBuilder builder = new PhraseQueryBuilder(_queries);
 
 		builder.setBoost(_exactMatchBoost);
 
@@ -114,22 +115,22 @@ public class FullTextQueryBuilder {
 			return matchQuery;
 		}
 
-		BooleanQuery booleanQueryImpl = new BooleanQuery();
+		BooleanQuery booleanQuery = (BooleanQuery)_queries.booleanQuery();
 
-		booleanQueryImpl.addShouldQueryClauses(matchQuery);
+		booleanQuery.addShouldQueryClauses(matchQuery);
 
-		booleanQueryImpl.addShouldQueryClauses(
+		booleanQuery.addShouldQueryClauses(
 			createAutocompleteQuery(field, sentence));
 
-		return booleanQueryImpl;
+		return booleanQuery;
 	}
 
 	protected Query createMatchQuery(String field, String value) {
-		return new MatchQuery(field, value);
+		return _queries.matchQuery(field, value);
 	}
 
 	protected Query createPhraseQuery(String field, String phrase) {
-		PhraseQueryBuilder builder = new PhraseQueryBuilder();
+		PhraseQueryBuilder builder = new PhraseQueryBuilder(_queries);
 
 		builder.setTrailingStarAware(true);
 
@@ -137,7 +138,7 @@ public class FullTextQueryBuilder {
 	}
 
 	protected Query createProximityQuery(String field, String value) {
-		PhraseQueryBuilder builder = new PhraseQueryBuilder();
+		PhraseQueryBuilder builder = new PhraseQueryBuilder(_queries);
 
 		builder.setSlop(_proximitySlop);
 
@@ -148,5 +149,6 @@ public class FullTextQueryBuilder {
 	private float _exactMatchBoost;
 	private final KeywordTokenizer _keywordTokenizer;
 	private Integer _proximitySlop;
+	private final Queries _queries;
 
 }

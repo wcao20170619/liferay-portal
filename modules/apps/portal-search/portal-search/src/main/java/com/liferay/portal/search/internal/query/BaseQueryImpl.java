@@ -12,14 +12,13 @@
  * details.
  */
 
-package com.liferay.portal.search.query;
+package com.liferay.portal.search.internal.query;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.search.query.Query;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
 public abstract class BaseQueryImpl implements Query {
 
 	@Override
@@ -40,6 +39,8 @@ public abstract class BaseQueryImpl implements Query {
 	public void setBoost(Float boost) {
 		_boost = boost;
 	}
+
+	private static final long serialVersionUID = 1L;
 
 	private Float _boost;
 

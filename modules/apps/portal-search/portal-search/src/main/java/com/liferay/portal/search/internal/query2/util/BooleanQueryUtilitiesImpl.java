@@ -17,6 +17,7 @@ package com.liferay.portal.search.internal.query2.util;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.BooleanQuery;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.RangeTermQuery;
 import com.liferay.portal.search.query.TermQuery;
@@ -229,7 +230,7 @@ public class BooleanQueryUtilitiesImpl implements BooleanQueryUtilities {
 	protected BooleanQuery addExactTerm(
 		BooleanQuery booleanQuery, String field, Object value) {
 
-		TermQuery termQuery = new TermQuery(field, value);
+		TermQuery termQuery = (TermQuery)_queries.termQuery(field, value);
 
 		return booleanQuery.addShouldQueryClauses(termQuery);
 	}
@@ -238,7 +239,7 @@ public class BooleanQueryUtilitiesImpl implements BooleanQueryUtilities {
 		BooleanQuery booleanQuery, String field, Object startValue,
 		Object endValue) {
 
-		RangeTermQuery rangeTermQuery = new RangeTermQuery(
+		RangeTermQuery rangeTermQuery = (RangeTermQuery)_queries.rangeTermQuery(
 			field, true, true, startValue, endValue);
 
 		return booleanQuery.addShouldQueryClauses(rangeTermQuery);
@@ -247,12 +248,15 @@ public class BooleanQueryUtilitiesImpl implements BooleanQueryUtilities {
 	protected BooleanQuery addRequiredTerm(
 		BooleanQuery booleanQuery, String field, Object value) {
 
-		TermQuery termQuery = new TermQuery(field, value);
+		TermQuery termQuery = (TermQuery)_queries.termQuery(field, value);
 
 		return booleanQuery.addMustQueryClauses(termQuery);
 	}
 
 	@Reference
 	private FieldQueryFactory _fieldQueryFactory;
+
+	@Reference
+	private Queries _queries;
 
 }

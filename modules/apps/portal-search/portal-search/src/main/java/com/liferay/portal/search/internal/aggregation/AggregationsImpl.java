@@ -142,11 +142,6 @@ public class AggregationsImpl implements Aggregations {
 	}
 
 	@Override
-	public GeoHashGridAggregation geoHashGrid(String name, String field) {
-		return new GeoHashGridAggregationImpl(name, field);
-	}
-
-	@Override
 	public FilterAggregation filter(String name, Query query) {
 		return new FilterAggregationImpl(name, query);
 	}
@@ -154,6 +149,11 @@ public class AggregationsImpl implements Aggregations {
 	@Override
 	public GeoBoundsAggregation geoBounds(String name, String field) {
 		return new GeoBoundsAggregationImpl(name, field);
+	}
+
+	@Override
+	public GeoHashGridAggregation geoHashGrid(String name, String field) {
+		return new GeoHashGridAggregationImpl(name, field);
 	}
 
 	@Override
@@ -256,13 +256,13 @@ public class AggregationsImpl implements Aggregations {
 	}
 
 	@Override
-	public ValueCountAggregation valueCount(String name, String field) {
-		return new ValueCountAggregationImpl(name, field);
+	public TopHitsAggregation topHits(String name) {
+		return new TopHitsAggregationImpl(name);
 	}
 
 	@Override
-	public TopHitsAggregation topHits(String name) {
-		return new TopHitsAggregationImpl(name);
+	public ValueCountAggregation valueCount(String name, String field) {
+		return new ValueCountAggregationImpl(name, field);
 	}
 
 }

@@ -19,8 +19,8 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.analysis.KeywordTokenizer;
 import com.liferay.portal.search.query.BooleanQuery;
+import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
-import com.liferay.portal.search.query.WildcardQuery;
 import com.liferay.portal.search.query.field.FieldQueryBuilder;
 
 import java.util.List;
@@ -37,15 +37,15 @@ public class SubstringFieldQueryBuilder implements FieldQueryBuilder {
 
 	@Override
 	public Query build(String field, String keywords) {
-		BooleanQuery booleanQueryImpl = new BooleanQuery();
+		BooleanQuery booleanQuery = (BooleanQuery)queries.booleanQuery();
 
 		List<String> tokens = keywordTokenizer.tokenize(keywords);
 
 		for (String token : tokens) {
-			booleanQueryImpl.addShouldQueryClauses(createQuery(field, token));
+			booleanQuery.addShouldQueryClauses(createQuery(field, token));
 		}
 
-		return booleanQueryImpl;
+		return booleanQuery;
 	}
 
 	protected Query createQuery(String field, String value) {
@@ -63,10 +63,13 @@ public class SubstringFieldQueryBuilder implements FieldQueryBuilder {
 				StringUtil.toLowerCase(value), StringPool.STAR);
 		}
 
-		return new WildcardQuery(field, value);
+		return queries.wildcardQuery(field, value);
 	}
 
 	@Reference
 	protected KeywordTokenizer keywordTokenizer;
+
+	@Reference
+	protected Queries queries;
 
 }
