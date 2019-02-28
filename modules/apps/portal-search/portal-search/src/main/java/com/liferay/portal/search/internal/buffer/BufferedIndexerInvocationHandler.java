@@ -63,7 +63,8 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 
 		Annotation annotation = method.getAnnotation(Bufferable.class);
 
-		IndexerRequestBuffer indexerRequestBuffer = IndexerRequestBuffer.get();
+		IndexerRequestBuffer indexerRequestBuffer =
+			IndexerRequestBufferImpl.get();
 
 		if ((annotation == null) || (args.length == 0) || (args.length > 2) ||
 			(indexerRequestBuffer == null)) {
@@ -209,7 +210,7 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 
 		ClassedModel classedModel = (ClassedModel)baseModel.clone();
 
-		IndexerRequest indexerRequest = new IndexerRequest(
+		IndexerRequest indexerRequest = new IndexerRequestImpl(
 			methodKey.getMethod(), classedModel, _indexer);
 
 		doBufferRequest(indexerRequest, indexerRequestBuffer);
@@ -230,7 +231,7 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 			return;
 		}
 
-		IndexerRequest indexerRequest = new IndexerRequest(
+		IndexerRequest indexerRequest = new IndexerRequestImpl(
 			methodKey.getMethod(), _indexer, className, classPK);
 
 		doBufferRequest(indexerRequest, indexerRequestBuffer);

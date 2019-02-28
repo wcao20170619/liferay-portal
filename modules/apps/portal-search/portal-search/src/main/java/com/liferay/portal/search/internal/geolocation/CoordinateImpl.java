@@ -12,26 +12,42 @@
  * details.
  */
 
-package com.liferay.portal.search.geolocation;
+package com.liferay.portal.search.internal.geolocation;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.search.geolocation.Coordinate;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface ShapeBuilder {
+public class CoordinateImpl implements Coordinate {
 
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+	public CoordinateImpl(double x, double y) {
+		_x = x;
+		_y = y;
 
-	public void addCoordinate(Coordinate coordinate);
+		_z = 0;
+	}
 
-	public void addCoordinates(Coordinate... coordinates);
+	public CoordinateImpl(double x, double y, double z) {
+		_x = x;
+		_y = y;
+		_z = z;
+	}
 
-	public void addCoordinates(List<Coordinate> coordinates);
+	public double getX() {
+		return _x;
+	}
 
-	public List<Coordinate> getCoordinates();
+	public double getY() {
+		return _y;
+	}
+
+	public double getZ() {
+		return _z;
+	}
+
+	private final double _x;
+	private final double _y;
+	private final double _z;
 
 }

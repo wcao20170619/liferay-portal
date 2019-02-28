@@ -12,26 +12,25 @@
  * details.
  */
 
-package com.liferay.portal.search.geolocation;
+package com.liferay.portal.search.internal.geolocation;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.search.geolocation.Coordinate;
+import com.liferay.portal.search.geolocation.PointShapeBuilder;
+import com.liferay.portal.search.geolocation.ShapeBuilderTranslator;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface ShapeBuilder {
+public class PointShapeBuilderImpl
+	extends ShapeBuilderImpl implements PointShapeBuilder {
 
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+	public PointShapeBuilderImpl(Coordinate coordinate) {
+		addCoordinates(coordinate);
+	}
 
-	public void addCoordinate(Coordinate coordinate);
-
-	public void addCoordinates(Coordinate... coordinates);
-
-	public void addCoordinates(List<Coordinate> coordinates);
-
-	public List<Coordinate> getCoordinates();
+	@Override
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
+		return shapeBuilderTranslator.translate(this);
+	}
 
 }

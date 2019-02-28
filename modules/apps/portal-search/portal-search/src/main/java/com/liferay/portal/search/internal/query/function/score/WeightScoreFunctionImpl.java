@@ -12,26 +12,20 @@
  * details.
  */
 
-package com.liferay.portal.search.geolocation;
+package com.liferay.portal.search.internal.query.function.score;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.search.query.function.score.ScoreFunctionTranslator;
+import com.liferay.portal.search.query.function.score.WeightScoreFunction;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface ShapeBuilder {
+public class WeightScoreFunctionImpl
+	extends ScoreFunctionImpl implements WeightScoreFunction {
 
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
-
-	public void addCoordinate(Coordinate coordinate);
-
-	public void addCoordinates(Coordinate... coordinates);
-
-	public void addCoordinates(List<Coordinate> coordinates);
-
-	public List<Coordinate> getCoordinates();
+	@Override
+	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator) {
+		return scoreFunctionTranslator.translate(this);
+	}
 
 }

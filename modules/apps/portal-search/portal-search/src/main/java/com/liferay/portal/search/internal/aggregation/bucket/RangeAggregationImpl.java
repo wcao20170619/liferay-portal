@@ -50,22 +50,22 @@ public class RangeAggregationImpl
 
 	@Override
 	public void addUnboundedFrom(Double from) {
-		addRange(new Range(from, null));
+		addRange(new RangeImpl(from, null));
 	}
 
 	@Override
 	public void addUnboundedFrom(String key, Double from) {
-		addRange(new Range(key, from, null));
+		addRange(new RangeImpl(key, from, null));
 	}
 
 	@Override
 	public void addUnboundedTo(Double to) {
-		addRange(new Range(null, to));
+		addRange(new RangeImpl(null, to));
 	}
 
 	@Override
 	public void addUnboundedTo(String key, Double to) {
-		addRange(new Range(key, null, to));
+		addRange(new RangeImpl(key, null, to));
 	}
 
 	@Override

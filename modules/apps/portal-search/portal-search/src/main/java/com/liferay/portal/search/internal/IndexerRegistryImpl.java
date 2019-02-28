@@ -31,6 +31,7 @@ import com.liferay.portal.search.buffer.IndexerRequestBufferOverflowHandler;
 import com.liferay.portal.search.configuration.IndexerRegistryConfiguration;
 import com.liferay.portal.search.index.IndexStatusManager;
 import com.liferay.portal.search.internal.buffer.BufferedIndexerInvocationHandler;
+import com.liferay.portal.search.internal.buffer.IndexerRequestBufferImpl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -255,7 +256,8 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 			return null;
 		}
 
-		IndexerRequestBuffer indexerRequestBuffer = IndexerRequestBuffer.get();
+		IndexerRequestBuffer indexerRequestBuffer =
+			IndexerRequestBufferImpl.get();
 
 		if ((indexerRequestBuffer == null) ||
 			!_indexerRegistryConfiguration.buffered()) {

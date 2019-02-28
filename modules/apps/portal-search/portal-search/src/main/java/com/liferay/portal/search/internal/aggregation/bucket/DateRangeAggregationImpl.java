@@ -18,7 +18,6 @@ import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.portal.search.aggregation.AggregationVisitor;
 import com.liferay.portal.search.aggregation.bucket.DateRangeAggregation;
-import com.liferay.portal.search.aggregation.bucket.Range;
 
 /**
  * @author Michael C. Han
@@ -38,32 +37,32 @@ public class DateRangeAggregationImpl
 
 	@Override
 	public void addRange(String fromDate, String toDate) {
-		addRange(new Range(fromDate, toDate));
+		addRange(new RangeImpl(fromDate, toDate));
 	}
 
 	@Override
 	public void addRange(String key, String fromDate, String toDate) {
-		addRange(new Range(key, fromDate, toDate));
+		addRange(new RangeImpl(key, fromDate, toDate));
 	}
 
 	@Override
 	public void addUnboundedFrom(String fromDate) {
-		addRange(new Range(fromDate, null));
+		addRange(new RangeImpl(fromDate, null));
 	}
 
 	@Override
 	public void addUnboundedFrom(String key, String fromDate) {
-		addRange(new Range(key, fromDate, null));
+		addRange(new RangeImpl(key, fromDate, null));
 	}
 
 	@Override
 	public void addUnboundedTo(String toDate) {
-		addRange(new Range(null, toDate));
+		addRange(new RangeImpl(null, toDate));
 	}
 
 	@Override
 	public void addUnboundedTo(String key, String toDate) {
-		addRange(new Range(key, null, toDate));
+		addRange(new RangeImpl(key, null, toDate));
 	}
 
 }

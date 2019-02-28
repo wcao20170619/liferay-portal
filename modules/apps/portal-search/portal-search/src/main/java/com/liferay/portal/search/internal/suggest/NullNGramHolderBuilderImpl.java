@@ -12,26 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.search.geolocation;
+package com.liferay.portal.search.internal.suggest;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.util.List;
+import com.liferay.portal.kernel.search.suggest.NGramHolder;
+import com.liferay.portal.search.suggest.NullNGramHolderBuilder;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface ShapeBuilder {
+public class NullNGramHolderBuilderImpl implements NullNGramHolderBuilder {
 
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+	@Override
+	public NGramHolder buildNGramHolder(String input) {
+		return new NGramHolder();
+	}
 
-	public void addCoordinate(Coordinate coordinate);
+	@Override
+	public NGramHolder buildNGramHolder(String input, int nGramMaxLength) {
+		return new NGramHolder();
+	}
 
-	public void addCoordinates(Coordinate... coordinates);
+	@Override
+	public NGramHolder buildNGramHolder(
+		String input, int nGramMinLength, int nGramMaxLength) {
 
-	public void addCoordinates(List<Coordinate> coordinates);
-
-	public List<Coordinate> getCoordinates();
+		return new NGramHolder();
+	}
 
 }

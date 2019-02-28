@@ -36,7 +36,7 @@ public class IndexerRequestBufferTransactionLifecycleListener
 		TransactionStatus transactionStatus) {
 
 		IndexerRequestBuffer indexerRequestBuffer =
-			IndexerRequestBuffer.remove();
+			IndexerRequestBufferImpl.remove();
 
 		if ((indexerRequestBuffer != null) && !indexerRequestBuffer.isEmpty()) {
 			IndexerRequestBufferExecutor indexerRequestBufferExecutor =
@@ -52,7 +52,7 @@ public class IndexerRequestBufferTransactionLifecycleListener
 		TransactionAttribute transactionAttribute,
 		TransactionStatus transactionStatus) {
 
-		IndexerRequestBuffer.create();
+		IndexerRequestBufferImpl.create();
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class IndexerRequestBufferTransactionLifecycleListener
 		TransactionStatus transactionStatus, Throwable throwable) {
 
 		IndexerRequestBuffer indexerRequestBuffer =
-			IndexerRequestBuffer.remove();
+			IndexerRequestBufferImpl.remove();
 
 		if ((indexerRequestBuffer != null) && !indexerRequestBuffer.isEmpty()) {
 			indexerRequestBuffer.clear();

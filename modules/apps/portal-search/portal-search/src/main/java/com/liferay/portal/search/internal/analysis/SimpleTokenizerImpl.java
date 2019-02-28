@@ -12,26 +12,25 @@
  * details.
  */
 
-package com.liferay.portal.search.geolocation;
+package com.liferay.portal.search.internal.analysis;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.analysis.SimpleTokenizer;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Michael C. Han
- */
-@ProviderType
-public interface ShapeBuilder {
+* @author Michael C. Han
+*/
+public class SimpleTokenizerImpl implements SimpleTokenizer {
 
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+	@Override
+	public List<String> tokenize(
+		String fieldName, String input, String languageId) {
 
-	public void addCoordinate(Coordinate coordinate);
-
-	public void addCoordinates(Coordinate... coordinates);
-
-	public void addCoordinates(List<Coordinate> coordinates);
-
-	public List<Coordinate> getCoordinates();
+		return Arrays.asList(StringUtil.split(input, StringPool.PERIOD));
+	}
 
 }
