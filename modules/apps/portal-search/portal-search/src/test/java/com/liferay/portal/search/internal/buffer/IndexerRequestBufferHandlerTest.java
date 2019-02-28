@@ -52,7 +52,7 @@ public class IndexerRequestBufferHandlerTest {
 			createIndexerRequestBufferOverflowHandler(),
 			createIndexerRegistryConfiguration(maxBufferSize));
 
-		_indexerRequestBuffer = IndexerRequestBuffer.create();
+		_indexerRequestBuffer = IndexerRequestBufferImpl.create();
 
 		Indexer<?> indexer = createIndexerWithDeepReindex();
 
@@ -81,7 +81,7 @@ public class IndexerRequestBufferHandlerTest {
 	}
 
 	protected IndexerRequest createIndexerRequest(Indexer<?> indexer) {
-		return new IndexerRequest(
+		return new IndexerRequestImpl(
 			_method, indexer, RandomTestUtil.randomString(),
 			RandomTestUtil.randomLong());
 	}

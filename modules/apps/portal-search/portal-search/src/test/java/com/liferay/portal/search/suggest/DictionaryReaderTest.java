@@ -16,9 +16,9 @@ package com.liferay.portal.search.suggest;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.internal.suggest.DictionaryReaderImpl;
 
 import java.io.ByteArrayInputStream;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -139,7 +139,7 @@ public class DictionaryReaderTest {
 
 		String content = String.join(StringPool.NEW_LINE, lines);
 
-		return new DictionaryReader(
+		return new DictionaryReaderImpl(
 			new ByteArrayInputStream(content.getBytes()));
 	}
 
