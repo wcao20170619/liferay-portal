@@ -17,7 +17,7 @@ package com.liferay.portal.search.constants;
 /**
  * @author André de Oliveira
  */
-public class SearchContextAttributes {
+public interface SearchContextAttributes {
 
 	public static final String ATTRIBUTE_KEY_BASIC_FACET_SELECTION =
 		"search.basic.facet.selection";

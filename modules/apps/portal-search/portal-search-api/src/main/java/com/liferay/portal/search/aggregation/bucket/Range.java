@@ -20,78 +20,16 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class Range {
+public interface Range {
 
-	public static Range unboundedFrom(Double from) {
-		return new Range(from, null);
-	}
+	public Double getFrom();
 
-	public static Range unboundedFrom(String key, Double from) {
-		return new Range(key, from, null);
-	}
+	public String getFromAsString();
 
-	public static Range unboundedTo(Double to) {
-		return new Range(null, to);
-	}
+	public String getKey();
 
-	public static Range unboundedTo(String key, Double to) {
-		return new Range(key, null, to);
-	}
+	public Double getTo();
 
-	public Range(Double from, Double to) {
-		_from = from;
-		_fromAsString = null;
-		_to = to;
-		_toAsString = null;
-	}
-
-	public Range(String key, Double from, Double to) {
-		_key = key;
-		_from = from;
-		_fromAsString = null;
-		_to = to;
-		_toAsString = null;
-	}
-
-	public Range(String from, String to) {
-		_from = null;
-		_fromAsString = from;
-		_to = null;
-		_toAsString = to;
-	}
-
-	public Range(String key, String from, String to) {
-		_key = key;
-		_from = null;
-		_fromAsString = from;
-		_to = null;
-		_toAsString = to;
-	}
-
-	public Double getFrom() {
-		return _from;
-	}
-
-	public String getFromAsString() {
-		return _fromAsString;
-	}
-
-	public String getKey() {
-		return _key;
-	}
-
-	public Double getTo() {
-		return _to;
-	}
-
-	public String getToAsString() {
-		return _toAsString;
-	}
-
-	private final Double _from;
-	private final String _fromAsString;
-	private String _key;
-	private final Double _to;
-	private final String _toAsString;
+	public String getToAsString();
 
 }

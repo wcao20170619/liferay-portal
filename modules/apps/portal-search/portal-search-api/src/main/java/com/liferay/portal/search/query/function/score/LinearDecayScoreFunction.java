@@ -20,24 +20,9 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class LinearDecayScoreFunction extends DecayScoreFunction {
-
-	public LinearDecayScoreFunction(
-		String field, Object origin, Object scale, Object offset) {
-
-		super(field, origin, scale, offset);
-	}
-
-	public LinearDecayScoreFunction(
-		String field, Object origin, Object scale, Object offset,
-		Double decay) {
-
-		super(field, origin, scale, offset, decay);
-	}
+public interface LinearDecayScoreFunction extends DecayScoreFunction {
 
 	@Override
-	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator) {
-		return scoreFunctionTranslator.translate(this);
-	}
+	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator);
 
 }

@@ -16,8 +16,6 @@ package com.liferay.portal.search.document;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,40 +23,16 @@ import java.util.Map;
  * @author Michael C. Han
  */
 @ProviderType
-public class Document {
+public interface Document {
 
-	public void addField(Field field) {
-		_fields.put(field.getName(), field);
-	}
+	public void addField(Field field);
 
-	public Field getField(String name) {
-		return _fields.get(name);
-	}
+	public Field getField(String name);
 
-	public Map<String, Field> getFields() {
-		return Collections.unmodifiableMap(_fields);
-	}
+	public Map<String, Field> getFields();
 
-	public Object getFieldValue(String name) {
-		Field field = _fields.get(name);
+	public Object getFieldValue(String name);
 
-		if (field == null) {
-			return null;
-		}
-
-		return field.getValue();
-	}
-
-	public List<Object> getFieldValues(String name) {
-		Field field = _fields.get(name);
-
-		if (field == null) {
-			return null;
-		}
-
-		return field.getValues();
-	}
-
-	private final Map<String, Field> _fields = new HashMap<>();
+	public List<Object> getFieldValues(String name);
 
 }

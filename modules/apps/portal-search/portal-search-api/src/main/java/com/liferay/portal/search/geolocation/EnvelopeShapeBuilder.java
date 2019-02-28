@@ -20,27 +20,12 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class EnvelopeShapeBuilder extends ShapeBuilder {
+public interface EnvelopeShapeBuilder extends ShapeBuilder {
 
-	public EnvelopeShapeBuilder(Coordinate topLeft, Coordinate bottomRight) {
-		_topLeft = topLeft;
-		_bottomRight = bottomRight;
-	}
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
-	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
-	}
+	public Coordinate getBottomRight();
 
-	public Coordinate getBottomRight() {
-		return _bottomRight;
-	}
-
-	public Coordinate getTopLeft() {
-		return _topLeft;
-	}
-
-	private final Coordinate _bottomRight;
-	private final Coordinate _topLeft;
+	public Coordinate getTopLeft();
 
 }

@@ -16,21 +16,12 @@ package com.liferay.portal.search.geolocation;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.List;
-
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class MultiPointShapeBuilder extends ShapeBuilder {
+public interface MultiPointShapeBuilder extends ShapeBuilder {
 
-	public MultiPointShapeBuilder(List<Coordinate> coodinates) {
-		addCoordinates(coodinates);
-	}
-
-	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
-	}
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
 }

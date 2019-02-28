@@ -20,35 +20,16 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class CircleShapeBuilder extends ShapeBuilder {
+public interface CircleShapeBuilder extends ShapeBuilder {
 
-	public CircleShapeBuilder(GeoDistance radius, Coordinate center) {
-		_radius = radius;
-		_center = center;
-	}
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
-	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
-	}
+	public Coordinate getCenter();
 
-	public Coordinate getCenter() {
-		return _center;
-	}
+	public GeoDistance getRadius();
 
-	public GeoDistance getRadius() {
-		return _radius;
-	}
+	public void setCenter(Coordinate center);
 
-	public void setCenter(Coordinate center) {
-		_center = center;
-	}
-
-	public void setRadius(GeoDistance radius) {
-		_radius = radius;
-	}
-
-	private Coordinate _center;
-	private GeoDistance _radius;
+	public void setRadius(GeoDistance radius);
 
 }

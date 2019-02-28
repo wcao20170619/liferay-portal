@@ -20,15 +20,8 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class PointShapeBuilder extends ShapeBuilder {
+public interface PointShapeBuilder extends ShapeBuilder {
 
-	public PointShapeBuilder(Coordinate coordinate) {
-		addCoordinates(coordinate);
-	}
-
-	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
-	}
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
 }

@@ -17,7 +17,7 @@ package com.liferay.portal.search.contributor;
 /**
  * @author Michael C. Han
  */
-public class ContributorConstants {
+public interface ContributorConstants {
 
 	public static final String ENTRY_CLASS_NAME_PROPERTY_KEY =
 		"entry.class.name";

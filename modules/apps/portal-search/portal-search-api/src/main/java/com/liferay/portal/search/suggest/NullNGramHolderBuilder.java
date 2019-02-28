@@ -20,23 +20,16 @@ import com.liferay.portal.kernel.search.suggest.NGramHolderBuilder;
 /**
  * @author Michael C. Han
  */
-public class NullNGramHolderBuilder implements NGramHolderBuilder {
+public interface NullNGramHolderBuilder extends NGramHolderBuilder {
 
 	@Override
-	public NGramHolder buildNGramHolder(String input) {
-		return new NGramHolder();
-	}
+	public NGramHolder buildNGramHolder(String input);
 
 	@Override
-	public NGramHolder buildNGramHolder(String input, int nGramMaxLength) {
-		return new NGramHolder();
-	}
+	public NGramHolder buildNGramHolder(String input, int nGramMaxLength);
 
 	@Override
 	public NGramHolder buildNGramHolder(
-		String input, int nGramMinLength, int nGramMaxLength) {
-
-		return new NGramHolder();
-	}
+		String input, int nGramMinLength, int nGramMaxLength);
 
 }

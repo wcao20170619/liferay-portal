@@ -16,47 +16,23 @@ package com.liferay.portal.search.geolocation;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class MultiPolygonShapeBuilder extends ShapeBuilder {
+public interface MultiPolygonShapeBuilder extends ShapeBuilder {
 
-	public MultiPolygonShapeBuilder(Orientation orientation) {
-		_orientation = orientation;
-	}
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
-	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
-	}
-
-	public void addPolygonShapeBuilder(
-		PolygonShapeBuilder polygonShapeBuilder) {
-
-		_polygonShapeBuilders.add(polygonShapeBuilder);
-	}
+	public void addPolygonShapeBuilder(PolygonShapeBuilder polygonShapeBuilder);
 
 	public void addPolygonShapeBuilders(
-		PolygonShapeBuilder... polygonShapeBuilders) {
+		PolygonShapeBuilder... polygonShapeBuilders);
 
-		Collections.addAll(_polygonShapeBuilders, polygonShapeBuilders);
-	}
+	public Orientation getOrientation();
 
-	public Orientation getOrientation() {
-		return _orientation;
-	}
-
-	public List<PolygonShapeBuilder> getPolygonShapeBuilders() {
-		return Collections.unmodifiableList(_polygonShapeBuilders);
-	}
-
-	private final Orientation _orientation;
-	private final List<PolygonShapeBuilder> _polygonShapeBuilders =
-		new ArrayList<>();
+	public List<PolygonShapeBuilder> getPolygonShapeBuilders();
 
 }
