@@ -14,8 +14,6 @@
 
 package com.liferay.portal.search.internal.hits;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
@@ -30,7 +28,6 @@ import java.util.Map;
  * @author Michael C. Han
  * @author André de Oliveira
  */
-@ProviderType
 public class SearchHitImpl implements SearchHit, Serializable {
 
 	public void addHighlightField(HighlightField highlightField) {
@@ -73,29 +70,47 @@ public class SearchHitImpl implements SearchHit, Serializable {
 		return _version;
 	}
 
-	public void setDocument(Document document) {
+	protected SearchHitImpl() {
+	}
+
+	protected SearchHitImpl(SearchHitImpl searchHitImpl) {
+		_document = searchHitImpl._document;
+		_explanation = searchHitImpl._explanation;
+
+		_highlightFields.putAll(searchHitImpl.getHighlightFields());
+
+		_id = searchHitImpl._id;
+		_matchedQueries = searchHitImpl._matchedQueries;
+		_score = searchHitImpl._score;
+		_sourceMap.putAll(searchHitImpl._sourceMap);
+		_version = searchHitImpl._version;
+	}
+
+	protected void setDocument(Document document) {
 		_document = document;
 	}
 
-	public void setExplanation(String explanation) {
+	protected void setExplanation(String explanation) {
 		_explanation = explanation;
 	}
 
-	public void setId(String id) {
+	protected void setId(String id) {
 		_id = id;
 	}
 
-	public void setMatchedQueries(String[] matchedQueries) {
+	protected void setMatchedQueries(String[] matchedQueries) {
 		_matchedQueries = matchedQueries;
 	}
 
-	public void setScore(float score) {
+	protected void setScore(float score) {
 		_score = score;
 	}
 
-	public void setVersion(long version) {
+	protected void setVersion(long version) {
 		_version = version;
 	}
+
+	private static final long serialVersionUID = 1L;
 
 	private Document _document;
 	private String _explanation;
