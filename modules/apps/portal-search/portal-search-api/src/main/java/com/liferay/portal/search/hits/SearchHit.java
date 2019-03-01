@@ -19,90 +19,29 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.highlight.HighlightField;
 
-import java.io.Serializable;
-
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class SearchHit implements Serializable {
+public interface SearchHit {
 
-	public void addHighlightField(HighlightField highlightField) {
-		_highlightFields.put(highlightField.getName(), highlightField);
-	}
+	public Document getDocument();
 
-	public void addSource(String name, Object value) {
-		_sourceMap.put(name, value);
-	}
+	public String getExplanation();
 
-	public Document getDocument() {
-		return _document;
-	}
+	public Map<String, HighlightField> getHighlightFields();
 
-	public String getExplanation() {
-		return _explanation;
-	}
+	public String getId();
 
-	public Map<String, HighlightField> getHighlightFields() {
-		return Collections.unmodifiableMap(_highlightFields);
-	}
+	public String[] getMatchedQueries();
 
-	public String getId() {
-		return _id;
-	}
+	public float getScore();
 
-	public String[] getMatchedQueries() {
-		return _matchedQueries;
-	}
+	public Map<String, Object> getSourceMap();
 
-	public float getScore() {
-		return _score;
-	}
-
-	public Map<String, Object> getSourceMap() {
-		return Collections.unmodifiableMap(_sourceMap);
-	}
-
-	public long getVersion() {
-		return _version;
-	}
-
-	public void setDocument(Document document) {
-		_document = document;
-	}
-
-	public void setExplanation(String explanation) {
-		_explanation = explanation;
-	}
-
-	public void setId(String id) {
-		_id = id;
-	}
-
-	public void setMatchedQueries(String[] matchedQueries) {
-		_matchedQueries = matchedQueries;
-	}
-
-	public void setScore(float score) {
-		_score = score;
-	}
-
-	public void setVersion(long version) {
-		_version = version;
-	}
-
-	private Document _document;
-	private String _explanation;
-	private final Map<String, HighlightField> _highlightFields =
-		new HashMap<>();
-	private String _id;
-	private String[] _matchedQueries;
-	private float _score;
-	private final Map<String, Object> _sourceMap = new HashMap<>();
-	private long _version;
+	public long getVersion();
 
 }
