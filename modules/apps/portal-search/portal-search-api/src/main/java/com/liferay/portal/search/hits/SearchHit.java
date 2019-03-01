@@ -44,27 +44,4 @@ public interface SearchHit {
 
 	public long getVersion();
 
-	@ProviderType
-	public interface Builder {
-
-		public Builder addHighlightField(HighlightField highlightField);
-
-		public Builder addSource(String name, Object value);
-
-		public SearchHit build();
-
-		public Builder document(Document document);
-
-		public Builder explanation(String explanation);
-
-		public Builder id(String id);
-
-		public Builder matchedQueries(String[] matchedQueries);
-
-		public Builder score(float score);
-
-		public Builder version(long version);
-
-	}
-
 }
