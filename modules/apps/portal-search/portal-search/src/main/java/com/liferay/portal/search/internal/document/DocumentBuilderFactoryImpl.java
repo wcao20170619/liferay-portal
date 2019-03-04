@@ -17,6 +17,7 @@ package com.liferay.portal.search.internal.document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -29,10 +30,29 @@ public class DocumentBuilderFactoryImpl implements DocumentBuilderFactory {
 
 	@Override
 	public DocumentBuilder getBuilder() {
+		return new DocumentBuilderImpl(
+			_fieldRegistryManager.getFieldRegistry());
+	}
+
+	@Override
+	public DocumentBuilder getBuilder(String indexName) {
+		FieldRegistry fieldRegistry = _fieldRegistryManager.getFieldRegistry(
+			indexName);
+
+		if (fieldRegistry == null) {
+			fieldRegistry = _fieldRegistryManager.getFieldRegistry();
+		}
+
 		return new DocumentBuilderImpl(fieldRegistry);
 	}
 
-	@Reference
-	protected FieldRegistry fieldRegistry;
+	@Reference(unbind = "-")
+	protected void setFieldRegistryManager(
+		FieldRegistryManager fieldRegistryManager) {
+
+		_fieldRegistryManager = fieldRegistryManager;
+	}
+
+	private FieldRegistryManager _fieldRegistryManager;
 
 }

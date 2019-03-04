@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.internal.sort;
 
-import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 import com.liferay.portal.search.sort.SortBuilder;
 import com.liferay.portal.search.sort.SortBuilderFactory;
 
@@ -29,13 +29,29 @@ public class DefaultSortBuilderFactory implements SortBuilderFactory {
 
 	@Override
 	public SortBuilder getBuilder() {
-		return new SortBuilderImpl(fieldRegistry, sortTranslator);
+		return new SortBuilderImpl(
+			_fieldRegistryManager.getFieldRegistry(), _sortTranslator);
 	}
 
-	@Reference
-	protected FieldRegistry fieldRegistry;
+	@Override
+	public SortBuilder getBuilder(String indexName) {
+		return new SortBuilderImpl(
+			_fieldRegistryManager.getFieldRegistry(indexName), _sortTranslator);
+	}
 
-	@Reference
-	protected SortTranslator sortTranslator;
+	@Reference(unbind = "-")
+	protected void setFieldRegistryManager(
+		FieldRegistryManager fieldRegistryManager) {
+
+		_fieldRegistryManager = fieldRegistryManager;
+	}
+
+	@Reference(unbind = "-")
+	protected void setSortTranslator(SortTranslator sortTranslator) {
+		_sortTranslator = sortTranslator;
+	}
+
+	private FieldRegistryManager _fieldRegistryManager;
+	private SortTranslator _sortTranslator;
 
 }

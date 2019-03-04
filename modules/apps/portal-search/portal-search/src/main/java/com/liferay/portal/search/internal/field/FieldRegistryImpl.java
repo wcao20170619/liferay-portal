@@ -31,31 +31,26 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Wade Cao
  */
-@Component(immediate = true, service = FieldRegistry.class)
 public class FieldRegistryImpl implements FieldRegistry {
 
-	@Activate
-	public void activate() {
-		registerContributedMappings();
-
-		registerSortableFields();								// TODO ???????????????
+	public FieldRegistryImpl() {
 	}
 
 	@Override
 	public Optional<Mapping> getMappingOptional(String fieldName) {
-		return mappingsHolder.getMappingOptional(fieldName);
+		return _mappingsHolder.getMappingOptional(fieldName);
 	}
 
 	@Override
 	public Map<String, Mapping> getMappings() {
-		return mappingsHolder.getMappings();
+		return _mappingsHolder.getMappings();
+	}
+
+	public MappingsHolder getMappingsHolder() {
+		return _mappingsHolder;
 	}
 
 	@Override
@@ -63,19 +58,10 @@ public class FieldRegistryImpl implements FieldRegistry {
 		return _sortableTextFields.contains(name);
 	}
 
-	/*public boolean isTheFieldType(String name, String dataType) {
-		Optional<Mapping> optional = mappingsHolder.getMappingOptional(name);
-
-		return optional.map(
-			mapping -> Objects.equals(dataType, mapping.getType())
-		).orElse(
-			false
-		);
-
-		//return mappedFieldType.isFieldTypeMatched(dataType);
+	public void register() {
+		registerContributedMappings();
+		registerSortableFields();
 	}
-
-	*/
 
 	@Override
 	public void register(String name, Mapping mapping) {
@@ -94,14 +80,15 @@ public class FieldRegistryImpl implements FieldRegistry {
 	protected void doRegister(String fieldName, Mapping mapping) {
 		guardCollision(fieldName);
 
-		mappingsHolder.putMapping(fieldName, mapping);
+		_mappingsHolder.putMapping(fieldName, mapping);
 
 		Stream<FieldRegistryListener> stream =
-			fieldRegistryListenersHolder.getAll();
+			_fieldRegistryListenersHolder.getAll();
 
 		stream.forEach(
-			fieldRegistryListener -> fieldRegistryListener.onFieldRegistered(
-				null, fieldName, mapping));								// TODO indexName
+			fieldRegistryListener ->
+				fieldRegistryListener.onFieldRegistered(
+					null, fieldName, mapping));
 	}
 
 	protected void doRegister(String fieldName, String type) {
@@ -115,7 +102,7 @@ public class FieldRegistryImpl implements FieldRegistry {
 	}
 
 	protected void guardCollision(String fieldName) {
-		Optional<Mapping> optional = mappingsHolder.getMappingOptional(
+		Optional<Mapping> optional = _mappingsHolder.getMappingOptional(
 			fieldName);
 
 		if (optional.isPresent()) {
@@ -126,7 +113,7 @@ public class FieldRegistryImpl implements FieldRegistry {
 
 	protected void registerContributedMappings() {
 		Stream<FieldRegistryContributor> stream =
-			fieldRegistryContributorsHolder.getAll();
+			_fieldRegistryContributorsHolder.getAll();
 
 		stream.forEach(
 			fieldRegistryContributor -> fieldRegistryContributor.contribute(
@@ -154,15 +141,25 @@ public class FieldRegistryImpl implements FieldRegistry {
 				defaultSortableTextField));
 	}
 
-	@Reference
-	protected FieldRegistryContributorsHolder fieldRegistryContributorsHolder;
+	protected void setFieldRegistryContributorsHolder(
+		FieldRegistryContributorsHolder fieldRegistryContributorsHolder) {
 
-	@Reference
-	protected FieldRegistryListenersHolder fieldRegistryListenersHolder;
+		_fieldRegistryContributorsHolder = fieldRegistryContributorsHolder;
+	}
 
-	@Reference
-	protected MappingsHolder mappingsHolder;
+	protected void setFieldRegistryListenersHolder(
+		FieldRegistryListenersHolder fieldRegistryListenersHolder) {
 
+		_fieldRegistryListenersHolder = fieldRegistryListenersHolder;
+	}
+
+	protected void setMappingsHolder(MappingsHolder mappingsHolder) {
+		_mappingsHolder = mappingsHolder;
+	}
+
+	private FieldRegistryContributorsHolder _fieldRegistryContributorsHolder;
+	private FieldRegistryListenersHolder _fieldRegistryListenersHolder;
+	private MappingsHolder _mappingsHolder;
 	private final Set<String> _sortableTextFields = new HashSet<>();
 
 }

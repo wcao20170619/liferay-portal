@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author André de Oliveira
@@ -87,7 +86,6 @@ public class DocumentBuilderFactoryImpl implements DocumentBuilderFactory {
 			field.getName(), valuesList.toArray(new Object[valuesList.size()]));
 	}
 
-	@Reference
 	protected void setFieldRegistry(FieldRegistry fieldRegistry) {
 		_fieldRegistry = fieldRegistry;
 	}
