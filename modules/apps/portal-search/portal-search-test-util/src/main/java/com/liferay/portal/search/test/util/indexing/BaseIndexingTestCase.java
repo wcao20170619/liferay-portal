@@ -32,7 +32,7 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
-import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderImpl;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -90,7 +90,7 @@ public abstract class BaseIndexingTestCase
 		_indexingFixture.setUp();
 
 		_documentBuilderFactory = _indexingFixture.getDocumentBuilderFactory();
-		_fieldRegistry = _indexingFixture.getFieldRegistry();
+		_fieldRegistryManager = _indexingFixture.getFieldRegistryManager();
 		_indexSearcher = _indexingFixture.getIndexSearcher();
 		_indexWriter = _indexingFixture.getIndexWriter();
 	}
@@ -216,8 +216,8 @@ public abstract class BaseIndexingTestCase
 		return _entryClassName;
 	}
 
-	protected FieldRegistry getFieldRegistry() {
-		return _fieldRegistry;
+	protected FieldRegistryManager getFieldRegistryManager() {
+		return _fieldRegistryManager;
 	}
 
 	protected IndexSearcher getIndexSearcher() {
@@ -296,6 +296,14 @@ public abstract class BaseIndexingTestCase
 			String fieldName, List<String> expectedValues) {
 
 			DocumentsAssert.assertValues(
+				(String)_searchContext.getAttribute("queryString"),
+				_hits.getDocs(), fieldName, expectedValues);
+		}
+
+		public void assertValuesIgnoreRelevance(
+			String fieldName, List<String> expectedValues) {
+
+			DocumentsAssert.assertValuesIgnoreRelevance(
 				(String)_searchContext.getAttribute("queryString"),
 				_hits.getDocs(), fieldName, expectedValues);
 		}
@@ -406,7 +414,7 @@ public abstract class BaseIndexingTestCase
 	private DocumentBuilderFactory _documentBuilderFactory;
 	private final DocumentFixture _documentFixture = new DocumentFixture();
 	private final String _entryClassName;
-	private FieldRegistry _fieldRegistry;
+	private FieldRegistryManager _fieldRegistryManager;
 	private IndexingFixture _indexingFixture;
 	private IndexSearcher _indexSearcher;
 	private IndexWriter _indexWriter;

@@ -23,7 +23,7 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 import com.liferay.portal.search.internal.sort.DefaultSortBuilderFactory;
 import com.liferay.portal.search.internal.sort.SortTranslator;
 import com.liferay.portal.search.sort.SortBuilder;
@@ -52,12 +52,12 @@ public abstract class BaseDocumentSortTestCase extends BaseDocumentTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		FieldRegistry fieldRegistry1 = getFieldRegistry();
+		FieldRegistryManager fieldRegistryManager = getFieldRegistryManager();
 
 		sortBuilderFactory = new DefaultSortBuilderFactory() {
 			{
-				fieldRegistry = fieldRegistry1;
-				sortTranslator = new SortTranslator();
+				setFieldRegistryManager(fieldRegistryManager);
+				setSortTranslator(new SortTranslator());
 			}
 		};
 	}

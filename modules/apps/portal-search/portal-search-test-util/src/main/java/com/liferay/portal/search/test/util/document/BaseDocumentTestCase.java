@@ -247,7 +247,7 @@ public abstract class BaseDocumentTestCase extends BaseIndexingTestCase {
 	protected final Map<String, Long[]> longArrays = new HashMap<>();
 	protected final Map<String, Long> longs = new HashMap<>();
 
-	private static class FieldRegistryInitializer {
+	protected static class FieldRegistryInitializer {
 
 		public FieldRegistryInitializer(FieldRegistryContributorHelper helper) {
 			_fieldRegistryContributorHelper = helper;

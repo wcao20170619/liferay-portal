@@ -17,7 +17,7 @@ package com.liferay.portal.search.test.util.indexing;
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
-import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 import com.liferay.portal.search.spi.field.contributor.FieldRegistryContributor;
 
 /**
@@ -31,7 +31,7 @@ public interface IndexingFixture {
 
 	public DocumentBuilderFactory getDocumentBuilderFactory();
 
-	public FieldRegistry getFieldRegistry();
+	public FieldRegistryManager getFieldRegistryManager();
 
 	public IndexSearcher getIndexSearcher();
 
