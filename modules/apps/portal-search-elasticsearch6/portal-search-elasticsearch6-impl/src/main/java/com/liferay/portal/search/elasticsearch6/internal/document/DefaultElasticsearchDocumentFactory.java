@@ -351,7 +351,7 @@ public class DefaultElasticsearchDocumentFactory
 			localizedName);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setDocumentBuilderFactory(
 		DocumentBuilderFactory documentBuilderFactory) {
 

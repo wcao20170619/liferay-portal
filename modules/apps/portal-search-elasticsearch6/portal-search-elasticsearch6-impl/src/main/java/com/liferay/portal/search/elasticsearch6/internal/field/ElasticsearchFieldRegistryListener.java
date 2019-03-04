@@ -32,7 +32,7 @@ public class ElasticsearchFieldRegistryListener
 		_fieldRegistrySynchronizer.sync(index);
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setFieldRegistrySynchronizer(
 		FieldRegistrySynchronizer fieldRegistrySynchronizer) {
 

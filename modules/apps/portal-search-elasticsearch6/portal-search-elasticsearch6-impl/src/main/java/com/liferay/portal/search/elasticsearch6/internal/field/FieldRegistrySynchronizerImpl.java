@@ -130,12 +130,18 @@ public class FieldRegistrySynchronizerImpl
 	}
 
 	protected String getElasticsearchType(String indexName) {
-		return LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE; // TODO Get from index? Type name registry?
+		return LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE;
+
+		// TODO Get from index? Type name registry?
+
 	}
 
 	protected String getIndexName(String indexName) {
 		if (indexName == null) {
-			return "_all";											// TODO Index per field registry, type per index
+			return "_all";
+
+			// TODO Index per field registry, type per index
+
 		}
 
 		return indexName;
@@ -153,20 +159,19 @@ public class FieldRegistrySynchronizerImpl
 
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setElasticsearchClientResolver(
 		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		_elasticsearchClientResolver = elasticsearchClientResolver;
 	}
 
-	@Reference
+	@Reference(unbind = "-")
 	protected void setMappingsHolder(MappingsHolder mappingsHolder) {
 		_mappingsHolder = mappingsHolder;
 	}
 
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
-
 	private MappingsHolder _mappingsHolder;
 
 }
