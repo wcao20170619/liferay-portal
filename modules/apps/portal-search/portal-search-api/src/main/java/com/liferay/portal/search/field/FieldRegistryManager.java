@@ -12,15 +12,29 @@
  * details.
  */
 
-package com.liferay.portal.search.sort;
+package com.liferay.portal.search.field;
+
+import aQute.bnd.annotation.ProviderType;
 
 /**
  * @author Wade Cao
  */
-public interface SortBuilderFactory {
+@ProviderType
+public interface FieldRegistryManager {
 
-	public SortBuilder getBuilder();
+	public static final String LIFERAY_COMPANY_INDEX_NAME = "company";
 
-	public SortBuilder getBuilder(String indexName);
+	public FieldRegistry getFieldRegistry();
+
+	public FieldRegistry getFieldRegistry(String indexName);
+
+	public MappingsHolder getMappingsHolder();
+
+	public MappingsHolder getMappingsHolder(String indexName);
+
+	public FieldRegistry register(String indexName);
+
+	public FieldRegistry register(
+		String indexName, MappingsHolder mappingsHolder);
 
 }

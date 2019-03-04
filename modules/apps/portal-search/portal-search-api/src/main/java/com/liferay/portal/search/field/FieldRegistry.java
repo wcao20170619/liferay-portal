@@ -29,6 +29,8 @@ public interface FieldRegistry {
 
 	public Map<String, Mapping> getMappings();
 
+	public MappingsHolder getMappingsHolder();
+
 	public boolean isSortableTextField(String name);
 
 	public void register(String fieldName, Mapping mapping);

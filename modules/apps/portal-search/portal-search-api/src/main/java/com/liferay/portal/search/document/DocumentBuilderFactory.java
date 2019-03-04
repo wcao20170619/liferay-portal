@@ -24,4 +24,6 @@ public interface DocumentBuilderFactory {
 
 	public DocumentBuilder getBuilder();
 
+	public DocumentBuilder getBuilder(String indexName);
+
 }
