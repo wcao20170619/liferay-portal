@@ -40,13 +40,14 @@ import com.liferay.portal.search.elasticsearch6.internal.suggest.PhraseSuggester
 import com.liferay.portal.search.elasticsearch6.internal.suggest.TermSuggesterTranslatorImpl;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.field.FieldRegistry;
+import com.liferay.portal.search.field.FieldRegistryManager;
 import com.liferay.portal.search.field.MappingsHolder;
 import com.liferay.portal.search.internal.document.DocumentBuilderFactoryImpl;
 import com.liferay.portal.search.internal.field.FieldRegistryContributorsHolder;
 import com.liferay.portal.search.internal.field.FieldRegistryContributorsHolderImpl;
-import com.liferay.portal.search.internal.field.FieldRegistryImpl;
 import com.liferay.portal.search.internal.field.FieldRegistryListenersHolder;
 import com.liferay.portal.search.internal.field.FieldRegistryListenersHolderImpl;
+import com.liferay.portal.search.internal.field.FieldRegistryManagerImpl;
 import com.liferay.portal.search.internal.field.MappingsHolderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
@@ -95,8 +96,8 @@ public class ElasticsearchIndexingFixture
 	}
 
 	@Override
-	public FieldRegistry getFieldRegistry() {
-		return _fieldRegistry;
+	public FieldRegistryManager getFieldRegistryManager() {
+		return _fieldRegistryManager;
 	}
 
 	public FieldRegistrySynchronizer getFieldRegistrySynchronizer() {
@@ -131,16 +132,18 @@ public class ElasticsearchIndexingFixture
 
 		MappingsHolder mappingsHolder = new MappingsHolderImpl();
 
-		FieldRegistryImpl fieldRegistryImpl = createFieldRegistry(
-			fieldRegistryContributorsHolderImpl,
-			fieldRegistryListenersHolderImpl, mappingsHolder);
+		FieldRegistryManagerImpl fieldRegistryManagerImpl =
+			createFieldRegistryManager(
+				fieldRegistryContributorsHolderImpl,
+				fieldRegistryListenersHolderImpl, mappingsHolder);
 
 		DocumentBuilderFactory documentBuilderFactory =
-			createDocumentBuilderFactory(fieldRegistryImpl);
+			createDocumentBuilderFactory(fieldRegistryManagerImpl);
 
 		ElasticsearchEngineAdapterFixture elasticsearchEngineAdapterFixture =
 			createElasticsearchEngineAdapterFixture(
-				_elasticsearchFixture, fieldRegistryImpl, getFacetProcessor());
+				_elasticsearchFixture, fieldRegistryManagerImpl,
+				getFacetProcessor());
 
 		elasticsearchEngineAdapterFixture.setUp();
 
@@ -171,7 +174,7 @@ public class ElasticsearchIndexingFixture
 			});
 
 		_documentBuilderFactory = documentBuilderFactory;
-		_fieldRegistry = fieldRegistryImpl;
+		_fieldRegistryManager = fieldRegistryManagerImpl;
 		_fieldRegistryContributorsHolderImpl =
 			fieldRegistryContributorsHolderImpl;
 		_fieldRegistrySynchronizer = fieldRegistrySynchronizer;
@@ -182,8 +185,9 @@ public class ElasticsearchIndexingFixture
 
 		elasticsearchIndexSearcher.activate(
 			_elasticsearchFixture.getElasticsearchConfigurationProperties());
-		fieldRegistryImpl.activate();
 
+		fieldRegistryManagerImpl.register(
+			FieldRegistryManager.LIFERAY_COMPANY_INDEX_NAME);
 		createIndex(indexNameBuilder);
 	}
 
@@ -193,11 +197,11 @@ public class ElasticsearchIndexingFixture
 	}
 
 	protected static DocumentBuilderFactory createDocumentBuilderFactory(
-		FieldRegistry fieldRegistry1) {
+		FieldRegistryManager fieldRegistryManager) {
 
 		return new DocumentBuilderFactoryImpl() {
 			{
-				fieldRegistry = fieldRegistry1;
+				setFieldRegistryManager(fieldRegistryManager);
 			}
 		};
 	}
@@ -216,14 +220,15 @@ public class ElasticsearchIndexingFixture
 	protected static ElasticsearchEngineAdapterFixture
 		createElasticsearchEngineAdapterFixture(
 			ElasticsearchClientResolver elasticsearchClientResolver,
-			FieldRegistry fieldRegistry,
+			FieldRegistryManager fieldRegistryManager,
 			FacetProcessor<SearchRequestBuilder> facetProcessor) {
 
 		return new ElasticsearchEngineAdapterFixture() {
 			{
 				setElasticsearchClientResolver(elasticsearchClientResolver);
 				setElasticsearchDocumentFactory(
-					createElasticsearchDocumentFactory(fieldRegistry));
+					createElasticsearchDocumentFactory(
+						fieldRegistryManager.getFieldRegistry()));
 				setFacetProcessor(facetProcessor);
 			}
 		};
@@ -272,17 +277,19 @@ public class ElasticsearchIndexingFixture
 		};
 	}
 
-	protected static FieldRegistryImpl createFieldRegistry(
-		FieldRegistryContributorsHolder fieldRegistryContributorsHolder1,
-		FieldRegistryListenersHolder fieldRegistryListenersHolder1,
-		MappingsHolder mappingsHolder1) {
+	protected static FieldRegistryManagerImpl createFieldRegistryManager(
+		FieldRegistryContributorsHolder fieldRegistryContributorsHolder,
+		FieldRegistryListenersHolder fieldRegistryListenersHolder,
+		MappingsHolder mappingsHolder) {
 
-		return new FieldRegistryImpl() {
+		return new FieldRegistryManagerImpl() {
 			{
-				fieldRegistryContributorsHolder =
-					fieldRegistryContributorsHolder1;
-				fieldRegistryListenersHolder = fieldRegistryListenersHolder1;
-				mappingsHolder = mappingsHolder1;
+				setFieldRegistryContributorsHolder(
+					fieldRegistryContributorsHolder);
+				setFieldRegistryListenersHolder(fieldRegistryListenersHolder);
+				register(
+					FieldRegistryManager.LIFERAY_COMPANY_INDEX_NAME,
+					mappingsHolder);
 			}
 		};
 	}
@@ -344,9 +351,11 @@ public class ElasticsearchIndexingFixture
 		return new
 			com.liferay.portal.
 				search.internal.legacy.document.DocumentBuilderFactoryImpl() {
+
 			{
 				setFieldRegistry(fieldRegistry);
 			}
+
 		};
 	}
 
@@ -394,6 +403,12 @@ public class ElasticsearchIndexingFixture
 		return new DefaultFacetProcessor();
 	}
 
+	protected void notifyListenersBeforeActivate() {
+		_indexingFixtureListeners.forEach(
+			indexingFixtureListener -> indexingFixtureListener.beforeActivate(
+				this));
+	}
+
 	protected void setCompanyId(long companyId) {
 		_companyId = companyId;
 	}
@@ -419,19 +434,12 @@ public class ElasticsearchIndexingFixture
 	private long _companyId;
 	private final List<CreateIndexContributor> _createIndexContributors =
 		new ArrayList<>();
+	private DocumentBuilderFactory _documentBuilderFactory;
 	private ElasticsearchFixture _elasticsearchFixture;
 	private FacetProcessor<SearchRequestBuilder> _facetProcessor;
-
-	protected void notifyListenersBeforeActivate() {
-		_indexingFixtureListeners.forEach(
-			indexingFixtureListener -> indexingFixtureListener.beforeActivate(
-				this));
-	}
-
-	private DocumentBuilderFactory _documentBuilderFactory;
-	private FieldRegistry _fieldRegistry;
 	private FieldRegistryContributorsHolderImpl
 		_fieldRegistryContributorsHolderImpl;
+	private FieldRegistryManager _fieldRegistryManager;
 	private FieldRegistrySynchronizer _fieldRegistrySynchronizer;
 	private final Collection<IndexingFixtureListener>
 		_indexingFixtureListeners = new ArrayList<>(1);

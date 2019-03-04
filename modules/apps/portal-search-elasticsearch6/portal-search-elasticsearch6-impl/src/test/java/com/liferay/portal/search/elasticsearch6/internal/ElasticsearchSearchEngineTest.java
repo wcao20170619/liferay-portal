@@ -199,8 +199,9 @@ public class ElasticsearchSearchEngineTest {
 
 		return new ElasticsearchSearchEngine() {
 			{
-				setIndexFactory(createCompanyIndexFactory(
-					new CreateIndexRequestFactoryImpl()));
+				setIndexFactory(
+					createCompanyIndexFactory(
+						new CreateIndexRequestFactoryImpl()));
 				setIndexNameBuilder(String::valueOf);
 				setElasticsearchConnectionManager(
 					elasticsearchConnectionManager);

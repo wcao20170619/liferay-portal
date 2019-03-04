@@ -113,6 +113,12 @@ public class IndexCreator {
 		_liferayMappingsAddedToIndex = liferayMappingsAddedToIndex;
 	}
 
+	private final List<CreateIndexContributor> _createIndexContributors =
+		new ArrayList<>();
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
+	private FieldRegistrySynchronizer _fieldRegistrySynchronizer;
+	private boolean _liferayMappingsAddedToIndex;
+
 	private class DeleteBeforeCreateIndexContributor
 		extends DummyCreateIndexContributor {
 
@@ -133,12 +139,5 @@ public class IndexCreator {
 		}
 
 	}
-
-	private final List<CreateIndexContributor> _createIndexContributors =
-		new ArrayList<>();
-
-	private ElasticsearchClientResolver _elasticsearchClientResolver;
-	private FieldRegistrySynchronizer _fieldRegistrySynchronizer;
-	private boolean _liferayMappingsAddedToIndex;
 
 }
