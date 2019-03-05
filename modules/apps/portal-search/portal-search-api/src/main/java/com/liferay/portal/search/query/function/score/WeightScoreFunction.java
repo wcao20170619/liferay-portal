@@ -20,11 +20,9 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class WeightScoreFunction extends ScoreFunction {
+public interface WeightScoreFunction extends ScoreFunction {
 
 	@Override
-	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator) {
-		return scoreFunctionTranslator.translate(this);
-	}
+	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator);
 
 }
