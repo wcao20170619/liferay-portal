@@ -42,7 +42,9 @@ import com.liferay.portal.search.internal.aggregation.AggregationsImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl;
 import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderImpl;
 import com.liferay.portal.search.internal.query.QueriesImpl;
+import com.liferay.portal.search.internal.script.ScriptsImpl;
 import com.liferay.portal.search.query.Queries;
+import com.liferay.portal.search.script.Scripts;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
@@ -269,6 +271,7 @@ public abstract class BaseIndexingTestCase {
 
 	protected final Aggregations aggregations = new AggregationsImpl();
 	protected final Queries queries = new QueriesImpl();
+	protected final Scripts scripts = new ScriptsImpl();
 
 	protected class IndexingTestHelper {
 

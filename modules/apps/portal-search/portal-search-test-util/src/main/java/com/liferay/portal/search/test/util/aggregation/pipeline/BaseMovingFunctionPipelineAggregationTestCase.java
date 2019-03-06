@@ -58,7 +58,7 @@ public abstract class BaseMovingFunctionPipelineAggregationTestCase
 
 		histogramAggregation.addChildAggregation(sumAggregation);
 
-		Script script = new Script(
+		Script script = scripts.script(
 			"painless", "MovingFunctions.unweightedAvg(values)");
 
 		MovingFunctionPipelineAggregation movingFunctionPipelineAggregation =
