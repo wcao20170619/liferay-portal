@@ -16,72 +16,49 @@ package com.liferay.portal.search.script;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class Script {
+public interface Script {
 
-	public Script(String scriptId) {
-		_language = null;
-		_idOrCode = scriptId;
-		_scriptType = ScriptType.STORED;
-		_parameters = null;
-	}
+	public String getIdOrCode();
 
-	public Script(String language, String code) {
-		_language = language;
-		_idOrCode = code;
-		_scriptType = ScriptType.INLINE;
-		_parameters = new HashMap<>();
-	}
+	public String getLanguage();
 
-	public void clearOption(String optionName) {
-		_options.remove(optionName);
-	}
+	public Map<String, String> getOptions();
 
-	public void clearOptions() {
-		_options.clear();
-	}
+	public Map<String, Object> getParameters();
 
-	public void clearParameter(String paramName) {
-		_parameters.remove(paramName);
-	}
+	public ScriptType getScriptType();
 
-	public void clearParameters() {
-		_parameters.clear();
-	}
+	@ProviderType
+	public interface Builder {
 
-	public String getIdOrCode() {
-		return _idOrCode;
-	}
+		public Script build();
 
-	public String getLanguage() {
-		return _language;
-	}
+		public void clearOption(String optionName);
 
-	public Map<String, String> getOptions() {
-		return Collections.unmodifiableMap(_options);
-	}
+		public void clearOptions();
 
-	public Map<String, Object> getParameters() {
-		return Collections.unmodifiableMap(_parameters);
-	}
+		public void clearParameter(String paramName);
 
-	public ScriptType getScriptType() {
-		return _scriptType;
-	}
+		public void clearParameters();
 
-	public void putOption(String optionName, String optionValue) {
-		_options.put(optionName, optionValue);
-	}
+		public void idOrCode(String idOrCode);
 
-	public void putParameter(String paramName, Object paramValue) {
-		_parameters.put(paramName, paramValue);
+		public void language(String language);
+
+		public void parameters(Map<String, Object> parameters);
+
+		public void putOption(String optionName, String optionValue);
+
+		public void putParameter(String paramName, Object paramValue);
+
+		public void scriptType(ScriptType scriptType);
+
 	}
 
 	public enum ScriptType {
@@ -89,11 +66,5 @@ public class Script {
 		INLINE, STORED
 
 	}
-
-	private final String _idOrCode;
-	private final String _language;
-	private final Map<String, String> _options = new HashMap<>();
-	private final Map<String, Object> _parameters;
-	private final ScriptType _scriptType;
 
 }

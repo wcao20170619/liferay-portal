@@ -14,31 +14,19 @@
 
 package com.liferay.portal.search.script;
 
-import aQute.bnd.annotation.ProviderType;
-
 /**
- * @author Michael C. Han
+ * @author Wade Cao
  */
-@ProviderType
-public interface ScriptField {
+public interface Scripts {
 
-	public String getField();
+	public Script.Builder getScriptBuilder();
 
-	public Script getScript();
+	public ScriptField.Builder getScriptFieldBuilder();
 
-	public boolean isIgnoreFailure();
+	public Script script(String scriptId);
 
-	@ProviderType
-	public interface Builder {
+	public Script script(String language, String code);
 
-		public ScriptField build();
-
-		public void field(String field);
-
-		public void ignoreFailure(boolean ignoreFailure);
-
-		public void script(Script script);
-
-	}
+	public ScriptField scriptField(String field, Script script);
 
 }
