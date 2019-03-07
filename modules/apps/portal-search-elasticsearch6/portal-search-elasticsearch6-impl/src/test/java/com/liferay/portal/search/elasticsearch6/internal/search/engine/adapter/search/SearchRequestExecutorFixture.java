@@ -35,6 +35,8 @@ import com.liferay.portal.search.elasticsearch6.internal.stats.DefaultStatsTrans
 import com.liferay.portal.search.elasticsearch6.internal.stats.StatsTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchRequestExecutor;
 import com.liferay.portal.search.internal.aggregation.AggregationResultsImpl;
+import com.liferay.portal.search.internal.hits.SearchHitBuilderFactoryImpl;
+import com.liferay.portal.search.internal.hits.SearchHitsBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.stats.StatsRequestBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.stats.StatsResultsTranslatorImpl;
 import com.liferay.portal.search.internal.stats.StatsResponseBuilderFactoryImpl;
@@ -283,6 +285,10 @@ public class SearchRequestExecutorFixture {
 
 		return new SearchSearchResponseAssemblerImpl() {
 			{
+				setSearchHitBuilderFactory(new SearchHitBuilderFactoryImpl());
+				setSearchHitsBuilderFactory(new SearchHitsBuilderFactoryImpl());
+				activate();
+
 				setAggregationResults(new AggregationResultsImpl());
 				setCommonSearchResponseAssembler(
 					new CommonSearchResponseAssemblerImpl() {
