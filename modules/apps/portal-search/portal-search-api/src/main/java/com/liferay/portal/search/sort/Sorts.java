@@ -16,27 +16,23 @@ package com.liferay.portal.search.sort;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.script.Script;
+
 /**
- * @author Michael C. Han
+ * @author Wade Cao
  */
 @ProviderType
-public interface FieldSort extends Sort {
+public interface Sorts {
 
-	@Override
-	public <T> T accept(SortVisitor<T> sortVisitor);
+	public FieldSort field(String field);
 
-	public String getField();
+	public GeoDistanceSort geoDistance(String field);
 
-	public Object getMissing();
+	public NestedSort nested(String path);
 
-	public NestedSort getNestedSort();
+	public ScoreSort score();
 
-	public SortMode getSortMode();
-
-	public void setMissing(Object missing);
-
-	public void setNestedSort(NestedSort nestedSort);
-
-	public void setSortMode(SortMode sortMode);
+	public ScriptSort script(
+		Script script, ScriptSort.ScriptSortType scriptSortType);
 
 }
