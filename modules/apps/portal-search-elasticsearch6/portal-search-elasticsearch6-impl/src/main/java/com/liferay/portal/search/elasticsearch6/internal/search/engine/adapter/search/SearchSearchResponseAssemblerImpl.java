@@ -30,7 +30,9 @@ import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslat
 import com.liferay.portal.search.elasticsearch6.internal.search.response.SearchResponseTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -39,6 +41,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregations;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -78,7 +81,8 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchAggregation) {
 
 		return new ElasticsearchAggregationResultTranslator(
-			elasticsearchAggregation, _aggregationResults);
+			elasticsearchAggregation, _aggregationResults,
+			_searchHitsTranslator);
 	}
 
 	@Override
@@ -89,6 +93,12 @@ public class SearchSearchResponseAssemblerImpl
 
 		return new ElasticsearchPipelineAggregationResultTranslator(
 			elasticsearchAggregation, _aggregationResults);
+	}
+
+	@Activate
+	protected void activate() {
+		_searchHitsTranslator = new SearchHitsTranslator(
+			_searchHitBuilderFactory, _searchHitsBuilderFactory);
 	}
 
 	protected void addAggregations(
@@ -155,6 +165,13 @@ public class SearchSearchResponseAssemblerImpl
 		}
 	}
 
+	@Reference(unbind = "-")
+	protected void setSearchHitBuilderFactory(
+		SearchHitBuilderFactory searchHitBuilderFactory) {
+
+		_searchHitBuilderFactory = searchHitBuilderFactory;
+	}
+
 	protected void setSearchHits(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse,
@@ -167,9 +184,14 @@ public class SearchSearchResponseAssemblerImpl
 			elasticsearchSearchHits,
 			searchSearchRequest.getAlternateUidFieldName());
 
-		searchHits.setTotalHits(elasticsearchSearchHits.totalHits);
-
 		searchSearchResponse.setSearchHits(searchHits);
+	}
+
+	@Reference(unbind = "-")
+	protected void setSearchHitsBuilderFactory(
+		SearchHitsBuilderFactory searchHitsBuilderFactory) {
+
+		_searchHitsBuilderFactory = searchHitsBuilderFactory;
 	}
 
 	@Reference(unbind = "-")
@@ -181,8 +203,9 @@ public class SearchSearchResponseAssemblerImpl
 
 	private AggregationResults _aggregationResults;
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
-	private final SearchHitsTranslator _searchHitsTranslator =
-		new SearchHitsTranslator();
+	private SearchHitBuilderFactory _searchHitBuilderFactory;
+	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
+	private SearchHitsTranslator _searchHitsTranslator;
 	private SearchResponseTranslator _searchResponseTranslator;
 
 }
