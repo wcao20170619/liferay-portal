@@ -63,7 +63,7 @@ public abstract class BasePrefixQueryTestCase extends BaseIndexingTestCase {
 				searchSearchRequest.setQuery(prefixQuery);
 				searchSearchRequest.setSize(30);
 
-				FieldSort fieldSort = new FieldSort(Field.USER_NAME);
+				FieldSort fieldSort = sorts.field(Field.USER_NAME);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

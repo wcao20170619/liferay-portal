@@ -79,7 +79,7 @@ public abstract class BaseTopHitsAggregationTestCase
 
 		TopHitsAggregation topHitsAggregation = aggregations.topHits("topHits");
 
-		FieldSort fieldSort = new FieldSort(Field.PRIORITY);
+		FieldSort fieldSort = sorts.field(Field.PRIORITY);
 
 		fieldSort.setSortOrder(SortOrder.DESC);
 

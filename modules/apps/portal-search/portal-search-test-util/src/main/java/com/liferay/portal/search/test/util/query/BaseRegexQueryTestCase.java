@@ -77,7 +77,7 @@ public abstract class BaseRegexQueryTestCase extends BaseIndexingTestCase {
 				searchSearchRequest.setQuery(regexQuery);
 				searchSearchRequest.setSize(30);
 
-				FieldSort fieldSort = new FieldSort(Field.USER_NAME);
+				FieldSort fieldSort = sorts.field(Field.USER_NAME);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

@@ -71,7 +71,7 @@ public abstract class BaseDateRangeTermQueryTestCase
 				searchSearchRequest.setIndexNames("_all");
 				searchSearchRequest.setQuery(dateRangeTermQuery);
 
-				FieldSort fieldSort = new FieldSort(Field.EXPIRATION_DATE);
+				FieldSort fieldSort = sorts.field(Field.EXPIRATION_DATE);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 
