@@ -25,6 +25,7 @@ import com.liferay.portal.search.aggregation.pipeline.BucketScriptPipelineAggreg
 import com.liferay.portal.search.internal.aggregation.bucket.HistogramAggregationImpl;
 import com.liferay.portal.search.internal.aggregation.metrics.SumAggregationImpl;
 import com.liferay.portal.search.internal.aggregation.pipeline.BucketScriptPipelineAggregationImpl;
+import com.liferay.portal.search.internal.script.ScriptImpl;
 import com.liferay.portal.search.script.Script;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
@@ -60,7 +61,7 @@ public abstract class BaseBucketScriptPipelineAggregationTestCase
 
 		histogramAggregation.addChildAggregation(sumAggregation);
 
-		Script script = new Script("painless", "params.sum * 50");
+		Script script = new ScriptImpl("painless", "params.sum * 50");
 
 		BucketScriptPipelineAggregation bucketScriptPipelineAggregation =
 			new BucketScriptPipelineAggregationImpl("bucket_script", script);

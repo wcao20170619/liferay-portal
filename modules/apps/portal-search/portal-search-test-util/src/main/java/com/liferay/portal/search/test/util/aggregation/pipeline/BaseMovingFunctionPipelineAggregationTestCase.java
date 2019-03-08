@@ -25,6 +25,7 @@ import com.liferay.portal.search.aggregation.pipeline.MovingFunctionPipelineAggr
 import com.liferay.portal.search.internal.aggregation.bucket.HistogramAggregationImpl;
 import com.liferay.portal.search.internal.aggregation.metrics.SumAggregationImpl;
 import com.liferay.portal.search.internal.aggregation.pipeline.MovingFunctionPipelineAggregationImpl;
+import com.liferay.portal.search.internal.script.ScriptImpl;
 import com.liferay.portal.search.script.Script;
 import com.liferay.portal.search.test.util.aggregation.AggregationAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
@@ -58,7 +59,7 @@ public abstract class BaseMovingFunctionPipelineAggregationTestCase
 
 		histogramAggregation.addChildAggregation(sumAggregation);
 
-		Script script = new Script(
+		Script script = new ScriptImpl(
 			"painless", "MovingFunctions.unweightedAvg(values)");
 
 		MovingFunctionPipelineAggregation movingFunctionPipelineAggregation =
