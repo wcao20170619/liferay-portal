@@ -12,21 +12,31 @@
  * details.
  */
 
-package com.liferay.portal.search.query.function.score;
+package com.liferay.portal.search.internal.query.function.score;
 
-import aQute.bnd.annotation.ProviderType;
-
+import com.liferay.portal.search.query.function.score.ScoreFunctionTranslator;
+import com.liferay.portal.search.query.function.score.ScriptScoreFunction;
 import com.liferay.portal.search.script.Script;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface ScriptScoreFunction extends ScoreFunction {
+public class ScriptScoreFunctionImpl
+	extends ScoreFunctionImpl implements ScriptScoreFunction {
+
+	public ScriptScoreFunctionImpl(Script script) {
+		_script = script;
+	}
 
 	@Override
-	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator);
+	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator) {
+		return scoreFunctionTranslator.translate(this);
+	}
 
-	public Script getScript();
+	public Script getScript() {
+		return _script;
+	}
+
+	private final Script _script;
 
 }

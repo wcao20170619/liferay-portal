@@ -12,30 +12,20 @@
  * details.
  */
 
-package com.liferay.portal.search.query.function.score;
+package com.liferay.portal.search.internal.query.function.score;
 
-import aQute.bnd.annotation.ProviderType;
-
-import com.liferay.portal.search.query.MultiValueMode;
+import com.liferay.portal.search.query.function.score.ScoreFunctionTranslator;
+import com.liferay.portal.search.query.function.score.WeightScoreFunction;
 
 /**
  * @author Michael C. Han
  */
-@ProviderType
-public interface DecayScoreFunction extends ScoreFunction {
+public class WeightScoreFunctionImpl
+	extends ScoreFunctionImpl implements WeightScoreFunction {
 
-	public Double getDecay();
-
-	public String getField();
-
-	public MultiValueMode getMultiValueMode();
-
-	public Object getOffset();
-
-	public Object getOrigin();
-
-	public Object getScale();
-
-	public void setMultiValueMode(MultiValueMode multiValueMode);
+	@Override
+	public <T> T accept(ScoreFunctionTranslator<T> scoreFunctionTranslator) {
+		return scoreFunctionTranslator.translate(this);
+	}
 
 }
