@@ -12,27 +12,22 @@
  * details.
  */
 
-package com.liferay.portal.search.hits;
+package com.liferay.portal.search.internal.hits;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.search.hits.SearchHitBuilder;
+import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 
-import java.io.Serializable;
-
-import java.util.List;
+import org.osgi.service.component.annotations.Component;
 
 /**
- * @author Michael C. Han
- * @author André de Oliveira
+ * @author Wade Cao
  */
-@ProviderType
-public interface SearchHits extends Serializable {
+@Component(immediate = true, service = SearchHitBuilderFactory.class)
+public class SearchHitBuilderFactoryImpl implements SearchHitBuilderFactory {
 
-	public float getMaxScore();
-
-	public List<SearchHit> getSearchHits();
-
-	public long getSearchTime();
-
-	public long getTotalHits();
+	@Override
+	public SearchHitBuilder getSearchHitBuilder() {
+		return new SearchHitBuilderImpl();
+	}
 
 }

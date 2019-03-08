@@ -21,85 +21,41 @@ import com.liferay.portal.search.geolocation.GeoDistanceType;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.geolocation.GeoValidationMethod;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class GeoDistanceSort extends Sort {
-
-	public GeoDistanceSort(String field) {
-		_field = field;
-	}
+public interface GeoDistanceSort extends Sort {
 
 	@Override
-	public <T> T accept(SortVisitor<T> sortVisitor) {
-		return sortVisitor.visit(this);
-	}
+	public <T> T accept(SortVisitor<T> sortVisitor);
 
-	public void addGeoLocationPoints(GeoLocationPoint... geoLocationPoints) {
-		Collections.addAll(_geoLocationPoints, geoLocationPoints);
-	}
+	public void addGeoLocationPoints(GeoLocationPoint... geoLocationPoints);
 
-	public DistanceUnit getDistanceUnit() {
-		return _distanceUnit;
-	}
+	public DistanceUnit getDistanceUnit();
 
-	public String getField() {
-		return _field;
-	}
+	public String getField();
 
-	public GeoDistanceType getGeoDistanceType() {
-		return _geoDistanceType;
-	}
+	public GeoDistanceType getGeoDistanceType();
 
-	public List<GeoLocationPoint> getGeoLocationPoints() {
-		return Collections.unmodifiableList(_geoLocationPoints);
-	}
+	public List<GeoLocationPoint> getGeoLocationPoints();
 
-	public GeoValidationMethod getGeoValidationMethod() {
-		return _geoValidationMethod;
-	}
+	public GeoValidationMethod getGeoValidationMethod();
 
-	public NestedSort getNestedSort() {
-		return _nestedSort;
-	}
+	public NestedSort getNestedSort();
 
-	public SortMode getSortMode() {
-		return _sortMode;
-	}
+	public SortMode getSortMode();
 
-	public void setDistanceUnit(DistanceUnit distanceUnit) {
-		_distanceUnit = distanceUnit;
-	}
+	public void setDistanceUnit(DistanceUnit distanceUnit);
 
-	public void setGeoDistanceType(GeoDistanceType geoDistanceType) {
-		_geoDistanceType = geoDistanceType;
-	}
+	public void setGeoDistanceType(GeoDistanceType geoDistanceType);
 
-	public void setGeoValidationMethod(
-		GeoValidationMethod geoValidationMethod) {
+	public void setGeoValidationMethod(GeoValidationMethod geoValidationMethod);
 
-		_geoValidationMethod = geoValidationMethod;
-	}
+	public void setNestedSort(NestedSort nestedSort);
 
-	public void setNestedSort(NestedSort nestedSort) {
-		_nestedSort = nestedSort;
-	}
-
-	public void setSortMode(SortMode sortMode) {
-		_sortMode = sortMode;
-	}
-
-	private DistanceUnit _distanceUnit;
-	private final String _field;
-	private GeoDistanceType _geoDistanceType;
-	private List<GeoLocationPoint> _geoLocationPoints = new ArrayList<>();
-	private GeoValidationMethod _geoValidationMethod;
-	private NestedSort _nestedSort;
-	private SortMode _sortMode;
+	public void setSortMode(SortMode sortMode);
 
 }

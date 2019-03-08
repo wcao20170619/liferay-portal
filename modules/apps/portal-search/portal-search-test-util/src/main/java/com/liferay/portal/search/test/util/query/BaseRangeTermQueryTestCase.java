@@ -64,7 +64,7 @@ public abstract class BaseRangeTermQueryTestCase extends BaseIndexingTestCase {
 				searchSearchRequest.setQuery(rangeTermQuery);
 				searchSearchRequest.setSize(15);
 
-				FieldSort fieldSort = new FieldSort(Field.PRIORITY);
+				FieldSort fieldSort = sorts.field(Field.PRIORITY);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

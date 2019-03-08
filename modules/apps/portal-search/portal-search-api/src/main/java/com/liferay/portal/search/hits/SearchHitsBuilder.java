@@ -16,23 +16,20 @@ package com.liferay.portal.search.hits;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.io.Serializable;
-
-import java.util.List;
-
 /**
- * @author Michael C. Han
- * @author André de Oliveira
+ * @author Wade Cao
  */
 @ProviderType
-public interface SearchHits extends Serializable {
+public interface SearchHitsBuilder {
 
-	public float getMaxScore();
+	public SearchHitsBuilder addSearchHit(SearchHit searchHit);
 
-	public List<SearchHit> getSearchHits();
+	public SearchHits build();
 
-	public long getSearchTime();
+	public SearchHitsBuilder maxScore(float maxScore);
 
-	public long getTotalHits();
+	public SearchHitsBuilder searchTime(long searchTime);
+
+	public SearchHitsBuilder totalHits(long totalHits);
 
 }

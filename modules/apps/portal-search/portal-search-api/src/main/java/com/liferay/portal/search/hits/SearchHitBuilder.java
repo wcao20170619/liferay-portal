@@ -16,23 +16,31 @@ package com.liferay.portal.search.hits;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.io.Serializable;
-
-import java.util.List;
+import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.highlight.HighlightField;
 
 /**
- * @author Michael C. Han
- * @author André de Oliveira
+ * @author Wade Cao
  */
 @ProviderType
-public interface SearchHits extends Serializable {
+public interface SearchHitBuilder {
 
-	public float getMaxScore();
+	public SearchHitBuilder addHighlightField(HighlightField highlightField);
 
-	public List<SearchHit> getSearchHits();
+	public SearchHitBuilder addSource(String name, Object value);
 
-	public long getSearchTime();
+	public SearchHit build();
 
-	public long getTotalHits();
+	public SearchHitBuilder document(Document document);
+
+	public SearchHitBuilder explanation(String explanation);
+
+	public SearchHitBuilder id(String id);
+
+	public SearchHitBuilder matchedQueries(String[] matchedQueries);
+
+	public SearchHitBuilder score(float score);
+
+	public SearchHitBuilder version(long version);
 
 }

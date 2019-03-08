@@ -20,48 +20,23 @@ import aQute.bnd.annotation.ProviderType;
  * @author Michael C. Han
  */
 @ProviderType
-public class FieldSort extends Sort {
-
-	public FieldSort(String field) {
-		_field = field;
-	}
+public interface FieldSort extends Sort {
 
 	@Override
-	public <T> T accept(SortVisitor<T> sortVisitor) {
-		return sortVisitor.visit(this);
-	}
+	public <T> T accept(SortVisitor<T> sortVisitor);
 
-	public String getField() {
-		return _field;
-	}
+	public String getField();
 
-	public Object getMissing() {
-		return _missing;
-	}
+	public Object getMissing();
 
-	public NestedSort getNestedSort() {
-		return _nestedSort;
-	}
+	public NestedSort getNestedSort();
 
-	public SortMode getSortMode() {
-		return _sortMode;
-	}
+	public SortMode getSortMode();
 
-	public void setMissing(Object missing) {
-		_missing = missing;
-	}
+	public void setMissing(Object missing);
 
-	public void setNestedSort(NestedSort nestedSort) {
-		_nestedSort = nestedSort;
-	}
+	public void setNestedSort(NestedSort nestedSort);
 
-	public void setSortMode(SortMode sortMode) {
-		_sortMode = sortMode;
-	}
-
-	private final String _field;
-	private Object _missing;
-	private NestedSort _nestedSort;
-	private SortMode _sortMode;
+	public void setSortMode(SortMode sortMode);
 
 }

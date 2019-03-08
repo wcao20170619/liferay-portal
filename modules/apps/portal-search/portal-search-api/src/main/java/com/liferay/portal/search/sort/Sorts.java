@@ -12,27 +12,27 @@
  * details.
  */
 
-package com.liferay.portal.search.hits;
+package com.liferay.portal.search.sort;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.io.Serializable;
-
-import java.util.List;
+import com.liferay.portal.search.script.Script;
 
 /**
- * @author Michael C. Han
- * @author André de Oliveira
+ * @author Wade Cao
  */
 @ProviderType
-public interface SearchHits extends Serializable {
+public interface Sorts {
 
-	public float getMaxScore();
+	public FieldSort field(String field);
 
-	public List<SearchHit> getSearchHits();
+	public GeoDistanceSort geoDistance(String field);
 
-	public long getSearchTime();
+	public NestedSort nested(String path);
 
-	public long getTotalHits();
+	public ScoreSort score();
+
+	public ScriptSort script(
+		Script script, ScriptSort.ScriptSortType scriptSortType);
 
 }

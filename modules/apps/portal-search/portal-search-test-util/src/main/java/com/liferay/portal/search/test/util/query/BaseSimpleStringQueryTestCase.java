@@ -66,7 +66,7 @@ public abstract class BaseSimpleStringQueryTestCase
 				searchSearchRequest.setQuery(simpleStringQuery);
 				searchSearchRequest.setSize(30);
 
-				FieldSort fieldSort = new FieldSort(Field.USER_NAME);
+				FieldSort fieldSort = sorts.field(Field.USER_NAME);
 
 				fieldSort.setSortOrder(SortOrder.ASC);
 

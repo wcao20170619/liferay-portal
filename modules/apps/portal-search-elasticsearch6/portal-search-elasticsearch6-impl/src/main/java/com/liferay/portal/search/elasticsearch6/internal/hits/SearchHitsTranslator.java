@@ -22,7 +22,11 @@ import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
+import com.liferay.portal.search.hits.SearchHitBuilder;
+import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.hits.SearchHitsBuilder;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 
 import java.util.Map;
 
@@ -36,22 +40,31 @@ import org.elasticsearch.common.text.Text;
  */
 public class SearchHitsTranslator {
 
+	public SearchHitsTranslator(
+		SearchHitBuilderFactory searchHitBuilderFactory,
+		SearchHitsBuilderFactory searchHitsBuilderFactory) {
+
+		_searchHitBuilderFactory = searchHitBuilderFactory;
+		_searchHitsBuilderFactory = searchHitsBuilderFactory;
+	}
+
 	public SearchHit translate(
 		org.elasticsearch.search.SearchHit elasticsearchSearchHit,
 		String alternateUidFieldName) {
 
-		SearchHit searchHit = new SearchHit();
+		SearchHitBuilder searchHitBuilder =
+			_searchHitBuilderFactory.getSearchHitBuilder();
 
-		searchHit.setId(elasticsearchSearchHit.getId());
+		searchHitBuilder.id(elasticsearchSearchHit.getId());
 
 		if (elasticsearchSearchHit.getExplanation() != null) {
 			Explanation explanation = elasticsearchSearchHit.getExplanation();
 
-			searchHit.setExplanation(explanation.toString());
+			searchHitBuilder.explanation(explanation.toString());
 		}
 
 		if (elasticsearchSearchHit.getMatchedQueries() != null) {
-			searchHit.setMatchedQueries(
+			searchHitBuilder.matchedQueries(
 				elasticsearchSearchHit.getMatchedQueries());
 		}
 
@@ -60,7 +73,7 @@ public class SearchHitsTranslator {
 
 		Document document = new Document();
 
-		searchHit.setDocument(document);
+		searchHitBuilder.document(document);
 
 		if (MapUtil.isNotEmpty(documentFieldsMap)) {
 			documentFieldsMap.forEach(
@@ -97,7 +110,7 @@ public class SearchHitsTranslator {
 		Map<String, Object> sourceMap = elasticsearchSearchHit.getSourceAsMap();
 
 		if (MapUtil.isNotEmpty(sourceMap)) {
-			sourceMap.forEach(searchHit::addSource);
+			sourceMap.forEach(searchHitBuilder::addSource);
 		}
 
 		populateUID(document, alternateUidFieldName);
@@ -121,14 +134,14 @@ public class SearchHitsTranslator {
 						highlightField.addFragment(fragment.string());
 					}
 
-					searchHit.addHighlightField(highlightField);
+					searchHitBuilder.addHighlightField(highlightField);
 				});
 		}
 
-		searchHit.setScore(elasticsearchSearchHit.getScore());
-		searchHit.setVersion(elasticsearchSearchHit.getVersion());
+		searchHitBuilder.score(elasticsearchSearchHit.getScore());
+		searchHitBuilder.version(elasticsearchSearchHit.getVersion());
 
-		return searchHit;
+		return searchHitBuilder.build();
 	}
 
 	public SearchHits translate(
@@ -141,11 +154,12 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits,
 		String alternateUidFieldName) {
 
-		SearchHits searchHits = new SearchHits();
+		SearchHitsBuilder searchHitsBuilder =
+			_searchHitsBuilderFactory.getSearchHitsBuilder();
 
-		searchHits.setTotalHits(elasticsearchSearchHits.totalHits);
+		searchHitsBuilder.totalHits(elasticsearchSearchHits.totalHits);
 
-		searchHits.setMaxScore(elasticsearchSearchHits.getMaxScore());
+		searchHitsBuilder.maxScore(elasticsearchSearchHits.getMaxScore());
 
 		org.elasticsearch.search.SearchHit[] elasticsearchSearchHitArray =
 			elasticsearchSearchHits.getHits();
@@ -156,10 +170,10 @@ public class SearchHitsTranslator {
 			SearchHit searchHit = translate(
 				elasticsearchSearchHit, alternateUidFieldName);
 
-			searchHits.addSearchHit(searchHit);
+			searchHitsBuilder.addSearchHit(searchHit);
 		}
 
-		return searchHits;
+		return searchHitsBuilder.build();
 	}
 
 	protected void populateUID(
@@ -189,5 +203,8 @@ public class SearchHitsTranslator {
 	private static final String _GEOPOINT_SUFFIX = ".geopoint";
 
 	private static final String _UID_FIELD_NAME = "uid";
+
+	private final SearchHitBuilderFactory _searchHitBuilderFactory;
+	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
 
 }

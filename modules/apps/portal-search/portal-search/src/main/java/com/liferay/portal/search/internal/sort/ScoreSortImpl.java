@@ -12,27 +12,19 @@
  * details.
  */
 
-package com.liferay.portal.search.hits;
+package com.liferay.portal.search.internal.sort;
 
-import aQute.bnd.annotation.ProviderType;
-
-import java.io.Serializable;
-
-import java.util.List;
+import com.liferay.portal.search.sort.ScoreSort;
+import com.liferay.portal.search.sort.SortVisitor;
 
 /**
  * @author Michael C. Han
- * @author André de Oliveira
  */
-@ProviderType
-public interface SearchHits extends Serializable {
+public class ScoreSortImpl extends SortImpl implements ScoreSort {
 
-	public float getMaxScore();
-
-	public List<SearchHit> getSearchHits();
-
-	public long getSearchTime();
-
-	public long getTotalHits();
+	@Override
+	public <T> T accept(SortVisitor<T> sortVisitor) {
+		return sortVisitor.visit(this);
+	}
 
 }
