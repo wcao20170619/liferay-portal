@@ -22,6 +22,7 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.highlight.HighlightField;
+import com.liferay.portal.search.highlight.Highlights;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHitBuilder;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
@@ -44,9 +45,10 @@ import org.elasticsearch.common.text.Text;
 public class SearchHitsTranslator {
 
 	public SearchHitsTranslator(
-		SearchHitBuilderFactory searchHitBuilderFactory,
+		Highlights highlights, SearchHitBuilderFactory searchHitBuilderFactory,
 		SearchHitsBuilderFactory searchHitsBuilderFactory) {
 
+		_highlights = highlights;
 		_searchHitBuilderFactory = searchHitBuilderFactory;
 		_searchHitsBuilderFactory = searchHitsBuilderFactory;
 	}
@@ -190,17 +192,19 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.fetch.subphase.highlight.HighlightField
 			elasticsearchHighlightField) {
 
-		HighlightField highlightField = new HighlightField(
-			elasticsearchHighlightField.getName());
+		HighlightField.Builder highlightFieldBuilder =
+			_highlights.getHighlightFieldBuilder();
 
-		highlightField.addFragments(
+		highlightFieldBuilder.fragments(
 			Stream.of(
 				elasticsearchHighlightField.getFragments()
 			).map(
 				Text::string
 			));
 
-		return highlightField;
+		highlightFieldBuilder.name(elasticsearchHighlightField.getName());
+
+		return highlightFieldBuilder.build();
 	}
 
 	protected Stream<HighlightField> translateHighlightFields(
@@ -225,6 +229,7 @@ public class SearchHitsTranslator {
 
 	private static final String _UID_FIELD_NAME = "uid";
 
+	private final Highlights _highlights;
 	private final SearchHitBuilderFactory _searchHitBuilderFactory;
 	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
 

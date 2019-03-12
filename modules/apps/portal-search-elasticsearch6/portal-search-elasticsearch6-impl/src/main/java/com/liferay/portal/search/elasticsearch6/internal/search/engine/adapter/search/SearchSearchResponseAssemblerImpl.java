@@ -30,6 +30,7 @@ import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslat
 import com.liferay.portal.search.elasticsearch6.internal.search.response.SearchResponseTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.highlight.Highlights;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
@@ -82,7 +83,8 @@ public class SearchSearchResponseAssemblerImpl
 		return new ElasticsearchAggregationResultTranslator(
 			elasticsearchAggregation, _aggregationResults,
 			new SearchHitsTranslator(
-				_searchHitBuilderFactory, _searchHitsBuilderFactory));
+				_highlights, _searchHitBuilderFactory,
+				_searchHitsBuilderFactory));
 	}
 
 	@Override
@@ -150,6 +152,11 @@ public class SearchSearchResponseAssemblerImpl
 		searchSearchResponse.setCount(searchHits.totalHits);
 	}
 
+	@Reference(unbind = "-")
+	protected void setHighlights(Highlights highlights) {
+		_highlights = highlights;
+	}
+
 	protected void setScrollId(
 		SearchResponse searchResponse,
 		SearchSearchResponse searchSearchResponse) {
@@ -172,7 +179,7 @@ public class SearchSearchResponseAssemblerImpl
 		SearchSearchRequest searchSearchRequest) {
 
 		SearchHitsTranslator searchHitsTranslator = new SearchHitsTranslator(
-			_searchHitBuilderFactory, _searchHitsBuilderFactory);
+			_highlights, _searchHitBuilderFactory, _searchHitsBuilderFactory);
 
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits =
 			searchResponse.getHits();
@@ -200,6 +207,7 @@ public class SearchSearchResponseAssemblerImpl
 
 	private AggregationResults _aggregationResults;
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
+	private Highlights _highlights;
 	private SearchHitBuilderFactory _searchHitBuilderFactory;
 	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
 	private SearchResponseTranslator _searchResponseTranslator;
