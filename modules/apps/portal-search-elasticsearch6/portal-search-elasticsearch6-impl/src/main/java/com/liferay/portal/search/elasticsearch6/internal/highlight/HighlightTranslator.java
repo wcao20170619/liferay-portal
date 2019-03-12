@@ -15,6 +15,7 @@
 package com.liferay.portal.search.elasticsearch6.internal.highlight;
 
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.search.highlight.FieldConfig;
 import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.query.QueryTranslator;
 
@@ -33,7 +34,7 @@ public class HighlightTranslator {
 
 		HighlightBuilder highlightBuilder = new HighlightBuilder();
 
-		List<Highlight.FieldConfig> fieldConfigs = highlight.getFieldConfigs();
+		List<FieldConfig> fieldConfigs = highlight.getFieldConfigs();
 
 		fieldConfigs.forEach(
 			fieldConfig -> {
