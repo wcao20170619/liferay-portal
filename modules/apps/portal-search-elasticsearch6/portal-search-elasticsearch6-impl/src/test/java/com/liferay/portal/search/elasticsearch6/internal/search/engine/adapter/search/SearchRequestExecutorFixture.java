@@ -37,6 +37,7 @@ import com.liferay.portal.search.elasticsearch6.internal.suggest.ElasticsearchSu
 import com.liferay.portal.search.engine.adapter.search.SearchRequestExecutor;
 import com.liferay.portal.search.internal.aggregation.AggregationResultsImpl;
 import com.liferay.portal.search.internal.document.DocumentBuilderFactoryImpl;
+import com.liferay.portal.search.internal.highlight.HighlightsImpl;
 import com.liferay.portal.search.internal.hits.SearchHitBuilderFactoryImpl;
 import com.liferay.portal.search.internal.hits.SearchHitsBuilderFactoryImpl;
 import com.liferay.portal.search.internal.legacy.stats.StatsRequestBuilderFactoryImpl;
@@ -298,6 +299,7 @@ public class SearchRequestExecutorFixture {
 						}
 					});
 				setDocumentBuilderFactory(new DocumentBuilderFactoryImpl());
+				setHighlights(new HighlightsImpl());
 				setSearchHitBuilderFactory(new SearchHitBuilderFactoryImpl());
 				setSearchHitsBuilderFactory(new SearchHitsBuilderFactoryImpl());
 				setSearchResponseTranslator(
