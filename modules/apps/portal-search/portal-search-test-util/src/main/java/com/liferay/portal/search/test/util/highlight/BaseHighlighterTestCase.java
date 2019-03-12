@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.highlight.FieldConfig;
 import com.liferay.portal.search.highlight.Highlight;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
@@ -53,16 +54,21 @@ public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
 
 		Query query = queries.string(fieldName.concat(":alpha"));
 
-		Highlight highlight = new Highlight();
+		Highlight.Builder highlightBuilder = highlights.getHighlightBuilder();
 
-		highlight.addFieldConfigs(fieldName);
-		highlight.addPreTags("[H]");
-		highlight.addPostTags("[/H]");
+		FieldConfig.Builder fieldConfigBuilder =
+			highlights.getFieldConfigBuilder();
 
-		highlight.setFragmentSize(20);
+		fieldConfigBuilder.field(fieldName);
+
+		highlightBuilder.fieldConfig(fieldConfigBuilder.build());
+
+		highlightBuilder.fragmentSize(20);
+		highlightBuilder.postTags("[/H]");
+		highlightBuilder.preTags("[H]");
 
 		assertSearch(
-			fieldName, query, highlight,
+			fieldName, query, highlightBuilder.build(),
 			Arrays.asList(
 				"[H]alpha[/H]", "[H]alpha[/H] beta",
 				"[H]alpha[/H] beta [H]alpha[/H]",
