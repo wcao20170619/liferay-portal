@@ -16,56 +16,38 @@ package com.liferay.portal.search.geolocation;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class PolygonShapeBuilder extends ShapeBuilder {
-
-	public PolygonShapeBuilder(
-		LineStringShapeBuilder shell, Orientation orientation) {
-
-		_shell = shell;
-		_orientation = orientation;
-	}
+public interface PolygonShapeBuilder extends ShapeBuilder {
 
 	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+
+	public List<LineStringShapeBuilder> getHolesLineStringShapeBuilders();
+
+	public Orientation getOrientation();
+
+	public LineStringShapeBuilder getShell();
+
+	@ProviderType
+	public interface Builder extends ShapeBuilder.Builder {
+
+		public PolygonShapeBuilder build();
+
+		public void holesLineStringShapeBuilder(
+			LineStringShapeBuilder lineStringShapeBuilder);
+
+		public void holesLineStringShapeBuilders(
+			LineStringShapeBuilder... lineStringShapeBuilders);
+
+		public void orientation(Orientation orientation);
+
+		public void shell(LineStringShapeBuilder shell);
+
 	}
-
-	public void addHolesLineStringShapeBuilder(
-		LineStringShapeBuilder lineStringShapeBuilder) {
-
-		_holesLineStringShapeBuilders.add(lineStringShapeBuilder);
-	}
-
-	public void addHolesLineStringShapeBuilders(
-		LineStringShapeBuilder... lineStringShapeBuilders) {
-
-		Collections.addAll(
-			_holesLineStringShapeBuilders, lineStringShapeBuilders);
-	}
-
-	public List<LineStringShapeBuilder> getHolesLineStringShapeBuilders() {
-		return Collections.unmodifiableList(_holesLineStringShapeBuilders);
-	}
-
-	public Orientation getOrientation() {
-		return _orientation;
-	}
-
-	public LineStringShapeBuilder getShell() {
-		return _shell;
-	}
-
-	private final List<LineStringShapeBuilder> _holesLineStringShapeBuilders =
-		new ArrayList<>();
-	private final Orientation _orientation;
-	private final LineStringShapeBuilder _shell;
 
 }

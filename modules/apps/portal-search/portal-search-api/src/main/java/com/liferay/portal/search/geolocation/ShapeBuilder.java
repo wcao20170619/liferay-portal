@@ -16,35 +16,28 @@ package com.liferay.portal.search.geolocation;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public abstract class ShapeBuilder {
+public interface ShapeBuilder {
 
 	public abstract <T> T accept(
 		ShapeBuilderTranslator<T> shapeBuilderTranslator);
 
-	public void addCoordinate(Coordinate coordinate) {
-		_coordinates.add(coordinate);
-	}
+	public List<Coordinate> getCoordinates();
 
-	public void addCoordinates(Coordinate... coordinates) {
-		Collections.addAll(_coordinates, coordinates);
-	}
+	@ProviderType
+	public interface Builder {
 
-	public void addCoordinates(List<Coordinate> coordinates) {
-		_coordinates.addAll(coordinates);
-	}
+		public void coordinate(Coordinate coordinate);
 
-	public List<Coordinate> getCoordinates() {
-		return Collections.unmodifiableList(_coordinates);
-	}
+		public void coordinates(Coordinate... coordinates);
 
-	private final List<Coordinate> _coordinates = new ArrayList<>();
+		public void coordinates(List<Coordinate> coordinates);
+
+	}
 
 }

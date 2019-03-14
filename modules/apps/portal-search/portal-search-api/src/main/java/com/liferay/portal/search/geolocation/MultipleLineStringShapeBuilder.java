@@ -16,44 +16,33 @@ package com.liferay.portal.search.geolocation;
 
 import aQute.bnd.annotation.ProviderType;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Michael C. Han
  */
 @ProviderType
-public class MultipleLineStringShapeBuilder extends ShapeBuilder {
+public interface MultipleLineStringShapeBuilder extends ShapeBuilder {
 
 	@Override
-	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator) {
-		return shapeBuilderTranslator.translate(this);
+	public <T> T accept(ShapeBuilderTranslator<T> shapeBuilderTranslator);
+
+	public List<LineStringShapeBuilder> getLineStringShapeBuilders();
+
+	@ProviderType
+	public interface Builder extends ShapeBuilder.Builder {
+
+		public MultipleLineStringShapeBuilder build();
+
+		public void lineStringShapeBuilder(
+			LineStringShapeBuilder lineStringShapeBuilder);
+
+		public void lineStringShapeBuilders(
+			LineStringShapeBuilder... lineStringShapeBuilders);
+
+		public void lineStringShapeBuilders(
+			List<LineStringShapeBuilder> lineStringShapeBuilders);
+
 	}
-
-	public void addLineStringShapeBuilder(
-		LineStringShapeBuilder lineStringShapeBuilder) {
-
-		_lineStringShapeBuilders.add(lineStringShapeBuilder);
-	}
-
-	public void addLineStringShapeBuilders(
-		LineStringShapeBuilder... lineStringShapeBuilders) {
-
-		Collections.addAll(_lineStringShapeBuilders, lineStringShapeBuilders);
-	}
-
-	public void addLineStringShapeBuilders(
-		List<LineStringShapeBuilder> lineStringShapeBuilders) {
-
-		_lineStringShapeBuilders.addAll(lineStringShapeBuilders);
-	}
-
-	public List<LineStringShapeBuilder> getLineStringShapeBuilders() {
-		return Collections.unmodifiableList(_lineStringShapeBuilders);
-	}
-
-	private final List<LineStringShapeBuilder> _lineStringShapeBuilders =
-		new ArrayList<>();
 
 }
