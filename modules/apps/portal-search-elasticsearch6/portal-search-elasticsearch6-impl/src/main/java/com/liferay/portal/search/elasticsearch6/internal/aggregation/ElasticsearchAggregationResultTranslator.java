@@ -89,6 +89,7 @@ import com.liferay.portal.search.aggregation.pipeline.PipelineAggregationResultT
 import com.liferay.portal.search.elasticsearch6.internal.aggregation.pipeline.ElasticsearchPipelineAggregationResultTranslator;
 import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslator;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
+import com.liferay.portal.search.geolocation.ShapeBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,11 +138,13 @@ public class ElasticsearchAggregationResultTranslator
 		org.elasticsearch.search.aggregations.Aggregation
 			elasticsearchAggregation,
 		AggregationResults aggregationResults,
-		SearchHitsTranslator searchHitsTranslator) {
+		SearchHitsTranslator searchHitsTranslator,
+		ShapeBuilders shapeBuilders) {
 
 		_elasticsearchAggregation = elasticsearchAggregation;
 		_aggregationResults = aggregationResults;
 		_searchHitsTranslator = searchHitsTranslator;
+		_shapeBuilders = shapeBuilders;
 	}
 
 	@Override
@@ -151,7 +154,7 @@ public class ElasticsearchAggregationResultTranslator
 
 		return new ElasticsearchAggregationResultTranslator(
 			elasticsearchAggregation, _aggregationResults,
-			_searchHitsTranslator);
+			_searchHitsTranslator, _shapeBuilders);
 	}
 
 	@Override
@@ -625,12 +628,14 @@ public class ElasticsearchAggregationResultTranslator
 			return null;
 		}
 
-		return new GeoLocationPoint(geoPoint.getLat(), geoPoint.getLon());
+		return _shapeBuilders.geoLocationPoint(
+			geoPoint.getLat(), geoPoint.getLon());
 	}
 
 	private final AggregationResults _aggregationResults;
 	private final org.elasticsearch.search.aggregations.Aggregation
 		_elasticsearchAggregation;
 	private final SearchHitsTranslator _searchHitsTranslator;
+	private final ShapeBuilders _shapeBuilders;
 
 }

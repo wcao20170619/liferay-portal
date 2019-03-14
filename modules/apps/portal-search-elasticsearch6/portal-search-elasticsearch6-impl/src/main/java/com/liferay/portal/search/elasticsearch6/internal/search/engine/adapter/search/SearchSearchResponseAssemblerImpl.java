@@ -30,6 +30,7 @@ import com.liferay.portal.search.elasticsearch6.internal.hits.SearchHitsTranslat
 import com.liferay.portal.search.elasticsearch6.internal.search.response.SearchResponseTranslator;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
+import com.liferay.portal.search.geolocation.ShapeBuilders;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
@@ -82,7 +83,9 @@ public class SearchSearchResponseAssemblerImpl
 		return new ElasticsearchAggregationResultTranslator(
 			elasticsearchAggregation, _aggregationResults,
 			new SearchHitsTranslator(
-				_searchHitBuilderFactory, _searchHitsBuilderFactory));
+				_searchHitBuilderFactory, _searchHitsBuilderFactory,
+				_shapeBuilders),
+			_shapeBuilders);
 	}
 
 	@Override
@@ -172,7 +175,8 @@ public class SearchSearchResponseAssemblerImpl
 		SearchSearchRequest searchSearchRequest) {
 
 		SearchHitsTranslator searchHitsTranslator = new SearchHitsTranslator(
-			_searchHitBuilderFactory, _searchHitsBuilderFactory);
+			_searchHitBuilderFactory, _searchHitsBuilderFactory,
+			_shapeBuilders);
 
 		org.elasticsearch.search.SearchHits elasticsearchSearchHits =
 			searchResponse.getHits();
@@ -198,10 +202,16 @@ public class SearchSearchResponseAssemblerImpl
 		_searchResponseTranslator = searchResponseTranslator;
 	}
 
+	@Reference(unbind = "-")
+	protected void setShapeBuilders(ShapeBuilders shapeBuilders) {
+		_shapeBuilders = shapeBuilders;
+	}
+
 	private AggregationResults _aggregationResults;
 	private CommonSearchResponseAssembler _commonSearchResponseAssembler;
 	private SearchHitBuilderFactory _searchHitBuilderFactory;
 	private SearchHitsBuilderFactory _searchHitsBuilderFactory;
 	private SearchResponseTranslator _searchResponseTranslator;
+	private ShapeBuilders _shapeBuilders;
 
 }

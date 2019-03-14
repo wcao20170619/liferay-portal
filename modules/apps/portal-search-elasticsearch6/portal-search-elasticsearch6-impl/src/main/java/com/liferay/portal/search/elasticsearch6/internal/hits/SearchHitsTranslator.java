@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
+import com.liferay.portal.search.geolocation.ShapeBuilders;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHitBuilder;
@@ -45,10 +46,12 @@ public class SearchHitsTranslator {
 
 	public SearchHitsTranslator(
 		SearchHitBuilderFactory searchHitBuilderFactory,
-		SearchHitsBuilderFactory searchHitsBuilderFactory) {
+		SearchHitsBuilderFactory searchHitsBuilderFactory,
+		ShapeBuilders shapeBuilders) {
 
 		_searchHitBuilderFactory = searchHitBuilderFactory;
 		_searchHitsBuilderFactory = searchHitsBuilderFactory;
+		_shapeBuilders = shapeBuilders;
 	}
 
 	public SearchHits translate(
@@ -163,12 +166,13 @@ public class SearchHitsTranslator {
 						GeoLocationPoint geoLocationPoint = null;
 
 						if (values.length == 2) {
-							geoLocationPoint = new GeoLocationPoint(
+							geoLocationPoint = _shapeBuilders.geoLocationPoint(
 								Double.valueOf(values[0]),
 								Double.valueOf(values[1]));
 						}
 						else {
-							geoLocationPoint = new GeoLocationPoint(values[0]);
+							geoLocationPoint = _shapeBuilders.geoLocationPoint(
+								values[0]);
 						}
 
 						field.addValue(geoLocationPoint);
@@ -227,5 +231,6 @@ public class SearchHitsTranslator {
 
 	private final SearchHitBuilderFactory _searchHitBuilderFactory;
 	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
+	private final ShapeBuilders _shapeBuilders;
 
 }
