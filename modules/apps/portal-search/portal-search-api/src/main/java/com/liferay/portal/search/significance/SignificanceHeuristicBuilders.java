@@ -17,16 +17,21 @@ package com.liferay.portal.search.significance;
 import aQute.bnd.annotation.ProviderType;
 
 /**
- * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class MutualInformationSignifanceHeuristic
-	extends NxySignificanceHeuristic {
+public interface SignificanceHeuristicBuilders {
 
-	public MutualInformationSignifanceHeuristic(
-		boolean backgroundIsSuperset, boolean includeNegatives) {
+	public ChiSquareSignificanceHeuristic.Builder chiSquare();
 
-		super(backgroundIsSuperset, includeNegatives);
-	}
+	public GNDSignificanceHeuristic.Builder gnd();
+
+	public JLHScoreSignificanceHeuristic.Builder jlhScore();
+
+	public MutualInformationSignificanceHeuristic.Builder mutualInformation();
+
+	public PercentageScoreSignificanceHeuristic.Builder percentageScore();
+
+	public ScriptSignificanceHeuristic.Builder script();
 
 }

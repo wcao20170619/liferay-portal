@@ -16,16 +16,24 @@ package com.liferay.portal.search.significance;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.search.script.Script;
+
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class ChiSquareSignifanceHeuristic extends NxySignificanceHeuristic {
+public interface ScriptSignificanceHeuristic extends SignificanceHeuristic {
 
-	public ChiSquareSignifanceHeuristic(
-		boolean backgroundIsSuperset, boolean includeNegatives) {
+	public Script getScript();
 
-		super(backgroundIsSuperset, includeNegatives);
+	@ProviderType
+	public interface Builder {
+
+		public ScriptSignificanceHeuristic build();
+
+		public Builder script(Script script);
+
 	}
 
 }

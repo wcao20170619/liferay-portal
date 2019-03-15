@@ -18,8 +18,17 @@ import aQute.bnd.annotation.ProviderType;
 
 /**
  * @author Michael C. Han
+ * @author André de Oliveira
  */
 @ProviderType
-public class PercentageScoreSignifanceHeuristic
-	implements SignificanceHeuristic {
+public interface PercentageScoreSignificanceHeuristic
+	extends SignificanceHeuristic {
+
+	@ProviderType
+	public interface Builder {
+
+		public PercentageScoreSignificanceHeuristic build();
+
+	}
+
 }
