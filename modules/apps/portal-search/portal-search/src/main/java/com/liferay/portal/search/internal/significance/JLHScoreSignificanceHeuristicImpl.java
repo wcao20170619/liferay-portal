@@ -12,26 +12,28 @@
  * details.
  */
 
-package com.liferay.portal.search.significance;
+package com.liferay.portal.search.internal.significance;
 
-import aQute.bnd.annotation.ProviderType;
-
-import com.liferay.portal.search.script.Script;
+import com.liferay.portal.search.significance.JLHScoreSignificanceHeuristic;
 
 /**
- * @author Michael C. Han
+ * @author André de Oliveira
  */
-@ProviderType
-public class ScriptSignifanceHeuristic implements SignificanceHeuristic {
+public class JLHScoreSignificanceHeuristicImpl
+	implements JLHScoreSignificanceHeuristic {
 
-	public ScriptSignifanceHeuristic(Script script) {
-		_script = script;
+	public static class Builder
+		implements JLHScoreSignificanceHeuristic.Builder {
+
+		@Override
+		public JLHScoreSignificanceHeuristic build() {
+			return _jlhScoreSignificanceHeuristicImpl;
+		}
+
+		private static final JLHScoreSignificanceHeuristicImpl
+			_jlhScoreSignificanceHeuristicImpl =
+				new JLHScoreSignificanceHeuristicImpl();
+
 	}
-
-	public Script getScript() {
-		return _script;
-	}
-
-	private final Script _script;
 
 }

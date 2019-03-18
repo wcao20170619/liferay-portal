@@ -12,25 +12,27 @@
  * details.
  */
 
-package com.liferay.portal.search.significance;
+package com.liferay.portal.search.internal.significance;
 
-import aQute.bnd.annotation.ProviderType;
+import com.liferay.portal.search.significance.PercentageScoreSignificanceHeuristic;
 
 /**
- * @author Michael C. Han
  * @author André de Oliveira
  */
-@ProviderType
-public interface GNDSignificanceHeuristic extends SignificanceHeuristic {
+public class PercentageScoreSignificanceHeuristicImpl
+	implements PercentageScoreSignificanceHeuristic {
 
-	public boolean isBackgroundIsSuperset();
+	public static class Builder
+		implements PercentageScoreSignificanceHeuristic.Builder {
 
-	@ProviderType
-	public interface Builder {
+		@Override
+		public PercentageScoreSignificanceHeuristic build() {
+			return _percentageScoreSignificanceHeuristicImpl;
+		}
 
-		public Builder backgroundIsSuperset(boolean backgroundIsSuperset);
-
-		public GNDSignificanceHeuristic build();
+		private static final PercentageScoreSignificanceHeuristicImpl
+			_percentageScoreSignificanceHeuristicImpl =
+				new PercentageScoreSignificanceHeuristicImpl();
 
 	}
 
