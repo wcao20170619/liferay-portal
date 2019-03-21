@@ -1,0 +1,26 @@
+{
+	"CustomRankingsType": {
+		"properties": {
+			"hidden_documents": {
+				"store": true,
+				"type": "keyword"
+			},
+			"index": {
+				"store": true,
+				"type": "keyword"
+			},
+			"keywords": {
+				"store": true,
+				"type": "keyword"
+			},
+			"pinned_documents": {
+				"store": true,
+				"type": "keyword"
+			},
+			"uid": {
+				"store": true,
+				"type": "keyword"
+			}
+		}
+	}
+}
