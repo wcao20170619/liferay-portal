@@ -16,4 +16,29 @@
 
 <%@ include file="/init.jsp" %>
 
-Test
+<%
+String redirect = ParamUtil.getString(request, "redirect");
+
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(redirect);
+%>
+
+<liferay-frontend:edit-form>
+	<liferay-frontend:edit-form-body>
+		<h2 class="sheet-title">
+			<liferay-ui:message key="enter-a-search-term" />
+		</h2>
+
+		<div class="sheet-text">
+			<liferay-ui:message key="customize-how-users-see-results-for-a-given-search-query" />
+		</div>
+
+		<aui:input label="<%= StringPool.BLANK %>" name="search-term" placeholder="search-term" />
+	</liferay-frontend:edit-form-body>
+
+	<liferay-frontend:edit-form-footer>
+		<aui:button type="submit" value="customize-results" />
+
+		<aui:button href="<%= redirect %>" type="cancel" />
+	</liferay-frontend:edit-form-footer>
+</liferay-frontend:edit-form>
