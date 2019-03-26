@@ -35,11 +35,11 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + SearchRankingPortletKeys.SEARCH_RANKING,
-		"mvc.command.name=editResultsRankingsEntry"
+		"mvc.command.name=addResultsRankingsEntry"
 	},
 	service = MVCRenderCommand.class
 )
-public class EditResultsRankingsMVCRenderCommand implements MVCRenderCommand {
+public class AddResultsRankingsMVCRenderCommand implements MVCRenderCommand {
 
 	@Override
 	public String render(
@@ -51,7 +51,7 @@ public class EditResultsRankingsMVCRenderCommand implements MVCRenderCommand {
 		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			renderRequest);
 
-		return "/edit_results_rankings.jsp";
+		return "/add_results_rankings.jsp";
 	}
 
 	@Reference
