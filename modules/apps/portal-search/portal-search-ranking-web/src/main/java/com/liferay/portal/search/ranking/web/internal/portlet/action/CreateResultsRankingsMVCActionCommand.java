@@ -27,6 +27,8 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.search.ranking.CustomRankingsIndexer;
 import com.liferay.portal.search.ranking.web.internal.constants.SearchRankingPortletKeys;
 
 import java.util.List;
@@ -40,7 +42,6 @@ import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Kevin Tan
  */
@@ -59,6 +60,44 @@ public class CreateResultsRankingsMVCActionCommand extends BaseMVCActionCommand 
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
+		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
+
+		String index = ParamUtil.getString(actionRequest, "index") +
+					   PortalUtil.getCompanyId(actionRequest);
+
+		String keywords = ParamUtil.getString(actionRequest, "search-term");
+		String uid = ParamUtil.getString(actionRequest, "uid");
+		String[] pinnedDocuments = ParamUtil.getStringValues(
+			actionRequest, "pinnedDocuments");
+		String[] hiddenDocuments = ParamUtil.getStringValues(
+			actionRequest, "hiddenDocuments");
+
+		if (cmd.equals("pin")) {
+			sendRedirect(actionRequest, actionResponse);
+		}
+		else if (cmd.equals("hide")) {
+			sendRedirect(actionRequest, actionResponse);
+		}
+		else if (cmd.equals("add")) {
+			String doc = customRankingsIndexer.getCustomRanking(
+				index, keywords);
+
+			if (doc == null) {
+				customRankingsIndexer.addCustomRanking(
+					index, keywords, pinnedDocuments, hiddenDocuments);
+			}
+			else {
+				throw new Exception("ranking already exists for keywords");
+			}
+		}
+		else if (cmd.equals("update")) {
+			customRankingsIndexer.updateCustomRanking(
+				index, keywords, pinnedDocuments, hiddenDocuments);
+		}
+		else if (cmd.equals("delete")) {
+			customRankingsIndexer.deleteCustomRanking(index, keywords);
+		}
+
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
 		PortletConfig portletConfig = (PortletConfig)actionRequest.getAttribute(
@@ -74,6 +113,8 @@ public class CreateResultsRankingsMVCActionCommand extends BaseMVCActionCommand 
 		portletURL.setWindowState(actionRequest.getWindowState());
 
 		sendRedirect(actionRequest, actionResponse, portletURL.toString());
-
 	}
+
+	@Reference
+	protected CustomRankingsIndexer customRankingsIndexer;
 }
