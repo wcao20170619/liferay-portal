@@ -17,12 +17,12 @@ package com.liferay.portal.search.ranking.web.internal.portlet.action;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.ranking.web.internal.constants.SearchRankingPortletKeys;
+import com.liferay.portal.search.searcher.Searcher;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -56,5 +56,8 @@ public class EditResultsRankingsMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private Portal _portal;
+	
+	@Reference 
+	private Searcher _searcher;
 
 }
