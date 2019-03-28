@@ -21,27 +21,40 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.SortFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.ranking.web.internal.request.SearchRankingRequest;
+import com.liferay.portal.search.ranking.web.internal.request.SearchRankingResponse;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.Searcher;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -51,14 +64,59 @@ public class ResultsRankingsDisplayContext {
 
 	public ResultsRankingsDisplayContext(
 		HttpServletRequest request, RenderRequest renderRequest,
-		RenderResponse renderResponse) {
+		RenderResponse renderResponse, Language language, Searcher searcher, 
+		SearchRequestBuilderFactory searchRequestBuilderFactory) {
 
 		_request = request;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
+		_searcher = searcher;
+		_searchRequestBuilderFactory = searchRequestBuilderFactory;
 
 		_themeDisplay = (ThemeDisplay)_request.getAttribute(
 			WebKeys.THEME_DISPLAY);
+		
+		String keywords = _getKeywords();
+
+		if (keywords == null) {
+			_hits = null;
+			_keywords = null;
+			_searchContainer = null;
+			_searchContext = null;
+
+			return;
+		}
+		
+		String emptyResultMessage = language.format(
+			request, "no-results-were-found-that-matched-the-keywords-x",
+			"<strong>" + HtmlUtil.getHtml().escape(keywords) + "</strong>", false);
+		
+		SearchContainer<Document> searchContainer = new SearchContainer<>(
+			_renderRequest, _getPortletURL(), null, emptyResultMessage);
+
+		SearchContext searchContext = SearchContextFactory.getInstance(request);
+
+		searchContext.setGroupIds(null);
+
+		Map<String, Serializable> attributes = searchContext.getAttributes();
+
+		attributes.remove("groupId", "0");
+			
+		searchContext.setKeywords(_keywords);
+
+		//searchContext.setEntryClassNames();
+			
+		SearchRankingRequest searchRankingRequest = new SearchRankingRequest(
+			searchContext, getSearchContainer(),
+			searcher, searchRequestBuilderFactory);
+
+		SearchRankingResponse searchRankingResponse = searchRankingRequest.search();
+
+		SearchResponse searchResponse = searchRankingResponse.getSearchResponse();
+
+		_hits = searchResponse.withHitsGet(Function.identity());
+		_searchContainer = searchContainer;
+		_searchContext = searchContext;
 	}
 
 	public List<DropdownItem> getActionDropdownItems() {
@@ -149,7 +207,7 @@ public class ResultsRankingsDisplayContext {
 		return portletURL.toString();
 	}
 
-	public SearchContainer getSearchContainer() throws PortalException {
+	public SearchContainer getSearchContainer()  {
 		if (_searchContainer != null) {
 			return _searchContainer;
 		}
@@ -301,10 +359,14 @@ public class ResultsRankingsDisplayContext {
 	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
+	private final Hits _hits;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final HttpServletRequest _request;
-	private SearchContainer _searchContainer;
+	private final Searcher _searcher;
+	private SearchContainer<Document> _searchContainer;
+	private final SearchContext _searchContext;
+	private final SearchRequestBuilderFactory _searchRequestBuilderFactory;
 	private final ThemeDisplay _themeDisplay;
 
 }
