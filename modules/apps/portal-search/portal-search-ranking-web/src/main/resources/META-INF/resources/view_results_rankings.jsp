@@ -95,10 +95,9 @@ ResultsRankingsDisplayContext resultsRankingsDisplayContext = (ResultsRankingsDi
 				value="<%= resultsRankingDisplayContext.getDisplayDate() %>"
 			/>
 
-			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand-smallest table-cell-minw-150"
+			<liferay-ui:search-container-column-status
 				name="status"
-				value="status"
+				status="0"
 			/>
 		</liferay-ui:search-container-row>
 
