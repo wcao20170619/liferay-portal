@@ -1,0 +1,80 @@
+{
+	"csfConfig": {
+		"js": {
+			"lint": {
+				"env": {
+					"browser": true,
+					"es6": true,
+					"jest": true,
+					"node": true
+				},
+				"extends": "liferay",
+				"parser": "babel-eslint",
+				"parserOptions": {
+					"ecmaVersion": 7
+				},
+				"plugins": [
+					"../../../node_modules/eslint-plugin-react"
+				],
+				"rules": {
+					"react/jsx-handler-names": [
+						2,
+						{
+							"eventHandlerPrefix": "_handle"
+						}
+					]
+				}
+			}
+		}
+	},
+	"dependencies": {
+		"classnames": "^2.2.6",
+		"lodash.isfunction": "^3.0.9",
+		"lodash.times": "^4.3.2",
+		"prop-types": "^15.6.2",
+		"react": "^16.6.3",
+		"react-dnd": "^7.0.2",
+		"react-dnd-html5-backend": "^7.0.2",
+		"react-dom": "^16.6.3",
+		"react-modal": "^3.8.1",
+		"react-select": "^2.4.2",
+		"react-tabs": "^3.0.0"
+	},
+	"devDependencies": {
+		"@babel/plugin-proposal-class-properties": "^7.4.0",
+		"@babel/plugin-proposal-object-rest-spread": "^7.4.0",
+		"@babel/preset-env": "^7.4.2",
+		"@babel/preset-react": "^7.0.0",
+		"@storybook/react": "^5.0.5",
+		"babel-plugin-module-resolver": "^3.2.0",
+		"clay-css": "^2.11.1",
+		"css-loader": "^2.1.1",
+		"eslint-plugin-react": "^7.12.4",
+		"http-proxy-middleware": "^0.19.1",
+		"liferay-lang-key-dev-loader": "^1.0.3",
+		"liferay-npm-scripts": "^1.4.9",
+		"node-sass": "^4.11.0",
+		"sass-loader": "^7.1.0",
+		"style-loader": "^0.23.1"
+	},
+	"jest": {
+		"setupFilesAfterEnv": [
+			"<rootDir>/test/js/setup.js"
+		],
+		"testPathIgnorePatterns": [
+			"<rootDir>/test/js/mock-data.js",
+			"<rootDir>/test/js/setup.js"
+		]
+	},
+	"main": "js/index.es.js",
+	"name": "portal-search-ranking-web",
+	"private": true,
+	"scripts": {
+		"build": "liferay-npm-scripts build --bundler",
+		"csf": "liferay-npm-scripts lint",
+		"format": "liferay-npm-scripts format",
+		"storybook": "start-storybook -p 9000 -c ./src/main/resources/META-INF/resources/js/stories",
+		"test": "liferay-npm-scripts test"
+	},
+	"version": "1.0.0"
+}
