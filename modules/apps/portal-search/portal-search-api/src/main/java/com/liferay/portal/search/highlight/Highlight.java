@@ -49,35 +49,4 @@ public interface Highlight {
 
 	public Boolean getRequireFieldMatch();
 
-	@ProviderType
-	public interface Builder {
-
-		public Highlight build();
-
-		public void fieldConfig(FieldConfig fieldConfig);
-
-		public void fieldConfigs(List<FieldConfig> fieldConfigs);
-
-		public void forceSource(Boolean forceSource);
-
-		public void fragmenter(String fragmenter);
-
-		public void fragmentSize(Integer fragmentSize);
-
-		public void highlighterType(String highlighterType);
-
-		public void highlightFilter(Boolean highlightFilter);
-
-		public void highlightQuery(Query highlightQuery);
-
-		public void numOfFragments(Integer numOfFragments);
-
-		public void postTags(String... postTags);
-
-		public void preTags(String... preTags);
-
-		public void requireFieldMatch(Boolean requireFieldMatch);
-
-	}
-
 }

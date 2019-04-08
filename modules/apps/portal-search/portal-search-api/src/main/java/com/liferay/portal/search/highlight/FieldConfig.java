@@ -31,19 +31,4 @@ public interface FieldConfig {
 
 	public Integer getNumFragments();
 
-	@ProviderType
-	public interface Builder {
-
-		public FieldConfig build();
-
-		public void field(String field);
-
-		public void fragmentOffset(Integer fragmentOffset);
-
-		public void fragmentSize(Integer fragmentSize);
-
-		public void numFragments(Integer numFragments);
-
-	}
-
 }

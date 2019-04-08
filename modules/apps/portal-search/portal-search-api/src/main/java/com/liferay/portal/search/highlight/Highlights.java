@@ -21,17 +21,13 @@ import aQute.bnd.annotation.ProviderType;
  */
 @ProviderType
 public interface Highlights {
-
+	
+	public FieldConfigBuilder getFieldConfigBuilder();
+	
+	public HighlightBuilder getHighlightBuilder();
+	
 	public FieldConfig fieldConfig(String field);
 
-	public FieldConfig.Builder getFieldConfigBuilder();
-
-	public Highlight.Builder getHighlightBuilder();
-
-	public HighlightField.Builder getHighlightFieldBuilder();
-
 	public Highlight highlight(FieldConfig fieldConfig);
-
-	public HighlightField highlightField(String field);
 
 }
