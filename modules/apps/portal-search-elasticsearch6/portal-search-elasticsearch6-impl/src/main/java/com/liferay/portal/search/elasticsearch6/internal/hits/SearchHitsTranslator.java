@@ -23,7 +23,8 @@ import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoLocationPoint;
 import com.liferay.portal.search.highlight.HighlightField;
-import com.liferay.portal.search.highlight.Highlights;
+import com.liferay.portal.search.highlight.HighlightFieldBuilder;
+import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHitBuilder;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
@@ -46,11 +47,12 @@ import org.elasticsearch.common.text.Text;
 public class SearchHitsTranslator {
 
 	public SearchHitsTranslator(
-		Highlights highlights, SearchHitBuilderFactory searchHitBuilderFactory,
+		HighlightFieldBuilderFactory highlightFieldBuilderFactory,
+		SearchHitBuilderFactory searchHitBuilderFactory,
 		SearchHitsBuilderFactory searchHitsBuilderFactory,
 		DocumentBuilderFactory documentBuilderFactory) {
 
-		_highlights = highlights;
+		_highlightFieldBuilderFactory = highlightFieldBuilderFactory;
 		_searchHitBuilderFactory = searchHitBuilderFactory;
 		_searchHitsBuilderFactory = searchHitsBuilderFactory;
 		_documentBuilderFactory = documentBuilderFactory;
@@ -191,8 +193,8 @@ public class SearchHitsTranslator {
 		org.elasticsearch.search.fetch.subphase.highlight.HighlightField
 			elasticsearchHighlightField) {
 
-		HighlightField.Builder highlightFieldBuilder =
-			_highlights.getHighlightFieldBuilder();
+		HighlightFieldBuilder highlightFieldBuilder =
+			_highlightFieldBuilderFactory.builder();
 
 		highlightFieldBuilder.fragments(
 			Stream.of(
@@ -229,7 +231,7 @@ public class SearchHitsTranslator {
 	private static final String _UID_FIELD_NAME = "uid";
 
 	private final DocumentBuilderFactory _documentBuilderFactory;
-	private final Highlights _highlights;
+	private final HighlightFieldBuilderFactory _highlightFieldBuilderFactory;
 	private final SearchHitBuilderFactory _searchHitBuilderFactory;
 	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
 
