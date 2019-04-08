@@ -15,6 +15,7 @@
 package com.liferay.portal.search.internal.highlight;
 
 import com.liferay.portal.search.highlight.HighlightField;
+import com.liferay.portal.search.highlight.HighlightFieldBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,16 +45,46 @@ public class HighlightFieldImpl implements HighlightField {
 		return _name;
 	}
 
+	public static final class HighlightFieldBuilderImpl
+		implements HighlightFieldBuilder {
+
+		@Override
+		public HighlightField build() {
+			return new HighlightFieldImpl(_highlightFieldImpl);
+		}
+
+		@Override
+		public HighlightFieldBuilder fragment(String fragment) {
+			_highlightFieldImpl.addFragment(fragment);
+
+			return this;
+		}
+
+		@Override
+		public HighlightFieldBuilder fragments(Stream<String> fragmentStream) {
+			_highlightFieldImpl.addFragments(fragmentStream);
+
+			return this;
+		}
+
+		@Override
+		public HighlightFieldBuilder name(String name) {
+			_highlightFieldImpl._name = name;
+
+			return this;
+		}
+
+		private final HighlightFieldImpl _highlightFieldImpl =
+			new HighlightFieldImpl();
+
+	}
+
 	protected void addFragment(String fragment) {
 		_fragments.add(fragment);
 	}
 
 	protected void addFragments(Stream<String> fragmentStream) {
 		fragmentStream.forEach(_fragments::add);
-	}
-
-	protected void setName(String name) {
-		_name = name;
 	}
 
 	private List<String> _fragments = new ArrayList<>();

@@ -15,6 +15,7 @@
 package com.liferay.portal.search.internal.highlight;
 
 import com.liferay.portal.search.highlight.FieldConfig;
+import com.liferay.portal.search.highlight.FieldConfigBuilder;
 
 /**
  * @author Michael C. Han
@@ -52,20 +53,44 @@ public class FieldConfigImpl implements FieldConfig {
 		return _numFragments;
 	}
 
-	protected void setField(String field) {
-		_field = field;
-	}
+	public static final class FieldConfigBuilderImpl
+		implements FieldConfigBuilder {
 
-	protected void setFragmentOffset(Integer fragmentOffset) {
-		_fragmentOffset = fragmentOffset;
-	}
+		@Override
+		public FieldConfig build() {
+			return new FieldConfigImpl(_fieldConfigImpl);
+		}
 
-	protected void setFragmentSize(Integer fragmentSize) {
-		_fragmentSize = fragmentSize;
-	}
+		@Override
+		public FieldConfigBuilder field(String field) {
+			_fieldConfigImpl._field = field;
 
-	protected void setNumFragments(Integer numFragments) {
-		_numFragments = numFragments;
+			return this;
+		}
+
+		@Override
+		public FieldConfigBuilder fragmentOffset(Integer fragmentOffset) {
+			_fieldConfigImpl._fragmentOffset = fragmentOffset;
+
+			return this;
+		}
+
+		@Override
+		public FieldConfigBuilder fragmentSize(Integer fragmentSize) {
+			_fieldConfigImpl._fragmentSize = fragmentSize;
+
+			return this;
+		}
+
+		@Override
+		public FieldConfigBuilder numFragments(Integer numFragments) {
+			_fieldConfigImpl._numFragments = numFragments;
+
+			return this;
+		}
+
+		private final FieldConfigImpl _fieldConfigImpl = new FieldConfigImpl();
+
 	}
 
 	private String _field;

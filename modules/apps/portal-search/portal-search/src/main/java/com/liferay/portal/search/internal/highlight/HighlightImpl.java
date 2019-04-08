@@ -16,6 +16,7 @@ package com.liferay.portal.search.internal.highlight;
 
 import com.liferay.portal.search.highlight.FieldConfig;
 import com.liferay.portal.search.highlight.Highlight;
+import com.liferay.portal.search.highlight.HighlightBuilder;
 import com.liferay.portal.search.query.Query;
 
 import java.util.ArrayList;
@@ -100,6 +101,101 @@ public class HighlightImpl implements Highlight {
 		return _requireFieldMatch;
 	}
 
+	public static final class HighlightBuilderImpl implements HighlightBuilder {
+
+		@Override
+		public Highlight build() {
+			return new HighlightImpl(_highlightImpl);
+		}
+
+		@Override
+		public HighlightBuilder fieldConfig(FieldConfig fieldConfig) {
+			_highlightImpl.addFieldConfig(fieldConfig);
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder fieldConfigs(List<FieldConfig> fieldConfigs) {
+			_highlightImpl.addFieldConfigs(fieldConfigs);
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder forceSource(Boolean forceSource) {
+			_highlightImpl._forceSource = forceSource;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder fragmenter(String fragmenter) {
+			_highlightImpl._fragmenter = fragmenter;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder fragmentSize(Integer fragmentSize) {
+			_highlightImpl._fragmentSize = fragmentSize;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder highlighterType(String highlighterType) {
+			_highlightImpl._highlighterType = highlighterType;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder highlightFilter(Boolean highlightFilter) {
+			_highlightImpl._highlightFilter = highlightFilter;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder highlightQuery(Query highlightQuery) {
+			_highlightImpl._highlightQuery = highlightQuery;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder numOfFragments(Integer numOfFragments) {
+			_highlightImpl._numOfFragments = numOfFragments;
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder postTags(String... postTags) {
+			_highlightImpl.addPostTags(postTags);
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder preTags(String... preTags) {
+			_highlightImpl.addPreTags(preTags);
+
+			return this;
+		}
+
+		@Override
+		public HighlightBuilder requireFieldMatch(Boolean requireFieldMatch) {
+			_highlightImpl._requireFieldMatch = requireFieldMatch;
+
+			return this;
+		}
+
+		private final HighlightImpl _highlightImpl = new HighlightImpl();
+
+	}
+
 	protected void addFieldConfig(FieldConfig fieldConfig) {
 		_fieldConfigs.add(fieldConfig);
 	}
@@ -114,38 +210,6 @@ public class HighlightImpl implements Highlight {
 
 	protected void addPreTags(String... preTags) {
 		Collections.addAll(_preTags, preTags);
-	}
-
-	protected void setForceSource(Boolean forceSource) {
-		_forceSource = forceSource;
-	}
-
-	protected void setFragmenter(String fragmenter) {
-		_fragmenter = fragmenter;
-	}
-
-	protected void setFragmentSize(Integer fragmentSize) {
-		_fragmentSize = fragmentSize;
-	}
-
-	protected void setHighlighterType(String highlighterType) {
-		_highlighterType = highlighterType;
-	}
-
-	protected void setHighlightFilter(Boolean highlightFilter) {
-		_highlightFilter = highlightFilter;
-	}
-
-	protected void setHighlightQuery(Query highlightQuery) {
-		_highlightQuery = highlightQuery;
-	}
-
-	protected void setNumOfFragments(Integer numOfFragments) {
-		_numOfFragments = numOfFragments;
-	}
-
-	protected void setRequireFieldMatch(Boolean requireFieldMatch) {
-		_requireFieldMatch = requireFieldMatch;
 	}
 
 	private final List<FieldConfig> _fieldConfigs = new ArrayList<>();
