@@ -18,8 +18,9 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
-import com.liferay.portal.search.highlight.FieldConfig;
+import com.liferay.portal.search.highlight.FieldConfigBuilder;
 import com.liferay.portal.search.highlight.Highlight;
+import com.liferay.portal.search.highlight.HighlightBuilder;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
@@ -54,9 +55,9 @@ public abstract class BaseHighlighterTestCase extends BaseIndexingTestCase {
 
 		Query query = queries.string(fieldName.concat(":alpha"));
 
-		Highlight.Builder highlightBuilder = highlights.getHighlightBuilder();
+		HighlightBuilder highlightBuilder = highlights.getHighlightBuilder();
 
-		FieldConfig.Builder fieldConfigBuilder =
+		FieldConfigBuilder fieldConfigBuilder =
 			highlights.getFieldConfigBuilder();
 
 		fieldConfigBuilder.field(fieldName);
