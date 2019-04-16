@@ -17,6 +17,7 @@ package com.liferay.portal.search.internal.searcher;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 import com.liferay.portal.search.internal.legacy.searcher.SearchRequestBuilderImpl.SearchRequestImpl;
 import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -67,7 +68,7 @@ public class SearcherImpl implements Searcher {
 
 		FacetedSearcherSearch facetedSearcherSearch = new FacetedSearcherSearch(
 			searchContext, searchRequest, facetedSearcherManager,
-			searchResponseBuilderFactory);
+			searchResponseBuilderFactory, searchHitsBuilderFactory);
 
 		return facetedSearcherSearch.search();
 	}
@@ -88,6 +89,9 @@ public class SearcherImpl implements Searcher {
 
 	@Reference
 	protected IndexerRegistry indexerRegistry;
+
+	@Reference
+	protected SearchHitsBuilderFactory searchHitsBuilderFactory;
 
 	@Reference
 	protected SearchResponseBuilderFactory searchResponseBuilderFactory;
