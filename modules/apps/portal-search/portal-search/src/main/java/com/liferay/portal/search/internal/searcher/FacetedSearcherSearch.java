@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
+import com.liferay.portal.search.hits.SearchHitsBuilder;
+import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
 import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchResponse;
@@ -32,12 +34,14 @@ public class FacetedSearcherSearch {
 	public FacetedSearcherSearch(
 		SearchContext searchContext, SearchRequest searchRequest,
 		FacetedSearcherManager facetedSearcherManager,
-		SearchResponseBuilderFactory searchResponseBuilderFactory) {
+		SearchResponseBuilderFactory searchResponseBuilderFactory,
+		SearchHitsBuilderFactory searchHitsBuilderFactory) {
 
 		_searchContext = searchContext;
 		_searchRequest = searchRequest;
 		_facetedSearcherManager = facetedSearcherManager;
 		_searchResponseBuilderFactory = searchResponseBuilderFactory;
+		_searchHitsBuilderFactory = searchHitsBuilderFactory;
 	}
 
 	public SearchResponse search() {
@@ -50,11 +54,13 @@ public class FacetedSearcherSearch {
 			_searchResponseBuilderFactory.getSearchResponseBuilder(
 				_searchContext);
 
-		return searchResponseBuilder.hits(
+		SearchResponse searchResponse = searchResponseBuilder.hits(
 			hits
 		).request(
 			_searchRequest
 		).build();
+
+		return searchHitsCheck(searchResponse, searchResponseBuilder);
 	}
 
 	protected Hits search(FacetedSearcher facetedSearcher) {
@@ -72,8 +78,23 @@ public class FacetedSearcherSearch {
 		}
 	}
 
+	protected SearchResponse searchHitsCheck(
+		SearchResponse searchResponse,
+		SearchResponseBuilder searchResponseBuilder) {
+
+		if (searchResponse.getSearchHits() == null) {
+			SearchHitsBuilder searchHitsBuilder =
+				_searchHitsBuilderFactory.getSearchHitsBuilder();
+
+			searchResponseBuilder.searchHits(searchHitsBuilder.build());
+		}
+
+		return searchResponse;
+	}
+
 	private final FacetedSearcherManager _facetedSearcherManager;
 	private final SearchContext _searchContext;
+	private final SearchHitsBuilderFactory _searchHitsBuilderFactory;
 	private final SearchRequest _searchRequest;
 	private final SearchResponseBuilderFactory _searchResponseBuilderFactory;
 
