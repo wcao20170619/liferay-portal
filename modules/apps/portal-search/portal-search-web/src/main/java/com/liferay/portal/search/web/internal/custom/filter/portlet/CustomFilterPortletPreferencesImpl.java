@@ -85,6 +85,34 @@ public class CustomFilterPortletPreferencesImpl
 	public String getFilterValueString() {
 		return getString(getFilterValueOptional());
 	}
+	
+	@Override
+	public String getFilterValueType() {
+		return _portletPreferencesHelper.getString(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_TYPE, "fieldValue");
+	}
+	
+	@Override
+	public Optional<String> getFilterLowerBoundOptional() {
+		return _portletPreferencesHelper.getString(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_LOWER);
+	}
+
+	@Override
+	public String getFilterLowerBoundString() {
+		return getString(getFilterLowerBoundOptional());
+	}
+	
+	@Override
+	public Optional<String> getFilterUpperBoundOptional() {
+		return _portletPreferencesHelper.getString(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE);
+	}
+
+	@Override
+	public String getFilterUpperBoundString() {
+		return getString(getFilterValueOptional());
+	}
 
 	@Override
 	public String getOccur() {
@@ -138,9 +166,27 @@ public class CustomFilterPortletPreferencesImpl
 	}
 
 	@Override
+	public boolean isIncludesLower() {
+		return _portletPreferencesHelper.getBoolean(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_LOWER, false);
+	}
+	
+	@Override
+	public boolean isIncludesUpper() {
+		return _portletPreferencesHelper.getBoolean(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_UPPER, false);
+	}
+	
+	@Override
 	public boolean isInvisible() {
 		return _portletPreferencesHelper.getBoolean(
 			CustomFilterPortletPreferences.PREFERENCE_KEY_INVISIBLE, false);
+	}
+	
+	@Override
+	public boolean isRange() {
+		return _portletPreferencesHelper.getBoolean(
+			CustomFilterPortletPreferences.PREFERENCE_KEY_RANGE, false);
 	}
 
 	protected String getString(Optional<String> optional) {

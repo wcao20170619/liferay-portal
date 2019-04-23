@@ -19,11 +19,14 @@ page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.CustomFilterPortletPreferences" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.CustomFilterPortletPreferencesImpl" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.ConfigurationDisplayContext" %><%@
+page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.FilterValueTypeEntriesHolder" %><%@
+page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.FilterValueTypeEntry" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.OccurEntriesHolder" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.OccurEntry" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.QueryTypeEntriesHolder" %><%@
 page import="com.liferay.portal.search.web.internal.custom.filter.portlet.action.QueryTypeEntry" %><%@
-page import="com.liferay.portal.search.web.internal.util.PortletPreferencesJspUtil" %>
+page import="com.liferay.portal.search.web.internal.util.PortletPreferencesJspUtil" %><%@
+page import="com.liferay.taglib.aui.AUIUtil" %>
 
 <%@ page import="java.util.Objects" %>
 
@@ -45,8 +48,10 @@ ConfigurationDisplayContext configurationDisplayContext = (ConfigurationDisplayC
 
 CustomFilterPortletPreferences customFilterPortletPreferences = new CustomFilterPortletPreferencesImpl(java.util.Optional.of(portletPreferences));
 
+FilterValueTypeEntriesHolder filterValueTypeEntriesHolder = configurationDisplayContext.getFilterValueTypeEntriesHolder();
 QueryTypeEntriesHolder queryTypeEntriesHolder = configurationDisplayContext.getQueryTypeEntriesHolder();
 OccurEntriesHolder occurEntriesHolder = configurationDisplayContext.getOccurEntriesHolder();
+
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -65,8 +70,33 @@ OccurEntriesHolder occurEntriesHolder = configurationDisplayContext.getOccurEntr
 		<liferay-frontend:fieldset-group>
 			<aui:input helpMessage="filter-field-help" label="filter-field" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_FIELD) %>" value="<%= customFilterPortletPreferences.getFilterFieldString() %>" />
 
-			<aui:input helpMessage="filter-value-help" label="filter-value" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE) %>" value="<%= customFilterPortletPreferences.getFilterValueString() %>" />
-
+			<aui:select helpMessage="filter-value-help" label="filter-value" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_TYPE) %>">
+			
+			<%
+			for (FilterValueTypeEntry filterValueTypeEntry : filterValueTypeEntriesHolder.getFilterValueTypeEntries()) {
+			%>
+				<aui:option label="<%= filterValueTypeEntry.getName() %>" selected="<%= Objects.equals(customFilterPortletPreferences.getFilterValueType(), filterValueTypeEntry.getTypeId()) %>" value="<%= filterValueTypeEntry.getTypeId() %>" />
+			<%
+			}
+			%>
+			</aui:select>
+				
+			<div id='<portlet:namespace /><%= filterValueTypeEntriesHolder.getFilterValueSectionIdByTypeId("fieldValue") %>' style="margin-left: 40px">
+				<aui:input label="" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE) %>" value="<%= customFilterPortletPreferences.getFilterValueString() %>" />			
+			</div>
+			<div  id='<portlet:namespace /><%= filterValueTypeEntriesHolder.getFilterValueSectionIdByTypeId("rangeValue") %>' style="margin-left: 40px">	
+				<aui:input label="Lower Bound" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_LOWER) %>" value="<%= customFilterPortletPreferences.getFilterLowerBoundString() %>" />	
+				<aui:input label="Includes Lower" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_LOWER) %>" type="checkbox" value="<%= customFilterPortletPreferences.isIncludesLower() %>" />
+				<aui:input label="Upper Bound" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_UPPER) %>" value="<%= customFilterPortletPreferences.getFilterUpperBoundString() %>" />					
+				<aui:input label="Includes Upper" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_UPPER) %>" type="checkbox" value="<%= customFilterPortletPreferences.isIncludesUpper() %>" />
+			</div>
+			<div  id='<portlet:namespace /><%= filterValueTypeEntriesHolder.getFilterValueSectionIdByTypeId("dateRange") %>' style="margin-left: 40px">	
+				<aui:input label="Start Date" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_LOWER) %>" value="<%= customFilterPortletPreferences.getFilterLowerBoundString() %>" />	
+				<aui:input label="Includes Start Date" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_LOWER) %>" type="checkbox" value="<%= customFilterPortletPreferences.isIncludesLower() %>" />
+				<aui:input label="End Date" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_UPPER) %>" value="<%= customFilterPortletPreferences.getFilterUpperBoundString() %>" />					
+				<aui:input label="Includes End Date" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_INCLUDES_UPPER) %>" type="checkbox" value="<%= customFilterPortletPreferences.isIncludesUpper() %>" />
+			</div>
+			
 			<aui:select helpMessage="filter-query-type-help" label="filter-query-type" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_QUERY_TYPE) %>">
 
 				<%
@@ -110,6 +140,7 @@ OccurEntriesHolder occurEntriesHolder = configurationDisplayContext.getOccurEntr
 			<aui:input helpMessage="immutable-help" label="immutable" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_IMMUTABLE) %>" type="checkbox" value="<%= customFilterPortletPreferences.isImmutable() %>" />
 
 			<aui:input helpMessage="disabled-help" label="disabled" name="<%= PortletPreferencesJspUtil.getInputName(CustomFilterPortletPreferences.PREFERENCE_KEY_DISABLED) %>" type="checkbox" value="<%= customFilterPortletPreferences.isDisabled() %>" />
+		
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
@@ -119,3 +150,16 @@ OccurEntriesHolder occurEntriesHolder = configurationDisplayContext.getOccurEntr
 		<aui:button type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
+<aui:script>
+<%
+for (FilterValueTypeEntry filterValueTypeEntry : filterValueTypeEntriesHolder.getFilterValueTypeEntries()) {
+%>
+Liferay.Util.toggleSelectBox(
+		'<portlet:namespace /><%= CustomFilterPortletPreferences.PREFERENCE_KEY_FILTER_VALUE_TYPE %>', 
+		'<%= filterValueTypeEntry.getTypeId() %>', 
+		'<portlet:namespace /><%= filterValueTypeEntry.getSectionId() %>');
+<%
+}
+%>
+
+</aui:script>

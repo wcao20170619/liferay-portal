@@ -125,18 +125,21 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 		}
 
 		protected Query buildQuery(ComplexQueryPart complexQueryPart) {
+			
+			Query query = null;
+			
 			if (complexQueryPart.isDisabled()) {
-				return null;
+				return query;
 			}
-
-			String field = GetterUtil.getString(complexQueryPart.getField());
-			String type = GetterUtil.getString(complexQueryPart.getType());
-			String value = GetterUtil.getString(complexQueryPart.getValue());
-
-			Query query = buildQuery(type, field, value);
-
+			
+			if (complexQueryPart.isRange()) {
+				query = buildQueryByRange(complexQueryPart);
+			} else {		
+				query = buildQueryByType(complexQueryPart);
+			}
+			
 			if (query == null) {
-				return null;
+				return query;
 			}
 
 			query.setBoost(complexQueryPart.getBoost());
@@ -145,7 +148,12 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 			return query;
 		}
 
-		protected Query buildQuery(String type, String field, String value) {
+		protected Query buildQueryByType(ComplexQueryPart complexQueryPart) {
+			
+			String field = GetterUtil.getString(complexQueryPart.getField());
+			String type = GetterUtil.getString(complexQueryPart.getType());
+			String value = GetterUtil.getString(complexQueryPart.getValue());
+			
 			if ("bool".equals(type)) {
 				return _queries.booleanQuery();
 			}
@@ -212,6 +220,24 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 			}
 
 			return null;
+		}
+		
+		protected Query buildQueryByRange(ComplexQueryPart complexQueryPart) {
+			String field = GetterUtil.getString(complexQueryPart.getField()); 
+			String type = GetterUtil.getString(complexQueryPart.getType());
+			
+			boolean includesLower = GetterUtil.getBoolean(complexQueryPart.isIncludesLower());
+			boolean includesUpper = GetterUtil.getBoolean(complexQueryPart.isIncludesUpper());
+			String lowerBound = GetterUtil.getString(complexQueryPart.getLowerBound());
+			String upperBound = GetterUtil.getString(complexQueryPart.getUpperBound());
+			
+			if ("date".equals(type)) {
+				return _queries.dateRangeTerm(
+					field, includesLower, includesUpper, lowerBound, upperBound);
+			} else {
+				return _queries.rangeTerm(
+					field, includesLower, includesUpper, lowerBound, upperBound);
+			}
 		}
 
 		protected Query getNamedQuery(String name) {

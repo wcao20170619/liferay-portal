@@ -75,6 +75,32 @@ public class ComplexQueryPartImpl implements ComplexQueryPart {
 	public boolean isDisabled() {
 		return _disabled;
 	}
+	
+	@Override
+	public boolean isRange() {
+		return _range;
+	}
+	
+	@Override
+	public String getLowerBound() {
+		return _lowerBound;
+	}
+
+	@Override
+	public String getUpperBound() {
+		return _upperBound;
+	}
+
+	@Override
+	public boolean isIncludesLower() {
+		return _includesLower;
+	}
+
+	@Override
+	public boolean isIncludesUpper() {
+		return _includesUpper;
+	}
+
 
 	public static class Builder implements ComplexQueryPartBuilder {
 
@@ -124,6 +150,13 @@ public class ComplexQueryPartImpl implements ComplexQueryPart {
 
 			return this;
 		}
+		
+		@Override
+		public ComplexQueryPartBuilder range(boolean range) {
+			_complexQueryPartImpl._range = range;
+
+			return this;
+		}
 
 		@Override
 		public Builder type(String type) {
@@ -142,6 +175,34 @@ public class ComplexQueryPartImpl implements ComplexQueryPart {
 		private final ComplexQueryPartImpl _complexQueryPartImpl =
 			new ComplexQueryPartImpl();
 
+		@Override
+		public ComplexQueryPartBuilder includesLower(boolean includesLower) {
+			_complexQueryPartImpl._includesLower = includesLower;
+			
+			return this;
+		}
+
+		@Override
+		public ComplexQueryPartBuilder includesUpper(boolean includesUpper) {
+			_complexQueryPartImpl._includesUpper = includesUpper;
+			
+			return this;
+		}
+
+		@Override
+		public ComplexQueryPartBuilder lowerBound(String lowerBound) {
+			_complexQueryPartImpl._lowerBound = lowerBound;
+			
+			return this;
+		}
+
+		@Override
+		public ComplexQueryPartBuilder upperBound(String upperBound) {
+			_complexQueryPartImpl._upperBound = upperBound;
+			
+			return this;
+		}
+
 	}
 
 	private Float _boost;
@@ -150,7 +211,12 @@ public class ComplexQueryPartImpl implements ComplexQueryPart {
 	private String _name;
 	private String _occur;
 	private String _parent;
+	private boolean _range;
+	private boolean _includesLower;
+	private boolean _includesUpper;
 	private String _type;
 	private String _value;
-
+	private String _lowerBound;
+	private String _upperBound;
+	
 }

@@ -35,9 +35,19 @@ public interface ComplexQueryPartBuilder {
 	public ComplexQueryPartBuilder occur(String occur);
 
 	public ComplexQueryPartBuilder parent(String parent);
+	
+	public ComplexQueryPartBuilder range(boolean range);
 
 	public ComplexQueryPartBuilder type(String type);
 
 	public ComplexQueryPartBuilder value(String value);
+	
+	public ComplexQueryPartBuilder includesLower(boolean includesLower);
+	
+	public ComplexQueryPartBuilder includesUpper(boolean includesUpper);
+	
+	public ComplexQueryPartBuilder lowerBound(String lowerBound);
+	
+	public ComplexQueryPartBuilder upperBound(String upperBound);
 
 }

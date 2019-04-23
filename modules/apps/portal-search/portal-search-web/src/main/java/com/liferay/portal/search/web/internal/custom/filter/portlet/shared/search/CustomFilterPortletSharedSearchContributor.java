@@ -67,11 +67,21 @@ public class CustomFilterPortletSharedSearchContributor
 				customFilterPortletPreferences.getOccur()
 			).parent(
 				customFilterPortletPreferences.getParentQueryNameString()
+			).range(
+				customFilterPortletPreferences.isRange()
 			).type(
 				customFilterPortletPreferences.getFilterQueryType()
 			).value(
 				getFilterValue(
 					portletSharedSearchSettings, customFilterPortletPreferences)
+			).includesLower(
+				customFilterPortletPreferences.isIncludesLower()
+			).includesUpper(
+				customFilterPortletPreferences.isIncludesUpper()
+			).lowerBound(
+				customFilterPortletPreferences.getFilterLowerBoundString()
+			).upperBound(
+				customFilterPortletPreferences.getFilterUpperBoundString()
 			).build());
 	}
 

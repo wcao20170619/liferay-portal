@@ -34,8 +34,18 @@ public interface CustomFilterPortletPreferences {
 		"filterQueryType";
 
 	public static final String PREFERENCE_KEY_FILTER_VALUE = "filterValue";
+	
+	public static final String PREFERENCE_KEY_FILTER_VALUE_TYPE = "filterValueType";
+	
+	public static final String PREFERENCE_KEY_FILTER_VALUE_LOWER = "filterValueLower";
+	
+	public static final String PREFERENCE_KEY_FILTER_VALUE_UPPER = "filterValueUpper";
 
 	public static final String PREFERENCE_KEY_IMMUTABLE = "immutable";
+	
+	public static final String PREFERENCE_KEY_INCLUDES_LOWER = "includesLower";
+	
+	public static final String PREFERENCE_KEY_INCLUDES_UPPER = "includesUpper";
 
 	public static final String PREFERENCE_KEY_INVISIBLE = "invisible";
 
@@ -47,6 +57,8 @@ public interface CustomFilterPortletPreferences {
 		"parentQueryName";
 
 	public static final String PREFERENCE_KEY_QUERY_NAME = "queryName";
+	
+	public static final String PREFERENCE_KEY_RANGE = "range";
 
 	public Optional<String> getBoostOptional();
 
@@ -59,12 +71,22 @@ public interface CustomFilterPortletPreferences {
 	public Optional<String> getFilterFieldOptional();
 
 	public String getFilterFieldString();
+	
+	public String getFilterValueType();
 
 	public String getFilterQueryType();
 
 	public Optional<String> getFilterValueOptional();
+	
+	public Optional<String> getFilterLowerBoundOptional();
+	
+	public Optional<String> getFilterUpperBoundOptional();
 
 	public String getFilterValueString();
+	
+	public String getFilterLowerBoundString();
+	
+	public String getFilterUpperBoundString();
 
 	public String getOccur();
 
@@ -83,7 +105,13 @@ public interface CustomFilterPortletPreferences {
 	public boolean isDisabled();
 
 	public boolean isImmutable();
+	
+	public boolean isIncludesLower();
+	
+	public boolean isIncludesUpper();
 
 	public boolean isInvisible();
+	
+	public boolean isRange();
 
 }

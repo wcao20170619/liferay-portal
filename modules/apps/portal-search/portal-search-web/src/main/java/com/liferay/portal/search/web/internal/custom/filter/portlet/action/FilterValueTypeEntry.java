@@ -12,40 +12,39 @@
  * details.
  */
 
-package com.liferay.portal.search.filter;
-
-import aQute.bnd.annotation.ProviderType;
+package com.liferay.portal.search.web.internal.custom.filter.portlet.action;
 
 /**
- * @author André de Oliveira
+ * @author Wade Cao
  */
-@ProviderType
-public interface ComplexQueryPart {
+public class FilterValueTypeEntry {
 
-	public Float getBoost();
-
-	public String getField();
-
-	public String getName();
-
-	public String getOccur();
-
-	public String getParent();
-
-	public String getType();
-
-	public String getValue();
+	public String getName() {
+		return _name;
+	}
 	
-	public String getLowerBound();
-	
-	public String getUpperBound();
+	public String getSectionId() {
+		return _sectionId;
+	}
 
-	public boolean isDisabled();
+	public String getTypeId() {
+		return _typeId;
+	}
+
+	protected void setName(String name) {
+		_name = name;
+	}
 	
-	public boolean isRange();
-	
-	public boolean isIncludesLower();
-	
-	public boolean isIncludesUpper();
+	protected void setSectionId(String sectionId) {
+		_sectionId = sectionId;
+	}
+
+	protected void setTypeId(String typeId) {
+		_typeId = typeId;
+	}
+
+	private String _name;
+	private String _sectionId;
+	private String _typeId;
 
 }

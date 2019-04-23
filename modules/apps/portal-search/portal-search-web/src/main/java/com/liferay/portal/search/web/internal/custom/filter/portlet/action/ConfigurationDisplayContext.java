@@ -26,10 +26,16 @@ public class ConfigurationDisplayContext {
 	public QueryTypeEntriesHolder getQueryTypeEntriesHolder() {
 		return _queryTypeEntriesHolder;
 	}
+	
+	public FilterValueTypeEntriesHolder getFilterValueTypeEntriesHolder() {
+		return _filterValueTypeEntriesHolder;
+	}
 
 	private final OccurEntriesHolder _occurEntriesHolder =
 		new OccurEntriesHolder();
 	private final QueryTypeEntriesHolder _queryTypeEntriesHolder =
 		new QueryTypeEntriesHolder();
+	private final FilterValueTypeEntriesHolder _filterValueTypeEntriesHolder =
+		new FilterValueTypeEntriesHolder();
 
 }
