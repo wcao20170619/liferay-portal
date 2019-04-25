@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.internal.filter;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryBuilder;
@@ -130,11 +131,17 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 				return null;
 			}
 
+			Query query = null;
+
 			String field = GetterUtil.getString(complexQueryPart.getField());
 			String type = GetterUtil.getString(complexQueryPart.getType());
 			String value = GetterUtil.getString(complexQueryPart.getValue());
 
-			Query query = buildQuery(type, field, value);
+			query = buildRangeQuery(field, value);
+
+			if (query == null) {
+				query = buildQuery(type, field, value);
+			}
 
 			if (query == null) {
 				return null;
@@ -228,6 +235,50 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 			return null;
 		}
 
+		protected Query buildRangeQuery(String field, String value) {
+			Query query = null;
+
+			if (!_isRangePattern(value)) {
+				return query;
+			}
+
+			boolean includesLower = false;
+			boolean includesUpper = false;
+			boolean dateRange = false;
+
+			if (value.startsWith(StringPool.OPEN_BRACKET)) {
+				includesLower = true;
+			}
+
+			if (value.endsWith(StringPool.CLOSE_BRACKET)) {
+				includesUpper = true;
+			}
+
+			value = value.substring(1, value.length() - 1);
+
+			if (value.indexOf("now") >= 0) {
+				dateRange = true;
+			}
+
+			String[] rangeParts = value.split(StringPool.SPACE);
+
+			String lowerBound = rangeParts[0];
+			String upperBound = rangeParts[rangeParts.length - 1];
+
+			if (dateRange) {
+				query = _queries.dateRangeTerm(
+					field, includesLower, includesUpper, lowerBound,
+					upperBound);
+			}
+			else {
+				query = _queries.rangeTerm(
+					field, includesLower, includesUpper, lowerBound,
+					upperBound);
+			}
+
+			return query;
+		}
+
 		protected Query getNamedQuery(String name) {
 			return _queriesMap.get(name);
 		}
@@ -272,6 +323,19 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 			_queriesMap.put(name, query);
 
 			return query;
+		}
+
+		private boolean _isRangePattern(String value) {
+			if ((value != null) &&
+				(value.startsWith(StringPool.OPEN_BRACKET) ||
+				 value.startsWith(StringPool.CLOSE_BRACKET)) &&
+				(value.endsWith(StringPool.OPEN_BRACKET) ||
+				 value.endsWith(StringPool.CLOSE_BRACKET))) {
+
+				return true;
+			}
+
+			return false;
 		}
 
 		private final Map<String, ComplexQueryPart> _complexQueryPartsMap;
