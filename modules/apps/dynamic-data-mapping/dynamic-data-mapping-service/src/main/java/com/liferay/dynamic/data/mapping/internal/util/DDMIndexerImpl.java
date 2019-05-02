@@ -89,6 +89,10 @@ public class DDMIndexerImpl implements DDMIndexer {
 
 					Serializable value = field.getValue(locale);
 
+					if (value == null) {
+						continue;
+					}
+
 					if (value instanceof BigDecimal) {
 						document.addNumberSortable(name, (BigDecimal)value);
 					}
@@ -185,7 +189,9 @@ public class DDMIndexerImpl implements DDMIndexer {
 								valueString = HtmlUtil.extractText(valueString);
 							}
 
-							if (indexType.equals("keyword")) {
+							if (indexType.equals("keyword") &&
+								!Validator.isBlank(valueString)) {
+
 								document.addKeywordSortable(name, valueString);
 							}
 							else {

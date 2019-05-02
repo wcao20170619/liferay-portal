@@ -76,6 +76,13 @@ public abstract class TestOrderHelper {
 			FieldConstants.BOOLEAN, DDMFormFieldType.CHECKBOX);
 	}
 
+	public void testOrderByDDMBooleanFieldNullPointer() throws Exception {
+		testOrderByDDMField(
+			new String[] {"false", "true", "false", "true", null},
+			new String[] {"false", "false", "true", "true", ""},
+			FieldConstants.BOOLEAN, DDMFormFieldType.CHECKBOX);
+	}
+
 	public void testOrderByDDMBooleanFieldRepeatable() throws Exception {
 		testOrderByDDMFieldRepeatable(
 			new String[] {
@@ -94,10 +101,28 @@ public abstract class TestOrderHelper {
 			FieldConstants.DATE, DDMFormFieldType.DATE);
 	}
 
+	public void testOrderByDDMDateFieldNullPointer() throws Exception {
+		testOrderByDDMField(
+			new String[] {
+				"20160417192501", "20160417192510", "20160417192503", null
+			},
+			new String[] {
+				"20160417192501", "20160417192503", "20160417192510", ""
+			},
+			FieldConstants.DATE, DDMFormFieldType.DATE);
+	}
+
 	public void testOrderByDDMIntegerField() throws Exception {
 		testOrderByDDMField(
 			new String[] {"1", "10", "3", "2"},
 			new String[] {"1", "2", "3", "10"}, FieldConstants.INTEGER,
+			DDMFormFieldType.INTEGER);
+	}
+
+	public void testOrderByDDMIntegerFieldNullPointer() throws Exception {
+		testOrderByDDMField(
+			new String[] {"1", "10", "3", "2", null},
+			new String[] {"1", "2", "3", "10", ""}, FieldConstants.INTEGER,
 			DDMFormFieldType.INTEGER);
 	}
 
@@ -115,6 +140,17 @@ public abstract class TestOrderHelper {
 			FieldConstants.NUMBER, DDMFormFieldType.NUMBER);
 	}
 
+	public void testOrderByDDMNumberFieldNullPointer() throws Exception {
+		testOrderByDDMField(
+			new String[] {
+				"3", "3.14", "12.34", "2.72", "1.41", "23.45", "20", null
+			},
+			new String[] {
+				"1.41", "2.72", "3", "3.14", "12.34", "20", "23.45", ""
+			},
+			FieldConstants.NUMBER, DDMFormFieldType.NUMBER);
+	}
+
 	public void testOrderByDDMNumberFieldRepeatable() throws Exception {
 		testOrderByDDMFieldRepeatable(
 			new String[] {"20|12.34", "16.0", "3.14"},
@@ -128,6 +164,26 @@ public abstract class TestOrderHelper {
 
 	public void testOrderByDDMRadioFieldKeyword() throws Exception {
 		testOrderByDDMRadioField("keyword");
+	}
+
+	public void testOrderByDDMRadioFieldKeywordNullPointer() throws Exception {
+		testOrderByDDMRadioFieldNullPointer("keyword");
+	}
+
+	public void testOrderByDDMRadioFieldKeywordNullWord() throws Exception {
+		testOrderByDDMRadioFieldNullWord(
+			new String[] {"a", "o", "null"}, new String[] {"a", "null", "o"},
+			"keyword");
+	}
+
+	public void testOrderByDDMRadioFieldNullPointer() throws Exception {
+		testOrderByDDMRadioFieldNullPointer("text");
+	}
+
+	public void testOrderByDDMRadioFieldNullWord() throws Exception {
+		testOrderByDDMRadioFieldNullWord(
+			new String[] {"a", "o", "null"}, new String[] {"a", "o", "null"},
+			"text");
 	}
 
 	public void testOrderByDDMTextField() throws Exception {
@@ -399,9 +455,9 @@ public abstract class TestOrderHelper {
 
 	protected void testOrderByDDMRadioField(String indexType) throws Exception {
 		testOrderByDDMRadioField(
-			new String[] {"a", "D", "c", "B"},
-			new String[] {"a", "B", "c", "D"}, FieldConstants.STRING, indexType,
-			DDMFormFieldType.RADIO);
+			new String[] {"a", "D", "c", "B", ""},
+			new String[] {"a", "B", "c", "D", ""}, FieldConstants.STRING,
+			indexType, DDMFormFieldType.RADIO);
 	}
 
 	protected void testOrderByDDMRadioField(
@@ -421,11 +477,28 @@ public abstract class TestOrderHelper {
 		testOrderByDDMField();
 	}
 
+	protected void testOrderByDDMRadioFieldNullPointer(String indexType)
+		throws Exception {
+
+		testOrderByDDMRadioField(
+			new String[] {"a", "o", null}, new String[] {"a", "o", ""},
+			FieldConstants.STRING, indexType, DDMFormFieldType.RADIO);
+	}
+
+	protected void testOrderByDDMRadioFieldNullWord(
+			String[] unsortedValues, String[] sortedValues, String indexType)
+		throws Exception {
+
+		testOrderByDDMRadioField(
+			unsortedValues, sortedValues, FieldConstants.STRING, indexType,
+			DDMFormFieldType.RADIO);
+	}
+
 	protected void testOrderByDDMTextField(String indexType) throws Exception {
 		testOrderByDDMField(
-			new String[] {"a", "D", "c", "B"},
-			new String[] {"a", "B", "c", "D"}, FieldConstants.STRING, indexType,
-			DDMFormFieldType.TEXT);
+			new String[] {"a", "D", "c", "B", ""},
+			new String[] {"a", "B", "c", "D", ""}, FieldConstants.STRING,
+			indexType, DDMFormFieldType.TEXT);
 	}
 
 	private String _dataType;
