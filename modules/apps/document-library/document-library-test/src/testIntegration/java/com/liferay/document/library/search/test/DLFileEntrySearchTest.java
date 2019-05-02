@@ -107,6 +107,14 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 	}
 
 	@Test
+	public void testOrderByDDMBooleanFieldNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMBooleanFieldNullPointer();
+	}
+
+	@Test
 	public void testOrderByDDMBooleanFieldRepeatable() throws Exception {
 		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
 			_ddmIndexer, group);
@@ -115,11 +123,27 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 	}
 
 	@Test
+	public void testOrderByDDMDateFieldNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMDateFieldNullPointer();
+	}
+
+	@Test
 	public void testOrderByDDMIntegerField() throws Exception {
 		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
 			_ddmIndexer, group);
 
 		testOrderHelper.testOrderByDDMIntegerField();
+	}
+
+	@Test
+	public void testOrderByDDMIntegerFieldNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMIntegerFieldNullPointer();
 	}
 
 	@Test
@@ -136,6 +160,14 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			_ddmIndexer, group);
 
 		testOrderHelper.testOrderByDDMNumberField();
+	}
+
+	@Test
+	public void testOrderByDDMNumberFieldNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMNumberFieldNullPointer();
 	}
 
 	@Test
@@ -160,6 +192,38 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 			_ddmIndexer, group);
 
 		testOrderHelper.testOrderByDDMRadioFieldKeyword();
+	}
+
+	@Test
+	public void testOrderByDDMRadioFieldKeywordNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMRadioFieldKeywordNullPointer();
+	}
+
+	@Test
+	public void testOrderByDDMRadioFieldKeywordNullWord() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMRadioFieldKeywordNullWord();
+	}
+
+	@Test
+	public void testOrderByDDMRadioFieldNullPointer() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMRadioFieldNullPointer();
+	}
+
+	@Test
+	public void testOrderByDDMRadioFieldNullWord() throws Exception {
+		TestOrderHelper testOrderHelper = new DLFileEntrySearchTestOrderHelper(
+			_ddmIndexer, group);
+
+		testOrderHelper.testOrderByDDMRadioFieldNullWord();
 	}
 
 	@Test
