@@ -32,12 +32,14 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
+import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
@@ -56,7 +58,6 @@ import com.liferay.portal.search.web.search.result.SearchResultImageContributor;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,7 +75,6 @@ import java.util.stream.Stream;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -646,10 +646,31 @@ public class SearchResultSummaryDisplayBuilder {
 	protected void buildViewURL(
 		String className, long classPK,
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext) {
+		
+		HttpServletRequest httpRequest = 
+			(HttpServletRequest)_renderRequest.getAttribute(
+				PortletServlet.PORTLET_SERVLET_REQUEST);
 
-		String viewURL = getSearchResultViewURL(className, classPK);
-
-		searchResultSummaryDisplayContext.setViewURL(viewURL);
+		boolean isConfigured = GetterUtil.getBoolean(httpRequest.getAttribute("isConfigured"), false);
+		
+		if (isConfigured) {
+			String viewURL = getSearchResultViewURL(className, classPK);
+			searchResultSummaryDisplayContext.setViewURL(viewURL);
+			return;
+		}
+		
+		
+		String myCurrentURL = PortalUtil.getCurrentURL(_renderRequest);
+		
+		if (myCurrentURL.indexOf("selectedresult=") > 0) {
+			String newValue = "selectedresult=" + className + StringPool.UNDERLINE  + classPK + "$1";
+			myCurrentURL = myCurrentURL.replaceFirst("\\bselectedresult=.*?(&|$)", newValue);
+		} else {
+			myCurrentURL = myCurrentURL + "&selectedresult=" + className + StringPool.UNDERLINE  + classPK;
+		}
+		
+		searchResultSummaryDisplayContext.setViewURL(myCurrentURL);
+		
 	}
 
 	protected String formatCreationDate(Date date) {

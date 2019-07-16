@@ -14,12 +14,14 @@
 
 package com.liferay.portal.search.web.internal.search.results.portlet;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.web.internal.result.display.context.SearchResultSummaryDisplayContext;
 
 import java.io.Serializable;
-
 import java.util.List;
 
 /**
@@ -52,6 +54,21 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 	public boolean isRenderNothing() {
 		return _renderNothing;
 	}
+	
+	public boolean isSelectedResult(Document document) {
+		boolean selectedResult = false;
+		if (document != null) {
+			String className = document.get(Field.ENTRY_CLASS_NAME);
+			long classPK = GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK));
+			
+			String selected = className + StringPool.UNDERLINE  + classPK;
+			
+			if (_selectedClassNamePK != null && selected.equals(_selectedClassNamePK)) {
+				selectedResult = true;
+			}
+		}
+		return selectedResult;
+	}
 
 	public void setDocuments(List<Document> documents) {
 		_documents = documents;
@@ -74,6 +91,10 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 
 		_searchResultsSummariesHolder = searchResultsSummariesHolder;
 	}
+	
+	public void setSelectedClassNamePK(String selectedClassNamePK) {
+		_selectedClassNamePK = selectedClassNamePK;
+	}
 
 	public void setTotalHits(int totalHits) {
 		_totalHits = totalHits;
@@ -84,6 +105,7 @@ public class SearchResultsPortletDisplayContext implements Serializable {
 	private boolean _renderNothing;
 	private SearchContainer<Document> _searchContainer;
 	private SearchResultsSummariesHolder _searchResultsSummariesHolder;
+	private String _selectedClassNamePK;
 	private int _totalHits;
 
 }

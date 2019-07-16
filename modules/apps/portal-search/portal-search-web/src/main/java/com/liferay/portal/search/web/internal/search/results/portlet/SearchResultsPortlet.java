@@ -151,6 +151,12 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 		searchResultsPortletDisplayContext.setKeywords(
 			keywordsOptional.orElse(StringPool.BLANK));
+		
+		Optional<String> selectedClassNamePKOptional =
+			portletSharedSearchResponse.getParameter("selectedresult", renderRequest);
+		
+		searchResultsPortletDisplayContext.setSelectedClassNamePK(
+			selectedClassNamePKOptional.orElse(StringPool.BLANK));
 
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
