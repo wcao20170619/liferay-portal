@@ -87,6 +87,10 @@ com.liferay.portal.kernel.dao.search.SearchContainer<com.liferay.portal.kernel.s
 
 		<%
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext = java.util.Objects.requireNonNull(searchResultsPortletDisplayContext.getSearchResultSummaryDisplayContext(document));
+
+		if (searchResultsPortletDisplayContext.isSelectedResult(document)) {
+			row.setCssClass("active");
+		}
 		%>
 
 		<c:choose>
