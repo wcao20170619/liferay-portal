@@ -287,6 +287,14 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 
 		return this;
 	}
+	
+	@Override
+	public SearchRequestBuilder moreLikeThisEnabled(boolean moreLikeThisEnabled) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setMoreLikeThisEnabled(moreLikeThisEnabled));
+
+		return this;
+	}
 
 	@Override
 	public void paginationStartParameterName(

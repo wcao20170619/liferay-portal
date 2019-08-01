@@ -115,5 +115,7 @@ public interface SearchRequest {
 	 *         <code>false</code> otherwise
 	 */
 	public boolean isIncludeResponseString();
+	
+	public boolean isMoreLikeThisEnabled();
 
 }

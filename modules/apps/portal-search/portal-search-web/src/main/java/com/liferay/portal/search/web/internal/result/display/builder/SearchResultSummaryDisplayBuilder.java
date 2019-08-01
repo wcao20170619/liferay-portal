@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
@@ -56,7 +57,6 @@ import com.liferay.portal.search.web.search.result.SearchResultImageContributor;
 import java.text.DateFormat;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,7 +74,6 @@ import java.util.stream.Stream;
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -142,6 +141,14 @@ public class SearchResultSummaryDisplayBuilder {
 
 		return this;
 	}
+	
+	public SearchResultSummaryDisplayBuilder setDocument(
+		com.liferay.portal.search.document.Document document) {
+
+		_document = document;
+
+		return this;
+	}
 
 	public SearchResultSummaryDisplayBuilder setDocumentBuilderFactory(
 		DocumentBuilderFactory documentBuilderFactory) {
@@ -192,6 +199,13 @@ public class SearchResultSummaryDisplayBuilder {
 	public SearchResultSummaryDisplayBuilder setLocale(Locale locale) {
 		_locale = locale;
 
+		return this;
+	}
+	
+	public SearchResultSummaryDisplayBuilder setMoreLikeThisEnabled(
+		boolean moreLikeThisEnabled) {
+		_moreLikeThisEnabled = moreLikeThisEnabled;
+		
 		return this;
 	}
 
@@ -349,7 +363,7 @@ public class SearchResultSummaryDisplayBuilder {
 		buildModelResource(searchResultSummaryDisplayContext, className);
 		buildUserPortrait(
 			searchResultSummaryDisplayContext, assetEntry, className);
-		buildViewURL(className, classPK, searchResultSummaryDisplayContext);
+		buildViewURL(assetEntry, className, classPK, searchResultSummaryDisplayContext);
 
 		return searchResultSummaryDisplayContext;
 	}
@@ -644,12 +658,51 @@ public class SearchResultSummaryDisplayBuilder {
 	}
 
 	protected void buildViewURL(
-		String className, long classPK,
+			AssetEntry assetEntry, String className, long classPK,
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext) {
+		
+		if (!_moreLikeThisEnabled) {
+			String viewURL = getSearchResultViewURL(className, classPK);
+			
+			searchResultSummaryDisplayContext.setViewURL(viewURL);
+			return;
+		}
+			
+		String currentURL = buildMoreLikeThisViewURL(assetEntry);
+		
+		searchResultSummaryDisplayContext.setViewURL(currentURL);
+		
+	}
 
-		String viewURL = getSearchResultViewURL(className, classPK);
-
-		searchResultSummaryDisplayContext.setViewURL(viewURL);
+	protected String buildMoreLikeThisViewURL(AssetEntry assetEntry) {
+		String currentURL = PortalUtil.getCurrentURL(_renderRequest);
+		List<String> uids = getFieldValueStrings(Field.UID);
+		
+		currentURL = addParameter(Field.UID, uids.get(0), currentURL);
+		
+		String assetEntryIdValue = String.valueOf(assetEntry.getEntryId());
+		
+		currentURL = addParameter("assetEntryId", assetEntryIdValue, currentURL);
+		
+		AssetRendererFactory<?> assetRendererFactory = assetEntry.getAssetRendererFactory();
+		
+		if (assetRendererFactory != null) {
+			currentURL = addParameter("assetType", assetRendererFactory.getType(), currentURL);
+		}
+	
+		return currentURL;
+	}
+	
+	protected static String addParameter(String parameterName, String parameterValue, String currentURL) {
+		
+		if (currentURL.indexOf(parameterName + "=") > 0) {
+			String newValue = parameterName + "=" + parameterValue + "$1";
+			currentURL = currentURL.replaceFirst("\\b" + parameterName + "=.*?(&|$)", newValue);
+		} else {
+			currentURL = currentURL + "&" + parameterName + "=" + parameterValue;
+		}
+		
+		return currentURL;
 	}
 
 	protected String formatCreationDate(Date date) {
@@ -912,6 +965,7 @@ public class SearchResultSummaryDisplayBuilder {
 	private Language _language;
 	private com.liferay.portal.kernel.search.Document _legacyDocument;
 	private Locale _locale;
+	private boolean _moreLikeThisEnabled;
 	private PortletURLFactory _portletURLFactory;
 	private RenderRequest _renderRequest;
 	private RenderResponse _renderResponse;

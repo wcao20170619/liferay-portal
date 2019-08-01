@@ -245,6 +245,11 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	public boolean isExplain() {
 		return _explain;
 	}
+	
+	@Override
+	public boolean isMoreLikeThisEnabled() {
+		return _moreLikeThisEnabled;
+	}
 
 	@Override
 	public boolean isIncludeResponseString() {
@@ -312,6 +317,10 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 
 		Collections.addAll(_modelIndexerClasses, classes);
 	}
+	
+	public void setMoreLikeThisEnabled(boolean moreLikeThisEnabled) {
+		_moreLikeThisEnabled = moreLikeThisEnabled;
+	}
 
 	public void setPaginationStartParameterName(
 		String paginationStartParameterName) {
@@ -372,6 +381,7 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	private final List<String> _includeContributors = new ArrayList<>();
 	private boolean _includeResponseString;
 	private final List<Class<?>> _modelIndexerClasses = new ArrayList<>();
+	private boolean _moreLikeThisEnabled;
 	private String _paginationStartParameterName;
 	private final Map<String, PipelineAggregation> _pipelineAggregationsMap =
 		new LinkedHashMap<>();

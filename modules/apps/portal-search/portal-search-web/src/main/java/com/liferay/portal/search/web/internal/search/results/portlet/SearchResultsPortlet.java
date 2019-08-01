@@ -22,12 +22,14 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -49,7 +51,6 @@ import com.liferay.portal.search.web.portlet.shared.search.PortletSharedSearchRe
 import com.liferay.portal.search.web.search.result.SearchResultImageContributor;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -62,7 +63,6 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -151,7 +151,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 		searchResultsPortletDisplayContext.setKeywords(
 			keywordsOptional.orElse(StringPool.BLANK));
-
+	
 		SearchResultsPortletPreferences searchResultsPortletPreferences =
 			new SearchResultsPortletPreferencesImpl(
 				portletSharedSearchResponse.getPortletPreferences(
@@ -252,6 +252,10 @@ public class SearchResultsPortlet extends MVCPortlet {
 			portletSharedSearchResponse, searchResultsPortletPreferences);
 
 		List<Document> documents = searchResponse.getDocuments71();
+		
+		SearchRequest searchRequest = searchResponse.getRequest();
+		
+		boolean moreLikeThisEnabled = searchRequest.isMoreLikeThisEnabled();
 
 		SearchResultsSummariesHolder searchResultsSummariesHolder =
 			new SearchResultsSummariesHolder(documents.size());
@@ -266,11 +270,14 @@ public class SearchResultsPortlet extends MVCPortlet {
 		for (Document document : documents) {
 			SearchResultSummaryDisplayContext
 				searchResultSummaryDisplayContext = doBuildSummary(
-					document, renderRequest, renderResponse, themeDisplay,
+					document, moreLikeThisEnabled, renderRequest, 
+					renderResponse, themeDisplay,
 					portletURLFactory, searchResultsPortletPreferences,
 					searchResultPreferences);
 
 			if (searchResultSummaryDisplayContext != null) {
+				searchResultSummaryDisplayContext.setSelectedResult(
+					isSelectedResult(document, renderRequest));
 				searchResultsSummariesHolder.put(
 					document, searchResultSummaryDisplayContext);
 			}
@@ -280,7 +287,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 	}
 
 	protected SearchResultSummaryDisplayContext doBuildSummary(
-			Document document, RenderRequest renderRequest,
+			Document document, boolean moreLikeThisEnabled, 
+			RenderRequest renderRequest,
 			RenderResponse renderResponse, ThemeDisplay themeDisplay,
 			PortletURLFactory portletURLFactory,
 			SearchResultsPortletPreferences searchResultsPortletPreferences,
@@ -312,6 +320,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			language
 		).setLocale(
 			themeDisplay.getLocale()
+		).setMoreLikeThisEnabled(
+			moreLikeThisEnabled	
 		).setPortletURLFactory(
 			portletURLFactory
 		).setRenderRequest(
@@ -408,6 +418,27 @@ public class SearchResultsPortlet extends MVCPortlet {
 		}
 
 		return true;
+	}
+	
+	protected boolean isSelectedResult(Document document, RenderRequest renderRequest) {
+		boolean selectedResult = false;
+		
+		PortletSharedSearchResponse portletSharedSearchResponse =
+			portletSharedSearchRequest.search(renderRequest);
+		
+		Optional<String> uidOptional =
+			portletSharedSearchResponse.getParameter(Field.UID, renderRequest);
+		
+		String selectedUid = uidOptional.orElse(StringPool.BLANK);
+		
+		if (document != null) {
+			String uid = document.get(Field.UID);
+			
+			if (!Validator.isBlank(uid) && uid.equals(selectedUid)) {
+				selectedResult = true;
+			}
+		}
+		return selectedResult;
 	}
 
 	protected void removeSearchResultImageContributor(

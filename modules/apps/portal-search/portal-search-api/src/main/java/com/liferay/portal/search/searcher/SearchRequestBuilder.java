@@ -121,6 +121,8 @@ public interface SearchRequestBuilder {
 	public SearchRequestBuilder indexes(String... indexes);
 
 	public SearchRequestBuilder modelIndexerClasses(Class<?>... classes);
+	
+	public SearchRequestBuilder moreLikeThisEnabled(boolean moreLikeThisEnabled);
 
 	public void paginationStartParameterName(
 		String paginationStartParameterName);

@@ -150,6 +150,10 @@ public class SearchResultSummaryDisplayContext implements Serializable {
 	public boolean isModelResourceVisible() {
 		return _modelResourceVisible;
 	}
+	
+	public boolean isSelectedResult() {
+		return _selectedResult;
+	}
 
 	public boolean isTemporarilyUnavailable() {
 		return _temporarilyUnavailable;
@@ -283,6 +287,10 @@ public class SearchResultSummaryDisplayContext implements Serializable {
 	public void setPortletURL(PortletURL portletURL) {
 		_portletURL = portletURL;
 	}
+	
+	public void setSelectedResult(boolean selectedResult) {
+		_selectedResult = selectedResult;
+	}
 
 	public void setTemporarilyUnavailable(boolean temporarilyUnavailable) {
 		_temporarilyUnavailable = temporarilyUnavailable;
@@ -337,6 +345,7 @@ public class SearchResultSummaryDisplayContext implements Serializable {
 	private boolean _modelResourceVisible;
 	private String _pathThemeImages;
 	private PortletURL _portletURL;
+	private boolean _selectedResult;
 	private boolean _temporarilyUnavailable;
 	private String _thumbnailURLString;
 	private boolean _thumbnailVisible;

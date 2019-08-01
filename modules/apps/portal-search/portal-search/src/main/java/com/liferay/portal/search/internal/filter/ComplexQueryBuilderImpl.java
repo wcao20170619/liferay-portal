@@ -15,11 +15,13 @@
 package com.liferay.portal.search.internal.filter;
 
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryBuilder;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.internal.util.SearchStringUtil;
 import com.liferay.portal.search.query.BooleanQuery;
+import com.liferay.portal.search.query.MoreLikeThisQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.SimpleStringQuery;
@@ -194,6 +196,24 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 				}
 
 				return _queries.matchPhrasePrefix(field, value);
+			}
+			
+			if (Objects.equals(type, "more_like_this")) {
+				if (Validator.isBlank(value)) {
+					return null;
+				}
+
+				if (Validator.isBlank(field)) {
+					return _queries.moreLikeThis(value);
+				} else {
+					MoreLikeThisQuery moreLikeThis = _queries.moreLikeThis(
+						SearchStringUtil.splitAndUnquote(field), 
+						SearchStringUtil.splitAndUnquote(value));
+					
+					moreLikeThis.addDocumentIdentifier(_queries.documentIdentifier("index", "type", "id"));
+					return moreLikeThis;
+				}
+
 			}
 
 			if (Objects.equals(type, "multi_match")) {
