@@ -1,0 +1,4 @@
+Bundle-Name: Liferay Portal Search Related Results Web
+Bundle-SymbolicName: com.liferay.portal.search.related.results.web
+Bundle-Version: 1.0.0
+Web-ContextPath: /portal-search-related-results-web
