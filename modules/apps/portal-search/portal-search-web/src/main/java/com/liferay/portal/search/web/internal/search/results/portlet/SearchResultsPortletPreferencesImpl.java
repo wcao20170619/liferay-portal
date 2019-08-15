@@ -101,6 +101,14 @@ public class SearchResultsPortletPreferencesImpl
 	}
 
 	@Override
+	public boolean isResultPreviewEnabled() {
+		return _portletPreferencesHelper.getBoolean(
+			SearchResultsPortletPreferences.
+				PREFERENCE_KEY_RESULT_PREVIEW_ENABLED,
+			false);
+	}
+
+	@Override
 	public boolean isViewInContext() {
 		return _portletPreferencesHelper.getBoolean(
 			SearchResultsPortletPreferences.PREFERENCE_KEY_VIEW_IN_CONTEXT,
