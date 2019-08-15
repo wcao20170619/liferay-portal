@@ -42,6 +42,9 @@ public interface SearchResultsPortletPreferences {
 	public static final String PREFERENCE_KEY_PAGINATION_START_PARAMETER_NAME =
 		"paginationStartParameterName";
 
+	public static final String PREFERENCE_KEY_RESULT_PREVIEW_ENABLED =
+		"resultPreviewEnabled";
+
 	public static final String PREFERENCE_KEY_VIEW_IN_CONTEXT = "viewInContext";
 
 	public Optional<String> getFederatedSearchKeyOptional();
@@ -61,6 +64,8 @@ public interface SearchResultsPortletPreferences {
 	public boolean isDisplayInDocumentForm();
 
 	public boolean isHighlightEnabled();
+
+	public boolean isResultPreviewEnabled();
 
 	public boolean isViewInContext();
 
