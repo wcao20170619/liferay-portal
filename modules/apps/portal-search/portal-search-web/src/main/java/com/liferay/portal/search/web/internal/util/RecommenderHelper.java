@@ -31,7 +31,7 @@ import javax.portlet.RenderRequest;
  */
 public class RecommenderHelper {
 
-	public RecommenderHelper(
+	public RecommenderHelper( 
 		PortletSharedSearchResponse portletSharedSearchResponse) {
 
 		_portletSharedSearchResponse = portletSharedSearchResponse;

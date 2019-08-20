@@ -43,6 +43,7 @@ public class DocumentUIDBuilder {
 		}
 
 		if (Validator.isBlank(currentURL)) {
+			
 			return StringPool.BLANK;
 		}
 
