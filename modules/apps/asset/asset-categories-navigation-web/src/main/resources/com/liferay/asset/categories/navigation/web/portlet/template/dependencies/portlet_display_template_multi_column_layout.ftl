@@ -1,12 +1,8 @@
-
 <#if entries?has_content>
 	<@liferay_aui.row>
 		<#list entries as entry>
 			<@liferay_aui.col width=25>
 				<div class="results-header">
-
-					${entry}
-
 					<h3>
 						${entry.getUnambiguousTitle(entries, themeDisplay.getSiteGroupId(), themeDisplay.getLocale())}
 					</h3>
