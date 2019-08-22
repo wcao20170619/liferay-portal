@@ -16,12 +16,10 @@
 
 <div class="display-compact">
 	<ul>
-
 		<li>
 			<aui:a cssClass="link-primary single-link" href="#">
 				Title Test
 			</aui:a>
 		</li>
-
 	</ul>
 </div>

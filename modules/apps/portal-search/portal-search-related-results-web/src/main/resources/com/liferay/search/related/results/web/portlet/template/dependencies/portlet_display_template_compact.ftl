@@ -1,11 +1,13 @@
 <div class="display-compact">
 	<ul>
-
-		<li>
-			<a class="link-primary single-link" href="#">
-				Title Test
-			</a>
-		</li>
-
+		<#if entries?has_content>
+			<#list entries as entry>
+				<li>
+					<a class="link-primary single-link" href="${entry.getViewURL()}">
+						${entry.getTitle()}
+					</a>
+				</li>
+			</#list>
+		</#if>
 	</ul>
 </div>

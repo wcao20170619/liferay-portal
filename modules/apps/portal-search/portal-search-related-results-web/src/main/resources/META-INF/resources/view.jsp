@@ -26,6 +26,7 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.portal.search.document.Document" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDisplayContext" %><%@
+page import="com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDocumentDisplayContext" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsPortletInstanceConfiguration" %>
 
 <%@ page import="java.util.ArrayList" %><%@
@@ -46,7 +47,22 @@ Map<String, Object> contextObjects = new HashMap<String, Object>();
 
 contextObjects.put("searchRelatedResultsDisplayContext", searchRelatedResultsDisplayContext);
 
-List<Document> documentsList_MOCK = new ArrayList<>();
+List<SearchRelatedResultsDocumentDisplayContext> documentList_MOCK = new ArrayList<>();
+
+SearchRelatedResultsDocumentDisplayContext document_MOCK = new SearchRelatedResultsDocumentDisplayContext();
+
+document_MOCK.setCategoriesString("Marketing, Nutrition");
+document_MOCK.setTitle("Test Title");
+document_MOCK.setViewURL("#");
+document_MOCK.setCreatorUserName("Test Test");
+document_MOCK.setCreationDateString("Apr 18, 2019, 11:05 AM");
+document_MOCK.setModelResource("Blogs Entry");
+document_MOCK.setContent("This is a shortened description of the content...");
+
+documentList_MOCK.add(document_MOCK);
+documentList_MOCK.add(document_MOCK);
+documentList_MOCK.add(document_MOCK);
+documentList_MOCK.add(document_MOCK);
 %>
 
 <liferay-ddm:template-renderer
@@ -54,7 +70,7 @@ List<Document> documentsList_MOCK = new ArrayList<>();
 	contextObjects="<%= contextObjects %>"
 	displayStyle="<%= searchRelatedResultsPortletInstanceConfiguration.displayStyle() %>"
 	displayStyleGroupId="<%= searchRelatedResultsDisplayContext.getDisplayStyleGroupId() %>"
-	entries="<%= documentsList_MOCK %>"
+	entries="<%= documentList_MOCK %>"
 >
 	<h4><liferay-ui:message key="more-like-this" /></h4>
 
