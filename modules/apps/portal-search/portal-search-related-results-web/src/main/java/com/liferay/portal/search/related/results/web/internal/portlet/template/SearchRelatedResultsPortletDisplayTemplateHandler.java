@@ -79,13 +79,9 @@ public class SearchRelatedResultsPortletDisplayTemplateHandler
 
 		templateVariableGroup.empty();
 
-		templateVariableGroup.addVariable(
-			"search-related-results-display-context",
-			SearchRelatedResultsDisplayContext.class,
-			"searchRelatedResultsDisplayContext");
 		templateVariableGroup.addCollectionVariable(
 			"documents", List.class, PortletDisplayTemplateConstants.ENTRIES,
-			"document", Document.class, "curDocument", "name");
+			"document", Document.class, "curDocument", "title");
 
 		TemplateVariableGroup categoriesServicesTemplateVariableGroup =
 			new TemplateVariableGroup(
