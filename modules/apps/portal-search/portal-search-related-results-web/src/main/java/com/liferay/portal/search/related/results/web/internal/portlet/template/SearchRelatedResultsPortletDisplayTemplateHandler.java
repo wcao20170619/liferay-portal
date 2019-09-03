@@ -14,14 +14,16 @@
 
 package com.liferay.portal.search.related.results.web.internal.portlet.template;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portletdisplaytemplate.BasePortletDisplayTemplateHandler;
 import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.template.TemplateVariableGroup;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsWebTemplateConfiguration;
 import com.liferay.portal.search.related.results.web.internal.constants.SearchRelatedResultsPortletKeys;
+import com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDocumentDisplayContext;
 import com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDisplayContext;
 import com.liferay.portlet.display.template.constants.PortletDisplayTemplateConstants;
 
@@ -30,14 +32,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Kevin Tan
  */
 @Component(
-	immediate = true,
+	configurationPid = "com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsWebTemplateConfiguration",
+	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
 	property = "javax.portlet.name=" + SearchRelatedResultsPortletKeys.SEARCH_RELATED_RESULTS,
 	service = TemplateHandler.class
 )
@@ -46,7 +52,13 @@ public class SearchRelatedResultsPortletDisplayTemplateHandler
 
 	@Override
 	public String getClassName() {
-		return Document.class.getName();
+		return SearchRelatedResultsDocumentDisplayContext.class.getName();
+	}
+
+	@Override
+	public String getDefaultTemplateKey() {
+		return _searchRelatedResultsWebTemplateConfiguration.
+			searchRelatedResultsTemplateKeyDefault();
 	}
 
 	@Override
@@ -79,9 +91,12 @@ public class SearchRelatedResultsPortletDisplayTemplateHandler
 
 		templateVariableGroup.empty();
 
+		templateVariableGroup.addVariable(
+			"search-related-results-display-context", SearchRelatedResultsDisplayContext.class,
+			"searchRelatedResultsDisplayContext");
 		templateVariableGroup.addCollectionVariable(
 			"documents", List.class, PortletDisplayTemplateConstants.ENTRIES,
-			"document", Document.class, "curDocument", "title");
+			"document", SearchRelatedResultsDocumentDisplayContext.class, "curDocument", "title");
 
 		TemplateVariableGroup categoriesServicesTemplateVariableGroup =
 			new TemplateVariableGroup(
@@ -96,6 +111,14 @@ public class SearchRelatedResultsPortletDisplayTemplateHandler
 		return templateVariableGroups;
 	}
 
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_searchRelatedResultsWebTemplateConfiguration =
+			ConfigurableUtil.createConfigurable(
+				SearchRelatedResultsWebTemplateConfiguration.class, properties);
+	}
+
 	@Override
 	protected String getTemplatesConfigPath() {
 		return "com/liferay/search/related/results/web/portlet/template" +
@@ -104,5 +127,8 @@ public class SearchRelatedResultsPortletDisplayTemplateHandler
 
 	@Reference
 	private Portal _portal;
+
+	private volatile SearchRelatedResultsWebTemplateConfiguration
+		_searchRelatedResultsWebTemplateConfiguration;
 
 }

@@ -14,8 +14,7 @@
  */
 --%>
 
-<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
-taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
+<%@ taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
@@ -44,13 +43,9 @@ List<SearchRelatedResultsDocumentDisplayContext> documentList = searchRelatedRes
 %>
 
 <liferay-ddm:template-renderer
-	className="<%= Document.class.getName() %>"
+	className="<%= SearchRelatedResultsDocumentDisplayContext.class.getName() %>"
 	contextObjects="<%= contextObjects %>"
 	displayStyle="<%= searchRelatedResultsPortletInstanceConfiguration.displayStyle() %>"
 	displayStyleGroupId="<%= searchRelatedResultsDisplayContext.getDisplayStyleGroupId() %>"
 	entries="<%= documentList %>"
->
-	<h4><liferay-ui:message key="more-like-this" /></h4>
-
-	<%@ include file="/display/compact.jspf" %>
-</liferay-ddm:template-renderer>
+/>

@@ -25,6 +25,7 @@ taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %>
 page import="com.liferay.portal.search.document.Document" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsPortletInstanceConfiguration" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDisplayContext" %><%@
+page import="com.liferay.portal.search.related.results.web.internal.display.context.SearchRelatedResultsDocumentDisplayContext" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.portlet.SearchRelatedResultsPortletPreferences" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.portlet.SearchRelatedResultsPortletPreferencesImpl" %><%@
 page import="com.liferay.portal.search.related.results.web.internal.util.PortletPreferencesJspUtil" %>
@@ -55,11 +56,10 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 			<liferay-frontend:fieldset>
 				<div class="display-template">
 					<liferay-ddm:template-selector
-						className="<%= Document.class.getName() %>"
+						className="<%= SearchRelatedResultsDocumentDisplayContext.class.getName() %>"
 						displayStyle="<%= searchRelatedResultsPortletInstanceConfiguration.displayStyle() %>"
 						displayStyleGroupId="<%= searchRelatedResultsDisplayContext.getDisplayStyleGroupId() %>"
 						refreshURL="<%= configurationRenderURL %>"
-						showEmptyOption="<%= false %>"
 					/>
 				</div>
 			</liferay-frontend:fieldset>

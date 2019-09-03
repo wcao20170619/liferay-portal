@@ -21,21 +21,18 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 /**
  * @author Kevin Tan
  */
-@ExtendedObjectClassDefinition(
-	category = "search",
-	scope = ExtendedObjectClassDefinition.Scope.PORTLET_INSTANCE
-)
+@ExtendedObjectClassDefinition(category = "search")
 @Meta.OCD(
-	id = "com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsPortletInstanceConfiguration",
+	id = "com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsWebTemplateConfiguration",
 	localization = "content/Language",
-	name = "search-related-results-portlet-instance-configuration-name"
+	name = "search-related-results-web-template-configuration-name"
 )
-public interface SearchRelatedResultsPortletInstanceConfiguration {
+public interface SearchRelatedResultsWebTemplateConfiguration {
 
-	@Meta.AD(deflt = "0", name = "display-style-group-id", required = false)
-	public long displayStyleGroupId();
-
-	@Meta.AD(name = "display-style", required = false)
-	public String displayStyle();
+	@Meta.AD(
+		deflt = "related-results-compact-ftl", name = "search-related-results-template-key-default",
+		required = false
+	)
+	public String searchRelatedResultsTemplateKeyDefault();
 
 }
