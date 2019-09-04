@@ -18,9 +18,11 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.related.results.web.internal.configuration.SearchRelatedResultsPortletInstanceConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +76,11 @@ public class SearchRelatedResultsDisplayContext {
 	public List<SearchRelatedResultsDocumentDisplayContext>
 		getSearchRelatedResultsDocumentDisplayContexts() {
 
-		return _searchRelatedResultsDocumentDisplayContexts;
+		if (_searchRelatedResultsDocumentDisplayContexts != null) {
+			return _searchRelatedResultsDocumentDisplayContexts;
+		}
+
+		return new ArrayList<>();
 	}
 
 	public SearchRelatedResultsPortletInstanceConfiguration
