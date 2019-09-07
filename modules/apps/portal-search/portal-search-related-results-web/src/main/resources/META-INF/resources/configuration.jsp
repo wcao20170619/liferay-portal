@@ -52,7 +52,10 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:fieldset-group>
-			<liferay-frontend:fieldset>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="display-settings"
+			>
 				<div class="display-template">
 					<liferay-ddm:template-selector
 						className="<%= SearchRelatedResultsDocumentDisplayContext.class.getName() %>"
@@ -62,23 +65,33 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 					/>
 				</div>
 			</liferay-frontend:fieldset>
-		</liferay-frontend:fieldset-group>
 
-		<liferay-frontend:fieldset-group>
-			<aui:fieldset>
+			<liferay-frontend:fieldset
+				collapsible="<%= true %>"
+				label="advanced-configuration"
+			>
 				<aui:input helpMessage="fields-help" label="fields" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_FIELDS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getFields() %>" />
+
 				<aui:input helpMessage="max-query-terms-help" label="max-query-terms" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_QUERY_TERMS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxQueryTerms() %>" />
+
 				<aui:input helpMessage="min-term-freq-help" label="min-term-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_TERM_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinTermFrequency() %>" />
+
 				<aui:input helpMessage="min-doc-freq-help" label="min-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_DOC_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinDocFrequency() %>" />
+
 				<aui:input helpMessage="max-doc-freq-help" label="max-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_DOC_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxDocFrequency() %>" />
+
 				<aui:input helpMessage="min-word-length-help" label="min-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_WORD_LENGTH) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinWordLength() %>" />
+
 				<aui:input helpMessage="max-word-length-help" label="max-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_WORD_LENGTH) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxWordLength() %>" />
+
 				<aui:input helpMessage="stop-words-help" label="stop-words" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_STOP_WORDS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getStopWords() %>" />
+
 				<aui:input helpMessage="analyzer-help" label="analyzer" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_ANALYZER) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getAnalyzer() %>" />
 
 				<aui:input helpMessage="min-should-match-help" label="min-should-match" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_SHOULD_MATCH) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinShouldMatch() %>" />
+
 				<aui:input helpMessage="term-boost-help" label="term-boost" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_TERM_BOOST) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getTermBoost() %>" />
-			</aui:fieldset>
+			</liferay-frontend:fieldset>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 
