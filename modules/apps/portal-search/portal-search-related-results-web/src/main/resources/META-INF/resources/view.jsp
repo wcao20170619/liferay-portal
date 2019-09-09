@@ -14,6 +14,8 @@
  */
 --%>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
 <%@ taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
@@ -48,6 +50,7 @@ if (documentList.isEmpty()) {
 	renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, Boolean.TRUE);
 }
 %>
+
 <c:choose>
 	<c:when test="<%= documentList.isEmpty() %>">
 		<div class="alert alert-info text-center">
