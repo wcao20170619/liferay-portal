@@ -64,6 +64,11 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 						refreshURL="<%= configurationRenderURL %>"
 					/>
 				</div>
+
+				<aui:input helpMessage="max-item-display-help" label="max-item-display" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_ITEM_DISPLAY) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMaxItemDisplay() %>">
+					<aui:validator name="digit" />
+					<aui:validator name="min">0</aui:validator>
+				</aui:input>
 			</liferay-frontend:fieldset>
 
 			<liferay-frontend:fieldset
