@@ -66,7 +66,7 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 				</div>
 
 				<aui:input helpMessage="max-item-display-help" label="max-item-display" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_ITEM_DISPLAY) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMaxItemDisplay() %>">
-					<aui:validator name="digit" />
+					<aui:validator name="digits" />
 					<aui:validator name="min">0</aui:validator>
 				</aui:input>
 			</liferay-frontend:fieldset>
@@ -77,17 +77,17 @@ SearchRelatedResultsPortletPreferences searchRelatedResultsPortletPreferences = 
 			>
 				<aui:input helpMessage="fields-help" label="fields" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_FIELDS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getFields() %>" />
 
-				<aui:input helpMessage="max-query-terms-help" label="max-query-terms" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_QUERY_TERMS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxQueryTerms() %>" />
+				<aui:input helpMessage="max-query-terms-help" label="max-query-terms" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_QUERY_TERMS) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMaxQueryTerms() %>" />
 
-				<aui:input helpMessage="min-term-freq-help" label="min-term-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_TERM_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinTermFrequency() %>" />
+				<aui:input helpMessage="min-term-freq-help" label="min-term-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_TERM_FREQUENCY) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMinTermFrequency() %>" />
 
-				<aui:input helpMessage="min-doc-freq-help" label="min-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_DOC_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinDocFrequency() %>" />
+				<aui:input helpMessage="min-doc-freq-help" label="min-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_DOC_FREQUENCY) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMinDocFrequency() %>" />
 
-				<aui:input helpMessage="max-doc-freq-help" label="max-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_DOC_FREQUENCY) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxDocFrequency() %>" />
+				<aui:input helpMessage="max-doc-freq-help" label="max-doc-freq" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_DOC_FREQUENCY) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMaxDocFrequency() %>" />
 
-				<aui:input helpMessage="min-word-length-help" label="min-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_WORD_LENGTH) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMinWordLength() %>" />
+				<aui:input helpMessage="min-word-length-help" label="min-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MIN_WORD_LENGTH) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMinWordLength() %>" />
 
-				<aui:input helpMessage="max-word-length-help" label="max-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_WORD_LENGTH) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getMaxWordLength() %>" />
+				<aui:input helpMessage="max-word-length-help" label="max-word-length" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_MAX_WORD_LENGTH) %>" type="number" value="<%= searchRelatedResultsPortletPreferences.getMaxWordLength() %>" />
 
 				<aui:input helpMessage="stop-words-help" label="stop-words" name="<%= PortletPreferencesJspUtil.getInputName(searchRelatedResultsPortletPreferences.PREFERENCE_KEY_STOP_WORDS) %>" type="text" value="<%= searchRelatedResultsPortletPreferences.getStopWords() %>" />
 
