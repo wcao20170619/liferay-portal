@@ -6,9 +6,9 @@ A set of variables have been made available for the template developers:
 
 {$ddmTemplateId}: the current template id
 
-{$entries}: the list of vocabularies that are being shown in the portlet
+{$entries}: the list of results that are being shown in the portlet
 
-{$entry}: the vocabulary when there's only one vocabulary
+{$entry}: the result when there's only one result
 
 {$locale}: the locale of the site
 

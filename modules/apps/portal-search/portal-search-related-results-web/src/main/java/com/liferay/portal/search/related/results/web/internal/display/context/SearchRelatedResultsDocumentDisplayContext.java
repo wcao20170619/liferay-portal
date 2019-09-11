@@ -37,7 +37,7 @@ public class SearchRelatedResultsDocumentDisplayContext {
 
 	public String getIconId() {
 		if (_iconId == null) {
-			_iconId = "documents-and-media";
+			_iconId = "web-content";
 		}
 
 		return _iconId;
@@ -48,10 +48,6 @@ public class SearchRelatedResultsDocumentDisplayContext {
 	}
 
 	public String getThumbnailURLString() {
-		if (_thumbnailURLString == null) {
-			_thumbnailURLString = "";
-		}
-
 		return _thumbnailURLString;
 	}
 

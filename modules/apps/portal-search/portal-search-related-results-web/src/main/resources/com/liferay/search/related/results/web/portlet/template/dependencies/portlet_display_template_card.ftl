@@ -7,10 +7,10 @@
 						<div class="aspect-ratio card-item-first">
 							<div
 								class="aspect-ratio-item aspect-ratio-item-center-middle aspect-ratio-item-fluid card-type-asset-icon">
-								<#if validator.isNotNull(entry.getThumbnailURLString())>
+								<#if (entry.getThumbnailURLString()??) && validator.isNotNull(entry.getThumbnailURLString())>
 									<img src="${entry.getThumbnailURLString()}" />
 								<#else>
-									<@clay.icon symbol="documents-and-media" />
+									<@clay.icon symbol="${entry.getIconId()}" />
 								</#if>
 							</div>
 						</div>
