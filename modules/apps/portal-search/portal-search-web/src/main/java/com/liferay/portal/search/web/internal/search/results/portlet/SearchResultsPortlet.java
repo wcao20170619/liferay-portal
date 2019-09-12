@@ -22,12 +22,14 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
 import com.liferay.portal.search.searcher.SearchRequest;
@@ -252,6 +254,9 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 		List<Document> documents = searchResponse.getDocuments71();
 
+		boolean moreLikeThis =
+			searchResultsPortletPreferences.isResultPreviewEnabled();
+
 		SearchResultsSummariesHolder searchResultsSummariesHolder =
 			new SearchResultsSummariesHolder(documents.size());
 
@@ -265,11 +270,14 @@ public class SearchResultsPortlet extends MVCPortlet {
 		for (Document document : documents) {
 			SearchResultSummaryDisplayContext
 				searchResultSummaryDisplayContext = doBuildSummary(
-					document, renderRequest, renderResponse, themeDisplay,
-					portletURLFactory, searchResultsPortletPreferences,
-					searchResultPreferences);
+					document, moreLikeThis, renderRequest, renderResponse,
+					themeDisplay, portletURLFactory,
+					searchResultsPortletPreferences, searchResultPreferences);
 
 			if (searchResultSummaryDisplayContext != null) {
+				searchResultSummaryDisplayContext.setSelectedResult(
+					isSelectedResult(document, renderRequest));
+
 				searchResultsSummariesHolder.put(
 					document, searchResultSummaryDisplayContext);
 			}
@@ -279,9 +287,9 @@ public class SearchResultsPortlet extends MVCPortlet {
 	}
 
 	protected SearchResultSummaryDisplayContext doBuildSummary(
-			Document document, RenderRequest renderRequest,
-			RenderResponse renderResponse, ThemeDisplay themeDisplay,
-			PortletURLFactory portletURLFactory,
+			Document document, boolean moreLikeThis,
+			RenderRequest renderRequest, RenderResponse renderResponse,
+			ThemeDisplay themeDisplay, PortletURLFactory portletURLFactory,
 			SearchResultsPortletPreferences searchResultsPortletPreferences,
 			SearchResultPreferences searchResultPreferences)
 		throws Exception {
@@ -311,6 +319,8 @@ public class SearchResultsPortlet extends MVCPortlet {
 			language
 		).setLocale(
 			themeDisplay.getLocale()
+		).setMoreLikeThis(
+			moreLikeThis
 		).setPortletURLFactory(
 			portletURLFactory
 		).setRenderRequest(
@@ -407,6 +417,30 @@ public class SearchResultsPortlet extends MVCPortlet {
 		}
 
 		return true;
+	}
+
+	protected boolean isSelectedResult(
+		Document document, RenderRequest renderRequest) {
+
+		boolean selectedResult = false;
+
+		PortletSharedSearchResponse portletSharedSearchResponse =
+			portletSharedSearchRequest.search(renderRequest);
+
+		Optional<String> uidOptional = portletSharedSearchResponse.getParameter(
+			Field.UID, renderRequest);
+
+		String selectedUid = uidOptional.orElse(StringPool.BLANK);
+
+		if (document != null) {
+			String uid = document.get(Field.UID);
+
+			if (!Validator.isBlank(uid) && uid.equals(selectedUid)) {
+				selectedResult = true;
+			}
+		}
+
+		return selectedResult;
 	}
 
 	protected void removeSearchResultImageContributor(

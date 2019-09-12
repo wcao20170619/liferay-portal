@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.legacy.document.DocumentBuilderFactory;
@@ -143,6 +144,12 @@ public class SearchResultSummaryDisplayBuilder {
 		return this;
 	}
 
+	public SearchResultSummaryDisplayBuilder setDocument(Document document) {
+		_document = document;
+
+		return this;
+	}
+
 	public SearchResultSummaryDisplayBuilder setDocumentBuilderFactory(
 		DocumentBuilderFactory documentBuilderFactory) {
 
@@ -191,6 +198,14 @@ public class SearchResultSummaryDisplayBuilder {
 
 	public SearchResultSummaryDisplayBuilder setLocale(Locale locale) {
 		_locale = locale;
+
+		return this;
+	}
+
+	public SearchResultSummaryDisplayBuilder setMoreLikeThis(
+		boolean moreLikeThis) {
+
+		_moreLikeThis = moreLikeThis;
 
 		return this;
 	}
@@ -278,6 +293,33 @@ public class SearchResultSummaryDisplayBuilder {
 		return this;
 	}
 
+	protected static String addParameter(
+		String parameterName, String parameterValue, String currentURL) {
+
+		StringBundler sb = new StringBundler(5);
+
+		if (currentURL.indexOf(parameterName + "=") > 0) {
+			sb.append(parameterName);
+			sb.append("=");
+			sb.append(parameterValue);
+			sb.append("$1");
+
+			currentURL = currentURL.replaceFirst(
+				"\\b" + parameterName + "=.*?(&|$)", sb.toString());
+		}
+		else {
+			sb.append(currentURL);
+			sb.append("&");
+			sb.append(parameterName);
+			sb.append("=");
+			sb.append(parameterValue);
+
+			currentURL = sb.toString();
+		}
+
+		return currentURL;
+	}
+
 	protected SearchResultSummaryDisplayContext build(
 			String className, long classPK)
 		throws Exception {
@@ -349,7 +391,8 @@ public class SearchResultSummaryDisplayBuilder {
 		buildModelResource(searchResultSummaryDisplayContext, className);
 		buildUserPortrait(
 			searchResultSummaryDisplayContext, assetEntry, className);
-		buildViewURL(className, classPK, searchResultSummaryDisplayContext);
+		buildViewURL(
+			assetEntry, className, classPK, searchResultSummaryDisplayContext);
 
 		return searchResultSummaryDisplayContext;
 	}
@@ -616,6 +659,28 @@ public class SearchResultSummaryDisplayBuilder {
 		}
 	}
 
+	protected String buildMoreLikeThisViewURL(AssetEntry assetEntry) {
+		String currentURL = PortalUtil.getCurrentURL(_renderRequest);
+		List<String> uids = getFieldValueStrings(Field.UID);
+
+		currentURL = addParameter(Field.UID, uids.get(0), currentURL);
+
+		String assetEntryIdValue = String.valueOf(assetEntry.getEntryId());
+
+		currentURL = addParameter(
+			"assetEntryId", assetEntryIdValue, currentURL);
+
+		AssetRendererFactory<?> assetRendererFactory =
+			assetEntry.getAssetRendererFactory();
+
+		if (assetRendererFactory != null) {
+			currentURL = addParameter(
+				"assetType", assetRendererFactory.getType(), currentURL);
+		}
+
+		return currentURL;
+	}
+
 	protected SearchResultSummaryDisplayContext buildTemporarilyUnavailable() {
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext =
 			new SearchResultSummaryDisplayContext();
@@ -644,12 +709,20 @@ public class SearchResultSummaryDisplayBuilder {
 	}
 
 	protected void buildViewURL(
-		String className, long classPK,
+		AssetEntry assetEntry, String className, long classPK,
 		SearchResultSummaryDisplayContext searchResultSummaryDisplayContext) {
 
-		String viewURL = getSearchResultViewURL(className, classPK);
+		if (!_moreLikeThis) {
+			String viewURL = getSearchResultViewURL(className, classPK);
 
-		searchResultSummaryDisplayContext.setViewURL(viewURL);
+			searchResultSummaryDisplayContext.setViewURL(viewURL);
+
+			return;
+		}
+
+		String currentURL = buildMoreLikeThisViewURL(assetEntry);
+
+		searchResultSummaryDisplayContext.setViewURL(currentURL);
 	}
 
 	protected String formatCreationDate(Date date) {
@@ -912,6 +985,7 @@ public class SearchResultSummaryDisplayBuilder {
 	private Language _language;
 	private com.liferay.portal.kernel.search.Document _legacyDocument;
 	private Locale _locale;
+	private boolean _moreLikeThis;
 	private PortletURLFactory _portletURLFactory;
 	private RenderRequest _renderRequest;
 	private RenderResponse _renderResponse;
