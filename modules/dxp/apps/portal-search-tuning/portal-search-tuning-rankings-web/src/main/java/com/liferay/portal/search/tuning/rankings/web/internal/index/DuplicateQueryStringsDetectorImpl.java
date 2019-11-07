@@ -57,7 +57,7 @@ public class DuplicateQueryStringsDetectorImpl
 		SearchSearchResponse searchSearchResponse = searchEngineAdapter.execute(
 			new SearchSearchRequest() {
 				{
-					setIndexNames(RankingIndexDefinition.INDEX_NAME);
+					setIndexNames(RankingIndexUtil.getRankingIndexName());
 					setQuery(getCriteriaQuery(criteria));
 					setScoreEnabled(false);
 					setSize(0);
