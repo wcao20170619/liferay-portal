@@ -185,35 +185,38 @@ public class SimilarResultsPortletSearchContributor
 		MoreLikeThisQuery moreLikeThisQuery,
 		SimilarResultsPortletPreferences similarResultsPortletPreferences) {
 
-		moreLikeThisQuery.setMaxQueryTerms(
-			similarResultsPortletPreferences.getMaxQueryTerms());
-
-		moreLikeThisQuery.setMinTermFrequency(
-			similarResultsPortletPreferences.getMinTermFrequency());
-
-		moreLikeThisQuery.setMinDocFrequency(
-			similarResultsPortletPreferences.getMinDocFrequency());
+		moreLikeThisQuery.setAnalyzer(
+			similarResultsPortletPreferences.getAnalyzer());
 
 		moreLikeThisQuery.setMaxDocFrequency(
 			similarResultsPortletPreferences.getMaxDocFrequency());
 
-		moreLikeThisQuery.setMinWordLength(
-			similarResultsPortletPreferences.getMinWordLength());
+		moreLikeThisQuery.setMaxQueryTerms(
+			similarResultsPortletPreferences.getMaxQueryTerms());
 
 		moreLikeThisQuery.setMaxWordLength(
 			similarResultsPortletPreferences.getMaxWordLength());
 
-		moreLikeThisQuery.addStopWord(
-			similarResultsPortletPreferences.getStopWords());
-
-		moreLikeThisQuery.setAnalyzer(
-			similarResultsPortletPreferences.getAnalyzer());
+		moreLikeThisQuery.setMinDocFrequency(
+			similarResultsPortletPreferences.getMinDocFrequency());
 
 		moreLikeThisQuery.setMinShouldMatch(
 			similarResultsPortletPreferences.getMinShouldMatch());
 
+		moreLikeThisQuery.setMinTermFrequency(
+			similarResultsPortletPreferences.getMinTermFrequency());
+
+		moreLikeThisQuery.setMinWordLength(
+			similarResultsPortletPreferences.getMinWordLength());
+
 		moreLikeThisQuery.setTermBoost(
 			similarResultsPortletPreferences.getTermBoost());
+
+		String stopWords = similarResultsPortletPreferences.getStopWords();
+
+		if (!Validator.isBlank(stopWords)) {
+			moreLikeThisQuery.addStopWords(stopWords);
+		}
 	}
 
 	@Reference
