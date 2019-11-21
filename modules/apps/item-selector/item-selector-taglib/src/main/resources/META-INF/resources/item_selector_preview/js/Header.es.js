@@ -18,11 +18,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 const Header = ({
+	disabledAddButton = false,
+	handleClickAdd,
 	handleClickClose,
-	handleClickDone,
 	handleClickEdit,
 	headerTitle,
-	infoButtonRef
+	infoButtonRef,
+	showEditIcon,
+	showInfoIcon
 }) => (
 	<div className="navbar navigation-bar navigation-bar-light">
 		<div className="container-fluid header">
@@ -49,31 +52,36 @@ const Header = ({
 			<nav className="navbar navbar-expand-md navbar-underline navigation-bar navigation-bar-light">
 				<div className="container-fluid container-fluid-max-xl">
 					<ul className="navbar-nav">
-						<li className="btn-group-item nav-item">
-							<ClayButton
-								borderless
-								displayType="secondary"
-								monospaced
-								onClick={handleClickEdit}
-							>
-								<ClayIcon symbol="pencil" />
-							</ClayButton>
-						</li>
-						<li className="btn-group-item nav-item">
-							<ClayButton
-								borderless
-								displayType="secondary"
-								id="infoButtonRef"
-								monospaced
-								ref={infoButtonRef}
-							>
-								<ClayIcon symbol="info-panel-open" />
-							</ClayButton>
-						</li>
+						{showEditIcon && (
+							<li className="btn-group-item nav-item">
+								<ClayButton
+									borderless
+									displayType="secondary"
+									monospaced
+									onClick={handleClickEdit}
+								>
+									<ClayIcon symbol="pencil" />
+								</ClayButton>
+							</li>
+						)}
+						{showInfoIcon && (
+							<li className="btn-group-item nav-item">
+								<ClayButton
+									borderless
+									displayType="secondary"
+									id="infoButtonRef"
+									monospaced
+									ref={infoButtonRef}
+								>
+									<ClayIcon symbol="info-panel-open" />
+								</ClayButton>
+							</li>
+						)}
 						<li className="nav-item">
 							<ClayButton
+								disabled={disabledAddButton}
 								displayType="primary"
-								onClick={handleClickDone}
+								onClick={handleClickAdd}
 							>
 								{Liferay.Language.get('add')}
 							</ClayButton>
@@ -86,9 +94,13 @@ const Header = ({
 );
 
 Header.propTypes = {
+	disabledAddButton: PropTypes.bool,
+	handleClickAdd: PropTypes.func.isRequired,
 	handleClickClose: PropTypes.func.isRequired,
-	handleClickDone: PropTypes.func.isRequired,
-	headerTitle: PropTypes.string.isRequired
+	handleClickEdit: PropTypes.func,
+	headerTitle: PropTypes.string.isRequired,
+	showEditIcon: PropTypes.bool,
+	showInfoIcon: PropTypes.bool
 };
 
 export default Header;

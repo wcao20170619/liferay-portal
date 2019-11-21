@@ -20,7 +20,14 @@ import DropDown from './DropDown.es';
 
 const {Body, Cell, Head, Row} = ClayTable;
 
-const Table = ({actions, checkable, columns, forwardRef, items}) => {
+const Table = ({
+	actions,
+	align = 'left',
+	checkable,
+	columns,
+	forwardRef,
+	items
+}) => {
 	return (
 		<div ref={forwardRef}>
 			<ClayTable hover={false}>
@@ -29,6 +36,7 @@ const Table = ({actions, checkable, columns, forwardRef, items}) => {
 						{checkable && <Cell headingCell></Cell>}
 						{columns.map((column, index) => (
 							<Cell
+								align={index === 0 ? 'left' : align}
 								className={
 									index > 0 && 'table-cell-expand-smaller'
 								}
@@ -56,6 +64,7 @@ const Table = ({actions, checkable, columns, forwardRef, items}) => {
 							)}
 							{columns.map((column, index) => (
 								<Cell
+									align={index === 0 ? 'left' : align}
 									className={
 										index > 0 && 'table-cell-expand-smaller'
 									}
@@ -66,9 +75,11 @@ const Table = ({actions, checkable, columns, forwardRef, items}) => {
 									{item[column.key]}
 								</Cell>
 							))}
-							<Cell>
-								<DropDown actions={actions} item={item} />
-							</Cell>
+							{actions && (
+								<Cell>
+									<DropDown actions={actions} item={item} />
+								</Cell>
+							)}
 						</Row>
 					))}
 				</Body>

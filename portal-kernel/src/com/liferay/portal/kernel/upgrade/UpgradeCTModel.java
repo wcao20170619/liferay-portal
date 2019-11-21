@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
+import com.liferay.portal.kernel.util.LoggingTimer;
 
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -29,8 +30,12 @@ import java.sql.ResultSet;
  */
 public class UpgradeCTModel extends UpgradeProcess {
 
-	public UpgradeCTModel(String tableName) {
-		_tableName = tableName;
+	public UpgradeCTModel(String... tableNames) {
+		if (tableNames.length == 0) {
+			throw new IllegalArgumentException("Table names is empty");
+		}
+
+		_tableNames = tableNames;
 	}
 
 	@Override
@@ -39,11 +44,26 @@ public class UpgradeCTModel extends UpgradeProcess {
 
 		DBInspector dbInspector = new DBInspector(connection);
 
-		String tableName = dbInspector.normalizeName(
-			_tableName, databaseMetaData);
+		for (String tableName : _tableNames) {
+			try (LoggingTimer loggingTimer = new LoggingTimer(
+					UpgradeCTModel.class, tableName)) {
+
+				_upgradeCTModel(databaseMetaData, dbInspector, tableName);
+			}
+		}
+	}
+
+	private void _upgradeCTModel(
+			DatabaseMetaData databaseMetaData, DBInspector dbInspector,
+			String tableName)
+		throws Exception {
+
+		String normalizedTableName = dbInspector.normalizeName(
+			tableName, databaseMetaData);
 
 		try (ResultSet rs = databaseMetaData.getColumns(
-				dbInspector.getCatalog(), dbInspector.getSchema(), tableName,
+				dbInspector.getCatalog(), dbInspector.getSchema(),
+				normalizedTableName,
 				dbInspector.normalizeName(
 					"ctCollectionId", databaseMetaData))) {
 
@@ -55,7 +75,8 @@ public class UpgradeCTModel extends UpgradeProcess {
 		String primaryKeyColumnName = null;
 
 		try (ResultSet rs = databaseMetaData.getPrimaryKeys(
-				dbInspector.getCatalog(), dbInspector.getSchema(), tableName)) {
+				dbInspector.getCatalog(), dbInspector.getSchema(),
+				normalizedTableName)) {
 
 			if (rs.next()) {
 				primaryKeyColumnName = rs.getString("COLUMN_NAME");
@@ -64,18 +85,18 @@ public class UpgradeCTModel extends UpgradeProcess {
 			if (rs.next()) {
 				throw new UpgradeException(
 					"Single column primary key is required to upgrade " +
-						tableName);
+						normalizedTableName);
 			}
 		}
 
 		if (primaryKeyColumnName == null) {
 			throw new UpgradeException(
-				"No primary key column found for " + tableName);
+				"No primary key column found for " + normalizedTableName);
 		}
 
 		runSQL(
 			StringBundler.concat(
-				"alter table ", tableName,
+				"alter table ", normalizedTableName,
 				" add ctCollectionId LONG default 0 not null"));
 
 		DB db = DBManagerUtil.getDB();
@@ -84,7 +105,7 @@ public class UpgradeCTModel extends UpgradeProcess {
 			String primaryKeyConstraintName = null;
 
 			try (PreparedStatement ps = connection.prepareStatement(
-					"sp_helpconstraint " + tableName);
+					"sp_helpconstraint " + normalizedTableName);
 				ResultSet rs = ps.executeQuery()) {
 
 				while (rs.next()) {
@@ -100,26 +121,27 @@ public class UpgradeCTModel extends UpgradeProcess {
 
 			if (primaryKeyConstraintName == null) {
 				throw new UpgradeException(
-					"No primary key constraint found for " + tableName);
+					"No primary key constraint found for " +
+						normalizedTableName);
 			}
 
 			runSQL(
 				StringBundler.concat(
-					"sp_dropkey primary ", tableName, " ",
+					"sp_dropkey primary ", normalizedTableName, " ",
 					primaryKeyConstraintName));
 		}
 		else {
 			runSQL(
 				StringBundler.concat(
-					"alter table ", tableName, " drop primary key"));
+					"alter table ", normalizedTableName, " drop primary key"));
 		}
 
 		runSQL(
 			StringBundler.concat(
-				"alter table ", tableName, " add primary key (",
+				"alter table ", normalizedTableName, " add primary key (",
 				primaryKeyColumnName, ", ctCollectionId)"));
 	}
 
-	private final String _tableName;
+	private final String[] _tableNames;
 
 }

@@ -227,9 +227,7 @@ public class UpgradeDDMFormFieldValidation extends UpgradeProcess {
 							availableLanguageIdsJSONArray, expression,
 							validationJSONObject);
 					}
-					else if (Validator.isNull(
-								expressionJSONObject.isNull("name"))) {
-
+					else if (expressionJSONObject.isNull("name")) {
 						_upgradeValidation(
 							availableLanguageIdsJSONArray,
 							expressionJSONObject.getString("value"),

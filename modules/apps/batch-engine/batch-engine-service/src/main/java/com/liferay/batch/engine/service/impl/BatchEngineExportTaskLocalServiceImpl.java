@@ -18,13 +18,13 @@ import com.liferay.batch.engine.model.BatchEngineExportTask;
 import com.liferay.batch.engine.model.BatchEngineExportTaskContentBlobModel;
 import com.liferay.batch.engine.service.base.BatchEngineExportTaskLocalServiceBaseImpl;
 import com.liferay.petra.io.AutoDeleteFileInputStream;
-import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.OutputBlob;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.File;
 
@@ -65,6 +65,8 @@ public class BatchEngineExportTaskLocalServiceImpl
 		batchEngineExportTask.setUserId(userId);
 		batchEngineExportTask.setCallbackURL(callbackURL);
 		batchEngineExportTask.setClassName(className);
+		batchEngineExportTask.setContent(
+			new OutputBlob(new UnsyncByteArrayInputStream(new byte[0]), 0));
 		batchEngineExportTask.setContentType(contentType);
 		batchEngineExportTask.setExecuteStatus(executeStatus);
 		batchEngineExportTask.setFieldNamesList(fieldNamesList);

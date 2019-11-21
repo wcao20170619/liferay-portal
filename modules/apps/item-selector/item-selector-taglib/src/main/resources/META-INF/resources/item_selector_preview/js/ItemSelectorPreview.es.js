@@ -30,14 +30,23 @@ const TPL_EDIT_DIALOG_TITLE = '{edit} {title} ({copy})';
 
 class ItemSelectorPreview extends Component {
 	static propTypes = {
-		container: PropTypes.instanceOf(Element),
+		container: PropTypes.instanceOf(Element).isRequired,
 		currentIndex: PropTypes.number.isRequired,
-		editItemURL: PropTypes.string.isRequired,
+		editItemURL: PropTypes.string,
 		handleSelectedItem: PropTypes.func.isRequired,
 		headerTitle: PropTypes.string.isRequired,
-		items: PropTypes.array.isRequired,
-		uploadItemReturnType: PropTypes.string.isRequired,
-		uploadItemURL: PropTypes.string.isRequired
+		items: PropTypes.arrayOf(
+			PropTypes.shape({
+				base64: PropTypes.string,
+				metadata: PropTypes.string,
+				returntype: PropTypes.string.isRequired,
+				title: PropTypes.string.isRequired,
+				url: PropTypes.string,
+				value: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+			})
+		).isRequired,
+		uploadItemReturnType: PropTypes.string,
+		uploadItemURL: PropTypes.string
 	};
 
 	constructor(props) {
@@ -71,6 +80,11 @@ class ItemSelectorPreview extends Component {
 				width: '320px'
 			});
 		}
+
+		this._updateCurrentItemHandler = Liferay.on(
+			'updateCurrentItem',
+			this.updateCurrentItem
+		);
 	}
 
 	componentWillUnmount() {
@@ -78,6 +92,8 @@ class ItemSelectorPreview extends Component {
 			'keydown',
 			this.handleOnKeyDown.bind(this)
 		);
+
+		Liferay.detach('updateCurrentItem', this._updateCurrentItemHandler);
 	}
 
 	close = () => {
@@ -143,31 +159,35 @@ class ItemSelectorPreview extends Component {
 	handleClickNext = () => {
 		const {currentItemIndex, items} = this.state;
 
-		const lastIndex = items.length - 1;
-		const shouldResetIndex = currentItemIndex === lastIndex;
-		const index = shouldResetIndex ? 0 : currentItemIndex + 1;
+		if (items.length > 1) {
+			const lastIndex = items.length - 1;
+			const shouldResetIndex = currentItemIndex === lastIndex;
+			const index = shouldResetIndex ? 0 : currentItemIndex + 1;
 
-		const currentItem = items[index];
+			const currentItem = items[index];
 
-		this.setState({
-			currentItem,
-			currentItemIndex: index
-		});
+			this.setState({
+				currentItem,
+				currentItemIndex: index
+			});
+		}
 	};
 
 	handleClickPrevious = () => {
 		const {currentItemIndex, items} = this.state;
 
-		const lastIndex = items.length - 1;
-		const shouldResetIndex = currentItemIndex === 0;
-		const index = shouldResetIndex ? lastIndex : currentItemIndex - 1;
+		if (items.length > 1) {
+			const lastIndex = items.length - 1;
+			const shouldResetIndex = currentItemIndex === 0;
+			const index = shouldResetIndex ? lastIndex : currentItemIndex - 1;
 
-		const currentItem = items[index];
+			const currentItem = items[index];
 
-		this.setState({
-			currentItem,
-			currentItemIndex: index
-		});
+			this.setState({
+				currentItem,
+				currentItemIndex: index
+			});
+		}
 	};
 
 	handleOnKeyDown = e => {
@@ -211,8 +231,9 @@ class ItemSelectorPreview extends Component {
 		};
 
 		const editedItem = {
-			metadata: editedItemMetadata,
+			metadata: JSON.stringify(editedItemMetadata),
 			returnType: this.props.uploadItemReturnType,
+			title: itemData.title,
 			url: itemData.url,
 			value: itemData.resolvedValue
 		};
@@ -226,17 +247,26 @@ class ItemSelectorPreview extends Component {
 		});
 	};
 
+	updateCurrentItem = ({url, value}) => {
+		this.setState({currentItem: {...this.state.currentItem, url, value}});
+	};
+
 	render() {
 		const {currentItem, currentItemIndex, items} = this.state;
+		const showEditIcon = !!this.props.editItemURL;
+		const showInfoIcon = !!currentItem.metadata;
 
 		return (
 			<div className="fullscreen item-selector-preview">
 				<Header
+					disabledAddButton={!currentItem.url}
+					handleClickAdd={this.handleClickDone}
 					handleClickClose={this.handleClickClose}
-					handleClickDone={this.handleClickDone}
 					handleClickEdit={this.handleClickEdit}
 					headerTitle={this.props.headerTitle}
 					infoButtonRef={this.infoButtonRef}
+					showEditIcon={showEditIcon}
+					showInfoIcon={showInfoIcon}
 				/>
 
 				<Carousel

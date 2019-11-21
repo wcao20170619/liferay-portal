@@ -49,18 +49,15 @@ Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 
 			<aui:model-context bean="<%= selLayout %>" model="<%= Layout.class %>" />
 
-			<div>
+			<div class="form-group">
 				<label class="control-label"><liferay-ui:message key="image" /></label>
 
-				<div class="input-group">
-					<div class="input-group-item">
-						<aui:input disabled="<%= true %>" label="<%= StringPool.BLANK %>" name="openGraphImageURL" placeholder="image" type="text" value="<%= layoutsAdminDisplayContext.getOpenGraphImageURL() %>" wrapperCssClass="w-100" />
-					</div>
+				<aui:input label="<%= StringPool.BLANK %>" name="openGraphImageURL" placeholder="image" readonly="<%= true %>" type="text" value="<%= layoutsAdminDisplayContext.getOpenGraphImageURL() %>" wrapperCssClass="mb-3" />
 
-					<div class="input-group-item input-group-item-shrink">
-						<aui:button name="openGraphImageButton" value="select" />
-					</div>
-				</div>
+				<aui:button-row cssClass="mt-0">
+					<aui:button name="openGraphImageButton" value="select" />
+					<aui:button name="openGraphClearImageButton" value="clear" />
+				</aui:button-row>
 			</div>
 
 			<%
@@ -171,27 +168,22 @@ Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 			url: '<%= layoutsAdminDisplayContext.getItemSelectorURL() %>'
 		});
 
+		var openGraphImageFileEntryId = document.getElementById(
+			'<portlet:namespace />openGraphImageFileEntryId'
+		);
+
+		var openGraphImageURL = document.getElementById(
+			'<portlet:namespace />openGraphImageURL'
+		);
+
 		itemSelectorDialog.on('selectedItemChange', function(event) {
 			var selectedItem = event.selectedItem;
 
 			if (selectedItem) {
 				var itemValue = JSON.parse(selectedItem.value);
 
-				var openGraphImageFileEntryId = document.getElementById(
-					'<portlet:namespace />openGraphImageFileEntryId'
-				);
-
-				if (openGraphImageFileEntryId) {
-					openGraphImageFileEntryId.value = itemValue.fileEntryId;
-				}
-
-				var openGraphImageURL = document.getElementById(
-					'<portlet:namespace />openGraphImageURL'
-				);
-
-				if (openGraphImageURL) {
-					openGraphImageURL.value = itemValue.url;
-				}
+				openGraphImageFileEntryId.value = itemValue.fileEntryId;
+				openGraphImageURL.value = itemValue.url;
 
 				PreviewSeoEvents.PreviewSeoFireChange('<portlet:namespace />', {
 					type: 'imgUrl',
@@ -200,9 +192,24 @@ Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 			}
 		});
 
-		openGraphImageButton.addEventListener('click', function(event) {
-			event.preventDefault();
+		openGraphImageButton.addEventListener('click', function() {
 			itemSelectorDialog.open();
+		});
+	}
+
+	var openGraphClearImageButton = document.getElementById(
+		'<portlet:namespace />openGraphClearImageButton'
+	);
+
+	if (openGraphClearImageButton) {
+		openGraphClearImageButton.addEventListener('click', function() {
+			openGraphImageFileEntryId.value = '';
+			openGraphImageURL.value = '';
+
+			PreviewSeoEvents.PreviewSeoFireChange('<portlet:namespace />', {
+				type: 'imgUrl',
+				value: ''
+			});
 		});
 	}
 

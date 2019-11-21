@@ -15,6 +15,7 @@
 package com.liferay.portal.library;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -43,6 +44,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -139,6 +142,20 @@ public class LibraryReferenceTest {
 			Assert.assertTrue(
 				_VERSIONS_EXT_FILE_NAME + " is missing a reference to " + jar,
 				_versionsExtJars.contains(jar));
+
+			String libDependencyJarsVersion = _libDependencyJarsVersions.get(
+				jar);
+
+			Assert.assertNotNull(
+				jar + " does not have a version", libDependencyJarsVersion);
+
+			String versionsJarsVersion = _versionsJarsVersions.get(jar);
+
+			Assert.assertEquals(
+				StringBundler.concat(
+					"Wrong version for ", jar, " in ", _VERSIONS_EXT_FILE_NAME),
+				_normalizeVersion(libDependencyJarsVersion),
+				versionsJarsVersion);
 		}
 	}
 
@@ -382,6 +399,23 @@ public class LibraryReferenceTest {
 
 						_libDependencyJars.add(jar);
 						_libJars.add(jar);
+
+						String dependency = properties.getProperty(fileTitle);
+
+						if (Validator.isNull(dependency)) {
+							continue;
+						}
+
+						String[] dependencyArray = StringUtil.split(
+							dependency, CharPool.COLON);
+
+						if (dependencyArray.length < 3) {
+							continue;
+						}
+
+						String version = dependencyArray[2];
+
+						_libDependencyJarsVersions.put(jar, version);
 					}
 
 					return FileVisitResult.CONTINUE;
@@ -489,12 +523,36 @@ public class LibraryReferenceTest {
 
 		Document document = documentBuilder.parse(new File(fileName));
 
-		NodeList nodeList = document.getElementsByTagName("file-name");
+		NodeList nodeList = document.getElementsByTagName("library");
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 
-			jars.add(node.getTextContent());
+			NodeList childNodes = node.getChildNodes();
+
+			String jar = null;
+			String version = null;
+
+			for (int j = 0; j < childNodes.getLength(); j++) {
+				Node childNode = childNodes.item(j);
+
+				if (Objects.equals("file-name", childNode.getNodeName())) {
+					jar = childNode.getTextContent();
+				}
+				else if (Objects.equals("version", childNode.getNodeName())) {
+					version = childNode.getTextContent();
+				}
+			}
+
+			if (Validator.isNull(jar)) {
+				continue;
+			}
+
+			jars.add(jar);
+
+			if (Validator.isNotNull(version)) {
+				_versionsJarsVersions.put(jar, version);
+			}
 		}
 	}
 
@@ -516,6 +574,41 @@ public class LibraryReferenceTest {
 				}
 			}
 		}
+	}
+
+	private String _normalizeVersion(String version) {
+		Matcher matcher = _versionPattern.matcher(version);
+
+		Assert.assertTrue(
+			_versionPattern.pattern() + " does not match " + version,
+			matcher.matches());
+
+		String numericVersion = matcher.group(1);
+
+		String suffix = matcher.group(4);
+
+		if (suffix.startsWith("RELEASE")) {
+			suffix = suffix.substring("RELEASE".length());
+		}
+
+		if (Validator.isNull(numericVersion)) {
+			return suffix;
+		}
+
+		if (Validator.isNull(suffix)) {
+			return numericVersion;
+		}
+
+		String upperCaseSuffix = StringUtil.toUpperCase(suffix);
+
+		for (String normalizedVersionSuffix : _normalizedVersionSuffixes) {
+			if (upperCaseSuffix.startsWith(normalizedVersionSuffix)) {
+				return StringBundler.concat(
+					numericVersion, StringPool.SPACE, upperCaseSuffix);
+			}
+		}
+
+		return version;
 	}
 
 	private static final String _ECLIPSE_FILE_NAME = ".classpath";
@@ -553,13 +646,21 @@ public class LibraryReferenceTest {
 	private static final Map<String, List<String>>
 		_intelliJModuleSourceModules = new HashMap<>();
 	private static final Set<String> _libDependencyJars = new HashSet<>();
+	private static final Map<String, String> _libDependencyJarsVersions =
+		new HashMap<>();
 	private static final Set<String> _libJars = new HashSet<>();
 	private static final Set<String> _moduleSourceDirs = new HashSet<>();
 	private static final Set<String> _netBeansJars = new HashSet<>();
 	private static final Set<String> _netBeansModuleSourceDirs =
 		new HashSet<>();
+	private static final List<String> _normalizedVersionSuffixes =
+		Arrays.asList("FCS", "GA", "RC");
 	private static Path _portalPath;
+	private static final Pattern _versionPattern = Pattern.compile(
+		"(\\d+(\\.\\d+)+)?(\\W)?(.*)");
 	private static final Set<String> _versionsExtJars = new HashSet<>();
 	private static final Set<String> _versionsJars = new HashSet<>();
+	private static final Map<String, String> _versionsJarsVersions =
+		new HashMap<>();
 
 }

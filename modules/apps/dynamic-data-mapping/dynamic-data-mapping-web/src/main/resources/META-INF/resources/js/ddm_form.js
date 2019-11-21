@@ -792,7 +792,13 @@ AUI.add(
 
 					var inputNode = instance.getInputNode();
 
-					return Lang.String.unescapeHTML(inputNode.val());
+					var value = '';
+
+					if (inputNode) {
+						value = Lang.String.unescapeHTML(inputNode.val());
+					}
+
+					return value;
 				},
 
 				initializer() {
@@ -4103,9 +4109,23 @@ AUI.add(
 				},
 
 				moveField(parentField, oldIndex, newIndex) {
+					var instance = this;
+
 					var fields = parentField.get('fields');
 
 					fields.splice(newIndex, 0, fields.splice(oldIndex, 1)[0]);
+
+					var field = fields[newIndex];
+
+					var fieldDefinition = field.getFieldDefinition();
+
+					if (fieldDefinition) {
+						var type = fieldDefinition.type;
+
+						if (type === 'ddm-text-html') {
+							instance.recreateEditor(field);
+						}
+					}
 				},
 
 				populateBlankLocalizationMap(
@@ -4118,9 +4138,14 @@ AUI.add(
 					var newFieldLocalizations = repeatedField.get(
 						'localizationMap'
 					);
-					var totalLocalizations = originalField.get(
-						'localizationMap'
-					);
+
+					var totalLocalizations = {};
+
+					if (originalField) {
+						totalLocalizations = originalField.get(
+							'localizationMap'
+						);
+					}
 
 					var currentLocale = repeatedField.get('displayLocale');
 
@@ -4152,7 +4177,12 @@ AUI.add(
 					repeatedField.set('localizationMap', newFieldLocalizations);
 
 					var newNestedFields = repeatedField.get('fields');
-					var originalNestedFields = originalField.get('fields');
+
+					var originalNestedFields = [];
+
+					if (originalField) {
+						originalNestedFields = originalField.get('fields');
+					}
 
 					for (var i = 0; i < newNestedFields.length; i++) {
 						instance.populateBlankLocalizationMap(
@@ -4160,6 +4190,32 @@ AUI.add(
 							originalNestedFields[i],
 							newNestedFields[i]
 						);
+					}
+				},
+
+				recreateEditor(field) {
+					var usingCKEditor =
+						CKEDITOR &&
+						CKEDITOR.instances &&
+						CKEDITOR.instances[field.getInputName() + 'Editor'];
+
+					var editor = field.getEditor();
+
+					var nativeEditor = editor.getNativeEditor();
+
+					var usingAlloyEditor =
+						nativeEditor &&
+						nativeEditor._editor &&
+						nativeEditor._editor.window.$.AlloyEditor;
+
+					if (usingCKEditor && !usingAlloyEditor) {
+						var html = editor.getHTML();
+
+						editor.dispose();
+
+						editor.create();
+
+						editor.setHTML(html);
 					}
 				},
 

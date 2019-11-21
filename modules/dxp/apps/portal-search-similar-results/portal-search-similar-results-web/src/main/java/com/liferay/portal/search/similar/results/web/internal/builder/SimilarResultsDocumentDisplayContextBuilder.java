@@ -373,8 +373,8 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Blogs entry thumnamil url exception and contains " +
-							"blogs entry id " + blogsEntry.getEntryId());
+						"Blogs entry thumbnail URL exception and contains " +
+							"blogs entry ID " + blogsEntry.getEntryId());
 				}
 			}
 
@@ -398,8 +398,8 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"JournalArticle entry thumnamil url exception and " +
-							"contains journal article classPK " + classPK);
+						"Journal article thumbnail URL exception and " +
+							"contains journal article class PK " + classPK);
 				}
 			}
 
@@ -423,7 +423,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 				FileEntry fileEntry = (FileEntry)assetObject;
 
 				similarResultsDocumentDisplayContext.setIconId(
-					fileEntry.getIcon());
+					fileEntry.getIconCssClass());
 
 				try {
 					thumbnailURLString = DLURLHelperUtil.getThumbnailSrc(
@@ -432,7 +432,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
-							"File entry thumnamil url exception and contains " +
+							"File entry thumbnail url exception and contains " +
 								"file classPK " + classPK);
 					}
 				}
@@ -445,7 +445,7 @@ public class SimilarResultsDocumentDisplayContextBuilder {
 					(DLFileEntry)assetRenderer.getAssetObject();
 
 				similarResultsDocumentDisplayContext.setIconId(
-					dlFileEntry.getIcon());
+					dlFileEntry.getIconCssClass());
 			}
 		}
 	}
