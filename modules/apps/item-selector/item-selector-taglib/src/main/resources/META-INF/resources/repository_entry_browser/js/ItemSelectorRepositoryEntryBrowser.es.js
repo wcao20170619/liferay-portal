@@ -19,6 +19,7 @@ import dom from 'metal-dom';
 import {EventHandler} from 'metal-events';
 import {Config} from 'metal-state';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import ItemSelectorPreview from '../../item_selector_preview/js/ItemSelectorPreview.es';
 
@@ -26,9 +27,6 @@ const STR_DRAG_LEAVE = 'dragleave';
 const STR_DRAG_OVER = 'dragover';
 const STR_DROP = 'drop';
 const statusCode = Liferay.STATUS_CODE;
-
-const uploadItemLinkTpl = ({preview, returnType, title, value}) =>
-	`<a data-returnType="${returnType}" data-value="${value}" href="${preview}" title="${title}"></a>`;
 
 /**
  * Handles the events in the Repository Entry Browser taglib.
@@ -48,24 +46,13 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	 * @inheritDoc
 	 */
 	attached() {
-		AUI().use(
-			'liferay-item-selector-uploader',
-			'liferay-item-viewer',
-			A => {
-				this._uploadItemViewer = new A.LiferayItemViewer({
-					btnCloseCaption: this.closeCaption,
-					links: '',
-					uploadItemURL: this.uploadItemURL
-				});
+		AUI().use('liferay-item-selector-uploader', A => {
+			this._itemSelectorUploader = new A.LiferayItemSelectorUploader({
+				rootNode: this.rootNode
+			});
 
-				this._itemSelectorUploader = new A.LiferayItemSelectorUploader({
-					rootNode: this.rootNode
-				});
-
-				this._bindEvents();
-				this._renderUI();
-			}
-		);
+			this._bindEvents();
+		});
 
 		this.attachItemSelectorPreviewComponent();
 	}
@@ -83,29 +70,35 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 					e.preventDefault();
 					e.stopPropagation();
 
-					const container = this.one(
-						'.item-selector-preview-container'
-					);
-
-					const data = {
-						container,
-						currentIndex: index,
-						editItemURL: this.editItemURL,
-						handleSelectedItem: this._onItemSelected.bind(this),
-						headerTitle: this.closeCaption,
-						items,
-						uploadItemReturnType: this.uploadItemReturnType,
-						uploadItemURL: this.uploadItemURL
-					};
-
-					render(
-						props => <ItemSelectorPreview {...props} />,
-						data,
-						container
-					);
+					this.openItemSelectorPreview(items, index);
 				});
 			});
 		}
+
+		this._itemSelectorPreviewContainer = this.one(
+			'.item-selector-preview-container'
+		);
+	}
+
+	openItemSelectorPreview(items, index) {
+		const container = this._itemSelectorPreviewContainer;
+
+		const data = {
+			container,
+			currentIndex: index,
+			editItemURL: this.editItemURL,
+			handleSelectedItem: this._onItemSelected.bind(this),
+			headerTitle: this.closeCaption,
+			items,
+			uploadItemReturnType: this.uploadItemReturnType,
+			uploadItemURL: this.uploadItemURL
+		};
+
+		render(props => <ItemSelectorPreview {...props} />, data, container);
+	}
+
+	closeItemSelectorPreview() {
+		ReactDOM.unmountComponentAtNode(this._itemSelectorPreviewContainer);
 	}
 
 	/**
@@ -114,7 +107,6 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	detached() {
 		super.detached();
 
-		this._uploadItemViewer.destroy();
 		this._itemSelectorUploader.destroy();
 
 		this._eventHandler.removeAllListeners();
@@ -148,16 +140,12 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 			this._eventHandler.add(
 				itemSelectorUploader.after('itemUploadCancel', () => {
-					this._uploadItemViewer.hide();
+					this.closeItemSelectorPreview();
 				}),
 				itemSelectorUploader.after('itemUploadComplete', itemData => {
-					const updatedImage = this._uploadItemViewer.updateCurrentImage(
-						itemData
-					);
-
-					this._onItemSelected({
-						returntype: this.uploadItemReturnType,
-						value: updatedImage.getData('value')
+					Liferay.fire('updateCurrentItem', {
+						url: itemData.file.url,
+						value: itemData.file.resolvedValue
 					});
 				}),
 				itemSelectorUploader.after(
@@ -369,7 +357,7 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 	 * @private
 	 */
 	_onItemUploadError(event) {
-		this._uploadItemViewer.hide();
+		this.closeItemSelectorPreview();
 
 		this._showError(this._getUploadErrorMessage(event.error));
 	}
@@ -390,17 +378,6 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 
 			reader.readAsDataURL(file);
 		}
-	}
-
-	/**
-	 * Renders the item viewer's components
-	 *
-	 * @private
-	 */
-	_renderUI() {
-		const rootNode = this.rootNode;
-
-		this._uploadItemViewer.render(rootNode);
 	}
 
 	/**
@@ -445,25 +422,15 @@ class ItemSelectorRepositoryEntryBrowser extends PortletBase {
 				'/file_system/large/default.png';
 		}
 
-		AUI().use('aui-node', A => {
-			const linkNode = A.Node.create(
-				uploadItemLinkTpl({
-					preview,
-					returnType: this.uploadItemReturnType,
-					title: file.name,
-					value: preview
-				})
-			);
+		const item = {
+			base64: preview,
+			metadata: JSON.stringify(this._getUploadFileMetadata(file)),
+			returntype: this.uploadItemReturnType,
+			title: file.name,
+			value: preview
+		};
 
-			linkNode.setData(
-				'metadata',
-				JSON.stringify(this._getUploadFileMetadata(file))
-			);
-
-			this._uploadItemViewer.set('links', new A.NodeList(linkNode));
-
-			this._uploadItemViewer.show();
-		});
+		this.openItemSelectorPreview([item], 0);
 
 		this._itemSelectorUploader.startUpload(file, this.uploadItemURL);
 	}

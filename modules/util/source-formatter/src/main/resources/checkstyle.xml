@@ -45,9 +45,7 @@
 			<message key="name.invalidPattern" value="Private method ''{0}'' must match pattern ''{1}''" />
 		</module>
 		<module name="MethodParamPadCheck" />
-
-		<!-- <module name="MissingDeprecatedCheck" /> -->
-
+		<module name="MissingDeprecatedCheck" />
 		<module name="ModifierOrderCheck" />
 		<module name="MultipleVariableDeclarationsCheck" />
 		<module name="NoLineWrapCheck" />
@@ -226,10 +224,13 @@
 			<message key="lps42924" value="Use ''classNameLocalService.getClassNameId'' instead of ''PortalUtil.getClassName''" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.MapBuilderCheck">
+			<property name="checkAnonymousClass" value="false" />
 			<property name="enabled" value="false" />
 			<property name="mapTypeNames" value="ConcurrentHashMap,HashMap,LinkedHashMap,TreeMap" />
-			<message key="map.builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3}). See " />
+			<message key="map.builder.include" value="Include method call ''{0}'' ({1}) in ''{2}'' ({3}). See https://github.com/liferay/liferay-portal/blob/master/modules/util/source-formatter/documentation/map_builders.markdown" />
+			<message key="map.builder.inline" value="Inline variable definition ''{0}'' ({1}) inside ''{2}'' ({3}). See https://github.com/liferay/liferay-portal/blob/master/modules/util/source-formatter/documentation/map_builders.markdown" />
 			<message key="map.builder.use" value="Use ''{0}'' ({1}, {2}). See https://github.com/liferay/liferay-portal/blob/master/modules/util/source-formatter/documentation/map_builders.markdown" />
+			<message key="map.builder.use.instead" value="Use ''{0}'' instead of new instance of ''{1}''. See https://github.com/liferay/liferay-portal/blob/master/modules/util/source-formatter/documentation/map_builders.markdown" />
 			<message key="null.value.cast" value="Cast null value in {0}" />
 		</module>
 		<module name="com.liferay.source.formatter.checkstyle.checks.MapIterationCheck">

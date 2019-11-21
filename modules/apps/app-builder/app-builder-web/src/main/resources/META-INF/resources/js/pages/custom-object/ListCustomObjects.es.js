@@ -23,6 +23,7 @@ import ListView from '../../components/list-view/ListView.es';
 import {useKeyDown} from '../../hooks/index.es';
 import isClickOutside from '../../utils/clickOutside.es';
 import {addItem, confirmDelete} from '../../utils/client.es';
+import CustomObjectPermissionsModal from './CustomObjectPermissionsModal.es';
 import CustomObjectPopover from './CustomObjectPopover.es';
 
 const COLUMNS = [
@@ -52,6 +53,9 @@ export default ({history}) => {
 
 	const [alignElement, setAlignElement] = useState(addButtonRef.current);
 	const [isPopoverVisible, setPopoverVisible] = useState(false);
+	const [isPermissionsModalVisible, setPermissionsModalVisible] = useState(
+		false
+	);
 
 	const onClickAddButton = ({currentTarget}) => {
 		setAlignElement(currentTarget);
@@ -155,6 +159,11 @@ export default ({history}) => {
 						name: 'divider'
 					},
 					{
+						action: _ =>
+							Promise.resolve(setPermissionsModalVisible(true)),
+						name: Liferay.Language.get('permissions')
+					},
+					{
 						action: confirmDelete(
 							'/o/data-engine/v1.0/data-definitions/'
 						),
@@ -209,6 +218,11 @@ export default ({history}) => {
 				onSubmit={onSubmit}
 				ref={popoverRef}
 				visible={isPopoverVisible}
+			/>
+
+			<CustomObjectPermissionsModal
+				onClose={() => setPermissionsModalVisible(false)}
+				visible={isPermissionsModalVisible}
 			/>
 		</>
 	);

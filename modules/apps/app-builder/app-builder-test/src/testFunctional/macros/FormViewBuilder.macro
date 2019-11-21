@@ -48,6 +48,12 @@ definition {
 		AppBuilderAdmin.openItem(itemName = "${formViewName}");
 
 		FormViewBuilder.validateFieldLabel(fieldLabel = "${fieldType}");
+
+		AppBuilderAdmin.gotoBack();
+	}
+
+	macro openFormView {
+		AppBuilderAdmin.openItem(itemName = "${formViewName}");
 	}
 
 	macro save {

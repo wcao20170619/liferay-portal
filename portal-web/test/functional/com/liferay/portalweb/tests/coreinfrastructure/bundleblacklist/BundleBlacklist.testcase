@@ -90,13 +90,25 @@ definition {
 			configurationName = "Bundle Blacklist",
 			configurationScope = "System Scope");
 
+		var testRunEnvironment = PropsUtil.get("test.run.environment");
+
+		if ("${testRunEnvironment}" == "EE") {
+			var symbolicName = "Liferay Foundation - Liferay Gogo Shell - Impl";
+			var consoleText = "STOPPED Liferay Foundation - Liferay Gogo Shell - Impl";
+
+		}
+		else {
+			var symbolicName = "Liferay CE Foundation - Liferay CE Gogo Shell - Impl";
+			var consoleText = "STOPPED Liferay CE Foundation - Liferay CE Gogo Shell - Impl";
+		}
+
 		BundleBlacklist.blacklistModuleAndComponentConfiguration(
 			label = "Blacklist Bundle Symbolic Names",
-			symbolicName = "Liferay Foundation - Liferay Gogo Shell - Impl");
+			symbolicName = "${symbolicName}");
 
 		BundleBlacklist.viewProductMenuBlacklistedModule(
 			category = "Configuration",
-			consoleText = "STOPPED Liferay Foundation - Liferay Gogo Shell - Impl",
+			consoleText = "${consoleText}",
 			panel = "Control Panel",
 			portlet = "Gogo Shell");
 	}

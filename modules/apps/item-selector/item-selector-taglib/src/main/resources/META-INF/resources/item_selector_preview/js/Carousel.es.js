@@ -40,7 +40,7 @@ const InfoPanel = metadata => {
 		return (
 			<ClayTabs.Item
 				active={activeTabKeyValue == index}
-				key={`tabItem-${index}`}
+				key={group.title}
 				onClick={() => setActiveTabKeyValue(index)}
 			>
 				{group.title}
@@ -51,10 +51,10 @@ const InfoPanel = metadata => {
 	const itemsContent = imageData.groups.map((group, index) => {
 		const itemContentTab = group.data.map(item => {
 			return (
-				<>
+				<React.Fragment key={item.key}>
 					<dt className="sidebar-dt">{item.key}</dt>
 					<dd className="sidebar-dd">{item.value}</dd>
-				</>
+				</React.Fragment>
 			);
 		});
 
@@ -96,7 +96,10 @@ const Carousel = ({
 				<Arrow direction="left" handleClick={handleClickPrevious} />
 			)}
 
-			<img alt={currentItem.title} src={currentItem.url} />
+			<img
+				alt={currentItem.title}
+				src={currentItem.url || currentItem.base64}
+			/>
 
 			{showArrows && (
 				<Arrow direction="right" handleClick={handleClickNext} />

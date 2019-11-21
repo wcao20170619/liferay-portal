@@ -30,14 +30,23 @@ const TPL_EDIT_DIALOG_TITLE = '{edit} {title} ({copy})';
 
 class ItemSelectorPreview extends Component {
 	static propTypes = {
-		container: PropTypes.instanceOf(Element),
+		container: PropTypes.instanceOf(Element).isRequired,
 		currentIndex: PropTypes.number.isRequired,
-		editItemURL: PropTypes.string.isRequired,
+		editItemURL: PropTypes.string,
 		handleSelectedItem: PropTypes.func.isRequired,
 		headerTitle: PropTypes.string.isRequired,
-		items: PropTypes.array.isRequired,
-		uploadItemReturnType: PropTypes.string.isRequired,
-		uploadItemURL: PropTypes.string.isRequired
+		items: PropTypes.arrayOf(
+			PropTypes.shape({
+				base64: PropTypes.string,
+				metadata: PropTypes.object,
+				returntype: PropTypes.string.isRequired,
+				title: PropTypes.string.isRequired,
+				url: PropTypes.string,
+				value: PropTypes.oneOfType([PropTypes.string, PropTypes.object])
+			})
+		).isRequired,
+		uploadItemReturnType: PropTypes.string,
+		uploadItemURL: PropTypes.string
 	};
 
 	constructor(props) {
@@ -71,6 +80,11 @@ class ItemSelectorPreview extends Component {
 				width: '320px'
 			});
 		}
+
+		this._updateCurrentItemHandler = Liferay.on(
+			'updateCurrentItem',
+			this.updateCurrentItem
+		);
 	}
 
 	componentWillUnmount() {
@@ -78,6 +92,8 @@ class ItemSelectorPreview extends Component {
 			'keydown',
 			this.handleOnKeyDown.bind(this)
 		);
+
+		Liferay.detach('updateCurrentItem', this._updateCurrentItemHandler);
 	}
 
 	close = () => {
@@ -226,17 +242,24 @@ class ItemSelectorPreview extends Component {
 		});
 	};
 
+	updateCurrentItem = ({url, value}) => {
+		this.setState({currentItem: {...this.state.currentItem, url, value}});
+	};
+
 	render() {
 		const {currentItem, currentItemIndex, items} = this.state;
 
 		return (
 			<div className="fullscreen item-selector-preview">
 				<Header
+					disabledAddButton={!currentItem.url}
 					handleClickClose={this.handleClickClose}
 					handleClickDone={this.handleClickDone}
 					handleClickEdit={this.handleClickEdit}
 					headerTitle={this.props.headerTitle}
 					infoButtonRef={this.infoButtonRef}
+					showEditIcon={this.props.editItemURL}
+					showInfoIcon={currentItem.metadata}
 				/>
 
 				<Carousel

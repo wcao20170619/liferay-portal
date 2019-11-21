@@ -22,12 +22,7 @@ import {
 } from '../../../util/fieldSupport.es';
 
 const handleFieldAdded = (props, state, event) => {
-	const {
-		addedToPlaceholder,
-		fieldType,
-		indexes,
-		skipFieldNameGeneration = false
-	} = event;
+	const {fieldType, indexes, skipFieldNameGeneration = false} = event;
 	const {
 		defaultLanguageId,
 		editingLanguageId,
@@ -66,8 +61,8 @@ const handleFieldAdded = (props, state, event) => {
 
 	const {fieldName, name, settingsContext} = focusedField;
 	const {pageIndex, rowIndex} = indexes;
-	let {pages} = state;
-	let {columnIndex} = indexes;
+	const {pages} = state;
+	const {columnIndex} = indexes;
 
 	const fieldProperties = {
 		...getFieldProperties(
@@ -82,12 +77,6 @@ const handleFieldAdded = (props, state, event) => {
 		spritemap,
 		type: fieldType.name
 	};
-
-	if (addedToPlaceholder) {
-		pages = FormSupport.addRow(pages, rowIndex, pageIndex);
-
-		columnIndex = 0;
-	}
 
 	return {
 		focusedField: {

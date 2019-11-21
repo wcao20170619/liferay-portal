@@ -23,7 +23,10 @@ import com.liferay.portal.workflow.kaleo.runtime.graph.GraphWalker;
 import com.liferay.portal.workflow.kaleo.runtime.graph.PathElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,21 +43,24 @@ public class PathElementMessageListener extends BaseMessageListener {
 
 	@Override
 	protected void doReceive(Message message) throws Exception {
-		PathElement pathElement = (PathElement)message.getPayload();
+		Queue<List<PathElement>> queue = new LinkedList<>();
 
-		List<PathElement> remainingPathElements = new ArrayList<>();
+		queue.add(Collections.singletonList((PathElement)message.getPayload()));
 
-		_graphWalker.follow(
-			pathElement.getStartNode(), pathElement.getTargetNode(),
-			remainingPathElements, pathElement.getExecutionContext());
+		List<PathElement> pathElements = null;
 
-		for (PathElement remainingPathElement : remainingPathElements) {
-			message = new Message();
+		while ((pathElements = queue.poll()) != null) {
+			for (PathElement pathElement : pathElements) {
+				List<PathElement> remainingPathElements = new ArrayList<>();
 
-			message.setPayload(remainingPathElement);
+				_graphWalker.follow(
+					pathElement.getStartNode(), pathElement.getTargetNode(),
+					remainingPathElements, pathElement.getExecutionContext());
 
-			_messageBus.sendMessage(
-				KaleoRuntimeDestinationNames.KALEO_GRAPH_WALKER, message);
+				if (!remainingPathElements.isEmpty()) {
+					queue.add(remainingPathElements);
+				}
+			}
 		}
 	}
 

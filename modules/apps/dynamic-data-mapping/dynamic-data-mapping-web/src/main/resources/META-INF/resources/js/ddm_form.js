@@ -792,7 +792,13 @@ AUI.add(
 
 					var inputNode = instance.getInputNode();
 
-					return Lang.String.unescapeHTML(inputNode.val());
+					var value = '';
+
+					if (inputNode) {
+						value = Lang.String.unescapeHTML(inputNode.val());
+					}
+
+					return value;
 				},
 
 				initializer() {
@@ -4118,9 +4124,14 @@ AUI.add(
 					var newFieldLocalizations = repeatedField.get(
 						'localizationMap'
 					);
-					var totalLocalizations = originalField.get(
-						'localizationMap'
-					);
+
+					var totalLocalizations = {};
+
+					if (originalField) {
+						totalLocalizations = originalField.get(
+							'localizationMap'
+						);
+					}
 
 					var currentLocale = repeatedField.get('displayLocale');
 
@@ -4152,7 +4163,12 @@ AUI.add(
 					repeatedField.set('localizationMap', newFieldLocalizations);
 
 					var newNestedFields = repeatedField.get('fields');
-					var originalNestedFields = originalField.get('fields');
+
+					var originalNestedFields = [];
+
+					if (originalField) {
+						originalNestedFields = originalField.get('fields');
+					}
 
 					for (var i = 0; i < newNestedFields.length; i++) {
 						instance.populateBlankLocalizationMap(
