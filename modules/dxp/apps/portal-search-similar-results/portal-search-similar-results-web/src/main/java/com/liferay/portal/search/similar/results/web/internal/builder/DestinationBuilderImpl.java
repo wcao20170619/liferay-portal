@@ -37,7 +37,7 @@ public class DestinationBuilderImpl implements DestinationBuilder {
 
 	@Override
 	public DestinationBuilder replace(String oldSub, String newSub) {
-		_urlString = StringUtil.replaceFirst(_urlString, oldSub, newSub);
+		_urlString = StringUtil.replace(_urlString, oldSub, newSub);
 
 		return this;
 	}
