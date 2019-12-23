@@ -56,12 +56,6 @@ public class HttpHelperImpl implements HttpHelper {
 			Map<String, String[]> parameterMap = _http.parameterMapFromString(
 				_http.getQueryString(urlString));
 
-			while (urlString.indexOf(CharPool.QUESTION) > -1) {
-				urlString = _http.getQueryString(urlString);
-
-				parameterMap.putAll(_http.parameterMapFromString(urlString));
-			}
-
 			String[] parameterValues = parameterMap.get(parameterName);
 
 			if (!ArrayUtil.isEmpty(parameterValues)) {
@@ -73,6 +67,24 @@ public class HttpHelperImpl implements HttpHelper {
 			return parameterMap.get(
 				StringBundler.concat(
 					StringPool.UNDERLINE, ppid, StringPool.UNDERLINE,
+					parameterName))[0];
+		}
+		catch (RuntimeException re) {
+			return null;
+		}
+	}
+
+	@Override
+	public String getPortletIdParameter(
+		String urlString, String parameterName, String portletId) {
+
+		try {
+			Map<String, String[]> parameterMap = _http.parameterMapFromString(
+				_http.getQueryString(urlString));
+
+			return parameterMap.get(
+				StringBundler.concat(
+					StringPool.UNDERLINE, portletId, StringPool.UNDERLINE,
 					parameterName))[0];
 		}
 		catch (RuntimeException re) {
