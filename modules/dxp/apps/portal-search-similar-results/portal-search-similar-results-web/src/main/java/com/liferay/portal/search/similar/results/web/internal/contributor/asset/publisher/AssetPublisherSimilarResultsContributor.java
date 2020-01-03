@@ -17,6 +17,7 @@ package com.liferay.portal.search.similar.results.web.internal.contributor.asset
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.search.similar.results.web.internal.builder.AssetTypeUtil;
@@ -56,7 +57,8 @@ public class AssetPublisherSimilarResultsContributor
 		putAttribute(parameters[2], "type", routeBuilder);
 
 		String assetEntryId = _httpHelper.getPortletIdParameter(
-			urlString, "assetEntryId");
+			urlString, "assetEntryId",
+			_getAssetPublisherPortletId(parameters[1]));
 
 		putAttribute(Long.valueOf(assetEntryId), "entryId", routeBuilder);
 	}
@@ -117,6 +119,11 @@ public class AssetPublisherSimilarResultsContributor
 		Object value, String name, RouteBuilder routeBuilder) {
 
 		routeBuilder.addAttribute(name, value);
+	}
+
+	private String _getAssetPublisherPortletId(String instanceId) {
+		return AssetPublisherPortletKeys.ASSET_PUBLISHER + "_INSTANCE_" +
+			instanceId;
 	}
 
 	private Long _getId(AssetEntry assetEntry) {
