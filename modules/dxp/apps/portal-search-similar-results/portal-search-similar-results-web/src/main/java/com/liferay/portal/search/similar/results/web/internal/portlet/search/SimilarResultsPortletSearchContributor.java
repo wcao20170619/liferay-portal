@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
@@ -199,10 +200,16 @@ public class SimilarResultsPortletSearchContributor
 		MoreLikeThisQuery moreLikeThisQuery,
 		SimilarResultsPortletPreferences similarResultsPortletPreferences) {
 
+		String fields = similarResultsPortletPreferences.getFields();
+
+		if (!Validator.isBlank(fields)) {
+			moreLikeThisQuery.addFields(fields);
+		}
+
 		String stopWords = similarResultsPortletPreferences.getStopWords();
 
 		if (!Validator.isBlank(stopWords)) {
-			moreLikeThisQuery.addStopWords(stopWords);
+			moreLikeThisQuery.addStopWords(StringUtil.toLowerCase(stopWords));
 		}
 
 		moreLikeThisQuery.setAnalyzer(
