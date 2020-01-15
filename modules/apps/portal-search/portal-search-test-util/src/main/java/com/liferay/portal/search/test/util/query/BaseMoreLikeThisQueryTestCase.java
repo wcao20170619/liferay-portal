@@ -97,6 +97,46 @@ public abstract class BaseMoreLikeThisQueryTestCase
 	}
 
 	@Test
+	public void testMoreLikeThisWithMinimumShouldMatch() throws Exception {
+		String[] texts = new String[10];
+
+		for (int i = 0; i < 10; i++) {
+			String text = "";
+
+			for (int j = 1; j <= (10 - i); j++) {
+				text += j + " ";
+			}
+
+			texts[i] = text.trim();
+			addDocuments(text);
+		}
+
+		String[] fields = {_FIELD_TITLE};
+
+		MoreLikeThisQuery moreLikeThisQuery = queries.moreLikeThis(
+			fields, texts[0]);
+
+		for (int i = 0; i <= 10; i++) {
+			String minimumShouldMatch = (10 * i) + "%";
+
+			moreLikeThisQuery.setMinShouldMatch(minimumShouldMatch);
+
+			List<String> expected = new ArrayList<>();
+
+			if (minimumShouldMatch.equals("0%")) {
+				expected = Arrays.asList(texts);
+			}
+			else {
+				for (int j = 0; j < (11 - i); j++) {
+					expected.add(texts[j]);
+				}
+			}
+
+			assertSearch(moreLikeThisQuery, expected);
+		}
+	}
+
+	@Test
 	public void testMoreLikeThisWithMultipleFields() throws Exception {
 		addDocuments("alpha charlie", "delta echo");
 
