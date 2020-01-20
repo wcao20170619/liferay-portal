@@ -17,6 +17,7 @@ package com.liferay.portal.search.tuning.rankings.web.internal.portlet;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.query.Queries;
@@ -35,6 +36,9 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Filipe Oshiro
@@ -71,7 +75,8 @@ public class ResultRankingsPortlet extends MVCPortlet {
 			new RankingPortletDisplayBuilder(
 				documentToRankingTranslator,
 				portal.getHttpServletRequest(renderRequest), language, queries,
-				sorts, renderRequest, renderResponse, searchEngineAdapter
+				sorts, renderRequest, renderResponse, searchEngineAdapter,
+				_searchEngineInformation
 			).build();
 
 		renderRequest.setAttribute(
@@ -101,5 +106,12 @@ public class ResultRankingsPortlet extends MVCPortlet {
 
 	@Reference
 	protected Sorts sorts;
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile SearchEngineInformation _searchEngineInformation;
 
 }
