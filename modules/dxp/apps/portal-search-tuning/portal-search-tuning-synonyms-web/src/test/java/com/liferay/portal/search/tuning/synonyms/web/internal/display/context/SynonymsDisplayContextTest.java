@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
@@ -33,14 +34,12 @@ import javax.portlet.ActionURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderURL;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -100,8 +99,8 @@ public class SynonymsDisplayContextTest {
 			new SynonymsDisplayBuilder(
 				_documentToSynonymSetTranslator, _httpServletRequest,
 				_indexNameBuilder, _language, _portal, _queries, _renderRequest,
-				_renderResponse, _searchEngineAdapter, _sorts,
-				_synonymSetIndexNameBuilder, _synonymSetIndexReader);
+				_renderResponse, _searchEngineAdapter, _searchEngineInformation, 
+				_sorts, _synonymSetIndexNameBuilder, _synonymSetIndexReader);
 
 		SynonymsDisplayContext synonymsDisplayContext =
 			synonymsDisplayBuilder.build();
@@ -117,8 +116,8 @@ public class SynonymsDisplayContextTest {
 			new SynonymsDisplayBuilder(
 				_documentToSynonymSetTranslator, _httpServletRequest,
 				_indexNameBuilder, _language, _portal, _queries, _renderRequest,
-				_renderResponse, _searchEngineAdapter, _sorts,
-				_synonymSetIndexNameBuilder, _synonymSetIndexReader);
+				_renderResponse, _searchEngineAdapter, _searchEngineInformation, 
+				_sorts, _synonymSetIndexNameBuilder, _synonymSetIndexReader);
 
 		SynonymsDisplayContext synonymsDisplayContext =
 			synonymsDisplayBuilder.build();
@@ -161,6 +160,9 @@ public class SynonymsDisplayContextTest {
 
 	@Mock
 	private SearchEngineAdapter _searchEngineAdapter;
+	
+	@Mock
+	private SearchEngineInformation _searchEngineInformation;
 
 	@Mock
 	private Sorts _sorts;
