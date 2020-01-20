@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.index.IndexNameBuilder;
@@ -38,6 +39,7 @@ import com.liferay.portal.search.tuning.synonyms.web.internal.request.SearchSyno
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +63,8 @@ public class SynonymsDisplayBuilder {
 		IndexNameBuilder indexNameBuilder, Language language, Portal portal,
 		Queries queries, RenderRequest renderRequest,
 		RenderResponse renderResponse, SearchEngineAdapter searchEngineAdapter,
-		Sorts sorts, SynonymSetIndexNameBuilder synonymSetIndexNameBuilder,
+		SearchEngineInformation searchEngineInformation, Sorts sorts,
+		SynonymSetIndexNameBuilder synonymSetIndexNameBuilder,
 		SynonymSetIndexReader synonymSetIndexReader) {
 
 		_documentToSynonymSetTranslator = documentToSynonymSetTranslator;
@@ -73,6 +76,7 @@ public class SynonymsDisplayBuilder {
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_searchEngineAdapter = searchEngineAdapter;
+		_searchEngineInformation = searchEngineInformation;
 		_sorts = sorts;
 		_synonymSetIndexNameBuilder = synonymSetIndexNameBuilder;
 		_synonymSetIndexReader = synonymSetIndexReader;
@@ -81,6 +85,12 @@ public class SynonymsDisplayBuilder {
 	public SynonymsDisplayContext build() {
 		SynonymsDisplayContext synonymsDisplayContext =
 			new SynonymsDisplayContext();
+
+		if (Objects.equals(
+				_searchEngineInformation.getVendorString(), "Solr")) {
+
+			return synonymsDisplayContext;
+		}
 
 		synonymsDisplayContext.setCreationMenu(getCreationMenu());
 
@@ -293,6 +303,7 @@ public class SynonymsDisplayBuilder {
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private final SearchEngineAdapter _searchEngineAdapter;
+	private final SearchEngineInformation _searchEngineInformation;
 	private final Sorts _sorts;
 	private final SynonymSetIndexNameBuilder _synonymSetIndexNameBuilder;
 	private final SynonymSetIndexReader _synonymSetIndexReader;
