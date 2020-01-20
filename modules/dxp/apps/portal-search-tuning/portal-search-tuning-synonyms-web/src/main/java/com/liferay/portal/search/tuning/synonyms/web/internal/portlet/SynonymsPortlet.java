@@ -17,6 +17,7 @@ package com.liferay.portal.search.tuning.synonyms.web.internal.portlet;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.search.engine.SearchEngineInformation;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
@@ -35,6 +36,9 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Filipe Oshiro
@@ -71,7 +75,8 @@ public class SynonymsPortlet extends MVCPortlet {
 				_documentToSynonymSetTranslator,
 				_portal.getHttpServletRequest(renderRequest), _indexNameBuilder,
 				_language, _portal, _queries, renderRequest, renderResponse,
-				_searchEngineAdapter, _sorts, _synonymSetIndexNameBuilder);
+				_searchEngineAdapter, _searchEngineInformation, _sorts,
+				_synonymSetIndexNameBuilder);
 
 		renderRequest.setAttribute(
 			SynonymsPortletKeys.SYNONYMS_DISPLAY_CONTEXT,
@@ -97,6 +102,13 @@ public class SynonymsPortlet extends MVCPortlet {
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
+
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private Sorts _sorts;
