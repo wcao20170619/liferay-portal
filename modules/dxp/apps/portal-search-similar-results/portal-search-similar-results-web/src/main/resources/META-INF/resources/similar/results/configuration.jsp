@@ -91,8 +91,6 @@ SimilarResultsPortletPreferences similarResultsPortletPreferences = new SimilarR
 
 				<aui:input helpMessage="stop-words-help" label="stop-words" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_STOP_WORDS) %>" type="text" value="<%= similarResultsPortletPreferences.getStopWords() %>" />
 
-				<aui:input helpMessage="analyzer-help" label="analyzer" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_ANALYZER) %>" type="text" value="<%= similarResultsPortletPreferences.getAnalyzer() %>" />
-
 				<aui:input helpMessage="min-should-match-help" label="min-should-match" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_MIN_SHOULD_MATCH) %>" type="text" value="<%= similarResultsPortletPreferences.getMinShouldMatch() %>" />
 
 				<aui:input helpMessage="term-boost-help" label="term-boost" name="<%= PortletPreferencesJspUtil.getInputName(similarResultsPortletPreferences.PREFERENCE_KEY_TERM_BOOST) %>" type="text" value="<%= similarResultsPortletPreferences.getTermBoost() %>" />
