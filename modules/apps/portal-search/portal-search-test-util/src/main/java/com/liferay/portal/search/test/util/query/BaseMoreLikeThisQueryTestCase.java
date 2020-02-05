@@ -97,6 +97,27 @@ public abstract class BaseMoreLikeThisQueryTestCase
 	}
 
 	@Test
+	public void testMoreLikeThisWithMinDocFreq() throws Exception {
+		addDocuments("Red Blue", "Red Dog", "Red Blue Color", "Color");
+
+		MoreLikeThisQuery moreLikeThisQuery = queries.moreLikeThis(
+			Collections.singletonList(_FIELD_TITLE), "Red Blue Color");
+
+		moreLikeThisQuery.setMinDocFrequency(1);
+		moreLikeThisQuery.setMinTermFrequency(1);
+
+		assertSearch(
+			null, moreLikeThisQuery,
+			Arrays.asList("Red Blue Color", "Red Blue", "Color", "Red Dog"));
+
+		moreLikeThisQuery.setMinDocFrequency(3);
+
+		assertSearch(
+			null, moreLikeThisQuery,
+			Arrays.asList("Red Blue", "Red Dog", "Red Blue Color"));
+	}
+
+	@Test
 	public void testMoreLikeThisWithMinimumShouldMatch() throws Exception {
 		String[] texts = new String[10];
 
