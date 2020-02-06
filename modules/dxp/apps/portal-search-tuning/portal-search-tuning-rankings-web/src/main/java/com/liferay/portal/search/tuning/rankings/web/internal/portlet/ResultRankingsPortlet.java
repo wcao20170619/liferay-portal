@@ -36,9 +36,6 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Filipe Oshiro
@@ -107,11 +104,7 @@ public class ResultRankingsPortlet extends MVCPortlet {
 	@Reference
 	protected Sorts sorts;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile SearchEngineInformation _searchEngineInformation;
+	@Reference
+	private SearchEngineInformation _searchEngineInformation;
 
 }
