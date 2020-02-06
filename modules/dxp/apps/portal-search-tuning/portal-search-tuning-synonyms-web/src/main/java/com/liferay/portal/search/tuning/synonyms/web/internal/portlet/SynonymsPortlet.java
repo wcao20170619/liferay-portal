@@ -36,9 +36,6 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Filipe Oshiro
@@ -103,12 +100,8 @@ public class SynonymsPortlet extends MVCPortlet {
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policy = ReferencePolicy.DYNAMIC,
-		policyOption = ReferencePolicyOption.GREEDY
-	)
-	private volatile SearchEngineInformation _searchEngineInformation;
+	@Reference
+	private SearchEngineInformation _searchEngineInformation;
 
 	@Reference
 	private Sorts _sorts;
