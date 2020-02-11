@@ -18,8 +18,12 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
+import com.liferay.blogs.model.BlogsEntry;
+import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.search.model.uid.UIDFactory;
 import com.liferay.portal.search.similar.results.web.internal.builder.AssetTypeUtil;
 import com.liferay.portal.search.similar.results.web.internal.util.SearchStringUtil;
 import com.liferay.portal.search.similar.results.web.internal.util.http.HttpHelper;
@@ -30,6 +34,8 @@ import com.liferay.portal.search.similar.results.web.spi.contributor.helper.Dest
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.DestinationHelper;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.RouteBuilder;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.RouteHelper;
+import com.liferay.wiki.model.WikiPage;
+import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.Objects;
 
@@ -83,18 +89,6 @@ public class AssetPublisherSimilarResultsContributor
 		);
 	}
 
-	@Reference(unbind = "-")
-	public void setAssetEntryLocalService(
-		AssetEntryLocalService assetEntryLocalService) {
-
-		_assetEntryLocalService = assetEntryLocalService;
-	}
-
-	@Reference(unbind = "-")
-	public void setHttpHelper(HttpHelper httpHelper) {
-		_httpHelper = httpHelper;
-	}
-
 	@Override
 	public void writeDestination(
 		DestinationBuilder destinationBuilder,
@@ -121,12 +115,43 @@ public class AssetPublisherSimilarResultsContributor
 		routeBuilder.addAttribute(name, value);
 	}
 
+	@Reference(unbind = "-")
+	protected void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		_assetEntryLocalService = assetEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setBlogsEntryLocalService(
+		BlogsEntryLocalService blogsEntryLocalService) {
+
+		_blogsEntryLocalService = blogsEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setHttpHelper(HttpHelper httpHelper) {
+		_httpHelper = httpHelper;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUIDFactory(UIDFactory uidFactory) {
+		_uidFactory = uidFactory;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWikiPageLocalService(
+		WikiPageLocalService wikiPageLocalService) {
+
+		_wikiPageLocalService = wikiPageLocalService;
+	}
+
 	private String _getAssetPublisherPortletId(String instanceId) {
 		return AssetPublisherPortletKeys.ASSET_PUBLISHER + "_INSTANCE_" +
 			instanceId;
 	}
 
-	private Long _getId(AssetEntry assetEntry) {
+	private ClassedModel _getClassedModel(AssetEntry assetEntry) {
 		if (Objects.equals(
 				JournalArticle.class.getName(), assetEntry.getClassName())) {
 
@@ -139,23 +164,53 @@ public class AssetPublisherSimilarResultsContributor
 				return null;
 			}
 
-			return journalArticle.getId();
+			return journalArticle;
+		}
+		else if (Objects.equals(
+					WikiPage.class.getName(), assetEntry.getClassName())) {
+
+			WikiPage wikiPage =
+				_wikiPageLocalService.fetchWikiPageByUuidAndGroupId(
+					assetEntry.getClassUuid(), assetEntry.getGroupId());
+
+			if (wikiPage == null) {
+				return null;
+			}
+
+			return wikiPage;
+		}
+		else if (Objects.equals(
+					BlogsEntry.class.getName(), assetEntry.getClassName())) {
+
+			BlogsEntry blogsEntry =
+				_blogsEntryLocalService.fetchBlogsEntryByUuidAndGroupId(
+					assetEntry.getClassUuid(), assetEntry.getGroupId());
+
+			if (blogsEntry == null) {
+				return null;
+			}
+
+			return blogsEntry;
 		}
 
-		return assetEntry.getClassPK();
+		return null;
 	}
 
 	private String _getUID(AssetEntry assetEntry) {
-		Long id = _getId(assetEntry);
+		ClassedModel classedModel = _getClassedModel(assetEntry);
 
-		if (id == null) {
-			return null;
+		if (classedModel != null) {
+			return _uidFactory.getUID(classedModel);
 		}
 
-		return Field.getUID(assetEntry.getClassName(), String.valueOf(id));
+		return Field.getUID(
+			assetEntry.getClassName(), String.valueOf(assetEntry.getClassPK()));
 	}
 
 	private AssetEntryLocalService _assetEntryLocalService;
+	private BlogsEntryLocalService _blogsEntryLocalService;
 	private HttpHelper _httpHelper;
+	private UIDFactory _uidFactory;
+	private WikiPageLocalService _wikiPageLocalService;
 
 }
