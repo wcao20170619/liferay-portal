@@ -79,7 +79,9 @@ public class BlogsSimilarResultsContributor
 
 		AssetRenderer<?> assetRenderer = destinationHelper.getAssetRenderer();
 
-		destinationBuilder.replace(urlTitle, assetRenderer.getUrlTitle());
+		destinationBuilder.replace(
+			_getBlogsURLParameterPattern(urlTitle),
+			_getBlogsURLParameterPattern(assetRenderer.getUrlTitle()));
 	}
 
 	@Reference(unbind = "-")
@@ -97,6 +99,10 @@ public class BlogsSimilarResultsContributor
 	@Reference(unbind = "-")
 	protected void setUIDFactory(UIDFactory uidFactory) {
 		_uidFactory = uidFactory;
+	}
+
+	private String _getBlogsURLParameterPattern(String parameterValue) {
+		return "-/blogs/" + parameterValue + "?";
 	}
 
 	private BlogsEntryLocalService _blogsEntryLocalService;
