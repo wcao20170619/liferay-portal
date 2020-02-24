@@ -89,6 +89,8 @@ public class SimilarResultsPortletSearchContributor
 		filterByEntryClassName(
 			criteria, searchRequestBuilder, portletSharedSearchSettings);
 
+		filterByGroupId(portletSharedSearchSettings, searchRequestBuilder);
+
 		searchRequestBuilder.query(
 			getMoreLikeThisQuery(
 				criteria.getUID(), similarResultsPortletPreferences)
@@ -122,6 +124,15 @@ public class SimilarResultsPortletSearchContributor
 						getComplexQueryPart(getEntryClassNameQuery(className)));
 				}
 			});
+	}
+
+	protected void filterByGroupId(
+		PortletSharedSearchSettings portletSharedSearchSettings,
+		SearchRequestBuilder searchRequestBuilder) {
+
+		searchRequestBuilder.withSearchContext(
+			searchContext -> searchContext.setGroupIds(
+				new long[] {getGroupId(portletSharedSearchSettings)}));
 	}
 
 	protected ComplexQueryPart getComplexQueryPart(Query query) {
