@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.search.highlight.HighlightUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -268,15 +269,27 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 			SearchContext searchContext)
 		throws Exception {
 
-		addSearchTerm(searchQuery, searchContext, Field.ARTICLE_ID, false);
-		addSearchTerm(searchQuery, searchContext, Field.CLASS_PK, false);
+		BooleanQuery booleanQuery = new BooleanQueryImpl();
+
+		addSearchTerm(booleanQuery, searchContext, Field.ARTICLE_ID, false);
+		addSearchTerm(booleanQuery, searchContext, Field.CLASS_PK, false);
 		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.CONTENT, false);
+			booleanQuery, searchContext, Field.CONTENT, false);
 		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.DESCRIPTION, false);
-		addSearchTerm(searchQuery, searchContext, Field.ENTRY_CLASS_PK, false);
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, false);
-		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
+			booleanQuery, searchContext, Field.DESCRIPTION, false);
+		addSearchTerm(booleanQuery, searchContext, Field.ENTRY_CLASS_PK, false);
+		addSearchLocalizedTerm(booleanQuery, searchContext, Field.TITLE, false);
+		addSearchTerm(booleanQuery, searchContext, Field.USER_NAME, false);
+
+		BooleanQuery entryClassQuery = new BooleanQueryImpl();
+
+		entryClassQuery.add(
+			new TermQueryImpl(
+				Field.ENTRY_CLASS_NAME, JournalArticle.class.getName()),
+			BooleanClauseOccur.MUST);
+		entryClassQuery.add(booleanQuery, BooleanClauseOccur.MUST);
+
+		searchQuery.add(entryClassQuery, BooleanClauseOccur.SHOULD);
 
 		LinkedHashMap<String, Object> params =
 			(LinkedHashMap<String, Object>)searchContext.getAttribute("params");
@@ -285,7 +298,8 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 			String expandoAttributes = (String)params.get("expandoAttributes");
 
 			if (Validator.isNotNull(expandoAttributes)) {
-				addSearchExpando(searchQuery, searchContext, expandoAttributes);
+				addSearchExpando(
+					booleanQuery, searchContext, expandoAttributes);
 			}
 		}
 
