@@ -41,6 +41,8 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.TermsFilter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -206,9 +208,20 @@ public class WikiPageIndexer
 			SearchContext searchContext)
 		throws Exception {
 
+		BooleanQuery booleanQuery = new BooleanQueryImpl();
+
 		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.CONTENT, false);
-		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, false);
+			booleanQuery, searchContext, Field.CONTENT, false);
+		addSearchLocalizedTerm(booleanQuery, searchContext, Field.TITLE, false);
+
+		BooleanQuery entryClassQuery = new BooleanQueryImpl();
+
+		entryClassQuery.add(
+			new TermQueryImpl(Field.ENTRY_CLASS_NAME, WikiPage.class.getName()),
+			BooleanClauseOccur.MUST);
+		entryClassQuery.add(booleanQuery, BooleanClauseOccur.MUST);
+
+		searchQuery.add(entryClassQuery, BooleanClauseOccur.SHOULD);
 	}
 
 	@Override
