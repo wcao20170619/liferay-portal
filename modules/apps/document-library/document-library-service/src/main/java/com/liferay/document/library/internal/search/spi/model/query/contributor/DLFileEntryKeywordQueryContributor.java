@@ -14,9 +14,15 @@
 
 package com.liferay.document.library.internal.search.spi.model.query.contributor;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
@@ -43,6 +49,8 @@ public class DLFileEntryKeywordQueryContributor
 		SearchContext searchContext =
 			keywordQueryContributorHelper.getSearchContext();
 
+		BooleanQuery searchTermQuery = new BooleanQueryImpl();
+
 		if (Validator.isNull(keywords)) {
 			queryHelper.addSearchTerm(
 				booleanQuery, searchContext, Field.DESCRIPTION, false);
@@ -53,14 +61,30 @@ public class DLFileEntryKeywordQueryContributor
 		}
 
 		queryHelper.addSearchTerm(
-			booleanQuery, searchContext, "ddmContent", false);
+			searchTermQuery, searchContext, "ddmContent", false);
 		queryHelper.addSearchTerm(
-			booleanQuery, searchContext, "extension", false);
+			searchTermQuery, searchContext, "extension", false);
 		queryHelper.addSearchTerm(
-			booleanQuery, searchContext, "fileEntryTypeId", false);
-		queryHelper.addSearchTerm(booleanQuery, searchContext, "path", false);
+			searchTermQuery, searchContext, "fileEntryTypeId", false);
+		queryHelper.addSearchTerm(
+			searchTermQuery, searchContext, "path", false);
 		queryHelper.addSearchLocalizedTerm(
-			booleanQuery, searchContext, Field.CONTENT, false);
+			searchTermQuery, searchContext, Field.CONTENT, false);
+
+		BooleanQuery entryClassQuery = new BooleanQueryImpl();
+
+		try {
+			entryClassQuery.add(
+				new TermQueryImpl(
+					Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName()),
+				BooleanClauseOccur.MUST);
+			entryClassQuery.add(searchTermQuery, BooleanClauseOccur.MUST);
+
+			booleanQuery.add(entryClassQuery, BooleanClauseOccur.SHOULD);
+		}
+		catch (ParseException parseException) {
+			throw new SystemException(parseException);
+		}
 	}
 
 	@Reference
