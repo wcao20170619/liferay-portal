@@ -14,9 +14,15 @@
 
 package com.liferay.message.boards.internal.search.spi.model.query.contributor;
 
+import com.liferay.message.boards.model.MBMessage;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.ParseException;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.search.query.QueryHelper;
 import com.liferay.portal.search.spi.model.query.contributor.KeywordQueryContributor;
 import com.liferay.portal.search.spi.model.query.contributor.helper.KeywordQueryContributorHelper;
@@ -43,10 +49,27 @@ public class MBMessageKeywordQueryContributor
 		SearchContext searchContext =
 			keywordQueryContributorHelper.getSearchContext();
 
+		BooleanQuery searchTermQuery = new BooleanQueryImpl();
+
 		queryHelper.addSearchLocalizedTerm(
-			booleanQuery, searchContext, Field.CONTENT, false);
+			searchTermQuery, searchContext, Field.CONTENT, false);
 		queryHelper.addSearchLocalizedTerm(
-			booleanQuery, searchContext, Field.TITLE, false);
+			searchTermQuery, searchContext, Field.TITLE, false);
+
+		BooleanQuery entryClassQuery = new BooleanQueryImpl();
+
+		try {
+			entryClassQuery.add(
+				new TermQueryImpl(
+					Field.ENTRY_CLASS_NAME, MBMessage.class.getName()),
+				BooleanClauseOccur.MUST);
+			entryClassQuery.add(searchTermQuery, BooleanClauseOccur.MUST);
+
+			booleanQuery.add(entryClassQuery, BooleanClauseOccur.SHOULD);
+		}
+		catch (ParseException parseException) {
+			throw new SystemException(parseException);
+		}
 	}
 
 	@Reference
