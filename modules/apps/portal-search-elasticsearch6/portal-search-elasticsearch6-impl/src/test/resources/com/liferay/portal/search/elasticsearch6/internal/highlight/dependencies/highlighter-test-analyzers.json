@@ -1,0 +1,129 @@
+{
+	"mappings": {
+		"LiferayDocumentType": {
+			"properties": {
+				"test_en_US": {
+					"analyzer": "english",
+					"search_analyzer": "test_analyzer_en",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				},
+				"test_es_ES": {
+					"analyzer": "spanish",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				},
+				"test_ja_JP": {
+					"analyzer": "kuromoji",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				},
+				"test_no_stopword_en_US": {
+					"analyzer": "test_no_stopword_analyzer_en",
+					"search_analyzer": "test_stopword_analyzer_en",
+					"search_quote_analyzer": "test_no_stopword_analyzer_en",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				},
+				"test_search_synonyms": {
+					"analyzer": "custom_analyzer_en",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				},
+				"test_stopword_en_US": {
+					"analyzer": "english",
+					"search_analyzer": "test_stopword_analyzer_en",
+					"store": true,
+					"term_vector": "with_positions_offsets",
+					"type": "text"
+				}
+			}
+		}
+	},
+	"settings": {
+		"analysis": {
+			"analyzer": {
+				"custom_analyzer_en": {
+					"filter": [
+						"english_possessive_stemmer",
+						"english_stop",
+						"english_stemmer",
+						"filter_synonym_en",
+						"lowercase"
+					],
+					"tokenizer": "standard"
+				},
+				"test_analyzer_en": {
+					"filter": [
+						"english_stemmer",
+						"english_possessive_stemmer",
+						"lowercase",
+						"filter_synonym_en",
+						"english_stop"
+					],
+					"tokenizer": "standard"
+				},
+				"test_no_stopword_analyzer_en": {
+					"filter": [
+						"lowercase"
+					],
+					"tokenizer": "standard",
+					"type": "custom"
+				},
+				"test_stopword_analyzer_en": {
+					"filter": [
+						"english_possessive_stemmer",
+						"lowercase",
+						"filter_stopword_synonym_en",
+						"english_stop",
+						"english_stemmer"
+					],
+					"tokenizer": "standard"
+				}
+			},
+			"filter": {
+				"autocomplete_filter": {
+					"max_gram": 20,
+					"min_gram": 1,
+					"type": "edge_ngram"
+				},
+				"english_keywords": {
+					"keywords": [],
+					"type": "keyword_marker"
+				},
+				"english_possessive_stemmer": {
+					"language": "possessive_english",
+					"type": "stemmer"
+				},
+				"english_stemmer": {
+					"language": "english",
+					"type": "stemmer"
+				},
+				"english_stop": {
+					"stopwords": "_english_",
+					"type": "stop"
+				},
+				"filter_stopword_synonym_en": {
+					"lenient": true,
+					"synonyms": [
+						"thing with words, phrase",
+						"for you, letter"
+					],
+					"type": "synonym_graph"
+				},
+				"filter_synonym_en": {
+					"lenient": true,
+					"synonyms": [
+						"article, journal"
+					],
+					"type": "synonym_graph"
+				}
+			}
+		}
+	}
+}
