@@ -61,6 +61,20 @@ public class FieldValuesAssert {
 			message, expected, _filterOnKey(_toMap(document), predicate));
 	}
 
+	public static void assertFieldValues(
+		String message, List<Document> documents, Predicate<String> predicate,
+		Map<?, ?> expected) {
+
+		if (documents.size() == 1) {
+			AssertUtils.assertEquals(
+				message, expected,
+				_filterOnKey(_toMap(documents.get(0)), predicate));
+		}
+		else {
+			AssertUtils.assertEquals(message, expected, documents);
+		}
+	}
+
 	private static Map<String, String> _filterOnKey(
 		Map<String, String> stringsMap, Predicate<String> predicate) {
 

@@ -39,23 +39,52 @@ public class AssertUtils {
 
 		String actual = _toString(actualJSONObject);
 
-		Assert.assertEquals(message, _toString(expectedJSONObject), actual);
+		Assert.assertEquals(
+			_getMessage(message, actual), _toString(expectedJSONObject),
+			actual);
 	}
 
 	public static void assertEquals(
 		String message, List<?> expectedList, List<?> actualList) {
 
+		String actual = actualList.toString();
+
 		Assert.assertEquals(
-			message, expectedList.toString(), actualList.toString());
+			_getMessage(message, actual), expectedList.toString(), actual);
+	}
+
+	public static void assertEquals(
+		String message, Map<?, ?> expectedMap, List<?> actualList) {
+
+		String actual = actualList.toString();
+
+		Assert.assertEquals(
+			_getMessage(message, actual), _toMapString(expectedMap), actual);
 	}
 
 	public static void assertEquals(
 		String message, Map<?, ?> expectedMap, Map<?, ?> actualMap) {
 
-		String actual = _toString(actualMap);
+		String actual = _toMapString(actualMap);
 
 		Assert.assertEquals(
-			message + "->" + actual, _toString(expectedMap), actual);
+			_getMessage(message, actual), _toMapString(expectedMap), actual);
+	}
+
+	private static String _getMessage(String message, Object object) {
+		return message + "->" + object;
+	}
+
+	private static String _toMapString(Map<?, ?> map) {
+		List<String> list = new ArrayList<>(map.size());
+
+		for (Map.Entry<?, ?> entry : map.entrySet()) {
+			list.add(entry.toString());
+		}
+
+		Collections.sort(list);
+
+		return list.toString();
 	}
 
 	private static String _toString(JSONArray jsonArray) {
@@ -81,18 +110,6 @@ public class AssertUtils {
 
 		return StringPool.OPEN_CURLY_BRACE + StringUtil.merge(list, ",") +
 			StringPool.CLOSE_CURLY_BRACE;
-	}
-
-	private static String _toString(Map<?, ?> map) {
-		List<String> list = new ArrayList<>(map.size());
-
-		for (Map.Entry<?, ?> entry : map.entrySet()) {
-			list.add(entry.toString());
-		}
-
-		Collections.sort(list);
-
-		return list.toString();
 	}
 
 	private static String _toString(Object object) {
