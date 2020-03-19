@@ -16,6 +16,7 @@ package com.liferay.portal.search.test.util;
 
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.List;
 
@@ -36,6 +37,19 @@ public class HitsAssert {
 		Assert.assertEquals(hits.toString(), 1, documents.size());
 
 		return documents.get(0);
+	}
+
+	public static Document assertOnlyOne(Hits hits, String message) {
+		List<Document> documents = hits.toList();
+
+		Assert.assertEquals(
+			_getMessage(hits.toString(), message), 1, documents.size());
+
+		return documents.get(0);
+	}
+
+	private static String _getMessage(String hitsToString, String message) {
+		return StringBundler.concat(message, "->", hitsToString);
 	}
 
 }
