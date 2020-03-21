@@ -97,12 +97,20 @@ public class CompanyIndexFactory
 
 		executeIndexContributorsBeforeRemove(indexName);
 
+		if (_log.isInfoEnabled()) {
+			_log.info("Index " + indexName + " will be deleted.");
+		}
+
 		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
 			indicesAdminClient.prepareDelete(indexName);
 
 		ActionResponse actionResponse = deleteIndexRequestBuilder.get();
 
 		LogUtil.logActionResponse(_log, actionResponse);
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Index " + indexName + " was deleted.");
+		}
 	}
 
 	@Override
@@ -157,6 +165,10 @@ public class CompanyIndexFactory
 	protected void createIndex(
 		String indexName, IndicesAdminClient indicesAdminClient) {
 
+		if (_log.isInfoEnabled()) {
+			_log.info("Index " + indexName + " will be created.");
+		}
+
 		CreateIndexRequestBuilder createIndexRequestBuilder =
 			indicesAdminClient.prepareCreate(indexName);
 
@@ -176,6 +188,10 @@ public class CompanyIndexFactory
 		updateLiferayDocumentType(indexName, liferayDocumentTypeFactory);
 
 		executeIndexContributorsAfterCreate(indexName);
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Index " + indexName + " was created.");
+		}
 	}
 
 	protected void executeIndexContributorAfterCreate(
@@ -271,14 +287,8 @@ public class CompanyIndexFactory
 	protected void loadIndexSettingsContributors(
 		final Settings.Builder builder) {
 
-		IndexSettingsHelper indexSettingsHelper = new IndexSettingsHelper() {
-
-			@Override
-			public void put(String setting, String value) {
-				builder.put(setting, value);
-			}
-
-		};
+		IndexSettingsHelper indexSettingsHelper =
+			(setting, value) -> builder.put(setting, value);
 
 		for (IndexSettingsContributor indexSettingsContributor :
 				_indexSettingsContributors) {
