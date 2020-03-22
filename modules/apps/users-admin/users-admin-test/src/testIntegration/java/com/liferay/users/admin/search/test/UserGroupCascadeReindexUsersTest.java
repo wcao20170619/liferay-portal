@@ -46,7 +46,7 @@ import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.DocumentsAssert;
-import com.liferay.portal.search.test.util.IdempotentRetryAssert;
+import com.liferay.portal.search.test.util.SearchRetryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -58,7 +58,6 @@ import com.liferay.users.admin.test.util.search.UserSearchFixture;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -167,7 +166,7 @@ public class UserGroupCascadeReindexUsersTest {
 
 		_userLocalService.addUserGroupUsers(userGroupId, users);
 
-		doAssert(
+		_searchRetryFixture.assertSearch(
 			() -> {
 				SearchResponse searchResponse = searchUsersInUserGroup(
 					userGroup);
@@ -185,7 +184,7 @@ public class UserGroupCascadeReindexUsersTest {
 				group.getGroupId(), userGroup);
 		}
 
-		doAssert(
+		_searchRetryFixture.assertSearch(
 			() -> {
 				SearchResponse searchResponse = searchUsersInGroup(
 					groups.get(0));
@@ -231,10 +230,6 @@ public class UserGroupCascadeReindexUsersTest {
 		);
 	}
 
-	protected void doAssert(Runnable runnable) throws Exception {
-		IdempotentRetryAssert.retryAssert(10, TimeUnit.SECONDS, runnable);
-	}
-
 	protected void doTraverseWithActionableDynamicQuery(
 			List<User> users, PerformActionMethod<User> performActionMethod)
 		throws Exception {
@@ -274,8 +269,8 @@ public class UserGroupCascadeReindexUsersTest {
 
 	protected SearchRequestBuilder getSearchRequestBuilder(long companyId) {
 		return _searchRequestBuilderFactory.builder(
-		).withSearchContext(
-			searchContext -> searchContext.setCompanyId(companyId)
+		).companyId(
+			companyId
 		);
 	}
 
@@ -426,6 +421,8 @@ public class UserGroupCascadeReindexUsersTest {
 	@DeleteAfterTestRun
 	private List<Organization> _organizations;
 
+	private final SearchRetryFixture _searchRetryFixture =
+		new SearchRetryFixture.Builder().build();
 	private int _userCount;
 
 	@DeleteAfterTestRun

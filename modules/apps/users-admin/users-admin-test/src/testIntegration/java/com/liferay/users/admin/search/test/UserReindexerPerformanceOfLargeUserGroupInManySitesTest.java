@@ -41,7 +41,7 @@ import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.DocumentsAssert;
-import com.liferay.portal.search.test.util.IdempotentRetryAssert;
+import com.liferay.portal.search.test.util.SearchRetryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -58,7 +58,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -281,28 +280,27 @@ public class UserReindexerPerformanceOfLargeUserGroupInManySitesTest {
 		measure(
 			timesMap, "reindex after addGroupUserGroup", () -> reindex(users));
 
-		Runnable runnable = () -> {
-			SearchResponse searchResponse = searchUsersInAllGroups(
-				groups, getTestUserId());
+		SearchRetryFixture.builder(
+		).attempts(
+			_getRetryAttempts()
+		).build(
+		).assertSearch(
+			() -> {
+				SearchResponse searchResponse = searchUsersInAllGroups(
+					groups, getTestUserId());
 
-			DocumentsAssert.assertValuesIgnoreRelevance(
-				searchResponse.getRequestString(),
-				searchResponse.getDocumentsStream(), Field.USER_ID,
-				_getUserIdsStream(users));
-		};
-
-		if (_waitForAsynchronousResults) {
-			waitForAsynchronousResults(runnable);
-		}
-		else {
-			runnable.run();
-		}
+				DocumentsAssert.assertValuesIgnoreRelevance(
+					searchResponse.getRequestString(),
+					searchResponse.getDocumentsStream(), Field.USER_ID,
+					_getUserIdsStream(users));
+			}
+		);
 	}
 
 	protected SearchRequestBuilder getSearchRequestBuilder(long companyId) {
 		return _searchRequestBuilderFactory.builder(
-		).withSearchContext(
-			searchContext -> searchContext.setCompanyId(companyId)
+		).companyId(
+			companyId
 		);
 	}
 
@@ -367,18 +365,6 @@ public class UserReindexerPerformanceOfLargeUserGroupInManySitesTest {
 			).build());
 	}
 
-	protected void waitForAsynchronousResults(Runnable runnable) {
-		try {
-			IdempotentRetryAssert.retryAssert(30, TimeUnit.SECONDS, runnable);
-		}
-		catch (RuntimeException runtimeException) {
-			throw runtimeException;
-		}
-		catch (Exception exception) {
-			throw new RuntimeException(exception);
-		}
-	}
-
 	protected GroupSearchFixture groupSearchFixture;
 	protected OrganizationSearchFixture organizationSearchFixture;
 	protected UserGroupSearchFixture userGroupSearchFixture;
@@ -394,6 +380,14 @@ public class UserReindexerPerformanceOfLargeUserGroupInManySitesTest {
 		Map<String, String> map) {
 
 		return new HashMapDictionary<>(new HashMap<String, Object>(map));
+	}
+
+	private Integer _getRetryAttempts() {
+		if (_waitForAsynchronousResults) {
+			return 0;
+		}
+
+		return 1;
 	}
 
 	private String _getTimesReport(Map<String, String> map) {
