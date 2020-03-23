@@ -175,16 +175,6 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			return new HitsImpl();
 		}
-		finally {
-			if (_log.isInfoEnabled()) {
-				stopWatch.stop();
-
-				_log.info(
-					StringBundler.concat(
-						"Searching ", query, " took ", stopWatch.getTime(),
-						" ms"));
-			}
-		}
 	}
 
 	@Override

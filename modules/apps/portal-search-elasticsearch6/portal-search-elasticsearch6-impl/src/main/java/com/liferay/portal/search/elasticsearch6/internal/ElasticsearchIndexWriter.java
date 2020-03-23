@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch6.internal;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -38,10 +39,14 @@ import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.DeleteByQueryDocumentRequest;
+import com.liferay.portal.search.engine.adapter.document.DeleteByQueryDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
+import com.liferay.portal.search.engine.adapter.document.DeleteDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
+import com.liferay.portal.search.engine.adapter.document.IndexDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 import com.liferay.portal.search.engine.adapter.index.RefreshIndexRequest;
+import com.liferay.portal.search.engine.adapter.index.RefreshIndexResponse;
 import com.liferay.portal.search.index.IndexNameBuilder;
 
 import java.util.Collection;
@@ -78,7 +83,16 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 		}
 
 		try {
-			_searchEngineAdapter.execute(indexDocumentRequest);
+			IndexDocumentResponse indexDocumentResponse =
+				_searchEngineAdapter.execute(indexDocumentRequest);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"addDocument (status ",
+						indexDocumentResponse.getStatus(), ", uid ",
+						indexDocumentResponse.getUid(), ") ", document));
+			}
 		}
 		catch (RuntimeException runtimeException) {
 			if (_logExceptionsOnly) {
@@ -117,6 +131,14 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 		BulkDocumentResponse bulkDocumentResponse =
 			_searchEngineAdapter.execute(bulkDocumentRequest);
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"addDocuments (errors ", bulkDocumentResponse.hasErrors(),
+					", took ", bulkDocumentResponse.getTook(), ") ",
+					documents));
+		}
+
 		if (bulkDocumentResponse.hasErrors()) {
 			if (_logExceptionsOnly) {
 				_log.error("Bulk add failed");
@@ -136,7 +158,19 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 			indexName);
 
 		try {
-			_searchEngineAdapter.execute(refreshIndexRequest);
+			RefreshIndexResponse refreshIndexResponse =
+				_searchEngineAdapter.execute(refreshIndexRequest);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"commit (failedShards ",
+						refreshIndexResponse.getFailedShards(),
+						", successfulShards ",
+						refreshIndexResponse.getSuccessfulShards(),
+						", totalShards ", refreshIndexResponse.getTotalShards(),
+						") ", indexName));
+			}
 		}
 		catch (RuntimeException runtimeException) {
 			if (_logExceptionsOnly) {
@@ -163,7 +197,15 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 		deleteDocumentRequest.setType(DocumentTypes.LIFERAY);
 
 		try {
-			_searchEngineAdapter.execute(deleteDocumentRequest);
+			DeleteDocumentResponse deleteDocumentResponse =
+				_searchEngineAdapter.execute(deleteDocumentRequest);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"deleteDocument (status ",
+						deleteDocumentResponse.getStatus(), ") ", uid));
+			}
 		}
 		catch (RuntimeException runtimeException) {
 			if (_logExceptionsOnly) {
@@ -201,6 +243,14 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 
 		BulkDocumentResponse bulkDocumentResponse =
 			_searchEngineAdapter.execute(bulkDocumentRequest);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"deleteDocuments (errors ",
+					bulkDocumentResponse.hasErrors(), ", took ",
+					bulkDocumentResponse.getTook(), ") ", uids));
+		}
 
 		if (bulkDocumentResponse.hasErrors()) {
 			if (_logExceptionsOnly) {
@@ -241,7 +291,17 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 				deleteByQueryDocumentRequest.setRefresh(true);
 			}
 
-			_searchEngineAdapter.execute(deleteByQueryDocumentRequest);
+			DeleteByQueryDocumentResponse deleteByQueryDocumentResponse =
+				_searchEngineAdapter.execute(deleteByQueryDocumentRequest);
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"deleteEntityDocuments (deleted ",
+						deleteByQueryDocumentResponse.getDeleted(), ", took ",
+						deleteByQueryDocumentResponse.getTook(), ") ",
+						className));
+			}
 		}
 		catch (ParseException parseException) {
 			throw new SystemException(parseException);
@@ -359,6 +419,13 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 		BulkDocumentResponse bulkDocumentResponse =
 			_searchEngineAdapter.execute(bulkDocumentRequest);
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"updateDocument (errors ", bulkDocumentResponse.hasErrors(),
+					", took ", bulkDocumentResponse.getTook(), ") ", document));
+		}
+
 		if (bulkDocumentResponse.hasErrors()) {
 			if (_logExceptionsOnly) {
 				_log.error("Update failed");
@@ -403,6 +470,14 @@ public class ElasticsearchIndexWriter extends BaseIndexWriter {
 
 		BulkDocumentResponse bulkDocumentResponse =
 			_searchEngineAdapter.execute(bulkDocumentRequest);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"updateDocuments (errors ",
+					bulkDocumentResponse.hasErrors(), ", took ",
+					bulkDocumentResponse.getTook(), ") ", documents));
+		}
 
 		if (bulkDocumentResponse.hasErrors()) {
 			if (_logExceptionsOnly) {
