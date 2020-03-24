@@ -25,6 +25,8 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTask" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskConstants" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil" %><%@
+page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatus" %><%@
+page import="com.liferay.portal.kernel.backgroundtask.BackgroundTaskStatusRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplay" %><%@
 page import="com.liferay.portal.kernel.backgroundtask.display.BackgroundTaskDisplayFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.model.CompanyConstants" %><%@
@@ -100,17 +102,22 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 					<%
 					BackgroundTask backgroundTask = null;
 					BackgroundTaskDisplay backgroundTaskDisplay = null;
+					BackgroundTaskStatus backgroundTaskStatus = null;
 
 					if (!reindexPortalBackgroundTasks.isEmpty()) {
 						backgroundTask = reindexPortalBackgroundTasks.get(0);
 
 						backgroundTaskDisplay = BackgroundTaskDisplayFactoryUtil.getBackgroundTaskDisplay(backgroundTask);
+
+						if (backgroundTask != null) {
+							backgroundTaskStatus = BackgroundTaskStatusRegistryUtil.getBackgroundTaskStatus(backgroundTask.getBackgroundTaskId());
+						}
 					}
 					%>
 
 					<div class="float-right index-action-wrapper" data-type="portal">
 						<c:choose>
-							<c:when test="<%= (backgroundTaskDisplay == null) || !backgroundTaskDisplay.hasPercentage() %>">
+							<c:when test="<%= (backgroundTaskDisplay == null) || ((backgroundTaskStatus != null) && !backgroundTaskDisplay.hasPercentage()) %>">
 
 								<%
 								long timeout = ParamUtil.getLong(request, "timeout");
@@ -150,7 +157,7 @@ portletURL.setParameter("mvcRenderCommandName", "/search_admin/view");
 
 						<div class="float-right index-action-wrapper" data-type="<%= indexer.getClassName() %>">
 							<c:choose>
-								<c:when test="<%= (backgroundTaskDisplay == null) || !backgroundTaskDisplay.hasPercentage() %>">
+								<c:when test="<%= (backgroundTaskDisplay == null) || (backgroundTask == null) || !backgroundTaskDisplay.hasPercentage() %>">
 									<aui:button cssClass="save-server-button" data-classname="<%= indexer.getClassName() %>" data-cmd="reindex" disabled="<%= !indexer.isIndexerEnabled() %>" value="execute" />
 								</c:when>
 								<c:otherwise>
