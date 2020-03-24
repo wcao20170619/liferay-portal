@@ -29,13 +29,6 @@ import com.liferay.journal.test.util.search.JournalArticleTitle;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistry;
-import com.liferay.portal.kernel.search.QueryConfig;
-import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
-import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -46,9 +39,13 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.facet.category.CategoryFacetFactory;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
+import com.liferay.portal.search.searcher.SearchResponse;
+import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.DocumentsAssert;
+import com.liferay.portal.search.test.util.SearchRetryFixture;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.users.admin.test.util.search.GroupBlueprint;
@@ -60,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -83,11 +81,10 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 			SynchronousDestinationTestRule.INSTANCE);
 
 	@Before
+	@SuppressWarnings("deprecation")
 	public void setUp() throws Exception {
-		WorkflowThreadLocal.setEnabled(false);
-
 		_journalArticleSearchFixture = new JournalArticleSearchFixture(
-			journalArticleLocalService);
+			_journalArticleLocalService);
 
 		_journalArticleSearchFixture.setUp();
 
@@ -102,11 +99,8 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 
 		_assetCategories = new ArrayList<>();
 		_assetVocabularies = new ArrayList<>();
-
-		Group group = _userSearchFixture.addGroup();
-
 		_user = _userSearchFixture.addUser(
-			RandomTestUtil.randomString(), group);
+			RandomTestUtil.randomString(), _userSearchFixture.addGroup());
 	}
 
 	@After
@@ -123,15 +117,10 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 
 		Locale locale = LocaleUtil.CHINA;
 
-		Group group = _userSearchFixture.addGroup(
-			new GroupBlueprint() {
-				{
-					setDefaultLocale(locale);
-				}
-			});
+		Group group = _addGroup(locale);
 
-		AssetCategory assetCategory = addCategory(
-			group, addVocabulary(group), categoryTitleString, locale);
+		AssetCategory assetCategory = _addCategory(
+			group, _addVocabulary(group), categoryTitleString, locale);
 
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
@@ -158,7 +147,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 				}
 			});
 
-		assertSearch(categoryTitleString, assetCategory, locale, group);
+		_assertSearch(categoryTitleString, assetCategory, locale, group);
 	}
 
 	@Test
@@ -169,15 +158,10 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 
 		Locale locale = LocaleUtil.US;
 
-		Group group = _userSearchFixture.addGroup(
-			new GroupBlueprint() {
-				{
-					setDefaultLocale(locale);
-				}
-			});
+		Group group = _addGroup(locale);
 
-		AssetCategory assetCategory = addCategory(
-			group, addVocabulary(group), categoryTitleString, locale);
+		AssetCategory assetCategory = _addCategory(
+			group, _addVocabulary(group), categoryTitleString, locale);
 
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
@@ -204,7 +188,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 				}
 			});
 
-		assertSearch(categoryTitleString, assetCategory, locale, group);
+		_assertSearch(categoryTitleString, assetCategory, locale, group);
 	}
 
 	@Test
@@ -218,17 +202,12 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		Locale locale = LocaleUtil.JAPAN;
 		String vocabularyTitleString = "ボキャブラリ";
 
-		Group group = _userSearchFixture.addGroup(
-			new GroupBlueprint() {
-				{
-					setDefaultLocale(locale);
-				}
-			});
+		Group group = _addGroup(locale);
 
-		AssetVocabulary assetVocabulary = addVocabulary(
+		AssetVocabulary assetVocabulary = _addVocabulary(
 			group, vocabularyTitleString);
 
-		AssetCategory assetCategory1 = addCategory(
+		AssetCategory assetCategory1 = _addCategory(
 			group, assetVocabulary, categoryTitleString1, locale);
 
 		_journalArticleSearchFixture.addArticle(
@@ -256,7 +235,7 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 				}
 			});
 
-		AssetCategory assetCategory2 = addCategory(
+		AssetCategory assetCategory2 = _addCategory(
 			group, assetVocabulary, categoryTitleString2, locale);
 
 		_journalArticleSearchFixture.addArticle(
@@ -284,11 +263,11 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 				}
 			});
 
-		assertSearch(categoryTitleString1, assetCategory1, locale, group);
-		assertSearch(categoryTitleString2, assetCategory2, locale, group);
+		_assertSearch(categoryTitleString1, assetCategory1, locale, group);
+		_assertSearch(categoryTitleString2, assetCategory2, locale, group);
 	}
 
-	protected AssetCategory addCategory(
+	private AssetCategory _addCategory(
 			Group group, AssetVocabulary assetVocabulary, String title,
 			Locale locale)
 		throws Exception {
@@ -306,11 +285,12 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		LocaleThreadLocal.setSiteDefaultLocale(locale);
 
 		try {
-			AssetCategory assetCategory = assetCategoryLocalService.addCategory(
-				_user.getUserId(), group.getGroupId(),
-				AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, titleMap,
-				new HashMap<>(), assetVocabulary.getVocabularyId(),
-				new String[0], serviceContext);
+			AssetCategory assetCategory =
+				_assetCategoryLocalService.addCategory(
+					_user.getUserId(), group.getGroupId(),
+					AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, titleMap,
+					new HashMap<>(), assetVocabulary.getVocabularyId(),
+					new String[0], serviceContext);
 
 			_assetCategories.add(assetCategory);
 
@@ -321,20 +301,30 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		}
 	}
 
-	protected AssetVocabulary addVocabulary(Group group) throws Exception {
-		return addVocabulary(group, RandomTestUtil.randomString());
+	@SuppressWarnings("deprecation")
+	private Group _addGroup(Locale locale) throws Exception {
+		return _userSearchFixture.addGroup(
+			new GroupBlueprint() {
+				{
+					setDefaultLocale(locale);
+				}
+			});
 	}
 
-	protected AssetVocabulary addVocabulary(Group group, String title)
+	private AssetVocabulary _addVocabulary(Group group) throws Exception {
+		return _addVocabulary(group, RandomTestUtil.randomString());
+	}
+
+	private AssetVocabulary _addVocabulary(Group group, String title)
 		throws Exception {
 
 		AssetVocabulary assetVocabulary =
-			assetVocabularyLocalService.addDefaultVocabulary(
+			_assetVocabularyLocalService.addDefaultVocabulary(
 				group.getGroupId());
 
 		assetVocabulary.setTitle(title);
 
-		assetVocabulary = assetVocabularyLocalService.updateAssetVocabulary(
+		assetVocabulary = _assetVocabularyLocalService.updateAssetVocabulary(
 			assetVocabulary);
 
 		_assetVocabularies.add(assetVocabulary);
@@ -342,92 +332,101 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 		return assetVocabulary;
 	}
 
-	protected void assertFacetedSearcher(
-			String categoryTitleString, AssetCategory assetCategory,
-			Locale locale, Group group)
+	private void _assertFacetedSearcher(
+			AssetCategory assetCategory, String categoryTitleString,
+			Group group, Locale locale)
 		throws Exception {
 
-		FacetedSearcher facetedSearcher =
-			facetedSearcherManager.createFacetedSearcher();
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilderFactory.builder(
+			).fields(
+				Field.ASSET_CATEGORY_IDS
+			).queryString(
+				categoryTitleString
+			).withSearchContext(
+				searchContext -> {
+					searchContext.setCompanyId(group.getCompanyId());
+					searchContext.setGroupIds(new long[] {group.getGroupId()});
+					searchContext.setLocale(locale);
+				}
+			).build());
 
-		SearchContext searchContext = getSearchContext(
-			categoryTitleString, locale, group);
+		Stream<Document> stream = searchResponse.getDocumentsStream();
 
-		Hits hits = facetedSearcher.search(searchContext);
-
-		assertHits(assetCategory, hits, searchContext);
+		_searchRetryFixture.assertSearch(
+			() -> _assertHits(
+				assetCategory, searchResponse.getRequestString(), stream));
 	}
 
-	protected void assertHits(
-		AssetCategory assetCategory, Hits hits, SearchContext searchContext) {
+	private void _assertHits(
+		AssetCategory assetCategory, String queryString,
+		Stream<Document> stream) {
+
+		List<String> queryStringList = Arrays.asList(
+			String.valueOf(assetCategory.getCategoryId()));
+
+		Stream<String> queryStringStream = queryStringList.stream();
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
-			(String)searchContext.getAttribute("queryString"), hits.getDocs(),
-			Field.ASSET_CATEGORY_IDS,
-			Arrays.asList(String.valueOf(assetCategory.getCategoryId())));
+			queryString, stream, Field.ASSET_CATEGORY_IDS, queryStringStream);
 	}
 
-	protected void assertJournalArticleIndexer(
+	private void _assertJournalArticleIndexer(
+			AssetCategory assetCategory, String categoryTitleString,
+			Group group, Locale locale)
+		throws Exception {
+
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilderFactory.builder(
+			).fields(
+				Field.ASSET_CATEGORY_IDS
+			).modelIndexerClasses(
+				JournalArticle.class
+			).queryString(
+				categoryTitleString
+			).withSearchContext(
+				searchContext -> {
+					searchContext.setCompanyId(group.getCompanyId());
+					searchContext.setGroupIds(new long[] {group.getGroupId()});
+					searchContext.setLocale(locale);
+				}
+			).build());
+
+		Stream<Document> stream = searchResponse.getDocumentsStream();
+
+		_searchRetryFixture.assertSearch(
+			() -> _assertHits(
+				assetCategory, searchResponse.getRequestString(), stream));
+	}
+
+	private void _assertSearch(
 			String categoryTitleString, AssetCategory assetCategory,
 			Locale locale, Group group)
 		throws Exception {
 
-		Indexer<JournalArticle> indexer = indexerRegistry.getIndexer(
-			JournalArticle.class);
-
-		SearchContext searchContext = getSearchContext(
-			categoryTitleString, locale, group);
-
-		QueryConfig queryConfig = searchContext.getQueryConfig();
-
-		queryConfig.addSelectedFieldNames(Field.ASSET_CATEGORY_IDS);
-
-		Hits hits = indexer.search(searchContext);
-
-		assertHits(assetCategory, hits, searchContext);
-	}
-
-	protected void assertSearch(
-			String categoryTitleString, AssetCategory assetCategory,
-			Locale locale, Group group)
-		throws Exception {
-
-		assertJournalArticleIndexer(
-			categoryTitleString, assetCategory, locale, group);
-		assertFacetedSearcher(
-			categoryTitleString, assetCategory, locale, group);
-	}
-
-	protected SearchContext getSearchContext(
-			String keywords, Locale locale, Group group)
-		throws Exception {
-
-		SearchContext searchContext = _userSearchFixture.getSearchContext(
-			keywords);
-
-		searchContext.setGroupIds(new long[] {group.getGroupId()});
-		searchContext.setLocale(locale);
-
-		return searchContext;
+		_assertJournalArticleIndexer(
+			assetCategory, categoryTitleString, group, locale);
+		_assertFacetedSearcher(
+			assetCategory, categoryTitleString, group, locale);
 	}
 
 	@Inject
-	protected static AssetCategoryLocalService assetCategoryLocalService;
+	private static AssetCategoryLocalService _assetCategoryLocalService;
 
 	@Inject
-	protected static AssetVocabularyLocalService assetVocabularyLocalService;
+	private static AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	@Inject
-	protected static CategoryFacetFactory categoryFacetFactory;
+	private static CategoryFacetFactory _categoryFacetFactory;
 
 	@Inject
-	protected static FacetedSearcherManager facetedSearcherManager;
+	private static JournalArticleLocalService _journalArticleLocalService;
 
 	@Inject
-	protected static IndexerRegistry indexerRegistry;
+	private static Searcher _searcher;
 
 	@Inject
-	protected static JournalArticleLocalService journalArticleLocalService;
+	private static SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 	@DeleteAfterTestRun
 	private List<AssetCategory> _assetCategories;
@@ -442,6 +441,8 @@ public class AssetCategoryTitlesMultiLanguageSearchTest {
 	private List<JournalArticle> _journalArticles;
 
 	private JournalArticleSearchFixture _journalArticleSearchFixture;
+	private final SearchRetryFixture _searchRetryFixture =
+		new SearchRetryFixture.Builder().build();
 	private User _user;
 
 	@DeleteAfterTestRun
