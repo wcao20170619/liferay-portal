@@ -16,11 +16,15 @@ package com.liferay.bookmarks.search.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.bookmarks.model.BookmarksFolder;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistry;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -30,8 +34,9 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.test.util.FieldValuesAssert;
+import com.liferay.portal.search.test.util.HitsAssert;
 import com.liferay.portal.search.test.util.IndexedFieldsFixture;
-import com.liferay.portal.search.test.util.IndexerFixture;
+import com.liferay.portal.search.test.util.SearchContextTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -68,8 +73,6 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 
 		setUpBookmarksFolderFixture();
 
-		setUpBookmarksFolderIndexerFixture();
-
 		setUpIndexedFieldsFixture();
 	}
 
@@ -80,8 +83,7 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 
 		String searchTerm = bookmarksFolder.getUserName();
 
-		Document document = bookmarksFolderIndexerFixture.searchOnlyOne(
-			searchTerm);
+		Document document = _searchOnlyOne(searchTerm);
 
 		indexedFieldsFixture.postProcessDocument(document);
 
@@ -95,16 +97,12 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 		_bookmarksFolders = bookmarksFixture.getBookmarksFolders();
 	}
 
-	protected void setUpBookmarksFolderIndexerFixture() {
-		bookmarksFolderIndexerFixture = new IndexerFixture<>(
-			BookmarksFolder.class);
-	}
-
 	protected void setUpIndexedFieldsFixture() {
 		indexedFieldsFixture = new IndexedFieldsFixture(
 			resourcePermissionLocalService, searchEngineHelper);
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void setUpUserSearchFixture() throws Exception {
 		userSearchFixture = new UserSearchFixture();
 
@@ -121,7 +119,6 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 	}
 
 	protected BookmarksFixture bookmarksFixture;
-	protected IndexerFixture<BookmarksFolder> bookmarksFolderIndexerFixture;
 	protected IndexedFieldsFixture indexedFieldsFixture;
 
 	@Inject
@@ -208,6 +205,21 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 			map);
 	}
 
+	private Document _searchOnlyOne(String keywords) {
+		try {
+			SearchContext searchContext =
+				SearchContextTestUtil.getSearchContext(
+					_user.getUserId(), null, keywords, null, null);
+
+			Hits hits = _indexer.search(searchContext);
+
+			return HitsAssert.assertOnlyOne(hits);
+		}
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
+		}
+	}
+
 	@DeleteAfterTestRun
 	private List<BookmarksFolder> _bookmarksFolders;
 
@@ -215,6 +227,11 @@ public class BookmarksFolderIndexerIndexedFieldsTest {
 
 	@DeleteAfterTestRun
 	private List<Group> _groups;
+
+	@Inject(
+		filter = "indexer.class.name=com.liferay.bookmarks.model.BookmarksFolder"
+	)
+	private Indexer<BookmarksFolder> _indexer;
 
 	private User _user;
 
