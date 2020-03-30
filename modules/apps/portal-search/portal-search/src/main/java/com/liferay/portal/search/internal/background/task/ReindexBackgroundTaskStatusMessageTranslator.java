@@ -109,7 +109,8 @@ public class ReindexBackgroundTaskStatusMessageTranslator
 				companyCount, companyIds.length, 0, 1, count, total);
 		}
 
-		backgroundTaskStatus.setAttribute("percentage", percentage);
+		backgroundTaskStatus.setAttribute(
+			"percentage", String.valueOf(percentage));
 	}
 
 	protected int getPercentage(
