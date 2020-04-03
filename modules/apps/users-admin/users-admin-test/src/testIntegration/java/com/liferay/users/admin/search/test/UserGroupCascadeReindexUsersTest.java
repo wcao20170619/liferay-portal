@@ -46,6 +46,7 @@ import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.DocumentsAssert;
+import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -57,6 +58,7 @@ import com.liferay.users.admin.test.util.search.UserSearchFixture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,12 +167,16 @@ public class UserGroupCascadeReindexUsersTest {
 
 		_userLocalService.addUserGroupUsers(userGroupId, users);
 
-		SearchResponse searchResponse = searchUsersInUserGroup(userGroup);
+		doAssert(
+			() -> {
+				SearchResponse searchResponse = searchUsersInUserGroup(
+					userGroup);
 
-		DocumentsAssert.assertValues(
-			searchResponse.getRequestString(),
-			searchResponse.getDocumentsStream(), "userGroupIds",
-			_repeat(String.valueOf(userGroupId), users.size()));
+				DocumentsAssert.assertValues(
+					searchResponse.getRequestString(),
+					searchResponse.getDocumentsStream(), "userGroupIds",
+					_repeat(String.valueOf(userGroupId), users.size()));
+			});
 
 		List<Group> groups = addGroups(_groupCount);
 
@@ -179,12 +185,16 @@ public class UserGroupCascadeReindexUsersTest {
 				group.getGroupId(), userGroup);
 		}
 
-		searchResponse = searchUsersInGroup(groups.get(0));
+		doAssert(
+			() -> {
+				SearchResponse searchResponse = searchUsersInGroup(
+					groups.get(0));
 
-		DocumentsAssert.assertValues(
-			searchResponse.getRequestString(),
-			searchResponse.getDocumentsStream(), Field.GROUP_ID,
-			_repeat(_getAllGroupIdsString(groups), users.size()));
+				DocumentsAssert.assertValues(
+					searchResponse.getRequestString(),
+					searchResponse.getDocumentsStream(), Field.GROUP_ID,
+					_repeat(_getAllGroupIdsString(groups), users.size()));
+			});
 	}
 
 	protected Group addGroup() {
@@ -219,6 +229,10 @@ public class UserGroupCascadeReindexUsersTest {
 		).collect(
 			Collectors.toList()
 		);
+	}
+
+	protected void doAssert(Runnable runnable) throws Exception {
+		IdempotentRetryAssert.retryAssert(10, TimeUnit.SECONDS, runnable);
 	}
 
 	protected void doTraverseWithActionableDynamicQuery(
