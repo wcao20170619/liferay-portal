@@ -142,8 +142,8 @@ public class FileInstallDeployTest {
 			_updateConfiguration(
 				() -> {
 					String content = StringBundler.concat(
-						_TEST_KEY, StringPool.EQUAL, "${", systemTestPropertyKey,
-						"}");
+						_TEST_KEY, StringPool.EQUAL, "${",
+						systemTestPropertyKey, "}");
 
 					Files.write(path, content.getBytes());
 				});
