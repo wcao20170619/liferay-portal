@@ -77,7 +77,9 @@ public abstract class BeanPortletMethodWrapper implements BeanPortletMethod {
 	}
 
 	@Override
-	public Object invoke(Object... arguments) throws ReflectiveOperationException {
+	public Object invoke(Object... arguments)
+		throws ReflectiveOperationException {
+
 		return _beanPortletMethod.invoke(arguments);
 	}
 

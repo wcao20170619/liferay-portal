@@ -22,6 +22,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface BeanFilterMethod {
 
-	public Object invoke(Object... arguments) throws ReflectiveOperationException;
+	public Object invoke(Object... arguments)
+		throws ReflectiveOperationException;
 
 }
