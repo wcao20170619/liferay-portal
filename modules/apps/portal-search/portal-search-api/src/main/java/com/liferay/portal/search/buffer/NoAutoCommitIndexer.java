@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.buffer;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Hits;
@@ -263,6 +265,13 @@ public class NoAutoCommitIndexer<T> implements Indexer<T> {
 	@Override
 	public void setIndexerEnabled(boolean indexerEnabled) {
 		_indexer.setIndexerEnabled(indexerEnabled);
+	}
+
+	@Override
+	public String toString() {
+		return StringBundler.concat(
+			super.toString(), StringPool.OPEN_BRACKET, _indexer,
+			StringPool.CLOSE_BRACKET);
 	}
 
 	@Override

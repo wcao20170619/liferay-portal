@@ -17,6 +17,7 @@ package com.liferay.portal.search.buffer;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.messaging.proxy.ProxyModeThreadLocal;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.search.Indexer;
@@ -121,7 +122,7 @@ public class IndexerRequest {
 		sb.append(", forceSync=");
 		sb.append(_forceSync);
 		sb.append(", indexer=");
-		sb.append(ClassUtil.getClassName(_indexer));
+		sb.append(_toString(_indexer));
 		sb.append(", method=");
 		sb.append(_method);
 		sb.append(", modelClassName=");
@@ -131,6 +132,12 @@ public class IndexerRequest {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	private static String _toString(Indexer indexer) {
+		return StringBundler.concat(
+			ClassUtil.getClassName(indexer), StringPool.OPEN_PARENTHESIS,
+			indexer, StringPool.CLOSE_PARENTHESIS);
 	}
 
 	private final ClassedModel _classedModel;

@@ -90,6 +90,11 @@ public class IndexerRequestBuffer {
 		return _indexerRequests.size();
 	}
 
+	@Override
+	public String toString() {
+		return String.valueOf(_indexerRequests.keySet());
+	}
+
 	private static final ThreadLocal<List<IndexerRequestBuffer>>
 		_indexerRequestBuffersThreadLocal = new CentralizedThreadLocal<>(
 			IndexerRequestBuffer.class + "._indexerRequestBuffersThreadLocal",
