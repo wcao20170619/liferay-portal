@@ -43,6 +43,13 @@ public class BaseModelRetrieverImpl implements BaseModelRetriever {
 		PersistedModel persistModel = _getPersistedModel(className, classPK);
 
 		if (persistModel == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Persisted model was null for ", className, " with PK ",
+						classPK));
+			}
+
 			return Optional.empty();
 		}
 
@@ -54,7 +61,7 @@ public class BaseModelRetrieverImpl implements BaseModelRetriever {
 			return Optional.empty();
 		}
 
-		return Optional.ofNullable((BaseModel<?>)persistModel);
+		return Optional.of((BaseModel<?>)persistModel);
 	}
 
 	private PersistedModel _getPersistedModel(String className, long classPK) {
@@ -87,6 +94,13 @@ public class BaseModelRetrieverImpl implements BaseModelRetriever {
 			throw new SystemException(
 				"No persisted model local service found for class " +
 					className);
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Persisted model local service found for class ", className,
+					": ", persistedModelLocalService));
 		}
 
 		return persistedModelLocalService;

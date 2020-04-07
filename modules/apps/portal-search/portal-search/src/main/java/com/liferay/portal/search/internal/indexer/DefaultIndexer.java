@@ -17,6 +17,8 @@ package com.liferay.portal.search.internal.indexer;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Document;
@@ -247,6 +249,13 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 
 	@Override
 	public void reindex(String className, long classPK) throws SearchException {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Reindex ", className, " with classPK ", classPK, " using ",
+					_indexerWriter));
+		}
+
 		_indexerWriter.reindex(classPK);
 	}
 
@@ -290,6 +299,13 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 	}
 
 	@Override
+	public String toString() {
+		return StringBundler.concat(
+			super.toString(), StringPool.LESS_THAN, getClassName(),
+			StringPool.GREATER_THAN);
+	}
+
+	@Override
 	public void unregisterIndexerPostProcessor(
 		IndexerPostProcessor indexerPostProcessor) {
 
@@ -304,6 +320,8 @@ public class DefaultIndexer<T extends BaseModel<?>> implements Indexer<T> {
 
 		return LocaleUtil.getMostRelevantLocale();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(DefaultIndexer.class);
 
 	private final IndexerDocumentBuilder _indexerDocumentBuilder;
 	private final IndexerPermissionPostFilter _indexerPermissionPostFilter;

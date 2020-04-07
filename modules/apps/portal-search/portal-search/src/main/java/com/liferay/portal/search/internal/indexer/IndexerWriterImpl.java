@@ -118,6 +118,13 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 				PropsKeys.INDEXER_ENABLED,
 				new Filter(_modelSearchSettings.getClassName()));
 
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						indexerEnabled, " indexer.enabled for ",
+						_modelSearchSettings.getClassName()));
+			}
+
 			_indexerEnabled = GetterUtil.getBoolean(indexerEnabled, true);
 
 			return _indexerEnabled;
@@ -127,6 +134,19 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 			_indexStatusManager.isIndexReadOnly(
 				_modelSearchSettings.getClassName()) ||
 			!_indexerEnabled) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"STOP! _indexStatusManager=", _indexStatusManager,
+						" | _indexStatusManager.isIndexReadOnly()=",
+						_indexStatusManager.isIndexReadOnly(),
+						" | _indexStatusManager.isIndexReadOnly(",
+						_modelSearchSettings.getClassName(), ")=",
+						_indexStatusManager.isIndexReadOnly(
+							_modelSearchSettings.getClassName()),
+						" | _indexerEnabled=", _indexerEnabled));
+			}
 
 			return false;
 		}
@@ -152,16 +172,49 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 	@Override
 	public void reindex(long classPK) {
 		if (!isEnabled()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Not enabled, skipping: Reindex ",
+						_modelSearchSettings.getClassName(), " with classPK ",
+						classPK));
+			}
+
 			return;
 		}
 
 		if (classPK <= 0) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Undefined key, skipping: Reindex ",
+						_modelSearchSettings.getClassName(), " with classPK ",
+						classPK));
+			}
+
 			return;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Reindex ", _modelSearchSettings.getClassName(),
+					" with classPK ", classPK));
 		}
 
 		Optional<BaseModel<?>> baseModelOptional =
 			_baseModelRetriever.fetchBaseModel(
 				_modelSearchSettings.getClassName(), classPK);
+
+		if (!baseModelOptional.isPresent()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"NOT reindexing, fetch could NOT find ",
+						_modelSearchSettings.getClassName(), " with classPK ",
+						classPK));
+			}
+		}
 
 		baseModelOptional.ifPresent(baseModel -> reindex((T)baseModel));
 	}
@@ -182,6 +235,14 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 			for (String id : ids) {
 				long companyId = GetterUtil.getLong(id);
 
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Reindexing all ",
+							_modelSearchSettings.getClassName(),
+							" for company: ", companyId));
+				}
+
 				CompanyThreadLocal.setCompanyId(companyId);
 
 				BatchIndexingActionable batchIndexingActionable =
@@ -197,17 +258,23 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 
 				try {
 					batchIndexingActionable.performActions();
+
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							StringBundler.concat(
+								"Reindexed all ",
+								_modelSearchSettings.getClassName(),
+								" for company: ", companyId));
+					}
 				}
 				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
-						StringBundler sb = new StringBundler(4);
-
-						sb.append("Error reindexing all ");
-						sb.append(_modelSearchSettings.getClassName());
-						sb.append(" for company: ");
-						sb.append(companyId);
-
-						_log.warn(sb.toString(), exception);
+						_log.warn(
+							StringBundler.concat(
+								"Error reindexing all ",
+								_modelSearchSettings.getClassName(),
+								" for company: ", companyId),
+							exception);
 					}
 				}
 			}
@@ -219,15 +286,36 @@ public class IndexerWriterImpl<T extends BaseModel<?>>
 
 	@Override
 	public void reindex(T baseModel) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("About to reindex model " + baseModel);
+		}
+
 		if (!isEnabled()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"IndexerWriterImpl is NOT enabled, will NOT reindex " +
+						baseModel);
+			}
+
 			return;
 		}
 
 		if (baseModel == null) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("null model, will NOT reindex");
+			}
+
 			return;
 		}
 
 		IndexerWriterMode indexerWriterMode = _getIndexerWriterMode(baseModel);
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Reindex model ", baseModel, " in IndexerWriterMode ",
+					indexerWriterMode));
+		}
 
 		if ((indexerWriterMode == IndexerWriterMode.UPDATE) ||
 			(indexerWriterMode == IndexerWriterMode.PARTIAL_UPDATE)) {
