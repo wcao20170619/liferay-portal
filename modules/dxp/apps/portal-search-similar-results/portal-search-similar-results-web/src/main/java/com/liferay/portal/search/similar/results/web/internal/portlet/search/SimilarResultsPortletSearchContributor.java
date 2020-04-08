@@ -100,7 +100,7 @@ public class SimilarResultsPortletSearchContributor
 			similarResultsPortletPreferences.getMaxItemDisplay()
 		);
 
-		setUIDRenderRequestAttribute(criteria, portletSharedSearchSettings);
+		_setUIDRenderRequestAttribute(criteria, portletSharedSearchSettings);
 	}
 
 	protected void filterByEntryClassName(
@@ -195,16 +195,6 @@ public class SimilarResultsPortletSearchContributor
 			portletSharedSearchSettings.getRenderRequest());
 	}
 
-	protected void setUIDRenderRequestAttribute(
-		Criteria criteria,
-		PortletSharedSearchSettings portletSharedSearchSettings) {
-
-		RenderRequest renderRequest =
-			portletSharedSearchSettings.getRenderRequest();
-
-		renderRequest.setAttribute(Field.UID, criteria.getUID());
-	}
-
 	@Reference
 	protected SimilarResultsContributorsRegistry
 		similarResultsContributorsRegistry;
@@ -247,6 +237,16 @@ public class SimilarResultsPortletSearchContributor
 			similarResultsPortletPreferences.getMinWordLength());
 		moreLikeThisQuery.setTermBoost(
 			similarResultsPortletPreferences.getTermBoost());
+	}
+
+	private void _setUIDRenderRequestAttribute(
+		Criteria criteria,
+		PortletSharedSearchSettings portletSharedSearchSettings) {
+
+		RenderRequest renderRequest =
+			portletSharedSearchSettings.getRenderRequest();
+
+		renderRequest.setAttribute(Field.UID, criteria.getUID());
 	}
 
 	@Reference
