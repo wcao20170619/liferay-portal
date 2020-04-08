@@ -14,6 +14,9 @@
 
 package com.liferay.portal.search.internal.buffer;
 
+import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.search.buffer.IndexerRequest;
 import com.liferay.portal.search.buffer.IndexerRequestBuffer;
 import com.liferay.portal.search.buffer.IndexerRequestBufferOverflowHandler;
@@ -40,6 +43,13 @@ public class IndexerRequestBufferHandler {
 		throws Exception {
 
 		if (!BufferOverflowThreadLocal.isOverflowMode()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					StringBundler.concat(
+						"Adding indexer request ", indexerRequest,
+						" to indexer request buffer ", indexerRequestBuffer));
+			}
+
 			int maxBufferSize = _indexerRegistryConfiguration.maxBufferSize();
 
 			indexerRequestBuffer.add(
@@ -47,9 +57,16 @@ public class IndexerRequestBufferHandler {
 				maxBufferSize);
 		}
 		else {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Overflow! Execute now: " + indexerRequest);
+			}
+
 			indexerRequest.execute();
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		IndexerRequestBufferHandler.class);
 
 	private final IndexerRegistryConfiguration _indexerRegistryConfiguration;
 	private final IndexerRequestBufferOverflowHandler

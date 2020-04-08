@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.internal.buffer;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -53,6 +54,13 @@ public class BufferedIndexerInvocationHandler implements InvocationHandler {
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 		throws Throwable {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				StringBundler.concat(
+					"Buffered indexer invoked. proxy(", proxy.getClass(),
+					") method(", method, ") args(", args, ")"));
+		}
 
 		Annotation annotation = method.getAnnotation(Bufferable.class);
 

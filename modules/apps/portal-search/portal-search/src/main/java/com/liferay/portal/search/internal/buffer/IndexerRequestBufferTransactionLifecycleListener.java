@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.internal.buffer;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionLifecycleListener;
 import com.liferay.portal.kernel.transaction.TransactionStatus;
@@ -39,6 +41,12 @@ public class IndexerRequestBufferTransactionLifecycleListener
 			IndexerRequestBuffer.remove();
 
 		if ((indexerRequestBuffer != null) && !indexerRequestBuffer.isEmpty()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Transaction committed. Consume indexer request buffer " +
+						indexerRequestBuffer);
+			}
+
 			IndexerRequestBufferExecutor indexerRequestBufferExecutor =
 				_indexerRequestBufferExecutorWatcher.
 					getIndexerRequestBufferExecutor();
@@ -67,6 +75,9 @@ public class IndexerRequestBufferTransactionLifecycleListener
 			indexerRequestBuffer.clear();
 		}
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		IndexerRequestBufferTransactionLifecycleListener.class);
 
 	@Reference
 	private IndexerRequestBufferExecutorWatcher

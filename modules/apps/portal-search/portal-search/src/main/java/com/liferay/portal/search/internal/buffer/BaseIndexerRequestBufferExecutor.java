@@ -32,6 +32,11 @@ public abstract class BaseIndexerRequestBufferExecutor
 
 	@Override
 	public void execute(IndexerRequestBuffer indexerRequestBuffer) {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Execute indexer request buffer:" + indexerRequestBuffer);
+		}
+
 		execute(indexerRequestBuffer, indexerRequestBuffer.size());
 	}
 
