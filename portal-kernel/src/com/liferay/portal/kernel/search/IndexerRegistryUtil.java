@@ -58,6 +58,6 @@ public class IndexerRegistryUtil {
 	private static volatile IndexerRegistry _indexerRegistry =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			IndexerRegistry.class, IndexerRegistryUtil.class,
-			"_indexerRegistry", false);
+			"_indexerRegistry", false, true);
 
 }
