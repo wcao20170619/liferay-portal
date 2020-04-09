@@ -17,9 +17,12 @@ package com.liferay.portal.search.internal.batch;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.search.batch.BatchIndexingActionable;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -36,6 +39,10 @@ public class DynamicQueryBatchIndexingActionableAdapter
 
 	@Override
 	public void addDocuments(Document... documents) {
+		if (_log.isDebugEnabled()) {
+			_log.debug("addDocuments " + Arrays.asList(documents));
+		}
+
 		try {
 			_indexableActionableDynamicQuery.addDocuments(documents);
 		}
@@ -46,6 +53,10 @@ public class DynamicQueryBatchIndexingActionableAdapter
 
 	@Override
 	public void performActions() {
+		if (_log.isDebugEnabled()) {
+			_log.debug("performActions");
+		}
+
 		try {
 			_indexableActionableDynamicQuery.performActions();
 		}
@@ -79,6 +90,9 @@ public class DynamicQueryBatchIndexingActionableAdapter
 	public void setSearchEngineId(String searchEngineId) {
 		_indexableActionableDynamicQuery.setSearchEngineId(searchEngineId);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DynamicQueryBatchIndexingActionableAdapter.class);
 
 	private final IndexableActionableDynamicQuery
 		_indexableActionableDynamicQuery;
