@@ -15,13 +15,17 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
@@ -35,11 +39,14 @@ import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
 import com.liferay.portal.search.tuning.rankings.web.internal.searcher.RankingSearchRequestHelper;
+import com.liferay.portal.search.web.interpreter.SearchResultInterpreter;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 /**
  * @author André de Oliveira
@@ -55,8 +62,9 @@ public class RankingGetVisibleResultsBuilder {
 		RankingIndexReader rankingIndexReader,
 		RankingSearchRequestHelper rankingSearchRequestHelper,
 		ResourceActions resourceActions, ResourceRequest resourceRequest,
-		Queries queries, Searcher searcher,
-		SearchRequestBuilderFactory searchRequestBuilderFactory) {
+		ResourceResponse resourceResponse, Queries queries, Searcher searcher,
+		SearchRequestBuilderFactory searchRequestBuilderFactory,
+		SearchResultInterpreter searchResultInterpreter) {
 
 		_complexQueryPartBuilderFactory = complexQueryPartBuilderFactory;
 		_dlAppLocalService = dlAppLocalService;
@@ -66,9 +74,11 @@ public class RankingGetVisibleResultsBuilder {
 		_rankingSearchRequestHelper = rankingSearchRequestHelper;
 		_resourceActions = resourceActions;
 		_resourceRequest = resourceRequest;
+		_resourceResponse = resourceResponse;
 		_queries = queries;
 		_searcher = searcher;
 		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+		_searchResultInterpreter = searchResultInterpreter;
 	}
 
 	public JSONObject build() {
@@ -175,6 +185,26 @@ public class RankingGetVisibleResultsBuilder {
 		return _searcher.search(searchRequest);
 	}
 
+	protected String getViewURL(Document document) {
+		try {
+			PortletURL portletURL = _searchResultInterpreter.getAssetURLView(
+				document,
+				PortalUtil.getLiferayPortletResponse(_resourceResponse),
+				_resourceRequest.getWindowState());
+
+			if (portletURL != null) {
+				return portletURL.toString();
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to get PortletURL", exception);
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
 	protected JSONObject translate(Document document, Ranking ranking) {
 		RankingJSONBuilder rankingJSONBuilder = new RankingJSONBuilder(
 			_dlAppLocalService, _fastDateFormatFactory, _resourceActions,
@@ -184,8 +214,13 @@ public class RankingGetVisibleResultsBuilder {
 			document
 		).pinned(
 			ranking.isPinned(document.getString(Field.UID))
+		).viewURL(
+			getViewURL(document)
 		).build();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RankingGetVisibleResultsBuilder.class);
 
 	private long _companyId;
 	private final ComplexQueryPartBuilderFactory
@@ -201,8 +236,10 @@ public class RankingGetVisibleResultsBuilder {
 	private final RankingSearchRequestHelper _rankingSearchRequestHelper;
 	private final ResourceActions _resourceActions;
 	private final ResourceRequest _resourceRequest;
+	private final ResourceResponse _resourceResponse;
 	private final Searcher _searcher;
 	private final SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	private final SearchResultInterpreter _searchResultInterpreter;
 	private int _size;
 
 }

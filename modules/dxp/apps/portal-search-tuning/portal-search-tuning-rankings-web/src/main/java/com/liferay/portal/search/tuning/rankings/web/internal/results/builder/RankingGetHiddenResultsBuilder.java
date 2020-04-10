@@ -15,14 +15,18 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.document.GetDocumentRequest;
@@ -33,12 +37,15 @@ import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.Ranking;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
+import com.liferay.portal.search.web.interpreter.SearchResultInterpreter;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 /**
  * @author André de Oliveira
@@ -51,8 +58,9 @@ public class RankingGetHiddenResultsBuilder {
 		FastDateFormatFactory fastDateFormatFactory, Queries queries,
 		RankingIndexName rankingIndexName,
 		RankingIndexReader rankingIndexReader, ResourceActions resourceActions,
-		ResourceRequest resourceRequest,
-		SearchEngineAdapter searchEngineAdapter) {
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+		SearchEngineAdapter searchEngineAdapter,
+		SearchResultInterpreter searchResultInterpreter) {
 
 		_dlAppLocalService = dlAppLocalService;
 		_fastDateFormatFactory = fastDateFormatFactory;
@@ -61,7 +69,9 @@ public class RankingGetHiddenResultsBuilder {
 		_rankingIndexReader = rankingIndexReader;
 		_resourceActions = resourceActions;
 		_resourceRequest = resourceRequest;
+		_resourceResponse = resourceResponse;
 		_searchEngineAdapter = searchEngineAdapter;
+		_searchResultInterpreter = searchResultInterpreter;
 	}
 
 	public JSONObject build() {
@@ -151,6 +161,26 @@ public class RankingGetHiddenResultsBuilder {
 		return idsQuery;
 	}
 
+	protected String getViewURL(Document document) {
+		try {
+			PortletURL portletURL = _searchResultInterpreter.getAssetURLView(
+				document,
+				PortalUtil.getLiferayPortletResponse(_resourceResponse),
+				_resourceRequest.getWindowState());
+
+			if (portletURL != null) {
+				return portletURL.toString();
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to get PortletURL", exception);
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
 	protected List<String> paginateIds(List<String> ids) {
 		int end = _from + _size;
 
@@ -166,10 +196,15 @@ public class RankingGetHiddenResultsBuilder {
 			document
 		).hidden(
 			true
+		).viewURL(
+			getViewURL(document)
 		).build();
 	}
 
 	protected static final String LIFERAY_DOCUMENT_TYPE = "LiferayDocumentType";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RankingGetHiddenResultsBuilder.class);
 
 	private final DLAppLocalService _dlAppLocalService;
 	private final FastDateFormatFactory _fastDateFormatFactory;
@@ -180,7 +215,9 @@ public class RankingGetHiddenResultsBuilder {
 	private final RankingIndexReader _rankingIndexReader;
 	private final ResourceActions _resourceActions;
 	private final ResourceRequest _resourceRequest;
+	private final ResourceResponse _resourceResponse;
 	private final SearchEngineAdapter _searchEngineAdapter;
+	private final SearchResultInterpreter _searchResultInterpreter;
 	private int _size;
 
 }

@@ -15,12 +15,16 @@
 package com.liferay.portal.search.tuning.rankings.web.internal.results.builder;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.util.FastDateFormatFactory;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.Queries;
@@ -28,10 +32,13 @@ import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
+import com.liferay.portal.search.web.interpreter.SearchResultInterpreter;
 
 import java.util.stream.Stream;
 
+import javax.portlet.PortletURL;
 import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 /**
  * @author André de Oliveira
@@ -44,8 +51,9 @@ public class RankingGetSearchResultsBuilder {
 		DLAppLocalService dlAppLocalService,
 		FastDateFormatFactory fastDateFormatFactory, Queries queries,
 		ResourceActions resourceActions, ResourceRequest resourceRequest,
-		Searcher searcher,
-		SearchRequestBuilderFactory searchRequestBuilderFactory) {
+		ResourceResponse resourceResponse, Searcher searcher,
+		SearchRequestBuilderFactory searchRequestBuilderFactory,
+		SearchResultInterpreter searchResultInterpreter) {
 
 		_complexQueryPartBuilderFactory = complexQueryPartBuilderFactory;
 		_dlAppLocalService = dlAppLocalService;
@@ -53,8 +61,10 @@ public class RankingGetSearchResultsBuilder {
 		_queries = queries;
 		_resourceActions = resourceActions;
 		_resourceRequest = resourceRequest;
+		_resourceResponse = resourceResponse;
 		_searcher = searcher;
 		_searchRequestBuilderFactory = searchRequestBuilderFactory;
+		_searchResultInterpreter = searchResultInterpreter;
 	}
 
 	public JSONObject build() {
@@ -127,6 +137,26 @@ public class RankingGetSearchResultsBuilder {
 		return stream.map(this::translate);
 	}
 
+	protected String getViewURL(Document document) {
+		try {
+			PortletURL portletURL = _searchResultInterpreter.getAssetURLView(
+				document,
+				PortalUtil.getLiferayPortletResponse(_resourceResponse),
+				_resourceRequest.getWindowState());
+
+			if (portletURL != null) {
+				return portletURL.toString();
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to get PortletURL", exception);
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
 	protected JSONObject translate(Document document) {
 		RankingJSONBuilder rankingJSONBuilder = new RankingJSONBuilder(
 			_dlAppLocalService, _fastDateFormatFactory, _resourceActions,
@@ -134,8 +164,13 @@ public class RankingGetSearchResultsBuilder {
 
 		return rankingJSONBuilder.document(
 			document
+		).viewURL(
+			getViewURL(document)
 		).build();
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		RankingGetSearchResultsBuilder.class);
 
 	private long _companyId;
 	private final ComplexQueryPartBuilderFactory
@@ -147,8 +182,10 @@ public class RankingGetSearchResultsBuilder {
 	private String _queryString;
 	private final ResourceActions _resourceActions;
 	private final ResourceRequest _resourceRequest;
+	private final ResourceResponse _resourceResponse;
 	private final Searcher _searcher;
 	private final SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	private final SearchResultInterpreter _searchResultInterpreter;
 	private int _size;
 
 }

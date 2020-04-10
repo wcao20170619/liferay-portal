@@ -92,6 +92,8 @@ public class RankingJSONBuilder {
 			"title", _getTitle()
 		).put(
 			"type", _getType()
+		).put(
+			"viewURL", _getViewURL()
 		);
 	}
 
@@ -110,6 +112,12 @@ public class RankingJSONBuilder {
 	public RankingJSONBuilder pinned(boolean pinned) {
 		_pinned = pinned;
 
+		return this;
+	}
+
+	public RankingJSONBuilder viewURL(String viewURL) {
+		_viewURL = viewURL;
+		
 		return this;
 	}
 
@@ -299,6 +307,10 @@ public class RankingJSONBuilder {
 		return _resourceActions.getModelResource(_locale, entryClassName);
 	}
 
+	private String _getViewURL() {
+		return _viewURL;
+	}
+
 	private boolean _isFileEntry() {
 		String entryClassName = _document.getString(Field.ENTRY_CLASS_NAME);
 
@@ -323,5 +335,6 @@ public class RankingJSONBuilder {
 	private boolean _pinned;
 	private final ResourceActions _resourceActions;
 	private final ThemeDisplay _themeDisplay;
+	private String _viewURL;
 
 }
