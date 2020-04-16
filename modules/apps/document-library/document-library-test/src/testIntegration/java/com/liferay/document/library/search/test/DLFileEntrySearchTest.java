@@ -47,7 +47,13 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
@@ -63,6 +69,7 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.test.util.BaseSearchTestCase;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -70,7 +77,10 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.liferay.portlet.documentlibrary.util.DLSearcher;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -227,6 +237,42 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 
 		assertBaseModelsCount(
 			initialBaseModelsSearchCount + 1, "Enterprise", searchContext);
+	}
+
+	@Override
+	protected Hits searchBaseModelsCount(
+		Class<?> clazz, long groupId, SearchContext searchContext)
+		throws Exception {
+
+		searchContext.setGroupIds(new long[] {groupId});
+
+		Set<String> entryClassNames = new HashSet<>();
+
+		for (RelatedEntryIndexer relatedEntryIndexer :
+			RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+			relatedEntryIndexer.updateFullQuery(searchContext);
+		}
+
+		for(String entryClassName : searchContext.getFullQueryEntryClassNames()) {
+			entryClassNames.add(entryClassName);
+		}
+
+		for(String entryClassName : DLSearcher.CLASS_NAMES) {
+			entryClassNames.add(entryClassName);
+		}
+
+		String[] entryClassNamesArray = entryClassNames.toArray(new String[0]);
+
+		searchContext.setEntryClassNames(entryClassNamesArray);
+
+		searchContext.setAttribute(
+			SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH, Boolean.TRUE);
+
+		FacetedSearcher facetedSearcher =
+			facetedSearcherManager.createFacetedSearcher();
+
+		return facetedSearcher.search(searchContext);
 	}
 
 	protected BaseModel<?> addBaseModel(
@@ -537,6 +583,9 @@ public class DLFileEntrySearchTest extends BaseSearchTestCase {
 
 	@Inject
 	private static DDMIndexer _ddmIndexer;
+
+	@Inject
+	protected static FacetedSearcherManager facetedSearcherManager;
 
 	private DDMStructure _ddmStructure;
 
