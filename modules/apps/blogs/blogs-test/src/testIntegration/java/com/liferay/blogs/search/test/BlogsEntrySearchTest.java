@@ -19,12 +19,23 @@ import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.blogs.test.util.BlogsTestUtil;
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.test.util.BaseSearchTestCase;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -143,6 +154,42 @@ public class BlogsEntrySearchTest extends BaseSearchTestCase {
 	}
 
 	@Override
+	protected Hits searchBaseModelsCount(
+			Class<?> clazz, long groupId, SearchContext searchContext)
+		throws Exception {
+
+		searchContext.setGroupIds(new long[] {groupId});
+
+		Set<String> entryClassNames = new HashSet<>();
+
+		for (RelatedEntryIndexer relatedEntryIndexer :
+				RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+			relatedEntryIndexer.updateFullQuery(searchContext);
+		}
+
+		for (String entryClassName :
+				searchContext.getFullQueryEntryClassNames()) {
+
+			entryClassNames.add(entryClassName);
+		}
+
+		entryClassNames.add(BlogsEntry.class.getName());
+
+		String[] entryClassNamesArray = entryClassNames.toArray(new String[0]);
+
+		searchContext.setEntryClassNames(entryClassNamesArray);
+
+		searchContext.setAttribute(
+			SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH, Boolean.TRUE);
+
+		FacetedSearcher facetedSearcher =
+			facetedSearcherManager.createFacetedSearcher();
+
+		return facetedSearcher.search(searchContext);
+	}
+
+	@Override
 	protected BaseModel<?> updateBaseModel(
 			BaseModel<?> baseModel, String keywords,
 			ServiceContext serviceContext)
@@ -154,5 +201,8 @@ public class BlogsEntrySearchTest extends BaseSearchTestCase {
 			serviceContext.getUserId(), entry.getEntryId(), keywords,
 			entry.getContent(), serviceContext);
 	}
+
+	@Inject
+	protected static FacetedSearcherManager facetedSearcherManager;
 
 }
