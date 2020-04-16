@@ -34,13 +34,15 @@ import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.search.SearchResultUtil;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -53,10 +55,12 @@ import com.liferay.trash.TrashHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,10 +77,12 @@ public class BlogEntriesDisplayContext {
 	public BlogEntriesDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
+		FacetedSearcherManager facetedSearcherManager,
 		TrashHelper trashHelper) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
+		_facetedSearcherManager = facetedSearcherManager;
 		_trashHelper = trashHelper;
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
@@ -241,9 +247,6 @@ public class BlogEntriesDisplayContext {
 			}
 		}
 		else {
-			Indexer<BlogsEntry> indexer = IndexerRegistryUtil.getIndexer(
-				BlogsEntry.class);
-
 			SearchContext searchContext = SearchContextFactory.getInstance(
 				_httpServletRequest);
 
@@ -284,7 +287,33 @@ public class BlogEntriesDisplayContext {
 
 			searchContext.setSorts(sort);
 
-			Hits hits = indexer.search(searchContext);
+			Set<String> entryClassNames = new HashSet<>();
+
+			for (RelatedEntryIndexer relatedEntryIndexer :
+					RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+				relatedEntryIndexer.updateFullQuery(searchContext);
+			}
+
+			for (String entryClassName :
+					searchContext.getFullQueryEntryClassNames()) {
+
+				entryClassNames.add(entryClassName);
+			}
+
+			entryClassNames.add(BlogsEntry.class.getName());
+
+			String[] entryClassNamesArray = entryClassNames.toArray(
+				new String[0]);
+
+			searchContext.setEntryClassNames(entryClassNamesArray);
+
+			FacetedSearcher facetedSearcher =
+				_facetedSearcherManager.createFacetedSearcher();
+
+			Hits hits;
+
+			hits = facetedSearcher.search(searchContext);
 
 			searchContainer.setTotal(hits.getLength());
 
@@ -329,6 +358,7 @@ public class BlogEntriesDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		BlogEntriesDisplayContext.class);
 
+	private final FacetedSearcherManager _facetedSearcherManager;
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;

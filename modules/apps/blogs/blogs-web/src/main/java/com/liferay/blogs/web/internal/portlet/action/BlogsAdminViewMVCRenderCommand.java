@@ -18,6 +18,7 @@ import com.liferay.blogs.constants.BlogsPortletKeys;
 import com.liferay.blogs.web.internal.constants.BlogsWebKeys;
 import com.liferay.blogs.web.internal.display.context.BlogEntriesDisplayContext;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.trash.TrashHelper;
 
@@ -49,10 +50,13 @@ public class BlogsAdminViewMVCRenderCommand implements MVCRenderCommand {
 			new BlogEntriesDisplayContext(
 				_portal.getLiferayPortletRequest(renderRequest),
 				_portal.getLiferayPortletResponse(renderResponse),
-				_trashHelper));
+				_facetedSearcherManager, _trashHelper));
 
 		return "/blogs_admin/view.jsp";
 	}
+
+	@Reference
+	private FacetedSearcherManager _facetedSearcherManager;
 
 	@Reference
 	private Portal _portal;
