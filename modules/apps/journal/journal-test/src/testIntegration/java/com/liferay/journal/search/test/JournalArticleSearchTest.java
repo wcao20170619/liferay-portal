@@ -48,8 +48,12 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexSearcherHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.PortalPreferencesLocalServiceUtil;
@@ -65,14 +69,18 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.test.util.BaseSearchTestCase;
+import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -549,6 +557,42 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	}
 
 	@Override
+	protected Hits searchBaseModelsCount(
+			Class<?> clazz, long groupId, SearchContext searchContext)
+		throws Exception {
+
+		searchContext.setGroupIds(new long[] {groupId});
+
+		Set<String> entryClassNames = new HashSet<>();
+
+		for (RelatedEntryIndexer relatedEntryIndexer :
+				RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+			relatedEntryIndexer.updateFullQuery(searchContext);
+		}
+
+		for (String entryClassName :
+				searchContext.getFullQueryEntryClassNames()) {
+
+			entryClassNames.add(entryClassName);
+		}
+
+		entryClassNames.add(JournalArticle.class.getName());
+
+		String[] entryClassNamesArray = entryClassNames.toArray(new String[0]);
+
+		searchContext.setEntryClassNames(entryClassNamesArray);
+
+		searchContext.setAttribute(
+			SearchContextAttributes.ATTRIBUTE_KEY_EMPTY_SEARCH, Boolean.TRUE);
+
+		FacetedSearcher facetedSearcher =
+			facetedSearcherManager.createFacetedSearcher();
+
+		return facetedSearcher.search(searchContext);
+	}
+
+	@Override
 	protected Hits searchGroupEntries(long groupId, long creatorUserId)
 		throws Exception {
 
@@ -591,6 +635,9 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 			_ddmStructure.getDescriptionMap(), ddmForm, ddmFormLayout,
 			serviceContext);
 	}
+
+	@Inject
+	protected static FacetedSearcherManager facetedSearcherManager;
 
 	protected class JournalArticleSearchTestOrderHelper
 		extends TestOrderHelper {
