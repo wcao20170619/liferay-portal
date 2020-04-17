@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.IndexStatusManagerThreadLocal;
 import com.liferay.portal.search.configuration.IndexStatusManagerConfiguration;
 import com.liferay.portal.search.index.IndexStatusManager;
+import com.liferay.portal.search.internal.configuration.FunctionalTestManagerConfiguration;
 
 import java.util.Collections;
 import java.util.Map;
@@ -35,13 +36,20 @@ import org.osgi.service.component.annotations.Modified;
  * @author Michael C. Han
  */
 @Component(
-	configurationPid = "com.liferay.portal.search.configuration.IndexStatusManagerConfiguration",
+	configurationPid = {
+		"com.liferay.portal.search.configuration.IndexStatusManagerConfiguration",
+		"com.liferay.portal.search.internal.configuration.FunctionalTestManagerConfiguration"
+	},
 	immediate = true, service = IndexStatusManager.class
 )
 public class IndexStatusManagerImpl implements IndexStatusManager {
 
 	@Override
 	public boolean isIndexReadOnly() {
+		if (_suppressIndexReadOnly) {
+			return false;
+		}
+
 		if (IndexStatusManagerThreadLocal.isIndexReadOnly() || _indexReadOnly) {
 			return true;
 		}
@@ -122,6 +130,13 @@ public class IndexStatusManagerImpl implements IndexStatusManager {
 				IndexStatusManagerConfiguration.class, properties);
 
 		_indexReadOnly = indexStatusManagerConfiguration.indexReadOnly();
+
+		FunctionalTestManagerConfiguration functionalTestManagerConfiguration =
+			ConfigurableUtil.createConfigurable(
+				FunctionalTestManagerConfiguration.class, properties);
+
+		_suppressIndexReadOnly =
+			functionalTestManagerConfiguration.suppressIndexReadOnly();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -133,5 +148,6 @@ public class IndexStatusManagerImpl implements IndexStatusManager {
 		new ConcurrentHashMap<>());
 	private boolean _readWriteRequired;
 	private Throwable _requireIndexReadWriteCallStackThrowable;
+	private boolean _suppressIndexReadOnly;
 
 }
