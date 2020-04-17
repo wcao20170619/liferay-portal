@@ -67,8 +67,6 @@ portletURL.setParameter("keywords", keywords);
 	>
 
 		<%
-		Indexer<WikiPage> indexer = IndexerRegistryUtil.getIndexer(WikiPage.class);
-
 		SearchContext searchContext = SearchContextFactory.getInstance(request);
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
@@ -83,7 +81,27 @@ portletURL.setParameter("keywords", keywords);
 		searchContext.setNodeIds(nodeIds);
 		searchContext.setStart(searchContainer.getStart());
 
-		Hits hits = indexer.search(searchContext);
+		HashSet<String> entryClassNames = new HashSet<String>();
+
+		for (RelatedEntryIndexer relatedEntryIndexer :
+			RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+			relatedEntryIndexer.updateFullQuery(searchContext);
+		}
+
+		for (String entryClassName : searchContext.getFullQueryEntryClassNames()) {
+			entryClassNames.add(entryClassName);
+		}
+
+		entryClassNames.add(WikiPage.class.getName());
+
+		String[] entryClassNamesArray = entryClassNames.toArray(new String[0]);
+
+		searchContext.setEntryClassNames(entryClassNamesArray);
+
+		FacetedSearcher facetedSearcher = FacetedSearcherManagerUtil.createFacetedSearcher();
+
+		Hits hits = facetedSearcher.search(searchContext);
 
 		searchContainer.setTotal(hits.getLength());
 		%>

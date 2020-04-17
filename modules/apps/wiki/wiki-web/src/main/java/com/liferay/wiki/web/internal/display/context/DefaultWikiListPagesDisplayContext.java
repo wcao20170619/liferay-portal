@@ -30,12 +30,14 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchResult;
 import com.liferay.portal.kernel.search.SearchResultUtil;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManagerUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.servlet.taglib.ui.DeleteMenuItem;
@@ -75,6 +77,7 @@ import com.liferay.wiki.web.internal.util.WikiPortletUtil;
 import com.liferay.wiki.web.internal.util.WikiWebComponentProvider;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -214,9 +217,6 @@ public class DefaultWikiListPagesDisplayContext
 		List<WikiPage> results = new ArrayList<>();
 
 		if (Validator.isNotNull(keywords)) {
-			Indexer<WikiPage> indexer = IndexerRegistryUtil.getIndexer(
-				WikiPage.class);
-
 			SearchContext searchContext = SearchContextFactory.getInstance(
 				_httpServletRequest);
 
@@ -228,7 +228,31 @@ public class DefaultWikiListPagesDisplayContext
 			searchContext.setNodeIds(new long[] {_wikiNode.getNodeId()});
 			searchContext.setStart(searchContainer.getStart());
 
-			Hits hits = indexer.search(searchContext);
+			HashSet<String> entryClassNames = new HashSet<>();
+
+			for (RelatedEntryIndexer relatedEntryIndexer :
+					RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+				relatedEntryIndexer.updateFullQuery(searchContext);
+			}
+
+			for (String entryClassName :
+					searchContext.getFullQueryEntryClassNames()) {
+
+				entryClassNames.add(entryClassName);
+			}
+
+			entryClassNames.add(WikiPage.class.getName());
+
+			String[] entryClassNamesArray = entryClassNames.toArray(
+				new String[0]);
+
+			searchContext.setEntryClassNames(entryClassNamesArray);
+
+			FacetedSearcher facetedSearcher =
+				FacetedSearcherManagerUtil.createFacetedSearcher();
+
+			Hits hits = facetedSearcher.search(searchContext);
 
 			searchContainer.setTotal(hits.getLength());
 
