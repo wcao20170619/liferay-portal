@@ -19,6 +19,7 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.IndexStatusManagerThreadLocal;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.search.configuration.IndexStatusManagerConfiguration;
 import com.liferay.portal.search.index.IndexStatusManager;
 
@@ -42,6 +43,10 @@ public class IndexStatusManagerImpl implements IndexStatusManager {
 
 	@Override
 	public boolean isIndexReadOnly() {
+		if (_suppressIndexReadOnly) {
+			return false;
+		}
+		
 		if (IndexStatusManagerThreadLocal.isIndexReadOnly() || _indexReadOnly) {
 			return true;
 		}
@@ -122,6 +127,8 @@ public class IndexStatusManagerImpl implements IndexStatusManager {
 				IndexStatusManagerConfiguration.class, properties);
 
 		_indexReadOnly = indexStatusManagerConfiguration.indexReadOnly();
+		
+		_suppressIndexReadOnly = PropsUtil.contains("suppress.index.read.only");
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -133,5 +140,6 @@ public class IndexStatusManagerImpl implements IndexStatusManager {
 		new ConcurrentHashMap<>());
 	private boolean _readWriteRequired;
 	private Throwable _requireIndexReadWriteCallStackThrowable;
+	private boolean _suppressIndexReadOnly;
 
 }
