@@ -57,8 +57,8 @@ public class CompanyIndexFactoryFixture {
 	public CompanyIndexFactory getCompanyIndexFactory() {
 		return new CompanyIndexFactory() {
 			{
-				indexNameBuilder = new TestIndexNameBuilder();
-				jsonFactory = new JSONFactoryImpl();
+				setIndexNameBuilder(new TestIndexNameBuilder());
+				setJsonFactory(new JSONFactoryImpl());
 			}
 		};
 	}

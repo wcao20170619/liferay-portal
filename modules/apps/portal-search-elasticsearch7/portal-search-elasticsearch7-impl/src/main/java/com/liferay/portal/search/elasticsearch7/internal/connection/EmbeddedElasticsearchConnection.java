@@ -74,7 +74,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration",
-	immediate = true, property = "operation.mode=EMBEDDED",
+	enabled = false, property = "operation.mode=EMBEDDED",
 	service = ElasticsearchConnection.class
 )
 public class EmbeddedElasticsearchConnection
@@ -510,26 +510,23 @@ public class EmbeddedElasticsearchConnection
 	protected SettingsBuilder settingsBuilder = new SettingsBuilder(
 		Settings.builder());
 
+	private static void _logRejectedExecution(
+		Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Discarded ", runnable, " on ", threadPoolExecutor));
+		}
+	}
+
 	/**
 	 * Keep this as a static field to avoid the class loading failure during
 	 * Tomcat shutdown.
 	 */
 	private static final RejectedExecutionHandler _REJECTED_EXECUTION_HANDLER =
-		new RejectedExecutionHandler() {
-
-			@Override
-			public void rejectedExecution(
-				Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Discarded ", runnable, " on ",
-							threadPoolExecutor));
-				}
-			}
-
-		};
+		(runnable, threadPoolExecutor) -> _logRejectedExecution(
+			runnable, threadPoolExecutor);
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EmbeddedElasticsearchConnection.class);

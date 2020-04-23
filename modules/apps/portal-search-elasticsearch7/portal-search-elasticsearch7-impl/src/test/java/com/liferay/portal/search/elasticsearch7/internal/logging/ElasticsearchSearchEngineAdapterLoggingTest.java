@@ -15,12 +15,15 @@
 package com.liferay.portal.search.elasticsearch7.internal.logging;
 
 import com.liferay.portal.kernel.search.generic.MatchAllQuery;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ClusterHealthResponseUtil;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.HealthExpectations;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.ElasticsearchEngineAdapterFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search.CountSearchRequestExecutorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search.MultisearchSearchRequestExecutorImpl;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search.SearchSearchRequestExecutorImpl;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
 import com.liferay.portal.search.engine.adapter.search.MultisearchSearchRequest;
@@ -32,6 +35,7 @@ import java.util.logging.Level;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -45,6 +49,8 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS112601);
+
 		_elasticsearchFixture = new ElasticsearchFixture(
 			ElasticsearchSearchEngineAdapterLoggingTest.class.getSimpleName());
 
@@ -130,9 +136,10 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 	public ExpectedLogTestRule expectedLogTestRule = ExpectedLogTestRule.none();
 
 	protected void waitForElasticsearchToStart(
-		ElasticsearchFixture elasticsearchFixture) {
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-		elasticsearchFixture.getClusterHealthResponse(
+		ClusterHealthResponseUtil.getClusterHealthResponse(
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(0);

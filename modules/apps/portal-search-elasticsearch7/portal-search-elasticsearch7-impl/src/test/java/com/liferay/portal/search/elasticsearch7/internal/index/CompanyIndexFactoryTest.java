@@ -15,6 +15,7 @@
 package com.liferay.portal.search.elasticsearch7.internal.index;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -32,17 +33,18 @@ import java.io.IOException;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
+
+import org.hamcrest.CoreMatchers;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -171,7 +173,7 @@ public class CompanyIndexFactoryTest {
 
 		createIndices();
 
-		assertIndicesExist(LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE);
+		assertMappings(Field.COMPANY_ID, Field.ENTRY_CLASS_NAME);
 	}
 
 	@Test
@@ -310,7 +312,7 @@ public class CompanyIndexFactoryTest {
 
 		createIndices();
 
-		assertIndicesExist(LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE);
+		assertMappings(Field.TITLE);
 	}
 
 	@Test
@@ -410,21 +412,21 @@ public class CompanyIndexFactoryTest {
 			"Index " + indexName + " does not exist", hasIndex(indexName));
 	}
 
-	protected void assertIndicesExist(String... indexNames) {
+	protected void assertMappings(String... fieldNames) {
+		String indexName = _companyIndexFactoryFixture.getIndexName();
+
 		GetIndexResponse getIndexResponse = _elasticsearchFixture.getIndex(
-			_companyIndexFactoryFixture.getIndexName());
+			indexName);
 
-		ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>>
-			mappings = getIndexResponse.getMappings();
+		Map<String, MappingMetaData> mappings = getIndexResponse.getMappings();
 
-		Iterator<ImmutableOpenMap<String, MappingMetaData>> iterator =
-			mappings.valuesIt();
+		MappingMetaData mappingMetaData = mappings.get(indexName);
 
-		ImmutableOpenMap<String, MappingMetaData> map = iterator.next();
+		Map<String, Object> map = getPropertiesMap(mappingMetaData);
 
-		for (String indexName : indexNames) {
-			Assert.assertTrue(indexName, map.containsKey(indexName));
-		}
+		Set<String> set = map.keySet();
+
+		Assert.assertThat(set, CoreMatchers.hasItems(fieldNames));
 	}
 
 	protected void assertNoAnalyzer(String field) throws Exception {
@@ -472,10 +474,17 @@ public class CompanyIndexFactoryTest {
 		GetIndexResponse getIndexResponse = _elasticsearchFixture.getIndex(
 			name);
 
-		ImmutableOpenMap<String, Settings> immutableOpenMap =
-			getIndexResponse.getSettings();
+		Map<String, Settings> map = getIndexResponse.getSettings();
 
-		return immutableOpenMap.get(name);
+		return map.get(name);
+	}
+
+	protected Map<String, Object> getPropertiesMap(
+		MappingMetaData mappingMetaData) {
+
+		Map<String, Object> map = mappingMetaData.getSourceAsMap();
+
+		return (Map<String, Object>)map.get("properties");
 	}
 
 	protected boolean hasIndex(String indexName) {

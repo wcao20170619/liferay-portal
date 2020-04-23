@@ -49,20 +49,29 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		_companyId = RandomTestUtil.randomLong();
+		long companyId = RandomTestUtil.randomLong();
+
+		setUpBackgroundTask(companyId);
 
 		setUpIndexerRegistry();
 
-		setUpBackgroundTask();
+		SearchEngineFixture searchEngineFixture = getSearchEngineFixture();
 
-		setUpSearchEngineFixture();
+		searchEngineFixture.setUp();
 
-		setUpSearchEngineHelper();
+		SearchEngineHelper searchEngineHelper = new SearchEngineHelperImpl();
+
+		searchEngineHelper.setSearchEngine(
+			"test", searchEngineFixture.getSearchEngine());
+
+		_companyId = companyId;
+		_searchEngineFixture = searchEngineFixture;
+		_searchEngineHelper = searchEngineHelper;
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		searchEngineFixture.tearDown();
+		_searchEngineFixture.tearDown();
 	}
 
 	@Test
@@ -81,7 +90,7 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 
 	protected String getIndexName() {
 		IndexNameBuilder indexNameBuilder =
-			searchEngineFixture.getIndexNameBuilder();
+			_searchEngineFixture.getIndexNameBuilder();
 
 		return indexNameBuilder.getIndexName(_companyId);
 	}
@@ -101,7 +110,7 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 
 	protected abstract SearchEngineFixture getSearchEngineFixture();
 
-	protected void setUpBackgroundTask() {
+	protected void setUpBackgroundTask(long companyId) {
 		Mockito.when(
 			_backgroundTask.getTaskContextMap()
 		).thenReturn(
@@ -110,7 +119,7 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 				RandomTestUtil.randomString()
 			).put(
 				ReindexBackgroundTaskConstants.COMPANY_IDS,
-				new long[] {_companyId}
+				new long[] {companyId}
 			).build()
 		);
 	}
@@ -122,21 +131,6 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 			_indexer
 		);
 	}
-
-	protected void setUpSearchEngineFixture() throws Exception {
-		searchEngineFixture = getSearchEngineFixture();
-
-		searchEngineFixture.setUp();
-	}
-
-	protected void setUpSearchEngineHelper() {
-		_searchEngineHelper = new SearchEngineHelperImpl();
-
-		_searchEngineHelper.setSearchEngine(
-			"test", searchEngineFixture.getSearchEngine());
-	}
-
-	protected SearchEngineFixture searchEngineFixture;
 
 	@Mock
 	private BackgroundTask _backgroundTask;
@@ -155,6 +149,7 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 	@Mock
 	private ReindexStatusMessageSender _reindexStatusMessageSender;
 
+	private SearchEngineFixture _searchEngineFixture;
 	private SearchEngineHelper _searchEngineHelper;
 
 }

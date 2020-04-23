@@ -63,16 +63,22 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 			"networkHost", "_site_"
 		).build();
 
-		_elasticsearchFixture = new ElasticsearchFixture(
-			EmbeddedElasticsearchConnectionHttpTest.class.getSimpleName(),
-			properties);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).elasticsearchConfigurationProperties(
+				properties
+			).tmpSubdirName(
+				EmbeddedElasticsearchConnectionHttpTest.class.getSimpleName()
+			).build();
 
-		_elasticsearchFixture.setUp();
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
+
+		_elasticsearchConnectionFixture.createNode();
 	}
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		_elasticsearchFixture.tearDown();
+		_elasticsearchConnectionFixture.destroyNode();
 	}
 
 	@Before
@@ -100,7 +106,7 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 
 	protected int getHttpPort() throws Exception {
 		RestHighLevelClient restHighLevelClient =
-			_elasticsearchFixture.getRestHighLevelClient();
+			_elasticsearchConnectionFixture.getRestHighLevelClient();
 
 		RestClient restClient = restHighLevelClient.getLowLevelClient();
 
@@ -141,7 +147,8 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 	}
 
 	private static String _clusterName;
-	private static ElasticsearchFixture _elasticsearchFixture;
+	private static ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
 	private static final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }
