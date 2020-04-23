@@ -27,8 +27,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
@@ -78,37 +76,26 @@ public class Sidecar {
 
 	public Sidecar(
 		ElasticsearchConfiguration elasticsearchConfiguration,
-		ProcessExecutor processExecutor, Props props) {
+		ProcessExecutor processExecutor, SidecarPaths sidecarPaths) {
 
 		_elasticsearchConfiguration = elasticsearchConfiguration;
 		_processExecutor = processExecutor;
-		_props = props;
 
-		Path liferayHomePath = Paths.get(props.get(PropsKeys.LIFERAY_HOME));
+		_sidecarPaths = sidecarPaths;
 
-		liferayHomePath = liferayHomePath.toAbsolutePath();
+		Path workPath = Paths.get(_sidecarPaths.getWork());
 
-		_dataHomePath = liferayHomePath.resolve("data/elasticsearch7");
-		_logsPath = liferayHomePath.resolve("logs");
+		workPath = workPath.toAbsolutePath();
+
+		_dataHomePath = workPath.resolve("data/elasticsearch7");
+		_logsPath = workPath.resolve("logs");
 
 		_indicesPath = _dataHomePath.resolve("indices");
 		_repoPath = _dataHomePath.resolve("repo");
 
-		Path sidecarHomePath = liferayHomePath.resolve(
-			elasticsearchConfiguration.sidecarHome());
+		Path homePath = resolveHomePath(workPath, elasticsearchConfiguration);
 
-		if (!Files.isDirectory(sidecarHomePath)) {
-			sidecarHomePath = Paths.get(
-				elasticsearchConfiguration.sidecarHome());
-
-			if (!Files.isDirectory(sidecarHomePath)) {
-				throw new IllegalArgumentException(
-					"Sidecar home " + elasticsearchConfiguration.sidecarHome() +
-						" does not exist");
-			}
-		}
-
-		_sidecarHomePath = sidecarHomePath.toAbsolutePath();
+		_sidecarHomePath = homePath.toAbsolutePath();
 	}
 
 	public String getNetworkHostAddress() {
@@ -273,6 +260,26 @@ public class Sidecar {
 		return _indicesPath;
 	}
 
+	protected Path resolveHomePath(
+		Path workPath, ElasticsearchConfiguration elasticsearchConfiguration) {
+
+		Path sidecarHomePath = workPath.resolve(
+			elasticsearchConfiguration.sidecarHome());
+
+		if (!Files.isDirectory(sidecarHomePath)) {
+			sidecarHomePath = Paths.get(
+				elasticsearchConfiguration.sidecarHome());
+
+			if (!Files.isDirectory(sidecarHomePath)) {
+				throw new IllegalArgumentException(
+					"Sidecar home " + elasticsearchConfiguration.sidecarHome() +
+						" does not exist");
+			}
+		}
+
+		return sidecarHomePath;
+	}
+
 	protected void setClusterDiscoverySettings(
 		SettingsBuilder settingsBuilder) {
 
@@ -317,7 +324,7 @@ public class Sidecar {
 
 		processConfigBuilder.setArguments(_getJVMArguments(bundleURL));
 
-		File file = new File(_props.get(PropsKeys.LIFERAY_LIB_GLOBAL_DIR));
+		File file = new File(_sidecarPaths.getLib());
 
 		String bootstrapClasspath = _createClasspath(
 			file.toPath(),
@@ -615,10 +622,10 @@ public class Sidecar {
 	private final Path _logsPath;
 	private ProcessChannel<Serializable> _processChannel;
 	private final ProcessExecutor _processExecutor;
-	private final Props _props;
 	private final Path _repoPath;
 	private FutureListener<Serializable> _restartFutureListener;
 	private final Path _sidecarHomePath;
+	private final SidecarPaths _sidecarPaths;
 	private Path _sidecarTempDirPath;
 
 	private class RestartFutureListener
@@ -638,7 +645,7 @@ public class Sidecar {
 			SidecarComponentUtil.disableSidecarElasticsearchConnectionManager();
 
 			if (_log.isInfoEnabled()) {
-				_log.info("Restaring sidecar process");
+				_log.info("Restarting sidecar process");
 			}
 
 			SidecarComponentUtil.enableSidecarElasticsearchConnectionManager();

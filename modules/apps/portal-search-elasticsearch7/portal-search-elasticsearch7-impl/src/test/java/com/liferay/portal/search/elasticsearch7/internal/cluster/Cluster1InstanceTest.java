@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.Index;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
@@ -42,20 +42,23 @@ public class Cluster1InstanceTest {
 
 	@Test
 	public void test1PrimaryShardByDefault() throws Exception {
-		ElasticsearchFixture elasticsearchFixture = _testCluster.getNode(0);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			_testCluster.getNode(0);
 
-		createIndex(elasticsearchFixture);
+		createIndex(elasticsearchConnectionFixture);
 
-		ClusterAssert.assert1PrimaryShardOnly(elasticsearchFixture);
+		ClusterAssert.assert1PrimaryShardOnly(elasticsearchConnectionFixture);
 	}
 
 	@Rule
 	public TestName testName = new TestName();
 
-	protected Index createIndex(ElasticsearchFixture elasticsearchFixture) {
+	protected Index createIndex(
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture) {
+
 		IndexCreator indexCreator = new IndexCreator() {
 			{
-				setElasticsearchClientResolver(elasticsearchFixture);
+				setElasticsearchClientResolver(elasticsearchConnectionFixture);
 			}
 		};
 

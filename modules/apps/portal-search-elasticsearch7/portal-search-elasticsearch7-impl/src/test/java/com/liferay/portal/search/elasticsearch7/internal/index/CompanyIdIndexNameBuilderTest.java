@@ -23,8 +23,8 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 import java.util.Collections;
 
 import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexResponse;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -117,8 +117,8 @@ public class CompanyIdIndexNameBuilderTest {
 
 		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory() {
 			{
-				indexNameBuilder = companyIdIndexNameBuilder;
-				jsonFactory = new JSONFactoryImpl();
+				setIndexNameBuilder(companyIdIndexNameBuilder);
+				setJsonFactory(new JSONFactoryImpl());
 			}
 		};
 

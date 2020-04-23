@@ -67,6 +67,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 public class CompanyIndexFactory
 	implements IndexContributorReceiver, IndexFactory {
 
+	@Override
 	public void addIndexContributor(IndexContributor indexContributor) {
 		_indexContributors.add(indexContributor);
 	}
@@ -106,6 +107,7 @@ public class CompanyIndexFactory
 		}
 	}
 
+	@Override
 	public void removeIndexContributor(IndexContributor indexContributor) {
 		_indexContributors.remove(indexContributor);
 	}
@@ -159,7 +161,7 @@ public class CompanyIndexFactory
 			indexName);
 
 		LiferayDocumentTypeFactory liferayDocumentTypeFactory =
-			new LiferayDocumentTypeFactory(indicesClient, jsonFactory);
+			new LiferayDocumentTypeFactory(indicesClient, _jsonFactory);
 
 		setSettings(createIndexRequest, liferayDocumentTypeFactory);
 
@@ -224,7 +226,7 @@ public class CompanyIndexFactory
 	}
 
 	protected String getIndexName(long companyId) {
-		return indexNameBuilder.getIndexName(companyId);
+		return _indexNameBuilder.getIndexName(companyId);
 	}
 
 	protected boolean hasIndex(IndicesClient indicesClient, String indexName) {
@@ -274,14 +276,8 @@ public class CompanyIndexFactory
 	protected void loadIndexSettingsContributors(
 		final Settings.Builder builder) {
 
-		IndexSettingsHelper indexSettingsHelper = new IndexSettingsHelper() {
-
-			@Override
-			public void put(String setting, String value) {
-				builder.put(setting, value);
-			}
-
-		};
+		IndexSettingsHelper indexSettingsHelper =
+			(setting, value) -> builder.put(setting, value);
 
 		for (IndexSettingsContributor indexSettingsContributor :
 				_indexSettingsContributors) {
@@ -329,12 +325,22 @@ public class CompanyIndexFactory
 		_additionalTypeMappings = additionalTypeMappings;
 	}
 
+	@Reference(unbind = "-")
+	protected void setIndexNameBuilder(IndexNameBuilder indexNameBuilder) {
+		_indexNameBuilder = indexNameBuilder;
+	}
+
 	protected void setIndexNumberOfReplicas(String indexNumberOfReplicas) {
 		_indexNumberOfReplicas = indexNumberOfReplicas;
 	}
 
 	protected void setIndexNumberOfShards(String indexNumberOfShards) {
 		_indexNumberOfShards = indexNumberOfShards;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJsonFactory(JSONFactory jsonFactory) {
+		_jsonFactory = jsonFactory;
 	}
 
 	protected void setOverrideTypeMappings(String overrideTypeMappings) {
@@ -383,12 +389,6 @@ public class CompanyIndexFactory
 		liferayDocumentTypeFactory.createOptionalDefaultTypeMappings(indexName);
 	}
 
-	@Reference
-	protected IndexNameBuilder indexNameBuilder;
-
-	@Reference
-	protected JSONFactory jsonFactory;
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		CompanyIndexFactory.class);
 
@@ -396,10 +396,12 @@ public class CompanyIndexFactory
 	private String _additionalTypeMappings;
 	private final List<IndexContributor> _indexContributors =
 		new CopyOnWriteArrayList<>();
+	private IndexNameBuilder _indexNameBuilder;
 	private String _indexNumberOfReplicas;
 	private String _indexNumberOfShards;
 	private final Set<IndexSettingsContributor> _indexSettingsContributors =
 		new ConcurrentSkipListSet<>();
+	private JSONFactory _jsonFactory;
 	private String _overrideTypeMappings;
 
 }

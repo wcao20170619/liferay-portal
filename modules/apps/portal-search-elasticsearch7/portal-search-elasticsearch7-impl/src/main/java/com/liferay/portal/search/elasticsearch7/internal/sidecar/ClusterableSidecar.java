@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
@@ -86,9 +85,10 @@ public class ClusterableSidecar
 		ClusterExecutor clusterExecutor,
 		ClusterMasterExecutor clusterMasterExecutor,
 		ElasticsearchConfiguration elasticsearchConfiguration,
-		JSONFactory jsonFactory, ProcessExecutor processExecutor, Props props) {
+		JSONFactory jsonFactory, ProcessExecutor processExecutor,
+		SidecarPaths sidecarPaths) {
 
-		super(elasticsearchConfiguration, processExecutor, props);
+		super(elasticsearchConfiguration, processExecutor, sidecarPaths);
 
 		_clusterExecutor = clusterExecutor;
 		_clusterMasterExecutor = clusterMasterExecutor;
@@ -178,6 +178,7 @@ public class ClusterableSidecar
 		_stopCountDownLatch.countDown();
 	}
 
+	@Override
 	protected String getLogProperties() {
 		return StringBundler.concat(
 			"logger.cluster.name=org.elasticsearch.cluster\n",
