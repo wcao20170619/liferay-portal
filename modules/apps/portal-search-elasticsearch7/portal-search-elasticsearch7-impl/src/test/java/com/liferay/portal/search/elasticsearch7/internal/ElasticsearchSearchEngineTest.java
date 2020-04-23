@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnection;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 
 import java.io.IOException;
 
@@ -35,6 +36,7 @@ import org.elasticsearch.snapshots.SnapshotInfo;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,6 +47,8 @@ public class ElasticsearchSearchEngineTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS112597);
+
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
 			createElasticsearchConnectionFixture();
 
