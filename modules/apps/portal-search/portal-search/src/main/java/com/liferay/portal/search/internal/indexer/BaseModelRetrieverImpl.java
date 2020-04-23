@@ -75,8 +75,8 @@ public class BaseModelRetrieverImpl implements BaseModelRetriever {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
-						"No ", className, " found for class PK ", classPK),
-					portalException);
+						"No ", className, " found for class PK ", classPK, " (",
+						portalException, ")"));
 			}
 
 			return null;
