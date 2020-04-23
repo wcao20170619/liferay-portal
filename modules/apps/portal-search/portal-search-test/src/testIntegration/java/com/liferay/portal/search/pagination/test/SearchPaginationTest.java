@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.randomizerbumpers.NumericStringRandomizerBumper;
 import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
@@ -43,8 +42,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,8 +61,8 @@ public class SearchPaginationTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public static void setUpClass() throws Exception {
 		int initialUsersCount = 0;
 
 		do {
@@ -98,6 +98,13 @@ public class SearchPaginationTest {
 				}
 
 			});
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		for (User user : _users) {
+			UserLocalServiceUtil.deleteUser(user);
+		}
 	}
 
 	@Test
@@ -229,11 +236,11 @@ public class SearchPaginationTest {
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
-	protected Hits getHits(int start, int end) throws Exception {
+	protected static Hits getHits(int start, int end) throws Exception {
 		return getHits(_randomLastName, start, end);
 	}
 
-	protected Hits getHits(String keyword, int start, int end)
+	protected static Hits getHits(String keyword, int start, int end)
 		throws Exception {
 
 		Indexer<User> indexer = IndexerRegistryUtil.getIndexer(User.class);
@@ -309,9 +316,7 @@ public class SearchPaginationTest {
 
 	private static final int _USERS_COUNT = 5;
 
-	private String _randomLastName;
-
-	@DeleteAfterTestRun
-	private final List<User> _users = new ArrayList<>();
+	private static String _randomLastName;
+	private static final List<User> _users = new ArrayList<>();
 
 }
