@@ -554,6 +554,9 @@ public class Sidecar {
 			"cluster.name", _elasticsearchConfiguration.clusterName());
 		settingsBuilder.put(
 			"http.cors.enabled", _elasticsearchConfiguration.httpCORSEnabled());
+		settingsBuilder.put(
+			"http.port",
+			String.valueOf(_elasticsearchConfiguration.embeddedHttpPort()));
 		settingsBuilder.put("path.data", _indicesPath.toString());
 		settingsBuilder.put("path.logs", _logsPath.toString());
 		settingsBuilder.put("path.repo", _repoPath.toString());
