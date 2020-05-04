@@ -4,6 +4,8 @@ import com.liferay.gradle.util.StringUtil
 task cleanSidecar
 task deploySidecar(type: Copy)
 
+task deployTestSidecar(type: Copy)
+
 String elasticsearchVersion = "7.3.0"
 String luceneVersion = "8.1.0"
 
@@ -20,6 +22,7 @@ cleanSidecar {
 		delete file("${buildDir}/elasticsearch-" + elasticsearchVersion)
 	}
 }
+
 
 configurations {
 	elasticsearchPlugins {
@@ -208,6 +211,50 @@ deploySidecar {
 	}
 }
 
+deployTestSidecar {
+  
+   	dependsOn cleanSidecar
+
+	description = "Assembles the Elasticsearch sidecar and deploys it to build test directory."
+	group = "build"
+
+	destinationDir = file("classes/elasticsearch" + elasticsearchVersion.substring(0, 1))
+
+	enabled = !sidecarDir.exists()
+
+	ext {
+		autoClean = false
+	}
+
+	from {
+		file("${buildDir}/elasticsearch-" + elasticsearchVersion)
+	}
+
+	doFirst {
+		String url = "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-${elasticsearchVersion}-no-jdk-linux-x86_64.tar.gz"
+
+		File file = file("${buildDir}/${url.drop(url.lastIndexOf('/') + 1)}")
+
+		FileUtil.get(project, url, file, false, true)
+
+		project.copy {
+			fileMode = 0777
+			includeEmptyDirs = false
+
+			exclude "elasticsearch-${elasticsearchVersion}/modules/ingest-geoip/**"
+			include "elasticsearch-${elasticsearchVersion}/lib/**"
+			include "elasticsearch-${elasticsearchVersion}/modules/**"
+
+			into buildDir
+			from tarTree(file)
+		}
+	}
+
+	doLast {
+		logger.lifecycle "Deployed Elasticsearch Sidecar: {}", destinationDir
+	}
+}
+
 processResources {
 	into("plugins") {
 		from configurations.elasticsearchPlugins
@@ -247,7 +294,13 @@ private void _createPluginTasks(String elasticsearchVersion, List<String> sideca
 		}
 
 		deploySidecar.dependsOn installPluginTask
+		
+		deployTestSidecar.dependsOn installPluginTask
 
 		installPluginTask.mustRunAfter cleanSidecar
 	}
+}
+
+test {	
+	dependsOn deployTestSidecar
 }
