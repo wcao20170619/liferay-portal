@@ -214,6 +214,10 @@ processResources {
 	}
 }
 
+test {
+	forkEvery = 0
+}
+
 _createPluginTasks(elasticsearchVersion, sidecarPluginURLs)
 
 private void _createPluginTasks(String elasticsearchVersion, List<String> sidecarPluginURLs) {
