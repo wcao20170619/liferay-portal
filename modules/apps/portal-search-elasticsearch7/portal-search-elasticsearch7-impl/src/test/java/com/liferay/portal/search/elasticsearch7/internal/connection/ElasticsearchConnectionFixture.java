@@ -311,7 +311,7 @@ public class ElasticsearchConnectionFixture
 		).getWork();
 
 		Mockito.doReturn(
-			"/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext"
+			"/BOGUS/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext"
 		).when(
 			sidecarPaths
 		).getLib();

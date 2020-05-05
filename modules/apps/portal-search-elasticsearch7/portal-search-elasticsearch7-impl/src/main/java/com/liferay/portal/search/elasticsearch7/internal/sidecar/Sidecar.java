@@ -306,6 +306,9 @@ public class Sidecar {
 
 			return sb.toString();
 		}
+		catch (NoSuchFileException noSuchFileException) {
+			return StringPool.BLANK;
+		}
 		catch (IOException ioException) {
 			throw new RuntimeException(
 				"Unable to iterate " + dirPath, ioException);
@@ -327,16 +330,7 @@ public class Sidecar {
 		File file = new File(_sidecarPaths.getLib());
 
 		String bootstrapClasspath = _createClasspath(
-			file.toPath(),
-			path -> {
-				String name = String.valueOf(path.getFileName());
-
-				if (name.contains("petra")) {
-					return true;
-				}
-
-				return false;
-			});
+			file.toPath(), path -> fileNameContains(path, "petra"));
 
 		processConfigBuilder.setBootstrapClassPath(bootstrapClasspath);
 
@@ -380,6 +374,16 @@ public class Sidecar {
 				File.pathSeparator, bootstrapClasspath));
 
 		return processConfigBuilder.build();
+	}
+
+	protected static boolean fileNameContains(Path path, String s) {
+		String name = String.valueOf(path.getFileName());
+
+		if (name.contains(s)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private List<String> _getJVMArguments(URL bundleURL) {
