@@ -33,13 +33,16 @@ import com.liferay.portal.util.FileImpl;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+
 import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+
 import org.elasticsearch.client.RestHighLevelClient;
+
 import org.mockito.Mockito;
+
 import org.osgi.framework.BundleContext;
 
 /**
@@ -289,9 +292,7 @@ public class ElasticsearchConnectionFixture
 				HashMapBuilder.putAll(
 					_elasticsearchConfigurationProperties
 				).put(
-					"sidecarHome",
-					Paths.get("").toAbsolutePath().toString() + 
-					File.separator + "classes" + File.separator + "elasticsearch7"
+					"sidecarHome", "classes/sidecar-elasticsearch"
 				).build());
 
 		return new SidecarElasticsearchConnection(
@@ -310,8 +311,7 @@ public class ElasticsearchConnectionFixture
 		).getWork();
 
 		Mockito.doReturn(
-			Paths.get("").toAbsolutePath().toString() + 
-			File.separator + "classes" + File.separator + "elasticsearch7" + File.separator + "lib" 
+			"/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext"
 		).when(
 			sidecarPaths
 		).getLib();
