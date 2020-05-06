@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
 import com.liferay.portal.search.test.util.AssertUtils;
 
@@ -27,6 +28,7 @@ import java.util.Arrays;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -58,6 +60,8 @@ public class ElasticsearchIndexInformationTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
 		_companyIndexFactoryFixture = createCompanyIndexFactoryFixture(
 			_elasticsearchConnectionFixture);
 

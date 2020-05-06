@@ -45,7 +45,7 @@ public class ReplicasManagerImplTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(LPS104115.LPS112601);
+		Assume.assumeTrue(LPS104115.LPS113038);
 
 		MockitoAnnotations.initMocks(this);
 

@@ -49,7 +49,7 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		Assume.assumeTrue(LPS104115.LPS112601);
+		Assume.assumeTrue(LPS104115.LPS113038);
 
 		_elasticsearchFixture = new ElasticsearchFixture(
 			ElasticsearchSearchEngineAdapterLoggingTest.class.getSimpleName());
@@ -59,7 +59,9 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		_elasticsearchFixture.tearDown();
+		if (_elasticsearchFixture != null) {
+			_elasticsearchFixture.tearDown();
+		}
 	}
 
 	@Before

@@ -18,9 +18,13 @@ import com.liferay.portal.search.elasticsearch7.internal.ElasticsearchSearchEngi
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.index.FieldMappingAssert;
 import com.liferay.portal.search.elasticsearch7.internal.index.LiferayTypeMappingsConstants;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.test.util.background.task.BaseReindexSingleIndexerBackgroundTaskExecutorTestCase;
 
 import org.elasticsearch.client.RestHighLevelClient;
+
+import org.junit.Assume;
+import org.junit.Before;
 
 /**
  * @author Adam Brandizzi
@@ -43,6 +47,13 @@ public class ReindexSingleIndexerBackgroundTaskExecutorTest
 		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
 
 		_elasticsearchSearchEngineFixture = elasticsearchSearchEngineFixture;
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
+		super.setUp();
 	}
 
 	@Override

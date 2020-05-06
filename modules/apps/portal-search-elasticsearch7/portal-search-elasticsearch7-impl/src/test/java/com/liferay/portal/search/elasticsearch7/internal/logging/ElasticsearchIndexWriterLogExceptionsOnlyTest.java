@@ -24,6 +24,7 @@ import com.liferay.portal.search.elasticsearch7.internal.LiferayElasticsearchInd
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document.BulkDocumentRequestExecutorImpl;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
@@ -34,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -42,6 +45,11 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 	extends BaseIndexingTestCase {
+
+	@Before
+	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+	}
 
 	@Test
 	public void testAddDocument() throws Exception {

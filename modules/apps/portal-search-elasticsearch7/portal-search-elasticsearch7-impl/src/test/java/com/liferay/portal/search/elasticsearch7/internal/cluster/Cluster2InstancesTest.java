@@ -36,7 +36,7 @@ public class Cluster2InstancesTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(LPS104115.LPS112601);
+		Assume.assumeTrue(LPS104115.LPS113038);
 
 		_testCluster.setUp();
 	}

@@ -65,7 +65,9 @@ public class ElasticsearchSearchEngineTest {
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		_elasticsearchSearchEngineFixture.tearDown();
+		if (_elasticsearchSearchEngineFixture != null) {
+			_elasticsearchSearchEngineFixture.tearDown();
+		}
 	}
 
 	public SnapshotClient getSnapshotClient() {

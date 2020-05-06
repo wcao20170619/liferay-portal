@@ -18,8 +18,10 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 import com.liferay.portal.search.elasticsearch7.internal.connection.Index;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +34,8 @@ public class Cluster1InstanceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
 		_testCluster.setUp();
 	}
 

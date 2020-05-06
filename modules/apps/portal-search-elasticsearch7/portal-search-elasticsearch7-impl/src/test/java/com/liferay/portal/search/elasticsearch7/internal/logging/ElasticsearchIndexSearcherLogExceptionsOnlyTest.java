@@ -22,12 +22,15 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.search.elasticsearch7.internal.LiferayElasticsearchIndexingFixtureFactory;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.logging.ExpectedLogTestRule;
 
 import java.util.Collections;
 
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -36,6 +39,11 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexSearcherLogExceptionsOnlyTest
 	extends BaseIndexingTestCase {
+
+	@Before
+	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+	}
 
 	@Test
 	public void testExceptionOnlyLoggedWhenQueryMalformedSearch() {

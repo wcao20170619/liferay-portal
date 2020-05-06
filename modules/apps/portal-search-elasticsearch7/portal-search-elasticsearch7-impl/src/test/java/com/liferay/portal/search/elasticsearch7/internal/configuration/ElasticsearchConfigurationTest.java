@@ -16,16 +16,24 @@ package com.liferay.portal.search.elasticsearch7.internal.configuration;
 
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author André de Oliveira
  */
 public class ElasticsearchConfigurationTest {
+
+	@Before
+	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+	}
 
 	@Test
 	public void testConfigurationsFromBuildTestXmlAntFile() throws Exception {

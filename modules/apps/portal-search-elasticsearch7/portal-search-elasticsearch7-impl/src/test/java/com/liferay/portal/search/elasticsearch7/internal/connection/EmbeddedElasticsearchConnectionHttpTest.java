@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 
 import java.io.InputStream;
 
@@ -40,6 +41,7 @@ import org.hamcrest.CoreMatchers;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -83,6 +85,8 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
 		MockitoAnnotations.initMocks(this);
 	}
 

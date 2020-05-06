@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.cluster.ClusterRequestExecutorFixture;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.cluster.ClusterHealthStatus;
 import com.liferay.portal.search.engine.adapter.cluster.ClusterRequestExecutor;
@@ -43,6 +44,7 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -68,11 +70,15 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
 	@AfterClass
 	public static void tearDownClass() {
-		_elasticsearchConnectionFixture.destroyNode();
+		if (_elasticsearchConnectionFixture != null) {
+			_elasticsearchConnectionFixture.destroyNode();
+		}
 	}
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
 		setUpJSONFactoryUtil();
 
 		_searchEngineAdapter = createSearchEngineAdapter(
@@ -226,6 +232,10 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 	}
 
 	private void _deleteIndex() {
+		if (_indicesClient == null) {
+			return;
+		}
+
 		DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(
 			_INDEX_NAME);
 

@@ -15,6 +15,7 @@
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.LPS104115;
 
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
@@ -24,6 +25,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,12 +36,16 @@ public class ClusterSettingsTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(LPS104115.LPS113038);
+
 		_elasticsearchFixture.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_elasticsearchFixture.tearDown();
+		if (_elasticsearchFixture != null) {
+			_elasticsearchFixture.tearDown();
+		}
 	}
 
 	@Test
