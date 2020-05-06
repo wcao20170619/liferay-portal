@@ -71,7 +71,9 @@ public abstract class BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 
 	@After
 	public void tearDown() throws Exception {
-		_searchEngineFixture.tearDown();
+		if (_searchEngineFixture != null) {
+			_searchEngineFixture.tearDown();
+		}
 	}
 
 	@Test

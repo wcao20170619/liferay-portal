@@ -102,6 +102,10 @@ public abstract class BaseIndexingTestCase {
 	public static void tearDownClassBaseIndexingTestCase() throws Exception {
 		_documentFixture.tearDown();
 
+		if (_indexingFixture == null) {
+			return;
+		}
+
 		if (_indexingFixture.isSearchEngineAvailable()) {
 			_indexingFixture.tearDown();
 		}
@@ -124,6 +128,10 @@ public abstract class BaseIndexingTestCase {
 
 	@After
 	public void tearDown() throws Exception {
+		if (_indexingFixture == null) {
+			return;
+		}
+
 		if (!_indexingFixture.isSearchEngineAvailable()) {
 			return;
 		}
