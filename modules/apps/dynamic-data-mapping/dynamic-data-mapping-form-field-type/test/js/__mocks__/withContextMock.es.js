@@ -12,8 +12,15 @@
  * details.
  */
 
-const withContextMock = Component => {
+const withContextMock = (Component) => {
 	return class WithContextMock extends Component {
+		created() {
+			super.created();
+			this.context = {
+				dispatch: () => {},
+			};
+		}
+
 		getChildContext() {
 			return {
 				store: {

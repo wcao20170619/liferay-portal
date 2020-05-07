@@ -203,6 +203,16 @@ public class MessageBoardThreadSerDes {
 			sb.append("\"");
 		}
 
+		if (messageBoardThread.getHasValidAnswer() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"hasValidAnswer\": ");
+
+			sb.append(messageBoardThread.getHasValidAnswer());
+		}
+
 		if (messageBoardThread.getHeadline() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -497,15 +507,25 @@ public class MessageBoardThreadSerDes {
 				String.valueOf(messageBoardThread.getCustomFields()));
 		}
 
-		map.put(
-			"dateCreated",
-			liferayToJSONDateFormat.format(
-				messageBoardThread.getDateCreated()));
+		if (messageBoardThread.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(
+					messageBoardThread.getDateCreated()));
+		}
 
-		map.put(
-			"dateModified",
-			liferayToJSONDateFormat.format(
-				messageBoardThread.getDateModified()));
+		if (messageBoardThread.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(
+					messageBoardThread.getDateModified()));
+		}
 
 		if (messageBoardThread.getEncodingFormat() == null) {
 			map.put("encodingFormat", null);
@@ -523,6 +543,15 @@ public class MessageBoardThreadSerDes {
 			map.put(
 				"friendlyUrlPath",
 				String.valueOf(messageBoardThread.getFriendlyUrlPath()));
+		}
+
+		if (messageBoardThread.getHasValidAnswer() == null) {
+			map.put("hasValidAnswer", null);
+		}
+		else {
+			map.put(
+				"hasValidAnswer",
+				String.valueOf(messageBoardThread.getHasValidAnswer()));
 		}
 
 		if (messageBoardThread.getHeadline() == null) {
@@ -743,6 +772,12 @@ public class MessageBoardThreadSerDes {
 				if (jsonParserFieldValue != null) {
 					messageBoardThread.setFriendlyUrlPath(
 						(String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "hasValidAnswer")) {
+				if (jsonParserFieldValue != null) {
+					messageBoardThread.setHasValidAnswer(
+						(Boolean)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "headline")) {

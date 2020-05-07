@@ -30,8 +30,10 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 <liferay-ui:success key="layoutPageTemplatePublished" message="the-page-template-was-published-succesfully" />
 
 <div class="container-fluid container-fluid-max-xl container-view">
-	<div class="row">
-		<div class="col-lg-3">
+	<clay:row>
+		<clay:col
+			lg="3"
+		>
 			<nav class="menubar menubar-transparent menubar-vertical-expand-lg">
 				<ul class="nav nav-nested">
 					<li class="nav-item">
@@ -114,9 +116,11 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 					</li>
 				</ul>
 			</nav>
-		</div>
+		</clay:col>
 
-		<div class="col-lg-9">
+		<clay:col
+			lg="9"
+		>
 
 			<%
 			LayoutPageTemplateCollection layoutPageTemplateCollection = layoutPageTemplateDisplayContext.getLayoutPageTemplateCollection();
@@ -143,15 +147,15 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 					</div>
 				</div>
 			</c:if>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <aui:form cssClass="hide" name="layoutPageTemplateCollectionsFm">
 </aui:form>
 
 <aui:script require="metal-dom/src/dom as dom, frontend-js-web/liferay/ItemSelectorDialog.es as ItemSelectorDialog">
-	var deleteCollections = function() {
+	var deleteCollections = function () {
 		var layoutPageTemplateCollectionsFm =
 			document.<portlet:namespace />layoutPageTemplateCollectionsFm;
 
@@ -164,7 +168,7 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcRenderCommandName" value="/layout_page_template/select_layout_page_template_collections" /></portlet:renderURL>',
 			});
 
-			itemSelectorDialog.on('selectedItemChange', function(event) {
+			itemSelectorDialog.on('selectedItemChange', function (event) {
 				var selectedItems = event.selectedItem;
 
 				if (selectedItems) {
@@ -173,7 +177,7 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 							'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />'
 						)
 					) {
-						Array.prototype.forEach.call(selectedItems, function(
+						Array.prototype.forEach.call(selectedItems, function (
 							item,
 							index
 						) {
@@ -204,8 +208,8 @@ List<LayoutPageTemplateCollection> layoutPageTemplateCollections = layoutPageTem
 		deleteCollections: deleteCollections,
 	};
 
-	Liferay.componentReady('actionsComponent').then(function(actionsComponent) {
-		actionsComponent.on(['click', 'itemClicked'], function(event, facade) {
+	Liferay.componentReady('actionsComponent').then(function (actionsComponent) {
+		actionsComponent.on(['click', 'itemClicked'], function (event, facade) {
 			var itemData;
 
 			if (event.data && event.data.item) {

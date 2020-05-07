@@ -22,6 +22,7 @@ import com.liferay.fragment.exception.DuplicateFragmentCompositionKeyException;
 import com.liferay.fragment.exception.DuplicateFragmentEntryKeyException;
 import com.liferay.fragment.exception.FragmentCollectionNameException;
 import com.liferay.fragment.importer.FragmentsImporter;
+import com.liferay.fragment.importer.FragmentsImporterResultEntry;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentComposition;
 import com.liferay.fragment.model.FragmentEntry;
@@ -91,7 +92,27 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			boolean overwrite)
 		throws Exception {
 
-		_invalidFragmentEntriesNames = new ArrayList<>();
+		List<FragmentsImporterResultEntry> fragmentsImporterResultEntries =
+			importFragmentEntries(
+				userId, groupId, fragmentCollectionId, file, overwrite);
+
+		Stream<FragmentsImporterResultEntry> stream =
+			fragmentsImporterResultEntries.stream();
+
+		return stream.map(
+			FragmentsImporterResultEntry::getName
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	@Override
+	public List<FragmentsImporterResultEntry> importFragmentEntries(
+			long userId, long groupId, long fragmentCollectionId, File file,
+			boolean overwrite)
+		throws Exception {
+
+		_fragmentsImporterResultEntries = new ArrayList<>();
 
 		try (ZipFile zipFile = new ZipFile(file)) {
 			Map<String, String> orphanFragmentCompositions = new HashMap<>();
@@ -184,7 +205,7 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			}
 		}
 
-		return _invalidFragmentEntriesNames;
+		return _fragmentsImporterResultEntries;
 	}
 
 	private FragmentCollection _addFragmentCollection(
@@ -240,8 +261,6 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 		try {
 			_fragmentEntryProcessorRegistry.validateFragmentEntryHTML(
 				html, configuration);
-
-			_fragmentEntryValidator.validateConfiguration(configuration);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
@@ -249,29 +268,55 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 			}
 
 			status = WorkflowConstants.STATUS_DRAFT;
-
-			_invalidFragmentEntriesNames.add(name);
 		}
 
 		int type = FragmentConstants.getTypeFromLabel(
 			StringUtil.toLowerCase(StringUtil.trim(typeLabel)));
 
-		if (fragmentEntry == null) {
-			fragmentEntry = _fragmentEntryService.addFragmentEntry(
-				fragmentCollection.getGroupId(), fragmentCollectionId,
-				fragmentEntryKey, name, css, html, js, cacheable, configuration,
-				0, type, status, ServiceContextThreadLocal.getServiceContext());
+		try {
+			if (fragmentEntry == null) {
+				fragmentEntry = _fragmentEntryService.addFragmentEntry(
+					fragmentCollection.getGroupId(), fragmentCollectionId,
+					fragmentEntryKey, name, css, html, js, cacheable,
+					configuration, 0, type, status,
+					ServiceContextThreadLocal.getServiceContext());
+			}
+			else {
+				fragmentEntry = _fragmentEntryService.updateFragmentEntry(
+					fragmentEntry.getFragmentEntryId(), name, css, html, js,
+					cacheable, configuration,
+					fragmentEntry.getPreviewFileEntryId(), status);
+			}
+
+			fragmentEntry.setReadOnly(readOnly);
+
+			fragmentEntry = _fragmentEntryLocalService.updateFragmentEntry(
+				fragmentEntry);
+
+			FragmentsImporterResultEntry.Status
+				fragmentsImporterResultEntryStatus =
+					FragmentsImporterResultEntry.Status.IMPORTED;
+
+			if (fragmentEntry.getStatus() == WorkflowConstants.STATUS_DRAFT) {
+				fragmentsImporterResultEntryStatus =
+					FragmentsImporterResultEntry.Status.IMPORTED_DRAFT;
+			}
+
+			_fragmentsImporterResultEntries.add(
+				new FragmentsImporterResultEntry(
+					name, fragmentsImporterResultEntryStatus));
+
+			return _fragmentEntryLocalService.updateFragmentEntry(
+				fragmentEntry);
 		}
-		else {
-			fragmentEntry = _fragmentEntryService.updateFragmentEntry(
-				fragmentEntry.getFragmentEntryId(), name, css, html, js,
-				cacheable, configuration, fragmentEntry.getPreviewFileEntryId(),
-				status);
+		catch (PortalException portalException) {
+			_fragmentsImporterResultEntries.add(
+				new FragmentsImporterResultEntry(
+					name, FragmentsImporterResultEntry.Status.INVALID,
+					portalException.getMessage()));
 		}
 
-		fragmentEntry.setReadOnly(readOnly);
-
-		return _fragmentEntryLocalService.updateFragmentEntry(fragmentEntry);
+		return null;
 	}
 
 	private String _getContent(ZipFile zipFile, String fileName)
@@ -678,6 +723,10 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 				fragmentCollectionId, entry.getKey(), name, css, html, js,
 				cacheable, configuration, readOnly, typeLabel, overwrite);
 
+			if (fragmentEntry == null) {
+				continue;
+			}
+
 			if (Validator.isNotNull(fragmentJSON)) {
 				if (fragmentEntry.getPreviewFileEntryId() > 0) {
 					PortletFileRepositoryUtil.deletePortletFileEntry(
@@ -861,7 +910,7 @@ public class FragmentsImporterImpl implements FragmentsImporter {
 	@Reference
 	private FragmentEntryValidator _fragmentEntryValidator;
 
-	private List<String> _invalidFragmentEntriesNames;
+	private List<FragmentsImporterResultEntry> _fragmentsImporterResultEntries;
 
 	@Reference
 	private Portal _portal;

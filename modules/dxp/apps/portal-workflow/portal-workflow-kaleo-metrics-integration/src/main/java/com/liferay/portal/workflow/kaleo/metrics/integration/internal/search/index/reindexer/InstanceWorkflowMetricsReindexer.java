@@ -18,15 +18,17 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.InstanceIndexerHelper;
+import com.liferay.portal.workflow.kaleo.metrics.integration.internal.helper.IndexerHelper;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
 import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalService;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
+import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsReindexStatusMessageSender;
 import com.liferay.portal.workflow.metrics.search.index.InstanceWorkflowMetricsIndexer;
 import com.liferay.portal.workflow.metrics.search.index.reindexer.WorkflowMetricsReindexer;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,6 +55,11 @@ public class InstanceWorkflowMetricsReindexer
 
 				dynamicQuery.add(companyIdProperty.eq(companyId));
 			});
+
+		long total = actionableDynamicQuery.performCount();
+
+		AtomicInteger atomicCounter = new AtomicInteger(0);
+
 		actionableDynamicQuery.setPerformActionMethod(
 			(KaleoInstance kaleoInstance) -> {
 				KaleoDefinitionVersion kaleoDefinitionVersion =
@@ -65,10 +72,12 @@ public class InstanceWorkflowMetricsReindexer
 				}
 
 				_instanceWorkflowMetricsIndexer.addInstance(
-					_instanceIndexerHelper.createAssetTitleLocalizationMap(
-						kaleoInstance),
-					_instanceIndexerHelper.createAssetTypeLocalizationMap(
-						kaleoInstance),
+					_indexerHelper.createAssetTitleLocalizationMap(
+						kaleoInstance.getClassName(),
+						kaleoInstance.getClassPK(), kaleoInstance.getGroupId()),
+					_indexerHelper.createAssetTypeLocalizationMap(
+						kaleoInstance.getClassName(),
+						kaleoInstance.getGroupId()),
 					kaleoInstance.getClassName(), kaleoInstance.getClassPK(),
 					companyId, kaleoInstance.getCompletionDate(),
 					kaleoInstance.getCreateDate(),
@@ -77,13 +86,16 @@ public class InstanceWorkflowMetricsReindexer
 					kaleoInstance.getKaleoDefinitionId(),
 					kaleoDefinitionVersion.getVersion(),
 					kaleoInstance.getUserId(), kaleoInstance.getUserName());
+
+				_workflowMetricsReindexStatusMessageSender.sendStatusMessage(
+					atomicCounter.incrementAndGet(), total, "instance");
 			});
 
 		actionableDynamicQuery.performActions();
 	}
 
 	@Reference
-	private InstanceIndexerHelper _instanceIndexerHelper;
+	private IndexerHelper _indexerHelper;
 
 	@Reference
 	private InstanceWorkflowMetricsIndexer _instanceWorkflowMetricsIndexer;
@@ -94,5 +106,9 @@ public class InstanceWorkflowMetricsReindexer
 
 	@Reference
 	private KaleoInstanceLocalService _kaleoInstanceLocalService;
+
+	@Reference
+	private WorkflowMetricsReindexStatusMessageSender
+		_workflowMetricsReindexStatusMessageSender;
 
 }

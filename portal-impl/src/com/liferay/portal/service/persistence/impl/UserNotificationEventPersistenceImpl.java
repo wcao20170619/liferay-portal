@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchUserNotificationEventException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
+import com.liferay.portal.kernel.model.UserNotificationEventTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.UserNotificationEventPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -11538,6 +11539,13 @@ public class UserNotificationEventPersistenceImpl
 		"userNotificationEvent.archived = ?";
 
 	public UserNotificationEventPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+		dbColumnNames.put("type", "type_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(UserNotificationEvent.class);
 
 		setModelImplClass(UserNotificationEventImpl.class);
@@ -11545,12 +11553,7 @@ public class UserNotificationEventPersistenceImpl
 		setEntityCacheEnabled(
 			UserNotificationEventModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-		dbColumnNames.put("type", "type_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(UserNotificationEventTable.INSTANCE);
 	}
 
 	/**

@@ -96,14 +96,14 @@ function switchLayoutData(state, {currentExperienceId, targetExperienceId}) {
 	const {layoutData: prevLayoutData, layoutDataList} = nextState;
 
 	const layoutDataItem = state.layoutDataList.find(
-		layoutDataItem =>
+		(layoutDataItem) =>
 			layoutDataItem.segmentsExperienceId === targetExperienceId
 	);
 
 	nextState = {
 		...nextState,
 		layoutData: layoutDataItem.layoutData,
-		layoutDataList: layoutDataList.map(layoutDataItem => {
+		layoutDataList: layoutDataList.map((layoutDataItem) => {
 			if (currentExperienceId === layoutDataItem.segmentsExperienceId) {
 				return {
 					...layoutDataItem,
@@ -116,31 +116,6 @@ function switchLayoutData(state, {currentExperienceId, targetExperienceId}) {
 	};
 
 	return nextState;
-}
-
-/**
- * Updates the fragmentEntryLinks editableValues in State
- *
- * @param {object} state
- * @param {string} state.defaultSegmentsExperienceId
- * @param {object} state.fragmentEntryLinks
- * @param {string} fragmentEntryLinks
- * @returns {object}
- */
-function updateFragmentEntryLinksEditableValues(
-	state,
-	fragmentEntryLinks = {}
-) {
-	const updatedFragmentEntryLinks = state.fragmentEntryLinks;
-
-	Object.entries(fragmentEntryLinks).forEach(([id, editableValues]) => {
-		updatedFragmentEntryLinks[id].editableValues = editableValues;
-	});
-
-	return {
-		...state,
-		fragmentEntryLinks: updatedFragmentEntryLinks,
-	};
 }
 
 function deleteExperienceById(state, segmentsExperienceId) {
@@ -158,7 +133,7 @@ function removeLayoutDataItemById(state, segmentsExperienceId) {
 	const layoutDataList = state.layoutDataList;
 
 	const updatedLayoutDataList = layoutDataList.filter(
-		layoutDataItem =>
+		(layoutDataItem) =>
 			layoutDataItem.segmentsExperienceId !== segmentsExperienceId
 	);
 
@@ -178,11 +153,11 @@ function removeLayoutDataItemById(state, segmentsExperienceId) {
 function updateUsedWidgets(widgets, portletIds) {
 	const filteredWidgets = [...widgets];
 
-	filteredWidgets.forEach(widgetCategory => {
+	filteredWidgets.forEach((widgetCategory) => {
 		const {categories = [], portlets = []} = widgetCategory;
 
 		widgetCategory.categories = updateUsedWidgets(categories, portletIds);
-		widgetCategory.portlets = portlets.map(portlet => {
+		widgetCategory.portlets = portlets.map((portlet) => {
 			if (
 				portletIds.indexOf(portlet.portletId) !== -1 &&
 				!portlet.instanceable
@@ -237,5 +212,4 @@ export {
 	setUsedWidgets,
 	storeNewLayoutData,
 	switchLayoutData,
-	updateFragmentEntryLinksEditableValues,
 };

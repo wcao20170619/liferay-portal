@@ -25,20 +25,20 @@ const Item = ({
 	overdueTaskCount,
 	processId,
 	taskCount,
-	taskKeys,
+	taskNames,
 }) => {
 	const {defaultDelta} = useContext(AppContext);
 
 	const getFiltersQuery = useCallback(
-		slaStatus => ({
+		(slaStatus) => ({
 			[filterConstants.assignee.key]: [id],
 			[filterConstants.processStatus.key]: [
 				processStatusConstants.pending,
 			],
-			[filterConstants.processStep.key]: taskKeys,
+			[filterConstants.processStep.key]: taskNames,
 			[filterConstants.slaStatus.key]: [slaStatus],
 		}),
-		[id, taskKeys]
+		[id, taskNames]
 	);
 
 	const instancesListPath = useMemo(
@@ -106,7 +106,7 @@ const Item = ({
 	);
 };
 
-const Table = ({items, processId, taskKeys}) => {
+const Table = ({items, processId, taskNames}) => {
 	return (
 		<div className="table-responsive workflow-process-dashboard">
 			<table className="table table-heading-nowrap table-hover table-list">
@@ -152,7 +152,7 @@ const Table = ({items, processId, taskKeys}) => {
 							{...item}
 							key={index}
 							processId={processId}
-							taskKeys={taskKeys}
+							taskNames={taskNames}
 						/>
 					))}
 				</tbody>

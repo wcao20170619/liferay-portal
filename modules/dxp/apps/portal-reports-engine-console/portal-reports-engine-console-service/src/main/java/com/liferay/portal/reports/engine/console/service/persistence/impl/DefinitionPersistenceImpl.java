@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.reports.engine.console.exception.NoSuchDefinitionException;
 import com.liferay.portal.reports.engine.console.model.Definition;
+import com.liferay.portal.reports.engine.console.model.DefinitionTable;
 import com.liferay.portal.reports.engine.console.model.impl.DefinitionImpl;
 import com.liferay.portal.reports.engine.console.model.impl.DefinitionModelImpl;
 import com.liferay.portal.reports.engine.console.service.persistence.DefinitionPersistence;
@@ -2839,16 +2840,18 @@ public class DefinitionPersistenceImpl
 		"definition.companyId = ?";
 
 	public DefinitionPersistenceImpl() {
-		setModelClass(Definition.class);
-
-		setModelImplClass(DefinitionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Definition.class);
+
+		setModelImplClass(DefinitionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DefinitionTable.INSTANCE);
 	}
 
 	/**

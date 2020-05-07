@@ -23,7 +23,8 @@ import java.util.Objects;
  */
 public enum TimeSpan {
 
-	LAST_7_DAYS("last-7-days", 7), LAST_30_DAYS("last-30-days", 30);
+	LAST_7_DAYS("last-7-days", 7), LAST_30_DAYS("last-30-days", 30),
+	TODAY("today", 1);
 
 	public static String defaultTimeSpanKey() {
 		return LAST_7_DAYS.getKey();

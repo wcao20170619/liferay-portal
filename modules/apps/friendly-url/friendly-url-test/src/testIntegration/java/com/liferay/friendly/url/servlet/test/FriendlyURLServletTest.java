@@ -65,6 +65,7 @@ import java.util.Objects;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -131,7 +132,8 @@ public class FriendlyURLServletTest {
 			"com.liferay.friendly.url.internal.servlet.FriendlyURLServlet");
 
 		_getRedirectMethod = clazz.getDeclaredMethod(
-			"getRedirect", HttpServletRequest.class, String.class);
+			"getRedirect", HttpServletRequest.class, HttpServletResponse.class,
+			String.class);
 
 		clazz = classLoader.loadClass(
 			"com.liferay.friendly.url.internal.servlet.FriendlyURLServlet" +
@@ -284,6 +286,26 @@ public class FriendlyURLServletTest {
 			"/careers", mockHttpServletResponse.getHeader("Location"));
 		Assert.assertEquals(302, mockHttpServletResponse.getStatus());
 		Assert.assertTrue(mockHttpServletResponse.isCommitted());
+	}
+
+	@Test
+	public void testServiceForwardToDefaultLayoutWith404OnMissingLayout()
+		throws Throwable {
+
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		testGetRedirect(
+			new MockHttpServletRequest(
+				"GET",
+				StringBundler.concat(
+					PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING,
+					_group.getFriendlyURL(), StringPool.SLASH, "path")),
+			mockHttpServletResponse, getPath(_group, _layout) + "/path",
+			Portal.PATH_MAIN,
+			_redirectConstructor1.newInstance(getURL(_layout)));
+
+		Assert.assertEquals(404, mockHttpServletResponse.getStatus());
 	}
 
 	@Test
@@ -482,18 +504,30 @@ public class FriendlyURLServletTest {
 	}
 
 	protected void testGetRedirect(
-			HttpServletRequest httpServletRequest, String path, String mainPath,
-			Object expectedRedirect)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String path,
+			String mainPath, Object expectedRedirect)
 		throws Throwable {
 
 		try {
 			Assert.assertEquals(
 				expectedRedirect,
-				_getRedirectMethod.invoke(_servlet, httpServletRequest, path));
+				_getRedirectMethod.invoke(
+					_servlet, httpServletRequest, httpServletResponse, path));
 		}
 		catch (InvocationTargetException invocationTargetException) {
 			throw invocationTargetException.getCause();
 		}
+	}
+
+	protected void testGetRedirect(
+			HttpServletRequest httpServletRequest, String path, String mainPath,
+			Object expectedRedirect)
+		throws Throwable {
+
+		testGetRedirect(
+			httpServletRequest, new MockHttpServletResponse(), path, mainPath,
+			expectedRedirect);
 	}
 
 	@Inject

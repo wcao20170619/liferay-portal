@@ -48,26 +48,39 @@ public final class AddOrUpdateFileOperation extends BaseOperation {
 			String filePath, String changeLog, InputStream inputStream)
 		throws SharepointException {
 
-		CopyIntoItemsResponseDocument copyIntoItemsResponseDocument = null;
-
 		try {
-			copyIntoItemsResponseDocument = copySoap12Stub.copyIntoItems(
-				getCopyIntoItemsDocument(filePath, inputStream));
+			CopyIntoItemsResponseDocument copyIntoItemsResponseDocument =
+				copySoap12Stub.copyIntoItems(
+					_getCopyIntoItemsDocument(filePath, inputStream));
+
+			_processCopyIntoItemsResponseDocument(
+				copyIntoItemsResponseDocument);
+
+			if (changeLog != null) {
+				_checkInFileOperation.execute(
+					filePath, changeLog,
+					SharepointConnection.CheckInType.MAJOR);
+			}
 		}
 		catch (RemoteException remoteException) {
 			throw RemoteExceptionSharepointExceptionMapper.map(
 				remoteException, sharepointConnectionInfo);
 		}
+	}
 
-		processCopyIntoItemsResponseDocument(copyIntoItemsResponseDocument);
+	private byte[] _getBytes(InputStream inputStream)
+		throws SharepointException {
 
-		if (changeLog != null) {
-			_checkInFileOperation.execute(
-				filePath, changeLog, SharepointConnection.CheckInType.MAJOR);
+		try {
+			return FileUtil.getBytes(inputStream);
+		}
+		catch (IOException ioException) {
+			throw new SharepointException(
+				"Unable to read input stream", ioException);
 		}
 	}
 
-	protected CopyIntoItemsDocument getCopyIntoItemsDocument(
+	private CopyIntoItemsDocument _getCopyIntoItemsDocument(
 			String filePath, InputStream inputStream)
 		throws SharepointException {
 
@@ -84,40 +97,6 @@ public final class AddOrUpdateFileOperation extends BaseOperation {
 		copyIntoItems.setStream(_getBytes(inputStream));
 
 		return copyIntoItemsDocument;
-	}
-
-	protected Void processCopyIntoItemsResponseDocument(
-			CopyIntoItemsResponseDocument copyIntoItemsResponseDocument)
-		throws SharepointException {
-
-		CopyIntoItemsResponseDocument.CopyIntoItemsResponse
-			copyIntoItemsResponse =
-				copyIntoItemsResponseDocument.getCopyIntoItemsResponse();
-
-		CopyResultCollection copyResultCollection =
-			copyIntoItemsResponse.getResults();
-
-		CopyResult copyResult = copyResultCollection.getCopyResultArray(0);
-
-		if (copyResult.getErrorCode() != CopyErrorCode.SUCCESS) {
-			throw new SharepointResultException(
-				String.valueOf(copyResult.getErrorCode()),
-				copyResult.getErrorMessage());
-		}
-
-		return null;
-	}
-
-	private byte[] _getBytes(InputStream inputStream)
-		throws SharepointException {
-
-		try {
-			return FileUtil.getBytes(inputStream);
-		}
-		catch (IOException ioException) {
-			throw new SharepointException(
-				"Unable to read input stream", ioException);
-		}
 	}
 
 	private DestinationUrlCollection _getDestinationUrlCollection(
@@ -139,6 +118,26 @@ public final class AddOrUpdateFileOperation extends BaseOperation {
 			_EMPTY_FIELD_INFORMATIONS);
 
 		return fieldInformationCollection;
+	}
+
+	private void _processCopyIntoItemsResponseDocument(
+			CopyIntoItemsResponseDocument copyIntoItemsResponseDocument)
+		throws SharepointException {
+
+		CopyIntoItemsResponseDocument.CopyIntoItemsResponse
+			copyIntoItemsResponse =
+				copyIntoItemsResponseDocument.getCopyIntoItemsResponse();
+
+		CopyResultCollection copyResultCollection =
+			copyIntoItemsResponse.getResults();
+
+		CopyResult copyResult = copyResultCollection.getCopyResultArray(0);
+
+		if (copyResult.getErrorCode() != CopyErrorCode.SUCCESS) {
+			throw new SharepointResultException(
+				String.valueOf(copyResult.getErrorCode()),
+				copyResult.getErrorMessage());
+		}
 	}
 
 	private static final FieldInformation[] _EMPTY_FIELD_INFORMATIONS =

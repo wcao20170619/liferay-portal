@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.tools.service.builder.test.exception.NoSuchEagerBlobEntityException;
 import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntity;
+import com.liferay.portal.tools.service.builder.test.model.EagerBlobEntityTable;
 import com.liferay.portal.tools.service.builder.test.model.impl.EagerBlobEntityImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.EagerBlobEntityModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.EagerBlobEntityPersistence;
@@ -873,18 +874,20 @@ public class EagerBlobEntityPersistenceImpl
 		"eagerBlobEntity.groupId = ?";
 
 	public EagerBlobEntityPersistenceImpl() {
-		setModelClass(EagerBlobEntity.class);
-
-		setModelImplClass(EagerBlobEntityImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(EagerBlobEntityModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("blob", "blob_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(EagerBlobEntity.class);
+
+		setModelImplClass(EagerBlobEntityImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(EagerBlobEntityModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(EagerBlobEntityTable.INSTANCE);
 	}
 
 	/**

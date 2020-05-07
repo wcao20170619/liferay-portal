@@ -28,7 +28,8 @@ const baseProps = {
 	url: 'http://url',
 };
 
-const renderComponent = props => render(<Ratings {...baseProps} {...props} />);
+const renderComponent = (props) =>
+	render(<Ratings {...baseProps} {...props} />);
 
 describe('RatingsLike', () => {
 	afterEach(cleanup);
@@ -148,7 +149,7 @@ describe('RatingsLike', () => {
 
 	describe('when there is a valid server response', () => {
 		beforeEach(() => {
-			fetch.mockResponseOnce(JSON.stringify({totalScore: 27}));
+			fetch.mockResponseOnce(JSON.stringify({totalScore: 27.1}));
 		});
 
 		afterEach(() => {
@@ -177,7 +178,7 @@ describe('RatingsLike', () => {
 				expect(objFormData.score).toBe('1');
 			});
 
-			it('updates the counters with the ones from the server', () => {
+			it('updates the rounded counters with the ones from the server', () => {
 				expect(LikeButton.value).toBe('27');
 			});
 		});

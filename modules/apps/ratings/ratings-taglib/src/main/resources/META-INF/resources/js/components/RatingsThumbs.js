@@ -126,13 +126,15 @@ const RatingsThumbs = ({
 	}, [inititalTitle, pressed]);
 
 	const handleSendVoteRequest = useCallback(
-		score => {
+		(score) => {
 			sendVoteRequest(score).then(({totalEntries, totalScore} = {}) => {
 				if (isMounted() && totalEntries && totalScore) {
+					const positiveVotes = Math.round(totalScore);
+
 					dispatch({
 						payload: {
-							negativeVotes: totalEntries - totalScore,
-							positiveVotes: totalScore,
+							negativeVotes: totalEntries - positiveVotes,
+							positiveVotes,
 						},
 						type: UPDATE_VOTES,
 					});
@@ -189,6 +191,6 @@ RatingsThumbs.propTypes = {
 	thumbUp: PropTypes.bool,
 };
 
-export default function(props) {
+export default function (props) {
 	return <RatingsThumbs {...props} />;
 }

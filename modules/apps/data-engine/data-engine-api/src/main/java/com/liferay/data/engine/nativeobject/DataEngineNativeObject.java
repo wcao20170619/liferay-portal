@@ -14,11 +14,17 @@
 
 package com.liferay.data.engine.nativeobject;
 
+import java.util.List;
+
 /**
  * @author Jeyvison Nascimento
  */
 public interface DataEngineNativeObject {
 
 	public String getClassName();
+
+	public List<DataEngineNativeObjectField> getDataEngineNativeObjectFields();
+
+	public String getName();
 
 }

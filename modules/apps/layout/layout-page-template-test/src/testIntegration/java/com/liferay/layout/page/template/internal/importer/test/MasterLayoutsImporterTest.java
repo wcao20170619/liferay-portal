@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -113,6 +114,23 @@ public class MasterLayoutsImporterTest {
 	}
 
 	@Test
+	public void testImportMasterLayoutDropZone() throws Exception {
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_importLayoutPageTemplateEntry("master-page-drop-zone");
+
+		Assert.assertEquals(
+			"Master Page Drop Zone", layoutPageTemplateEntry.getName());
+
+		_validateLayoutPageTemplateStructureDropZone(
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					_group.getGroupId(),
+					_portal.getClassNameId(Layout.class.getName()),
+					layoutPageTemplateEntry.getPlid()),
+			new ArrayList<>(), true);
+	}
+
+	@Test
 	public void testImportMasterLayoutDropZoneAllowedFragments()
 		throws Exception {
 
@@ -177,20 +195,61 @@ public class MasterLayoutsImporterTest {
 	}
 
 	@Test
-	public void testImportMasterLayoutsDropZone() throws Exception {
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_importLayoutPageTemplateEntry("master-page-drop-zone");
+	public void testImportMasterLayoutExistingNameNoOvewrite()
+		throws Exception {
+
+		String testCaseName = "master-page-drop-zone-allowed-fragments";
+
+		_importLayoutPageTemplateEntry(testCaseName);
+
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				_getLayoutPageTemplatesImporterResultEntries(testCaseName);
+
+		LayoutPageTemplatesImporterResultEntry
+			layoutPageTemplatesImporterResultEntry =
+				layoutPageTemplatesImporterResultEntries.get(0);
 
 		Assert.assertEquals(
-			"Master Page Drop Zone", layoutPageTemplateEntry.getName());
+			LayoutPageTemplatesImporterResultEntry.Status.IGNORED,
+			layoutPageTemplatesImporterResultEntry.getStatus());
+		Assert.assertEquals(
+			String.format(
+				"%s/master-pages/%s/master-page.json was ignored because a " +
+					"master page with the same key already exists.",
+				testCaseName, testCaseName),
+			layoutPageTemplatesImporterResultEntry.getErrorMessage());
+	}
 
-		_validateLayoutPageTemplateStructureDropZone(
-			_layoutPageTemplateStructureLocalService.
-				fetchLayoutPageTemplateStructure(
-					_group.getGroupId(),
-					_portal.getClassNameId(Layout.class.getName()),
-					layoutPageTemplateEntry.getPlid()),
-			new ArrayList<>(), true);
+	@Test
+	public void testImportMasterLayouts() throws Exception {
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				_getLayoutPageTemplatesImporterResultEntries(
+					"master-page-multiple");
+
+		Assert.assertEquals(
+			layoutPageTemplatesImporterResultEntries.toString(), 2,
+			layoutPageTemplatesImporterResultEntries.size());
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry1 =
+			_getLayoutPageTemplateEntry(
+				layoutPageTemplatesImporterResultEntries, 0);
+		LayoutPageTemplateEntry layoutPageTemplateEntry2 =
+			_getLayoutPageTemplateEntry(
+				layoutPageTemplatesImporterResultEntries, 1);
+
+		List<String> actualLayoutPageTemplateEntryNames = ListUtil.sort(
+			new ArrayList() {
+				{
+					add(layoutPageTemplateEntry1.getName());
+					add(layoutPageTemplateEntry2.getName());
+				}
+			});
+
+		Assert.assertArrayEquals(
+			new String[] {"Master Page One", "Master Page Two"},
+			actualLayoutPageTemplateEntryNames.toArray(new String[0]));
 	}
 
 	private void _addZipWriterEntry(ZipWriter zipWriter, URL url)
@@ -233,8 +292,36 @@ public class MasterLayoutsImporterTest {
 		}
 	}
 
-	private LayoutPageTemplateEntry _importLayoutPageTemplateEntry(
-			String testCaseName)
+	private LayoutPageTemplateEntry _getLayoutPageTemplateEntry(
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries,
+		int index) {
+
+		LayoutPageTemplatesImporterResultEntry
+			layoutPageTemplatesImporterResultEntry =
+				layoutPageTemplatesImporterResultEntries.get(index);
+
+		Assert.assertEquals(
+			LayoutPageTemplatesImporterResultEntry.Status.IMPORTED,
+			layoutPageTemplatesImporterResultEntry.getStatus());
+
+		String layoutPageTemplateEntryKey = StringUtil.toLowerCase(
+			layoutPageTemplatesImporterResultEntry.getName());
+
+		layoutPageTemplateEntryKey = StringUtil.replace(
+			layoutPageTemplateEntryKey, CharPool.SPACE, CharPool.DASH);
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
+				_group.getGroupId(), layoutPageTemplateEntryKey);
+
+		Assert.assertNotNull(layoutPageTemplateEntry);
+
+		return layoutPageTemplateEntry;
+	}
+
+	private List<LayoutPageTemplatesImporterResultEntry>
+			_getLayoutPageTemplatesImporterResultEntries(String testCaseName)
 		throws Exception {
 
 		File file = _generateZipFile(testCaseName);
@@ -258,31 +345,23 @@ public class MasterLayoutsImporterTest {
 
 		Assert.assertNotNull(layoutPageTemplatesImporterResultEntries);
 
+		return layoutPageTemplatesImporterResultEntries;
+	}
+
+	private LayoutPageTemplateEntry _importLayoutPageTemplateEntry(
+			String testCaseName)
+		throws Exception {
+
+		List<LayoutPageTemplatesImporterResultEntry>
+			layoutPageTemplatesImporterResultEntries =
+				_getLayoutPageTemplatesImporterResultEntries(testCaseName);
+
 		Assert.assertEquals(
 			layoutPageTemplatesImporterResultEntries.toString(), 1,
 			layoutPageTemplatesImporterResultEntries.size());
 
-		LayoutPageTemplatesImporterResultEntry
-			layoutPageTemplatesImporterResultEntry =
-				layoutPageTemplatesImporterResultEntries.get(0);
-
-		Assert.assertEquals(
-			LayoutPageTemplatesImporterResultEntry.Status.IMPORTED,
-			layoutPageTemplatesImporterResultEntry.getStatus());
-
-		String layoutPageTemplateEntryKey = StringUtil.toLowerCase(
-			layoutPageTemplatesImporterResultEntry.getName());
-
-		layoutPageTemplateEntryKey = StringUtil.replace(
-			layoutPageTemplateEntryKey, CharPool.SPACE, CharPool.DASH);
-
-		LayoutPageTemplateEntry layoutPageTemplateEntry =
-			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				_group.getGroupId(), layoutPageTemplateEntryKey);
-
-		Assert.assertNotNull(layoutPageTemplateEntry);
-
-		return layoutPageTemplateEntry;
+		return _getLayoutPageTemplateEntry(
+			layoutPageTemplatesImporterResultEntries, 0);
 	}
 
 	private void _populateZipWriter(ZipWriter zipWriter, URL url)

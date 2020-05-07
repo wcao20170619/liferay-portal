@@ -66,6 +66,8 @@ definition {
 
 	@priority = "4"
 	test AssertSearchInsightsExplain {
+		property test.name.skip.portal.instance = "Elasticsearch6#AssertSearchInsightsExplain";
+
 		JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
@@ -227,7 +229,6 @@ definition {
 	}
 
 	test SearchWithNonLiferayIndex {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "Elasticsearch6#SearchWithNonLiferayIndex";
 
 		Navigator.openSpecificURL(url = "http://localhost:9201");

@@ -77,8 +77,10 @@
 						<aui:input name="<%= net.oauth.OAuth.OAUTH_CALLBACK %>" type="hidden" value="<%= oAuthCallback %>" />
 						<aui:input name="<%= net.oauth.OAuth.OAUTH_TOKEN %>" type="hidden" value="<%= oAuthAccessor.getRequestToken() %>" />
 
-						<aui:row>
-							<aui:col width="<%= (oAuthApplication.getLogoId() != 0) ? 50 : 100 %>">
+						<clay:row>
+							<clay:col
+								md="<%= (oAuthApplication.getLogoId() != 0) ? String.valueOf(6) : String.valueOf(12) %>"
+							>
 								<liferay-ui:message key="the-application-listed-below-is-requesting-access-to-your-account" />
 
 								<h3>
@@ -102,14 +104,16 @@
 										</li>
 									</c:if>
 								</ul>
-							</aui:col>
+							</clay:col>
 
 							<c:if test="<%= oAuthApplication.getLogoId() != 0 %>">
-								<aui:col width="<%= 50 %>">
+								<clay:col
+									md="6"
+								>
 									<img src="<%= HtmlUtil.escape(themeDisplay.getPathImage() + "/logo?img_id=" + oAuthApplication.getLogoId() + "&t=" + WebServerServletTokenUtil.getToken(oAuthApplication.getLogoId())) %>" />
-								</aui:col>
+								</clay:col>
 							</c:if>
-						</aui:row>
+						</clay:row>
 
 						<aui:button-row>
 							<aui:button type="submit" value="grant-access" />

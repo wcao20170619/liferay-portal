@@ -202,9 +202,27 @@ public class DDMFormEvaluatorHelper {
 
 			evaluateDDMFormRuleAction(
 				stream.collect(Collectors.joining(" AND ")));
+
+			_evaluatedActions = ListUtil.copy(actions);
 		}
 		else {
-			_ddmFormRuleHelper.checkFieldAffectedByAction(ddmFormRule);
+			DDMFormRule copyDDMFormRule = new DDMFormRule(ddmFormRule);
+
+			if (_evaluatedActions != null) {
+				List<String> actions = copyDDMFormRule.getActions();
+
+				Stream<String> stream = actions.stream();
+
+				List<String> actionsNotEvaluated = stream.filter(
+					action -> !_evaluatedActions.contains(action)
+				).collect(
+					Collectors.toList()
+				);
+
+				copyDDMFormRule.setActions(actionsNotEvaluated);
+			}
+
+			_ddmFormRuleHelper.checkFieldAffectedByAction(copyDDMFormRule);
 		}
 	}
 
@@ -709,6 +727,7 @@ public class DDMFormEvaluatorHelper {
 		_ddmFormFieldTypeServicesTracker;
 	private final DDMFormLayout _ddmFormLayout;
 	private final DDMFormEvaluatorRuleHelper _ddmFormRuleHelper;
+	private List<String> _evaluatedActions;
 	private final Map<Integer, Integer> _pageFlow = new HashMap<>();
 	private ResourceBundle _resourceBundle;
 

@@ -16,6 +16,7 @@ package com.liferay.calendar.service.persistence.impl;
 
 import com.liferay.calendar.exception.NoSuchResourceException;
 import com.liferay.calendar.model.CalendarResource;
+import com.liferay.calendar.model.CalendarResourceTable;
 import com.liferay.calendar.model.impl.CalendarResourceImpl;
 import com.liferay.calendar.model.impl.CalendarResourceModelImpl;
 import com.liferay.calendar.service.persistence.CalendarResourcePersistence;
@@ -6259,11 +6260,6 @@ public class CalendarResourcePersistenceImpl
 		"calendarResource.active = ?";
 
 	public CalendarResourcePersistenceImpl() {
-		setModelClass(CalendarResource.class);
-
-		setModelImplClass(CalendarResourceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -6271,6 +6267,13 @@ public class CalendarResourcePersistenceImpl
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(CalendarResource.class);
+
+		setModelImplClass(CalendarResourceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(CalendarResourceTable.INSTANCE);
 	}
 
 	/**

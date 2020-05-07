@@ -53,6 +53,7 @@ class ResultRankingsForm extends Component {
 	};
 
 	state = {
+
 		/**
 		 * Number of the active tab.
 		 * @type {number}
@@ -189,7 +190,7 @@ class ResultRankingsForm extends Component {
 	 */
 	_getHiddenAdded = () =>
 		this.state.resultIdsHidden.filter(
-			item => !this._initialResultIdsHidden.includes(item)
+			(item) => !this._initialResultIdsHidden.includes(item)
 		);
 
 	/**
@@ -197,7 +198,7 @@ class ResultRankingsForm extends Component {
 	 */
 	_getHiddenRemoved = () =>
 		this._initialResultIdsHidden.filter(
-			item => !this.state.resultIdsHidden.includes(item)
+			(item) => !this.state.resultIdsHidden.includes(item)
 		);
 
 	/**
@@ -208,7 +209,7 @@ class ResultRankingsForm extends Component {
 	_getResultIdsVisible = () => {
 		const {resultIds, resultIdsPinned} = this.state;
 
-		const notPinnedOrHiddenIds = resultIds.filter(id =>
+		const notPinnedOrHiddenIds = resultIds.filter((id) =>
 			this._isNotPinnedOrHidden(id)
 		);
 
@@ -220,7 +221,7 @@ class ResultRankingsForm extends Component {
 	 * state of the ranking to inactive or active (boolean value).
 	 */
 	_handleActive = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			inactive: !state.inactive,
 		}));
 	};
@@ -232,7 +233,7 @@ class ResultRankingsForm extends Component {
 	 * @param {boolean} pin The new pin value to set. Defaults to true.
 	 */
 	_handleClickPin = (ids, pin = true) => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			dataMap: updateDataMap(state.dataMap, ids, {
 				hidden: false,
 				pinned: pin,
@@ -252,7 +253,7 @@ class ResultRankingsForm extends Component {
 	 * @param {boolean} hide The new hide value to set. Defaults to true.
 	 */
 	_handleClickHide = (ids, hide = true) => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			dataMap: updateDataMap(state.dataMap, ids, {
 				hidden: hide,
 				pinned: false,
@@ -288,12 +289,14 @@ class ResultRankingsForm extends Component {
 				const fetchedItems = items || {};
 
 				// Get existing results to update its addedResult property.
+
 				const existingFetchedIds = fetchedItems
 					.filter(({id}) => this.state.resultIds.includes(id))
 					.map(({id}) => id);
 
 				// Remove duplicate results from the new list of results to
 				// avoid duplicate key errors.
+
 				const newItems = fetchedItems.filter(
 					({id}) => !this.state.resultIds.includes(id)
 				);
@@ -305,21 +308,24 @@ class ResultRankingsForm extends Component {
 
 				// Keep history of all initially pinned results to update the
 				// end index of pinned results.
+
 				this._initialResultIdsPinned = [
 					...this._initialResultIdsPinned,
 					...newPinnedIds,
 				];
 
 				this.setState(
-					state => ({
+					(state) => ({
 						dataLoadingVisible: false,
 						dataMap: {
+
 							// In the case when a previously added result is
 							// actually one of the results that loads in, its
 							// 'addedResult' property must be set to false.
 							// This prevents confusion since unpinning or
 							// un-hiding added results removes it from results
 							// list entirely.
+
 							...updateDataMap(
 								state.dataMap,
 								existingFetchedIds,
@@ -345,7 +351,8 @@ class ResultRankingsForm extends Component {
 					}
 				);
 			})
-			.catch(error => {
+			.catch((error) => {
+
 				// Delay showing error message so the user has confirmation
 				// when attempting to reload the content after an error.
 
@@ -385,12 +392,14 @@ class ResultRankingsForm extends Component {
 
 				// Get already existing results in order to set addedResult
 				// property to false in setState.
+
 				const existingFetchedIds = fetchedItems
 					.filter(({id}) => this.state.resultIds.includes(id))
 					.map(({id}) => id);
 
 				// Remove duplicate results from the new list of results to
 				// avoid duplicate key errors.
+
 				const newItems = fetchedItems.filter(
 					({id}) => !this.state.resultIds.includes(id)
 				);
@@ -399,20 +408,23 @@ class ResultRankingsForm extends Component {
 
 				// Keep history of all initial results, to get the difference
 				// for addedResults and for all added/removed hidden/pinned
+
 				this._initialResultIdsHidden = [
 					...this._initialResultIdsHidden,
 					...newIds,
 				];
 
-				this.setState(state => ({
+				this.setState((state) => ({
 					dataLoadingHidden: false,
 					dataMap: {
+
 						// In the case when a previously added result is
 						// actually one of the results that loads in, its
 						// 'addedResult' property must be set to false.
 						// This prevents confusion since unpinning or
 						// un-hiding added results removes it from results
 						// list entirely.
+
 						...updateDataMap(state.dataMap, existingFetchedIds, {
 							addedResult: false,
 						}),
@@ -424,7 +436,8 @@ class ResultRankingsForm extends Component {
 					totalResultsHiddenCount: total,
 				}));
 			})
-			.catch(error => {
+			.catch((error) => {
+
 				// Delay showing error message so the user has confirmation
 				// when attempting to reload the content after an error.
 
@@ -448,7 +461,7 @@ class ResultRankingsForm extends Component {
 	 */
 	_handleMove = (fromIndex, toIndex) => {
 		if (!isNil(fromIndex) && !isNil(toIndex) && fromIndex !== toIndex) {
-			this.setState(state => ({
+			this.setState((state) => ({
 				resultIdsPinned: move(
 					state.resultIdsPinned,
 					fromIndex,
@@ -470,9 +483,9 @@ class ResultRankingsForm extends Component {
 			[`${namespace}inactive`]: this.state.inactive,
 			[`${namespace}keywords`]: this.props.searchQuery,
 			[`${namespace}resultsRankingUid`]: this.props.resultsRankingUid,
-		}).then(response => {
+		}).then((response) => {
 			if (response.errors.length) {
-				response.errors.forEach(message => {
+				response.errors.forEach((message) => {
 					Liferay.Util.openToast({
 						message,
 						title: Liferay.Language.get('error'),
@@ -499,7 +512,7 @@ class ResultRankingsForm extends Component {
 	 * @param {array} keywords The list of the new aliases (array of list-value
 	 * objects).
 	 */
-	_handleUpdateAliases = keywords => {
+	_handleUpdateAliases = (keywords) => {
 		this.setState({aliases: keywords.map(({value}) => value)});
 	};
 
@@ -509,7 +522,7 @@ class ResultRankingsForm extends Component {
 	 * @param {array} addedResultsDataList The value of the added results
 	 * (array of objects).
 	 */
-	_handleUpdateAddResultIds = addedResultsDataList => {
+	_handleUpdateAddResultIds = (addedResultsDataList) => {
 		const mappedData = resultsDataToMap(addedResultsDataList);
 
 		// Make sure that all added results that are not part of the original
@@ -541,30 +554,33 @@ class ResultRankingsForm extends Component {
 
 		const addedResultsIds = addedResultsDataList.map(({id}) => id);
 
-		this.setState(state => ({
+		this.setState((state) => ({
 			dataMap: {
 				...state.dataMap,
 				...newMappedData,
 			},
 			resultIds: [
 				...state.resultIds,
-				...addedResultsIds.filter(id => !state.resultIds.includes(id)),
+				...addedResultsIds.filter(
+					(id) => !state.resultIds.includes(id)
+				),
 			],
 
 			// Remove any results from hidden if they are getting pinned
 			// and considered as an addedResult.
 
 			resultIdsHidden: state.resultIdsHidden.filter(
-				id => !addedResultsIds.includes(id)
+				(id) => !addedResultsIds.includes(id)
 			),
 			resultIdsPinned: [
+
 				// Place the addedResults at the top of the pinned list
 				// while removing any that are already part of the
 				// pinned list.
 
 				...addedResultsDataList
 					.filter(
-						result => !state.resultIdsPinned.includes(result.id)
+						(result) => !state.resultIdsPinned.includes(result.id)
 					)
 					.map(({id}) => id),
 				...state.resultIdsPinned,
@@ -589,7 +605,7 @@ class ResultRankingsForm extends Component {
 	 * the remaining results in the visible tab.
 	 * @param {number|string} id The id of the item to check.
 	 */
-	_isNotPinnedOrHidden = id => {
+	_isNotPinnedOrHidden = (id) => {
 		const {resultIdsHidden, resultIdsPinned} = this.state;
 
 		return !resultIdsPinned.includes(id) && !resultIdsHidden.includes(id);
@@ -623,7 +639,7 @@ class ResultRankingsForm extends Component {
 	 * Updates the active tab of the results list by changing activeTabKeyValue.
 	 * @param {number} value The number of the tab.
 	 */
-	_setActiveTabKeyValue = value => {
+	_setActiveTabKeyValue = (value) => {
 		this.setState({
 			activeTabKeyValue: value,
 		});

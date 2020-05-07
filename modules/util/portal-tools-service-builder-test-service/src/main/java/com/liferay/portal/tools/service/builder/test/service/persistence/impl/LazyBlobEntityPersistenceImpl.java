@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.tools.service.builder.test.exception.NoSuchLazyBlobEntityException;
 import com.liferay.portal.tools.service.builder.test.model.LazyBlobEntity;
+import com.liferay.portal.tools.service.builder.test.model.LazyBlobEntityTable;
 import com.liferay.portal.tools.service.builder.test.model.impl.LazyBlobEntityImpl;
 import com.liferay.portal.tools.service.builder.test.model.impl.LazyBlobEntityModelImpl;
 import com.liferay.portal.tools.service.builder.test.service.persistence.LazyBlobEntityPersistence;
@@ -872,17 +873,19 @@ public class LazyBlobEntityPersistenceImpl
 		"lazyBlobEntity.groupId = ?";
 
 	public LazyBlobEntityPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("uuid", "uuid_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(LazyBlobEntity.class);
 
 		setModelImplClass(LazyBlobEntityImpl.class);
 		setModelPKClass(long.class);
 		setEntityCacheEnabled(LazyBlobEntityModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("uuid", "uuid_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(LazyBlobEntityTable.INSTANCE);
 	}
 
 	/**

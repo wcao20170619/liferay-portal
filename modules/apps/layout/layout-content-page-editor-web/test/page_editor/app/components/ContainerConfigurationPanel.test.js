@@ -106,7 +106,7 @@ jest.mock(
 describe('ContainerConfigurationPanel', () => {
 	afterEach(cleanup);
 
-	['top', 'bottom', 'horizontal'].forEach(paddingDirection => {
+	['top', 'bottom', 'horizontal'].forEach((paddingDirection) => {
 		const paddingLabel = `padding-${paddingDirection}`;
 		const paddingPropName = `padding${paddingDirection
 			.charAt(0)
@@ -161,6 +161,7 @@ describe('ContainerConfigurationPanel', () => {
 			});
 
 			// debug();
+
 			expect(getByLabelText('image-source').value).toBe(
 				'manual_selection'
 			);

@@ -31,6 +31,7 @@ export default ({
 	dataDefinitionId,
 	dataLayoutBuilder,
 	dataLayoutId,
+	fieldSetContentType,
 	groupId,
 }) => {
 	const reducer = createReducer(dataLayoutBuilder);
@@ -60,7 +61,7 @@ export default ({
 	useEffect(() => {
 		if (dataLayoutId) {
 			getItem(`/o/data-engine/v2.0/data-layouts/${dataLayoutId}`).then(
-				dataLayout =>
+				(dataLayout) =>
 					dispatch({
 						payload: {dataLayout},
 						type: UPDATE_DATA_LAYOUT,
@@ -73,7 +74,7 @@ export default ({
 		if (dataDefinitionId) {
 			getItem(
 				`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}`
-			).then(dataDefinition =>
+			).then((dataDefinition) =>
 				dispatch({
 					payload: {dataDefinition},
 					type: UPDATE_DATA_DEFINITION,
@@ -84,12 +85,22 @@ export default ({
 
 	useEffect(() => {
 		if (config.allowFieldSets && contentType) {
-			const globalFieldSetsPromise = getItem(
-				`/o/data-engine/v2.0/sites/${groupId}/data-definitions/by-content-type/${contentType}`
-			);
+			let _fieldSetContentType = fieldSetContentType;
+
+			if (!_fieldSetContentType) {
+				_fieldSetContentType = contentType;
+			}
+
+			let globalFieldSetsPromise = [];
+
+			if (groupId) {
+				globalFieldSetsPromise = getItem(
+					`/o/data-engine/v2.0/sites/${groupId}/data-definitions/by-content-type/${_fieldSetContentType}`
+				);
+			}
 
 			const groupFieldSetsPromise = getItem(
-				`/o/data-engine/v2.0/data-definitions/by-content-type/${contentType}`
+				`/o/data-engine/v2.0/data-definitions/by-content-type/${_fieldSetContentType}`
 			);
 
 			Promise.all([globalFieldSetsPromise, groupFieldSetsPromise])
@@ -109,7 +120,7 @@ export default ({
 						});
 					}
 				)
-				.catch(error => {
+				.catch((error) => {
 					if (process.env.NODE_ENV === 'development') {
 						console.warn(
 							`AppContextProvider: promise rejected: ${error}`
@@ -117,7 +128,13 @@ export default ({
 					}
 				});
 		}
-	}, [config.allowFieldSets, contentType, dispatch, groupId]);
+	}, [
+		config.allowFieldSets,
+		contentType,
+		dispatch,
+		fieldSetContentType,
+		groupId,
+	]);
 
 	return (
 		<AppContext.Provider value={[state, dispatch]}>

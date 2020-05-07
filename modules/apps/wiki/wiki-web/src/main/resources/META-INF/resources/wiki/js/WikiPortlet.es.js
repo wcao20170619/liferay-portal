@@ -23,6 +23,7 @@ import {EventHandler} from 'metal-events';
  * @extends {Component}
  */
 class WikiPortlet extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -43,7 +44,7 @@ class WikiPortlet extends PortletBase {
 			this.currentFormatIndex = formatSelect.selectedIndex;
 
 			this.eventHandler_.add(
-				formatSelect.addEventListener('change', e => {
+				formatSelect.addEventListener('change', (e) => {
 					this.changeWikiFormat_(e);
 				})
 			);
@@ -53,7 +54,7 @@ class WikiPortlet extends PortletBase {
 
 		if (publishButton) {
 			this.eventHandler_.add(
-				publishButton.addEventListener('click', e => {
+				publishButton.addEventListener('click', (e) => {
 					this.publishPage_(e);
 				})
 			);
@@ -63,7 +64,7 @@ class WikiPortlet extends PortletBase {
 
 		if (saveButton) {
 			this.eventHandler_.add(
-				saveButton.addEventListener('click', e => {
+				saveButton.addEventListener('click', (e) => {
 					this.saveDraft_(e);
 				})
 			);
@@ -71,7 +72,7 @@ class WikiPortlet extends PortletBase {
 
 		const searchContainerId = this.ns('pageAttachments');
 
-		Liferay.componentReady(searchContainerId).then(searchContainer => {
+		Liferay.componentReady(searchContainerId).then((searchContainer) => {
 			this.eventHandler_.add(
 				searchContainer
 					.get('contentBox')
@@ -170,7 +171,7 @@ class WikiPortlet extends PortletBase {
 
 		if (tempImages.length > 0) {
 			if (confirm(this.strings.confirmDiscardImages)) {
-				tempImages.forEach(node => {
+				tempImages.forEach((node) => {
 					node.parentElement.remove();
 				});
 			}
@@ -219,6 +220,7 @@ class WikiPortlet extends PortletBase {
  * @type {!Object}
  */
 WikiPortlet.STATE = {
+
 	/**
 	 * Portlet's constants
 	 * @instance

@@ -60,11 +60,13 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -201,11 +203,8 @@ public class DDMExpressionEvaluatorVisitor
 				_ddmExpressionFieldAccessor);
 		}
 
-		Optional<Method> methodOptional = Stream.of(
-			_getHierarchicalMethods(ddmExpressionFunction.getClass())
-		).filter(
-			method -> StringUtil.equals("apply", method.getName())
-		).findFirst();
+		Optional<Method> methodOptional = _getApplyMethodOptional(
+			ddmExpressionFunction);
 
 		if (!methodOptional.isPresent()) {
 			return null;
@@ -218,19 +217,26 @@ public class DDMExpressionEvaluatorVisitor
 		try {
 			Class<?>[] parameterTypes = method.getParameterTypes();
 
+			Object[] functionParameters = getFunctionParameters(
+				context.functionParameters());
+
 			if ((parameterTypes.length == 1) &&
 				(parameterTypes[0] == new Object[0].getClass())) {
 
+				Class<? extends Object> functionParameterClass =
+					functionParameters[0].getClass();
+
+				if ((functionParameters.length == 1) &&
+					functionParameterClass.isArray()) {
+
+					functionParameters = (Object[])functionParameters[0];
+				}
+
 				return method.invoke(
-					ddmExpressionFunction,
-					new Object[] {
-						getFunctionParameters(context.functionParameters())
-					});
+					ddmExpressionFunction, new Object[] {functionParameters});
 			}
 
-			return method.invoke(
-				ddmExpressionFunction,
-				getFunctionParameters(context.functionParameters()));
+			return method.invoke(ddmExpressionFunction, functionParameters);
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
@@ -540,6 +546,33 @@ public class DDMExpressionEvaluatorVisitor
 		ParseTree parseTree = parserRuleContext.getChild(childIndex);
 
 		return (T)parseTree.accept(this);
+	}
+
+	private Optional<Method> _getApplyMethodOptional(
+		DDMExpressionFunction ddmExpressionFunction) {
+
+		List<Method> methods = Stream.of(
+			_getHierarchicalMethods(ddmExpressionFunction.getClass())
+		).filter(
+			method -> StringUtil.equals("apply", method.getName())
+		).collect(
+			Collectors.toList()
+		);
+
+		Iterator<Method> iterator = methods.iterator();
+
+		Method method = iterator.next();
+
+		Class<?>[] parameterTypes = method.getParameterTypes();
+
+		if ((parameterTypes.length == 1) &&
+			(parameterTypes[0] == new Object().getClass()) &&
+			iterator.hasNext()) {
+
+			return Optional.ofNullable(iterator.next());
+		}
+
+		return Optional.ofNullable(method);
 	}
 
 	private Method[] _getHierarchicalMethods(Class<?> clazz) {

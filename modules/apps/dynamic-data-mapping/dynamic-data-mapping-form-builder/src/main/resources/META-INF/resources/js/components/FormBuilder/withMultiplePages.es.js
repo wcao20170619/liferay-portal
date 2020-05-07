@@ -25,7 +25,7 @@ import {Config} from 'metal-state';
 import {setValue} from '../../util/i18n.es';
 import formBuilderProps from './props.es';
 
-const withMultiplePages = ChildComponent => {
+const withMultiplePages = (ChildComponent) => {
 	class MultiplePages extends Component {
 		getPages() {
 			let {pages} = this.props;
@@ -43,7 +43,7 @@ const withMultiplePages = ChildComponent => {
 				];
 			}
 
-			return pages.map(page => {
+			return pages.map((page) => {
 				return {
 					...page,
 					enabled: true,
@@ -250,6 +250,7 @@ const withMultiplePages = ChildComponent => {
 	}
 
 	MultiplePages.PROPS = {
+
 		/**
 		 * @instance
 		 * @memberof LayoutProvider
@@ -262,6 +263,7 @@ const withMultiplePages = ChildComponent => {
 	};
 
 	MultiplePages.STATE = {
+
 		/**
 		 * @default false
 		 * @instance
@@ -269,9 +271,7 @@ const withMultiplePages = ChildComponent => {
 		 * @type {boolean}
 		 */
 
-		dropdownExpanded: Config.bool()
-			.value(false)
-			.internal(),
+		dropdownExpanded: Config.bool().value(false).internal(),
 	};
 
 	return MultiplePages;

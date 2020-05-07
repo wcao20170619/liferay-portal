@@ -16,6 +16,7 @@ package com.liferay.fragment.service.persistence.impl;
 
 import com.liferay.fragment.exception.NoSuchEntryException;
 import com.liferay.fragment.model.FragmentEntry;
+import com.liferay.fragment.model.FragmentEntryTable;
 import com.liferay.fragment.model.impl.FragmentEntryImpl;
 import com.liferay.fragment.model.impl.FragmentEntryModelImpl;
 import com.liferay.fragment.service.persistence.FragmentEntryPersistence;
@@ -6415,17 +6416,19 @@ public class FragmentEntryPersistenceImpl
 		"fragmentEntry.status = ?";
 
 	public FragmentEntryPersistenceImpl() {
-		setModelClass(FragmentEntry.class);
-
-		setModelImplClass(FragmentEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(FragmentEntry.class);
+
+		setModelImplClass(FragmentEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(FragmentEntryTable.INSTANCE);
 	}
 
 	/**

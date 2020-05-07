@@ -26,6 +26,7 @@ import OpenStreetMapMarker from './OpenStreetMapMarker.es';
  * @review
  */
 class MapOpenStreetMap extends MapBase {
+
 	/**
 	 * Creates a new map using OpenStreetMap's API
 	 * @param  {Array} args List of arguments to be passed to State
@@ -56,7 +57,7 @@ class MapOpenStreetMap extends MapBase {
 		if (this.data && this.data.features) {
 			const bounds = new L.LatLngBounds();
 
-			this.data.features.forEach(feature =>
+			this.data.features.forEach((feature) =>
 				bounds.extend(
 					new L.LatLng(
 						feature.geometry.coordinates[1],

@@ -10,17 +10,18 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useContext} from 'react';
 
+import {StoreContext} from '../context/store';
 import BasicInformation from './BasicInformation';
 import Chart from './Chart';
-import Hint from './Hint';
 import TotalCount from './TotalCount';
 import TrafficSources from './TrafficSources';
 
 export default function Main({
 	authorName,
 	chartDataProviders,
+	defaultTimeRange,
 	defaultTimeSpanOption,
 	languageTag,
 	onTrafficSourceClick,
@@ -31,6 +32,8 @@ export default function Main({
 	totalViewsDataProvider,
 	trafficSources,
 }) {
+	const [{readsEnabled}] = useContext(StoreContext);
+
 	return (
 		<>
 			<BasicInformation
@@ -41,7 +44,9 @@ export default function Main({
 			/>
 
 			<h5 className="mt-4 sheet-subtitle text-secondary">
-				{Liferay.Language.get('views-and-reads')}
+				{readsEnabled
+					? Liferay.Language.get('views-and-reads')
+					: Liferay.Language.get('views-metric')}
 			</h5>
 
 			<TotalCount
@@ -53,38 +58,36 @@ export default function Main({
 					'this-number-refers-to-the-total-number-of-views-since-the-content-was-published'
 				)}
 			/>
-			<TotalCount
-				dataProvider={totalReadsDataProvider}
-				label={Liferay.Util.sub(Liferay.Language.get('total-reads'))}
-				popoverHeader={Liferay.Language.get('total-reads')}
-				popoverMessage={Liferay.Language.get(
-					'this-number-refers-to-the-total-number-of-reads-since-the-content-was-published'
-				)}
-			/>
+
+			{readsEnabled && (
+				<TotalCount
+					dataProvider={totalReadsDataProvider}
+					label={Liferay.Util.sub(
+						Liferay.Language.get('total-reads')
+					)}
+					popoverHeader={Liferay.Language.get('total-reads')}
+					popoverMessage={Liferay.Language.get(
+						'this-number-refers-to-the-total-number-of-reads-since-the-content-was-published'
+					)}
+				/>
+			)}
 
 			<Chart
 				dataProviders={chartDataProviders}
+				defaultTimeRange={defaultTimeRange}
 				defaultTimeSpanOption={defaultTimeSpanOption}
 				languageTag={languageTag}
 				publishDate={pagePublishDate}
 				timeSpanOptions={timeSpanOptions}
 			/>
 
-			<h5 className="mt-2 sheet-subtitle text-secondary">
-				{Liferay.Language.get('search-engines-traffic')}
-				<Hint
-					message={Liferay.Language.get(
-						'search-engines-traffic-help'
-					)}
-					title={Liferay.Language.get('search-engines-traffic')}
+			{trafficSources.length > 0 && (
+				<TrafficSources
+					languageTag={languageTag}
+					onTrafficSourceClick={onTrafficSourceClick}
+					trafficSources={trafficSources}
 				/>
-			</h5>
-
-			<TrafficSources
-				languageTag={languageTag}
-				onTrafficSourceClick={onTrafficSourceClick}
-				trafficSources={trafficSources}
-			/>
+			)}
 		</>
 	);
 }
@@ -92,6 +95,7 @@ export default function Main({
 Main.proptypes = {
 	authorName: PropTypes.string.isRequired,
 	chartDataProviders: PropTypes.arrayOf(PropTypes.func.isRequired).isRequired,
+	defaultTimeRange: PropTypes.object.isRequired,
 	defaultTimeSpanOption: PropTypes.string.isRequired,
 	languageTag: PropTypes.string.isRequired,
 	onTrafficSourceClick: PropTypes.func.isRequired,

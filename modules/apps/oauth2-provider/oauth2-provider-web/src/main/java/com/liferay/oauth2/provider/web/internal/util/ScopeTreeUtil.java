@@ -35,15 +35,15 @@ import java.util.stream.Stream;
  */
 public class ScopeTreeUtil {
 
-	public static Tree.Node<String> getScopeTreeNode(
+	public static Tree.Node<String> getScopeAliasTreeNode(
 		List<String> scopeAliasesList,
 		ScopeMatcherFactory scopeMatcherFactory) {
 
-		return getScopeTreeNode(
+		return getScopeAliasTreeNode(
 			new HashSet<>(scopeAliasesList), scopeMatcherFactory);
 	}
 
-	public static Tree.Node<String> getScopeTreeNode(
+	public static Tree.Node<String> getScopeAliasTreeNode(
 		Set<String> scopeAliases, ScopeMatcherFactory scopeMatcherFactory) {
 
 		HashMap<String, ScopeMatcher> scopeMatchers = new HashMap<>();

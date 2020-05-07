@@ -3172,17 +3172,17 @@ public class GadgetPersistenceImpl
 		"(gadget.url IS NULL OR gadget.url = '')";
 
 	public GadgetPersistenceImpl() {
-		setModelClass(Gadget.class);
-
-		setModelImplClass(GadgetImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(GadgetModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Gadget.class);
+
+		setModelImplClass(GadgetImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(GadgetModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**

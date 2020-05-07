@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchPortletException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.PortletTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.PortletPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -831,18 +832,20 @@ public class PortletPersistenceImpl
 		"(portlet.portletId IS NULL OR portlet.portletId = '')";
 
 	public PortletPersistenceImpl() {
-		setModelClass(Portlet.class);
-
-		setModelImplClass(PortletImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(PortletModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("id", "id_");
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Portlet.class);
+
+		setModelImplClass(PortletImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(PortletModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(PortletTable.INSTANCE);
 	}
 
 	/**

@@ -13,16 +13,14 @@
  */
 
 import {ClayInput} from '@clayui/form';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {ImageSelector} from '../../../common/components/ImageSelector';
-import {useDebounceCallback} from '../../../core/hooks/useDebounceCallback';
 import {getEditableItemPropTypes} from '../../../prop-types/index';
 import {BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR} from '../../config/constants/backgroundImageFragmentEntryProcessor';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../config/constants/editableFragmentEntryProcessor';
 import {EDITABLE_TYPES} from '../../config/constants/editableTypes';
 import selectEditableValueContent from '../../selectors/selectEditableValueContent';
-import selectPrefixedSegmentsExperienceId from '../../selectors/selectPrefixedSegmentsExperienceId';
 import {useDispatch, useSelector} from '../../store/index';
 import updateEditableValuesThunk from '../../thunks/updateEditableValues';
 
@@ -30,7 +28,7 @@ export function ImagePropertiesPanel({item}) {
 	const {editableId, editableType, fragmentEntryLinkId} = item;
 
 	const dispatch = useDispatch();
-	const state = useSelector(state => state);
+	const state = useSelector((state) => state);
 
 	const processorKey =
 		editableType === EDITABLE_TYPES.backgroundImage
@@ -45,10 +43,22 @@ export function ImagePropertiesPanel({item}) {
 	const editableConfig = editableValue.config || {};
 
 	const [imageDescription, setImageDescription] = useState(
-		editableConfig.alt
+		editableConfig.alt || ''
 	);
 
-	const imageUrl = useSelector(state => {
+	useEffect(() => {
+		const editableConfig = editableValue ? editableValue.config : {};
+
+		setImageDescription((imageDescription) => {
+			if (imageDescription !== editableConfig.alt) {
+				return editableConfig.alt || '';
+			}
+
+			return imageDescription;
+		});
+	}, [editableValue]);
+
+	const imageUrl = useSelector((state) => {
 		const url = selectEditableValueContent(
 			state,
 			fragmentEntryLinkId,
@@ -94,21 +104,12 @@ export function ImagePropertiesPanel({item}) {
 		);
 	};
 
-	const [debounceUpdateEditableValues] = useDebounceCallback(
-		updateEditableValues,
-		500
-	);
-
 	const onImageChange = (imageTitle, imageUrl) => {
 		const {editableValues} = state.fragmentEntryLinks[fragmentEntryLinkId];
 
 		const editableProcessorValues = editableValues[processorKey];
 
 		const editableValue = editableProcessorValues[editableId];
-
-		const prefixedSegmentsExperienceId = selectPrefixedSegmentsExperienceId(
-			state
-		);
 
 		let nextEditableValue = {};
 
@@ -124,23 +125,11 @@ export function ImagePropertiesPanel({item}) {
 			nextEditableValueConfig.imageTitle = imageTitle;
 		}
 
-		if (prefixedSegmentsExperienceId) {
-			nextEditableValue = {
-				...editableValue,
-				config: nextEditableValueConfig,
-				[prefixedSegmentsExperienceId]: {
-					...editableValue[prefixedSegmentsExperienceId],
-					[state.languageId]: imageUrl,
-				},
-			};
-		}
-		else {
-			nextEditableValue = {
-				...editableValue,
-				config: nextEditableValueConfig,
-				[state.languageId]: imageUrl,
-			};
-		}
+		nextEditableValue = {
+			...editableValue,
+			config: nextEditableValueConfig,
+			[state.languageId]: imageUrl,
+		};
 
 		const nextEditableValues = {
 			...editableValues,
@@ -168,7 +157,9 @@ export function ImagePropertiesPanel({item}) {
 				imageTitle={editableConfig.imageTitle || imageUrl}
 				label={Liferay.Language.get('image')}
 				onClearButtonPressed={() => onImageChange('', '')}
-				onImageSelected={image => onImageChange(image.title, image.url)}
+				onImageSelected={(image) =>
+					onImageChange(image.title, image.url)
+				}
 			/>
 
 			{editableType === EDITABLE_TYPES.image && (
@@ -178,15 +169,20 @@ export function ImagePropertiesPanel({item}) {
 					</label>
 					<ClayInput
 						id="imageDescription"
-						onChange={event => {
-							setImageDescription(event.target.value);
+						onBlur={() => {
+							const previousValue = editableConfig.alt || '';
 
-							debounceUpdateEditableValues(
-								event.target.value,
-								editableValues,
-								editableId,
-								processorKey
-							);
+							if (previousValue !== imageDescription) {
+								updateEditableValues(
+									imageDescription,
+									editableValues,
+									editableId,
+									processorKey
+								);
+							}
+						}}
+						onChange={(event) => {
+							setImageDescription(event.target.value);
 						}}
 						sizing="sm"
 						type="text"

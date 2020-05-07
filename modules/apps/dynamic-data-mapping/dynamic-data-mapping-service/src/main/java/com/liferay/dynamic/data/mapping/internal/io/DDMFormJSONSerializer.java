@@ -240,6 +240,9 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 
 			return toJSONObject((DDMFormFieldValidation)property);
 		}
+		else if (_isArray(property)) {
+			return _jsonFactory.createJSONArray((Object[])property);
+		}
 
 		return String.valueOf(property);
 	}
@@ -340,6 +343,16 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		}
 
 		return jsonObject;
+	}
+
+	private boolean _isArray(Object value) {
+		if (value == null) {
+			return false;
+		}
+
+		Class<?> clazz = value.getClass();
+
+		return clazz.isArray();
 	}
 
 	private DDMFormFieldTypeServicesTracker _ddmFormFieldTypeServicesTracker;

@@ -16,6 +16,7 @@ package com.liferay.layout.service.persistence.impl;
 
 import com.liferay.layout.exception.NoSuchClassedModelUsageException;
 import com.liferay.layout.model.LayoutClassedModelUsage;
+import com.liferay.layout.model.LayoutClassedModelUsageTable;
 import com.liferay.layout.model.impl.LayoutClassedModelUsageImpl;
 import com.liferay.layout.model.impl.LayoutClassedModelUsageModelImpl;
 import com.liferay.layout.service.persistence.LayoutClassedModelUsagePersistence;
@@ -4118,17 +4119,19 @@ public class LayoutClassedModelUsagePersistenceImpl
 		"layoutClassedModelUsage.plid = ?";
 
 	public LayoutClassedModelUsagePersistenceImpl() {
-		setModelClass(LayoutClassedModelUsage.class);
-
-		setModelImplClass(LayoutClassedModelUsageImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(LayoutClassedModelUsage.class);
+
+		setModelImplClass(LayoutClassedModelUsageImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(LayoutClassedModelUsageTable.INSTANCE);
 	}
 
 	/**

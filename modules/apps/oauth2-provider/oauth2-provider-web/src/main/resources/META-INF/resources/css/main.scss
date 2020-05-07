@@ -24,6 +24,24 @@ $addedItemHighlightColor: #e6ffed;
 	}
 }
 
+.borderless {
+	border: none;
+	padding: 0.5rem;
+}
+
+.scope-children-1 {
+	margin-left: 1.5rem;
+}
+.scope-children-2 {
+	margin-left: 3rem;
+}
+.scope-children-3 {
+	margin-left: 4.5rem;
+}
+.scope-children-4 {
+	margin-left: 6rem;
+}
+
 .removed-scope {
 	background-color: $removedItemHighlightColor;
 }

@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.exception.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.LayoutSetPrototypeTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -3950,12 +3951,6 @@ public class LayoutSetPrototypePersistenceImpl
 		"layoutSetPrototype.active_ = ?";
 
 	public LayoutSetPrototypePersistenceImpl() {
-		setModelClass(LayoutSetPrototype.class);
-
-		setModelImplClass(LayoutSetPrototypeImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(LayoutSetPrototypeModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -3963,6 +3958,14 @@ public class LayoutSetPrototypePersistenceImpl
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(LayoutSetPrototype.class);
+
+		setModelImplClass(LayoutSetPrototypeImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(LayoutSetPrototypeModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(LayoutSetPrototypeTable.INSTANCE);
 	}
 
 	/**

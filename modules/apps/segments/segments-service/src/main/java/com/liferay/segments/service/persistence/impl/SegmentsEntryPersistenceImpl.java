@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.segments.exception.NoSuchEntryException;
 import com.liferay.segments.model.SegmentsEntry;
+import com.liferay.segments.model.SegmentsEntryTable;
 import com.liferay.segments.model.impl.SegmentsEntryImpl;
 import com.liferay.segments.model.impl.SegmentsEntryModelImpl;
 import com.liferay.segments.service.persistence.SegmentsEntryPersistence;
@@ -9775,11 +9776,6 @@ public class SegmentsEntryPersistenceImpl
 		"(segmentsEntry.type_ IS NULL OR segmentsEntry.type_ = '')";
 
 	public SegmentsEntryPersistenceImpl() {
-		setModelClass(SegmentsEntry.class);
-
-		setModelImplClass(SegmentsEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -9787,6 +9783,13 @@ public class SegmentsEntryPersistenceImpl
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SegmentsEntry.class);
+
+		setModelImplClass(SegmentsEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SegmentsEntryTable.INSTANCE);
 	}
 
 	/**

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchNodeException;
 import com.liferay.portal.workflow.kaleo.model.KaleoNode;
+import com.liferay.portal.workflow.kaleo.model.KaleoNodeTable;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoNodeImpl;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoNodeModelImpl;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoNodePersistence;
@@ -1671,17 +1672,19 @@ public class KaleoNodePersistenceImpl
 			"kaleoNode.kaleoDefinitionVersionId = ?";
 
 	public KaleoNodePersistenceImpl() {
-		setModelClass(KaleoNode.class);
-
-		setModelImplClass(KaleoNodeImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 		dbColumnNames.put("initial", "initial_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(KaleoNode.class);
+
+		setModelImplClass(KaleoNodeImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(KaleoNodeTable.INSTANCE);
 	}
 
 	/**

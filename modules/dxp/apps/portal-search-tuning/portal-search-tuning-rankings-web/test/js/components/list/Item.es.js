@@ -18,8 +18,8 @@ import '@testing-library/jest-dom/extend-expect';
 
 /* eslint-disable no-unused-vars */
 jest.mock('react-dnd', () => ({
-	DragSource: el => el => el,
-	DropTarget: el => el => el,
+	DragSource: (el) => (el) => el,
+	DropTarget: (el) => (el) => el,
 }));
 /* eslint-enable no-unused-vars */
 
@@ -31,13 +31,14 @@ const onClickHideFn = jest.fn();
 const onClickPinFn = jest.fn();
 const onFocusFn = jest.fn();
 
-function renderTestItem() {
+function renderTestItem(props) {
 	return render(
 		<Item
 			addedResult={false}
 			author={'Test Test'}
 			clicks={289}
 			date={'Apr 18 2018, 11:04 AM'}
+			deleted={false}
 			description={
 				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod'
 			}
@@ -59,6 +60,7 @@ function renderTestItem() {
 			selected={true}
 			title={'This is a Web Content Example'}
 			type={'Web Content'}
+			{...props}
 		/>
 	);
 }
@@ -121,5 +123,19 @@ describe('Item', () => {
 		fireEvent.focus(getByTitle(UNPIN_BUTTON_LABEL));
 
 		expect(onFocusFn.mock.calls.length).toBe(0);
+	});
+
+	it('renders a link to viewURL', () => {
+		const viewURL = '#';
+
+		const {container} = renderTestItem({viewURL});
+
+		expect(container.querySelector('a').getAttribute('href')).toBe(viewURL);
+	});
+
+	it('displays a deleted label if deleted is true', () => {
+		const {container} = renderTestItem({deleted: true});
+
+		expect(container).toHaveTextContent('deleted');
 	});
 });

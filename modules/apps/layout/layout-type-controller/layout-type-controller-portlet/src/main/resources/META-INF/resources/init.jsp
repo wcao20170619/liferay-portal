@@ -16,7 +16,8 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+<%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
+taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
@@ -32,6 +33,7 @@ page import="com.liferay.layout.util.structure.CollectionLayoutStructureItem" %>
 page import="com.liferay.layout.util.structure.ColumnLayoutStructureItem" %><%@
 page import="com.liferay.layout.util.structure.ContainerLayoutStructureItem" %><%@
 page import="com.liferay.layout.util.structure.DropZoneLayoutStructureItem" %><%@
+page import="com.liferay.layout.util.structure.FragmentDropZoneLayoutStructureItem" %><%@
 page import="com.liferay.layout.util.structure.FragmentLayoutStructureItem" %><%@
 page import="com.liferay.layout.util.structure.LayoutStructure" %><%@
 page import="com.liferay.layout.util.structure.LayoutStructureItem" %><%@

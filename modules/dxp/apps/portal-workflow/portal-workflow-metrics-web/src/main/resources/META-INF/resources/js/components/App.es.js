@@ -20,10 +20,11 @@ import PerformanceByAssigneePage from './performance-by-assignee-page/Performanc
 import PerformanceByStepPage from './performance-by-step-page/PerformanceByStepPage.es';
 import ProcessListPage from './process-list-page/ProcessListPage.es';
 import ProcessMetricsContainer from './process-metrics/ProcessMetricsContainer.es';
+import SettingsContainer from './settings/SettingsContainer.es';
 import SLAContainer from './sla/SLAContainer.es';
 import WorkloadByAssigneePage from './workload-by-assignee-page/WorkloadByAssigneePage.es';
 
-const App = props => {
+const App = (props) => {
 	return (
 		<Router>
 			<AppContextProvider {...props}>
@@ -74,6 +75,8 @@ const App = props => {
 							path="/performance/assignee/:processId/:pageSize/:page/:sort"
 							render={withParams(PerformanceByAssigneePage)}
 						/>
+
+						<Route component={SettingsContainer} path="/settings" />
 					</Switch>
 				</div>
 			</AppContextProvider>

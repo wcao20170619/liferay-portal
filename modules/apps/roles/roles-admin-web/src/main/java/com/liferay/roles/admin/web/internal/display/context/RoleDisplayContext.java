@@ -159,6 +159,20 @@ public class RoleDisplayContext {
 		return navigationItemList;
 	}
 
+	public boolean isAutomaticallyAssigned(Role role) {
+		List<RoleTypeContributor> roleTypeContributors =
+			RoleTypeContributorRetrieverUtil.getRoleTypeContributors(
+				_httpServletRequest);
+
+		for (RoleTypeContributor roleTypeContributor : roleTypeContributors) {
+			if (roleTypeContributor.isAutomaticallyAssigned(role)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private List<String> _getTabsNames() throws Exception {
 		List<String> tabsNames = new ArrayList<>();
 

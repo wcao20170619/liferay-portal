@@ -16,6 +16,7 @@ package com.liferay.asset.list.service.persistence.impl;
 
 import com.liferay.asset.list.exception.NoSuchEntrySegmentsEntryRelException;
 import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRel;
+import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRelTable;
 import com.liferay.asset.list.model.impl.AssetListEntrySegmentsEntryRelImpl;
 import com.liferay.asset.list.model.impl.AssetListEntrySegmentsEntryRelModelImpl;
 import com.liferay.asset.list.service.persistence.AssetListEntrySegmentsEntryRelPersistence;
@@ -2908,11 +2909,6 @@ public class AssetListEntrySegmentsEntryRelPersistenceImpl
 		"assetListEntrySegmentsEntryRel.segmentsEntryId = ?";
 
 	public AssetListEntrySegmentsEntryRelPersistenceImpl() {
-		setModelClass(AssetListEntrySegmentsEntryRel.class);
-
-		setModelImplClass(AssetListEntrySegmentsEntryRelImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -2920,6 +2916,13 @@ public class AssetListEntrySegmentsEntryRelPersistenceImpl
 			"assetListEntrySegmentsEntryRelId", "alEntrySegmentsEntryRelId");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(AssetListEntrySegmentsEntryRel.class);
+
+		setModelImplClass(AssetListEntrySegmentsEntryRelImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(AssetListEntrySegmentsEntryRelTable.INSTANCE);
 	}
 
 	/**

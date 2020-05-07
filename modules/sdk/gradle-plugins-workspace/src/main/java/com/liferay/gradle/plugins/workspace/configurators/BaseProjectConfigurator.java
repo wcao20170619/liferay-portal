@@ -15,6 +15,9 @@
 package com.liferay.gradle.plugins.workspace.configurators;
 
 import com.liferay.gradle.plugins.LiferayBasePlugin;
+import com.liferay.gradle.plugins.extensions.AppServer;
+import com.liferay.gradle.plugins.extensions.LiferayExtension;
+import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 import com.liferay.gradle.plugins.workspace.ProjectConfigurator;
 import com.liferay.gradle.plugins.workspace.WorkspaceExtension;
 import com.liferay.gradle.plugins.workspace.WorkspacePlugin;
@@ -29,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.gradle.api.GradleException;
+import org.gradle.api.NamedDomainObjectCollection;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.initialization.Settings;
@@ -124,6 +128,38 @@ public abstract class BaseProjectConfigurator implements ProjectConfigurator {
 		buildDockerImageTask.dependsOn(deployTask);
 
 		return copy;
+	}
+
+	protected void configureLiferay(
+		Project project, WorkspaceExtension workspaceExtension) {
+
+		LiferayExtension liferayExtension = GradleUtil.getExtension(
+			project, LiferayExtension.class);
+
+		liferayExtension.setAppServerParentDir(workspaceExtension.getHomeDir());
+
+		String version = GradleUtil.getProperty(
+			project, "app.server.tomcat.version", (String)null);
+
+		File dir = workspaceExtension.getHomeDir();
+
+		if ((version == null) && dir.exists()) {
+			for (String fileName : dir.list()) {
+				if (fileName.startsWith("tomcat-")) {
+					version = fileName.substring(fileName.indexOf("-") + 1);
+
+					NamedDomainObjectCollection<AppServer>
+						namedDomainObjectCollection =
+							liferayExtension.getAppServers();
+
+					TomcatAppServer tomcatAppServer =
+						(TomcatAppServer)namedDomainObjectCollection.getByName(
+							"tomcat");
+
+					tomcatAppServer.setVersion(version);
+				}
+			}
+		}
 	}
 
 	protected abstract Iterable<File> doGetProjectDirs(File rootDir)

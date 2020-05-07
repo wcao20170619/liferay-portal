@@ -15,13 +15,13 @@
 /**
  * The Autocomplete Input Caretoffset Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-autocomplete-input-caretoffset
  */
 
 AUI.add(
 	'liferay-autocomplete-input-caretoffset',
-	A => {
+	(A) => {
 		var ANode = A.Node;
 
 		var MIRROR_STYLES = [
@@ -46,7 +46,7 @@ AUI.add(
 
 		var STR_INPUT_NODE = 'inputNode';
 
-		var AutcompleteInputCaretOffset = function() {};
+		var AutcompleteInputCaretOffset = function () {};
 
 		AutcompleteInputCaretOffset.prototype = {
 			_applyMirrorContent() {
@@ -86,7 +86,7 @@ AUI.add(
 
 				var inputMirror = instance._inputMirror;
 
-				MIRROR_STYLES.forEach(item => {
+				MIRROR_STYLES.forEach((item) => {
 					inputMirror.setStyle(item, inputNode.getStyle(item));
 				});
 			},

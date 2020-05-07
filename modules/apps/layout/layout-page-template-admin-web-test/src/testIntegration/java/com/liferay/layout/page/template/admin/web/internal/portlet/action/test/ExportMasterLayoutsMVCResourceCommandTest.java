@@ -56,16 +56,12 @@ import java.util.zip.ZipFile;
 
 import javax.portlet.ResourceRequest;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Rubén Pulido
@@ -95,7 +91,7 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 				_serviceContext.getUserId(), _serviceContext.getScopeGroupId(),
 				0, "Master Page One",
 				LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT, 0,
-				WorkflowConstants.STATUS_DRAFT, _serviceContext);
+				WorkflowConstants.STATUS_APPROVED, _serviceContext);
 
 		_layoutPageTemplateStructureLocalService.addLayoutPageTemplateStructure(
 			TestPropsValues.getUserId(), _group.getGroupId(),
@@ -139,6 +135,28 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 			}
 
 			Assert.assertEquals(3, zipFile.size());
+		}
+	}
+
+	@Test
+	public void testGetFileDraft() throws Exception {
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.addLayoutPageTemplateEntry(
+				_serviceContext.getUserId(), _serviceContext.getScopeGroupId(),
+				0, StringUtil.randomString(),
+				LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT, 0,
+				WorkflowConstants.STATUS_DRAFT, _serviceContext);
+
+		long[] layoutPageTemplateEntryIds = {
+			layoutPageTemplateEntry.getLayoutPageTemplateEntryId()
+		};
+
+		File file = ReflectionTestUtil.invoke(
+			_mvcResourceCommand, "getFile", new Class<?>[] {long[].class},
+			layoutPageTemplateEntryIds);
+
+		try (ZipFile zipFile = new ZipFile(file)) {
+			Assert.assertEquals(0, zipFile.size());
 		}
 	}
 
@@ -188,7 +206,7 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 		long[] actualLayoutPageTemplateEntryIds = ReflectionTestUtil.invoke(
 			_mvcResourceCommand, "getLayoutPageTemplateEntryIds",
 			new Class<?>[] {ResourceRequest.class},
-			_getMockResourceRequest(expectedLayoutPageTemplateEntryId));
+			_getMockLiferayResourceRequest(expectedLayoutPageTemplateEntryId));
 
 		Assert.assertEquals(
 			Arrays.toString(actualLayoutPageTemplateEntryIds), 1,
@@ -198,16 +216,17 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 			actualLayoutPageTemplateEntryIds[0]);
 	}
 
-	private MockResourceRequest _getMockResourceRequest(
+	private MockLiferayResourceRequest _getMockLiferayResourceRequest(
 		long layoutPageTemplateEntryId) {
 
-		MockResourceRequest mockResourceRequest = new MockResourceRequest();
+		MockLiferayResourceRequest mockLiferayResourceRequest =
+			new MockLiferayResourceRequest();
 
-		mockResourceRequest.addParameter(
+		mockLiferayResourceRequest.addParameter(
 			"layoutPageTemplateEntryId",
 			String.valueOf(layoutPageTemplateEntryId));
 
-		return mockResourceRequest;
+		return mockLiferayResourceRequest;
 	}
 
 	private boolean _isMasterPageFile(String path) {
@@ -308,18 +327,5 @@ public class ExportMasterLayoutsMVCResourceCommandTest {
 	private Portal _portal;
 
 	private ServiceContext _serviceContext;
-
-	private static class MockResourceRequest
-		extends MockLiferayResourceRequest {
-
-		public MockResourceRequest() {
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return new MockHttpServletRequest();
-		}
-
-	}
 
 }

@@ -16,9 +16,10 @@ package com.liferay.change.tracking.service.base;
 
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.service.CTEntryLocalService;
+import com.liferay.change.tracking.service.persistence.CTCollectionFinder;
 import com.liferay.change.tracking.service.persistence.CTCollectionPersistence;
-import com.liferay.change.tracking.service.persistence.CTEntryFinder;
 import com.liferay.change.tracking.service.persistence.CTEntryPersistence;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -122,6 +123,11 @@ public abstract class CTEntryLocalServiceBaseImpl
 	@Override
 	public CTEntry deleteCTEntry(CTEntry ctEntry) throws PortalException {
 		return ctEntryPersistence.remove(ctEntry);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return ctEntryPersistence.dslQuery(dslQuery);
 	}
 
 	@Override
@@ -401,10 +407,10 @@ public abstract class CTEntryLocalServiceBaseImpl
 	protected CTEntryPersistence ctEntryPersistence;
 
 	@Reference
-	protected CTEntryFinder ctEntryFinder;
+	protected CTCollectionPersistence ctCollectionPersistence;
 
 	@Reference
-	protected CTCollectionPersistence ctCollectionPersistence;
+	protected CTCollectionFinder ctCollectionFinder;
 
 	@Reference
 	protected com.liferay.counter.kernel.service.CounterLocalService

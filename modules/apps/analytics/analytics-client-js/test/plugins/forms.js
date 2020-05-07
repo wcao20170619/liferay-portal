@@ -23,7 +23,9 @@ describe('Forms Plugin', () => {
 	let duration;
 
 	beforeEach(() => {
+
 		// Force attaching DOM Content Loaded event
+
 		Object.defineProperty(document, 'readyState', {
 			value: 'loading',
 			writable: false,
@@ -116,7 +118,7 @@ describe('Forms Plugin', () => {
 
 			document.body.appendChild(form);
 
-			form.addEventListener('submit', event => event.preventDefault());
+			form.addEventListener('submit', (event) => event.preventDefault());
 
 			const event = new Event('submit', {
 				cancelable: true,
@@ -195,6 +197,7 @@ describe('Forms Plugin', () => {
 			field.dispatchEvent(new Event('focus'));
 
 			// Fake timing.
+
 			duration = 1500;
 
 			field.dispatchEvent(new Event('blur'));

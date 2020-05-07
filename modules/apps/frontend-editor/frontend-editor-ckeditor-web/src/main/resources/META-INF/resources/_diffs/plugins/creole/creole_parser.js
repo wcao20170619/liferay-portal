@@ -39,7 +39,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-(function() {
+(function () {
 	if (!Parse) {
 		var Parse = {};
 	}
@@ -47,7 +47,7 @@
 		Parse.Simple = {};
 	}
 
-	Parse.Simple.Base = function(grammar, options) {
+	Parse.Simple.Base = function (grammar, options) {
 		if (!arguments.length) {
 			return;
 		}
@@ -84,7 +84,7 @@
 
 	Parse.Simple.Base.prototype.constructor = Parse.Simple.Base;
 
-	Parse.Simple.Base.Rule = function(params) {
+	Parse.Simple.Base.Rule = function (params) {
 		if (!arguments.length) {
 			return;
 		}
@@ -205,7 +205,9 @@
 		fallback: {
 			apply(node, data, options) {
 				if (options && options.forIE) {
+
 					// workaround for bad IE
+
 					data = data.replace(/\n/g, ' \r');
 				}
 				node.appendChild(document.createTextNode(data));
@@ -224,7 +226,7 @@
 
 	Parse.Simple.Base.Rule.prototype.constructor = Parse.Simple.Base.Rule;
 
-	Parse.Simple.Creole = function(options) {
+	Parse.Simple.Creole = function (options) {
 		var rx = {};
 		rx.link = '[^\\]|~\\n]*(?:(?:\\](?!\\])|~.)[^\\]|~\\n]*)*';
 		rx.linkText = '[^\\]~\\n]*(?:(?:\\](?!\\])|~.)[^\\]~\\n]*)*';
@@ -240,7 +242,7 @@
 			(options && options.strict ? '' : ')?') +
 			'}}';
 
-		var formatLink = function(link, format) {
+		var formatLink = function (link, format) {
 			if (format instanceof Function) {
 				return format(link);
 			}
@@ -433,7 +435,7 @@
 
 			unnamedUri: {build: 'dummy', regex: '\\[\\[(' + rx.uri + ')\\]\\]'},
 		};
-		g.unnamedUri.build = g.rawUri.build = function(node, r, options) {
+		g.unnamedUri.build = g.rawUri.build = function (node, r, options) {
 			if (!options) {
 				options = {};
 			}
@@ -441,7 +443,7 @@
 			g.namedUri.build.call(this, node, Array(r[0], r[1], r[1]), options);
 			options.isPlainUri = false;
 		};
-		g.unnamedLink.build = function(node, r, options) {
+		g.unnamedLink.build = function (node, r, options) {
 			g.namedLink.build.call(
 				this,
 				node,
@@ -485,7 +487,7 @@
 				rx.linkText +
 				')\\]\\]',
 		};
-		g.unnamedInterwikiLink.build = function(node, r, options) {
+		g.unnamedInterwikiLink.build = function (node, r, options) {
 			g.namedInterwikiLink.build.call(
 				this,
 				node,

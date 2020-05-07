@@ -14,23 +14,25 @@
 
 package com.liferay.fragment.entry.processor.drop.zone;
 
-import com.liferay.fragment.exception.FragmentEntryContentException;
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
-import com.liferay.petra.string.StringPool;
+import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.fragment.renderer.FragmentDropZoneRenderer;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.util.Portal;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,6 +40,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
@@ -52,74 +55,96 @@ public class DropZoneFragmentEntryProcessor implements FragmentEntryProcessor {
 	public JSONArray getAvailableTagsJSONArray() {
 		return JSONUtil.put(
 			JSONUtil.put(
-				"content", "<lfr-drop-zone id=\"\"></lfr-drop-zone>"
+				"content", "<lfr-drop-zone></lfr-drop-zone>"
 			).put(
 				"name", "lfr-drop-zone"
 			));
 	}
 
 	@Override
-	public JSONObject getDefaultEditableValuesJSONObject(
-		String html, String configuration) {
-
-		Document document = _getDocument(html);
-
-		Elements elements = document.select("lfr-drop-zone");
-
-		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-
-		for (Element element : elements) {
-			jsonArray.put(
-				JSONUtil.put(
-					"id", element.attr("id")
-				).put(
-					"uuid", StringPool.BLANK
-				));
-		}
-
-		return JSONUtil.put("dropZones", jsonArray);
-	}
-
-	@Override
-	public void validateFragmentEntryHTML(String html, String configuration)
+	public String processFragmentEntryLinkHTML(
+			FragmentEntryLink fragmentEntryLink, String html,
+			FragmentEntryProcessorContext fragmentEntryProcessorContext)
 		throws PortalException {
 
 		Document document = _getDocument(html);
 
 		Elements elements = document.select("lfr-drop-zone");
 
-		for (Element element : elements) {
-			if (Validator.isNull(element.attr("id"))) {
-				ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-					"content.Language", getClass());
+		if (elements.size() <= 0) {
+			return html;
+		}
 
-				throw new FragmentEntryContentException(
-					LanguageUtil.get(
-						resourceBundle, "drop-zone-id-must-not-be-empty"));
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					fragmentEntryLink.getGroupId(),
+					_portal.getClassNameId(Layout.class.getName()),
+					fragmentEntryLink.getClassPK());
+
+		if (layoutPageTemplateStructure == null) {
+			return html;
+		}
+
+		LayoutStructure layoutStructure = LayoutStructure.of(
+			layoutPageTemplateStructure.getData(
+				fragmentEntryLink.getSegmentsExperienceId()));
+
+		LayoutStructureItem layoutStructureItem =
+			layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
+				fragmentEntryLink.getFragmentEntryLinkId());
+
+		if (layoutStructureItem == null) {
+			return html;
+		}
+
+		List<String> dropZoneItemIds = layoutStructureItem.getChildrenItemIds();
+
+		if (Objects.equals(
+				fragmentEntryProcessorContext.getMode(),
+				FragmentEntryLinkConstants.EDIT)) {
+
+			for (int i = 0;
+				 (i < dropZoneItemIds.size()) && (i < elements.size()); i++) {
+
+				Element element = elements.get(i);
+
+				element.attr("uuid", dropZoneItemIds.get(i));
 			}
+
+			Element bodyElement = document.body();
+
+			return bodyElement.html();
 		}
 
-		Stream<Element> uniqueElementsStream = elements.stream();
+		Optional<Map<String, Object>> fieldValuesOptional =
+			fragmentEntryProcessorContext.getFieldValuesOptional();
 
-		Map<String, Long> idsMap = uniqueElementsStream.collect(
-			Collectors.groupingBy(
-				element -> element.attr("id"), Collectors.counting()));
+		for (int i = 0; i < elements.size(); i++) {
+			Element element = elements.get(i);
 
-		Collection<String> ids = idsMap.keySet();
+			String dropZoneHTML = _fragmentDropZoneRenderer.renderDropZone(
+				fragmentEntryProcessorContext.getHttpServletRequest(),
+				fragmentEntryProcessorContext.getHttpServletResponse(),
+				fieldValuesOptional.orElse(null),
+				fragmentEntryLink.getGroupId(), fragmentEntryLink.getClassPK(),
+				dropZoneItemIds.get(i), fragmentEntryProcessorContext.getMode(),
+				true);
 
-		Stream<String> idsStream = ids.stream();
+			Element dropZoneElement = new Element("div");
 
-		idsStream = idsStream.filter(id -> idsMap.get(id) > 1);
+			dropZoneElement.html(dropZoneHTML);
 
-		if (idsStream.count() > 0) {
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", getClass());
-
-			throw new FragmentEntryContentException(
-				LanguageUtil.get(
-					resourceBundle,
-					"you-must-define-a-unique-id-for-each-drop-zone"));
+			element.replaceWith(dropZoneElement);
 		}
+
+		Element bodyElement = document.body();
+
+		return bodyElement.html();
+	}
+
+	@Override
+	public void validateFragmentEntryHTML(String html, String configuration) {
 	}
 
 	private Document _getDocument(String html) {
@@ -133,5 +158,15 @@ public class DropZoneFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		return document;
 	}
+
+	@Reference
+	private FragmentDropZoneRenderer _fragmentDropZoneRenderer;
+
+	@Reference
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

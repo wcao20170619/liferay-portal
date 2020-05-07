@@ -73,20 +73,20 @@ public class Mapping {
 	protected String fieldKey;
 
 	@Schema
-	public String getItemKey() {
-		return itemKey;
+	public String getItemClassName() {
+		return itemClassName;
 	}
 
-	public void setItemKey(String itemKey) {
-		this.itemKey = itemKey;
+	public void setItemClassName(String itemClassName) {
+		this.itemClassName = itemClassName;
 	}
 
 	@JsonIgnore
-	public void setItemKey(
-		UnsafeSupplier<String, Exception> itemKeyUnsafeSupplier) {
+	public void setItemClassName(
+		UnsafeSupplier<String, Exception> itemClassNameUnsafeSupplier) {
 
 		try {
-			itemKey = itemKeyUnsafeSupplier.get();
+			itemClassName = itemClassNameUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -98,7 +98,35 @@ public class Mapping {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String itemKey;
+	protected String itemClassName;
+
+	@Schema
+	public Long getItemClassPK() {
+		return itemClassPK;
+	}
+
+	public void setItemClassPK(Long itemClassPK) {
+		this.itemClassPK = itemClassPK;
+	}
+
+	@JsonIgnore
+	public void setItemClassPK(
+		UnsafeSupplier<Long, Exception> itemClassPKUnsafeSupplier) {
+
+		try {
+			itemClassPK = itemClassPKUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long itemClassPK;
 
 	@Override
 	public boolean equals(Object object) {
@@ -141,18 +169,28 @@ public class Mapping {
 			sb.append("\"");
 		}
 
-		if (itemKey != null) {
+		if (itemClassName != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"itemKey\": ");
+			sb.append("\"itemClassName\": ");
 
 			sb.append("\"");
 
-			sb.append(_escape(itemKey));
+			sb.append(_escape(itemClassName));
 
 			sb.append("\"");
+		}
+
+		if (itemClassPK != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"itemClassPK\": ");
+
+			sb.append(itemClassPK);
 		}
 
 		sb.append("}");
@@ -187,9 +225,44 @@ public class Mapping {
 			sb.append("\"");
 			sb.append(entry.getKey());
 			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
+
+			Object value = entry.getValue();
+
+			Class<?> clazz = value.getClass();
+
+			if (clazz.isArray()) {
+				sb.append("[");
+
+				Object[] valueArray = (Object[])value;
+
+				for (int i = 0; i < valueArray.length; i++) {
+					if (valueArray[i] instanceof String) {
+						sb.append("\"");
+						sb.append(valueArray[i]);
+						sb.append("\"");
+					}
+					else {
+						sb.append(valueArray[i]);
+					}
+
+					if ((i + 1) < valueArray.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else if (value instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)value));
+			}
+			else if (value instanceof String) {
+				sb.append("\"");
+				sb.append(value);
+				sb.append("\"");
+			}
+			else {
+				sb.append(value);
+			}
 
 			if (iterator.hasNext()) {
 				sb.append(",");

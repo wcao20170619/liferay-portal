@@ -27,4 +27,6 @@ public interface CTConstants {
 
 	public static final long CT_COLLECTION_ID_PRODUCTION = 0;
 
+	public static final String RESOURCE_NAME = "com.liferay.change.tracking";
+
 }

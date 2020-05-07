@@ -669,17 +669,17 @@ public class PowwowServerPersistenceImpl
 		"powwowServer.active = ?";
 
 	public PowwowServerPersistenceImpl() {
-		setModelClass(PowwowServer.class);
-
-		setModelImplClass(PowwowServerImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(PowwowServerModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(PowwowServer.class);
+
+		setModelImplClass(PowwowServerImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(PowwowServerModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**

@@ -50,10 +50,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
 
@@ -94,14 +91,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
-
-		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
-
-		Close.closeWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -111,12 +101,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
-
-		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		AssertLocation(value1 = "${portalURL}/web/test-site-name/test-destination-page");
 	}
@@ -137,12 +122,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
-
-		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		AssertLocation(value1 = "${portalURL}/web/test-site-name/test-destination-page");
 
@@ -180,14 +160,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
-
-		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
-
-		Close.closeWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -197,12 +170,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
-
-		SelectWindow(locator1 = "title=New Test Destination Page - Test Site Name - ${siteName}");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		AssertLocation(value1 = "${portalURL}/web/test-site-name/new-test-destination-page");
 	}
@@ -244,10 +212,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -285,10 +250,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -349,10 +311,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -387,10 +346,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -430,10 +386,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -468,10 +421,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -493,6 +443,32 @@ definition {
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			redirectType = "Temporary",
 			sourceURL = "${portalURL}/web/test-site-name/test-destination-page1");
+	}
+
+	@description = "This ensures that the destination URL passes validation before it can be used."
+	@priority = "5"
+	test CheckDestinationURL {
+		var portalURL = PropsUtil.get("portal.url");
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.addEntry(
+			destinationURL = " ",
+			destinationURLVariation = "Space",
+			siteName = "test-site-name",
+			sourceURL = "test-source-page");
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.addEntry(
+			checkDestinationURL = "true",
+			destinationPageName = "Test Destination Page",
+			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
+			groupName = "Test Site Name",
+			portalName = "${siteName}",
+			siteName = "test-site-name",
+			sourceURL = "test-source-page");
 	}
 
 	@description = "This ensures that all redirect entries can be deleted simultaneously."
@@ -562,8 +538,6 @@ definition {
 	@description = "This ensures that an unexpired redirect can be edited."
 	@priority = "5"
 	test EditEntry {
-		property portal.upstream = "quarantine";
-
 		var portalURL = PropsUtil.get("portal.url");
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -572,6 +546,7 @@ definition {
 		Redirect.addEntry(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			expirationDate = "12/31/2024",
+			redirectType = "Permanent (301)",
 			siteName = "test-site-name",
 			sourceURL = "test-source-page");
 
@@ -615,10 +590,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -677,24 +649,15 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page2",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page2 (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page2");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page2",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page2 (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page2");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -718,11 +681,83 @@ definition {
 			entry2 = "2");
 	}
 
+	@description = "This ensures that accessing a nonexistent URL redirects the user to the home of the current site."
+	@priority = "4"
+	test Redirect404sToSiteHomePage {
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/fakepage");
+
+		AssertLocation(value1 = "${portalURL}/web/test-site-name/fakepage");
+
+		AssertVisible(
+			key_pageName = "Test Source Page",
+			locator1 = "Home#PAGE_ACTIVE");
+
+		AssertTextEquals(
+			locator1 = "Home#ERROR_MESSAGE_ALERT_ERROR",
+			value1 = "Not Found");
+	}
+
+	@description = "This ensures that a user is redirected to the updated friendlyURL when he accesses the former friendlyURL."
+	@priority = "5"
+	test RedirectToUpdatedFriendlyURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Test Source Page");
+
+		Page.editFriendlyURL(friendlyURLEdit = "/new-test-page");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
+
+		AssertLocation(value1 = "${portalURL}/web/test-site-name/new-test-page");
+
+		AssertVisible(
+			key_pageName = "Test Source Page",
+			locator1 = "Home#PAGE_ACTIVE");
+	}
+
+	@description = "This ensures that a user is redirected to the updated localized friendlyURL when he accesses the former localized friendlyURL."
+	@priority = "5"
+	test RedirectToUpdatedLocalizedFriendlyURL {
+		var portalURL = PropsUtil.get("portal.url");
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		SitePages.gotoPageMenuItem(
+			menuItem = "Configure",
+			pageName = "Test Source Page");
+
+		Page.addFriendlyURLLocalizedPG(
+			friendlyUrlLocalized = "es_ES",
+			localizedFriendlyURL = "/pagina-de-prueba");
+
+		PortletEntry.inputName(name = "Pagina de prueba");
+
+		Button.clickSave();
+
+		Page.addFriendlyURLLocalizedPG(
+			friendlyUrlLocalized = "es_ES",
+			localizedFriendlyURL = "/nueva-pagina-de-prueba");
+
+		Button.clickSave();
+
+		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/pagina-de-prueba");
+
+		AssertLocation(value1 = "${portalURL}/es/web/test-site-name/nueva-pagina-de-prueba");
+
+		AssertVisible(
+			key_pageName = "Pagina de prueba",
+			locator1 = "Home#PAGE_ACTIVE");
+	}
+
 	@description = "This ensures that an expired permanent redirect can be reset."
 	@priority = "5"
 	test ResetExpiredEntry {
-		property portal.upstream = "quarantine";
-
 		var portalURL = PropsUtil.get("portal.url");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
@@ -730,6 +765,7 @@ definition {
 		Redirect.addEntry(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			expirationDate = "12/31/2013",
+			redirectType = "Permanent (301)",
 			siteName = "test-site-name",
 			sourceURL = "test-source-page");
 
@@ -746,6 +782,25 @@ definition {
 			expirationDate = "12/31/24",
 			redirectType = "Permanent",
 			sourceURL = "${portalURL}/web/test-site-name/test-source-page");
+	}
+
+	@description = "This test covers LPS-110773. It ensures that a redirect entry can be found by search."
+	@priority = "3"
+	test SearchEntry {
+		var portalURL = PropsUtil.get("portal.url");
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.addEntry(
+			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
+			siteName = "test-site-name",
+			sourceURL = "test-source-page");
+
+		for (var searchTerm : list "source,destination") {
+			Redirect.viewResultEntryTitle(
+				searchEntryTitle = "${portalURL}/web/test-site-name/test-source-page",
+				searchTerm = "${searchTerm}");
+		}
 	}
 
 	@description = "This ensures that the redirect can be set."
@@ -780,12 +835,62 @@ definition {
 			value1 = "Temporary (302)");
 	}
 
+	@description = "This ensures that the 404 URLs can be viewed after reactivating."
+	@priority = "5"
+	test View404URLsAfterReactivating {
+		var portalURL = PropsUtil.get("portal.url");
+
+		for (var i : list "1,2,3") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Source Page${i}");
+		}
+
+		for (var i : list "1,2,3") {
+			Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+			Redirect.addEntry(
+				destinationURL = "${portalURL}/web/test-site-name/test-destination-page${i}",
+				redirectType = "Permanent (301)",
+				siteName = "test-site-name",
+				sourceURL = "test-source-page${i}");
+		}
+
+		for (var i : list "1,2,3") {
+			Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+			Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page${i}");
+		}
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.ignoreEntry(ignoreAllEntries = "true");
+
+		Redirect.view404URLsDefault();
+
+		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+		Redirect.ignoreEntry(
+			unignore = "true",
+			unignoreAllEntries = "true");
+
+		Redirect.view404URLsDefault();
+
+		for (var i : list "1,2,3") {
+			Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
+
+			Redirect.view404URLs(
+				activeIgnoreURL = "true",
+				ignoreURL = "${portalURL}/web/test-site-name/test-destination-page${i}",
+				multipleURLs = "true");
+		}
+	}
+
 	@description = "This ensures that an expired temporary redirect can be reactivated."
 	@priority = "5"
 	test ViewExpiredAndActiveEntries {
-		property portal.upstream = "quarantine";
-
 		var portalURL = PropsUtil.get("portal.url");
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
@@ -798,10 +903,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		SelectWindow(locator1 = "title=Test Source Page - Test Site Name - ${siteName}");
 
@@ -815,10 +917,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		SelectWindow(locator1 = "title=Test Destination Page - Test Site Name - ${siteName}");
 
@@ -828,8 +927,6 @@ definition {
 	@description = "This ensures that an expired permanent redirect can be viewed."
 	@priority = "5"
 	test ViewExpiredPermanentEntry {
-		property portal.upstream = "quarantine";
-
 		var portalURL = PropsUtil.get("portal.url");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
@@ -837,6 +934,7 @@ definition {
 		Redirect.addEntry(
 			destinationURL = "${portalURL}/web/test-site-name/test-destination-page",
 			expirationDate = "12/31/2013",
+			redirectType = "Permanent (301)",
 			siteName = "test-site-name",
 			sourceURL = "test-source-page");
 
@@ -852,8 +950,6 @@ definition {
 	@description = "This ensures that an expired temporary redirect can be viewed."
 	@priority = "5"
 	test ViewExpiredTempEntry {
-		property portal.upstream = "quarantine";
-
 		var portalURL = PropsUtil.get("portal.url");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
@@ -889,10 +985,7 @@ definition {
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 
-		AssertClick(
-			key_rowEntry = "${portalURL}/web/test-site-name/test-source-page",
-			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
-			value1 = "${portalURL}/web/test-site-name/test-source-page (Opens New Window)");
+		Navigator.openSpecificURL(url = "${portalURL}/web/test-site-name/test-source-page");
 
 		Redirect.openRedirectAdmin(siteURLKey = "test-site-name");
 

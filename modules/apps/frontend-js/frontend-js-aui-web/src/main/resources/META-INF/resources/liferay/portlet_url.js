@@ -15,16 +15,16 @@
 /**
  * The Portlet URL Utility
  *
- * @deprecated As of Athanasius(7.3.x), replaced by Liferay.Util.PortletURL
+ * @deprecated As of Athanasius (7.3.x), replaced by Liferay.Util.PortletURL
  * @module liferay-portlet-url
  */
 
 AUI.add(
 	'liferay-portlet-url',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
-		var PortletURL = function(lifecycle, params, basePortletURL) {
+		var PortletURL = function (lifecycle, params, basePortletURL) {
 			var instance = this;
 
 			instance.params = {};
@@ -106,7 +106,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setCopyCurrentRenderParameters() {
@@ -132,7 +132,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setEncrypt() {
@@ -209,7 +209,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated
+			 * @deprecated As of Wilberforce (7.0.x)
 			 */
 
 			setPortletConfiguration() {
@@ -243,7 +243,7 @@ AUI.add(
 			},
 
 			/*
-			 * @deprecated since 7.2, unused
+			 * @deprecated As of Mueller (7.2.x), with no direct replacement
 			 */
 			setSecure(secure) {
 				var instance = this;

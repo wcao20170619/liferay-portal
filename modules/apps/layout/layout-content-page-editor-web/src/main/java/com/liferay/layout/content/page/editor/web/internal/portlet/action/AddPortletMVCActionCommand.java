@@ -26,7 +26,6 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkUtil;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
 import com.liferay.layout.util.structure.LayoutStructureItem;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.PortletIdException;
@@ -48,9 +47,9 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
-import com.liferay.segments.util.SegmentsExperiencePortletUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -141,8 +140,10 @@ public class AddPortletMVCActionCommand
 			actionRequest, "segmentsExperienceId",
 			SegmentsExperienceConstants.ID_DEFAULT);
 
+		String namespace = StringUtil.randomId();
+
 		String instanceId = _getPortletInstanceId(
-			themeDisplay.getLayout(), portletId, segmentsExperienceId);
+			namespace, themeDisplay.getLayout(), portletId);
 
 		JSONObject editableValueJSONObject =
 			_fragmentEntryProcessorRegistry.getDefaultEditableValuesJSONObject(
@@ -163,7 +164,7 @@ public class AddPortletMVCActionCommand
 				0, segmentsExperienceId, _portal.getClassNameId(Layout.class),
 				themeDisplay.getPlid(), StringPool.BLANK, StringPool.BLANK,
 				StringPool.BLANK, StringPool.BLANK,
-				editableValueJSONObject.toString(), StringPool.BLANK, 0, null,
+				editableValueJSONObject.toString(), namespace, 0, null,
 				serviceContext);
 
 		JSONObject jsonObject = addFragmentEntryLinkToLayoutData(
@@ -180,35 +181,24 @@ public class AddPortletMVCActionCommand
 	}
 
 	private String _getPortletInstanceId(
-			Layout layout, String portletId, long segmentsExperienceId)
+			String namespace, Layout layout, String portletId)
 		throws PortletIdException {
 
 		Portlet portlet = _portletLocalService.getPortletById(portletId);
 
 		if (portlet.isInstanceable()) {
-			return SegmentsExperiencePortletUtil.setSegmentsExperienceId(
-				PortletIdCodec.generateInstanceId(), segmentsExperienceId);
+			return namespace;
 		}
 
-		String instanceId =
-			SegmentsExperiencePortletUtil.setSegmentsExperienceId(
-				String.valueOf(CharPool.NUMBER_0), segmentsExperienceId);
-
-		String checkPortletId =
-			SegmentsExperiencePortletUtil.setSegmentsExperienceId(
-				PortletIdCodec.encode(portletId, instanceId),
-				segmentsExperienceId);
-
 		long count = _portletPreferencesLocalService.getPortletPreferencesCount(
-			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(),
-			checkPortletId);
+			PortletKeys.PREFS_OWNER_TYPE_LAYOUT, layout.getPlid(), portletId);
 
 		if (count > 0) {
 			throw new PortletIdException(
 				"Unable to add uninstanceable portlet more than once");
 		}
 
-		return instanceId;
+		return StringPool.BLANK;
 	}
 
 	@Reference

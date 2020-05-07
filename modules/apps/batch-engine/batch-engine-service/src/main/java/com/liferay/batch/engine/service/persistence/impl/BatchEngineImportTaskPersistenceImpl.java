@@ -16,6 +16,7 @@ package com.liferay.batch.engine.service.persistence.impl;
 
 import com.liferay.batch.engine.exception.NoSuchImportTaskException;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
+import com.liferay.batch.engine.model.BatchEngineImportTaskTable;
 import com.liferay.batch.engine.model.impl.BatchEngineImportTaskImpl;
 import com.liferay.batch.engine.model.impl.BatchEngineImportTaskModelImpl;
 import com.liferay.batch.engine.service.persistence.BatchEngineImportTaskPersistence;
@@ -1793,16 +1794,18 @@ public class BatchEngineImportTaskPersistenceImpl
 		"(batchEngineImportTask.executeStatus IS NULL OR batchEngineImportTask.executeStatus = '')";
 
 	public BatchEngineImportTaskPersistenceImpl() {
-		setModelClass(BatchEngineImportTask.class);
-
-		setModelImplClass(BatchEngineImportTaskImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(BatchEngineImportTask.class);
+
+		setModelImplClass(BatchEngineImportTaskImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(BatchEngineImportTaskTable.INSTANCE);
 	}
 
 	/**

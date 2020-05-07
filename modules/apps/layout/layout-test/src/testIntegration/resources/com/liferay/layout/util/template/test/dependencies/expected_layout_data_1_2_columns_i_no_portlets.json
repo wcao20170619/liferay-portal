@@ -5,7 +5,8 @@
 				"ROOT-CONTAINER0",
 				"ROOT-CONTAINER1"
 			],
-			"config": {},
+			"config": {
+			},
 			"itemId": "ROOT",
 			"parentId": "",
 			"type": "root"
@@ -15,7 +16,8 @@
 				"ROOT-CONTAINER0-ROW0"
 			],
 			"config": {
-				"backgroundImage": {},
+				"backgroundImage": {
+				},
 				"paddingBottom": 3,
 				"paddingHorizontal": 3,
 				"paddingTop": 3,
@@ -31,14 +33,39 @@
 			],
 			"config": {
 				"gutters": true,
-				"numberOfColumns": 1
+				"landscapeMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"modulesPerRow": 3,
+				"numberOfColumns": 1,
+				"portraitMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"reverseOrder": false,
+				"tablet": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"verticalAlignment": "top"
 			},
 			"itemId": "ROOT-CONTAINER0-ROW0",
 			"parentId": "ROOT-CONTAINER0",
 			"type": "row"
 		},
 		"ROOT-CONTAINER0-ROW0-COLUMN0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"size": 12
 			},
@@ -51,7 +78,8 @@
 				"ROOT-CONTAINER1-ROW0"
 			],
 			"config": {
-				"backgroundImage": {},
+				"backgroundImage": {
+				},
 				"paddingBottom": 3,
 				"paddingHorizontal": 3,
 				"paddingTop": 3,
@@ -68,14 +96,39 @@
 			],
 			"config": {
 				"gutters": true,
-				"numberOfColumns": 2
+				"landscapeMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"modulesPerRow": 3,
+				"numberOfColumns": 2,
+				"portraitMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"reverseOrder": false,
+				"tablet": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"verticalAlignment": "top"
 			},
 			"itemId": "ROOT-CONTAINER1-ROW0",
 			"parentId": "ROOT-CONTAINER1",
 			"type": "row"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"size": 4
 			},
@@ -84,7 +137,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"size": 8
 			},

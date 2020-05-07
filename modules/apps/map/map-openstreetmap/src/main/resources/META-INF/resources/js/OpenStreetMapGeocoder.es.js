@@ -18,6 +18,7 @@ import State from 'metal-state';
  * OpenStreetMapGeocoder
  */
 class OpenStreetMapGeocoder extends State {
+
 	/**
 	 * Handles the server response of a successfull address forward
 	 * @param {Object} response Server response
@@ -62,7 +63,7 @@ class OpenStreetMapGeocoder extends State {
 	 * @review
 	 */
 	forward(query, callback) {
-		AUI().use('jsonp', A => {
+		AUI().use('jsonp', (A) => {
 			const forwardUrl = OpenStreetMapGeocoder.TPL_FORWARD_GEOCODING_URL.replace(
 				'{query}',
 				query
@@ -84,7 +85,7 @@ class OpenStreetMapGeocoder extends State {
 	 * @review
 	 */
 	reverse(location, callback) {
-		AUI().use('jsonp', A => {
+		AUI().use('jsonp', (A) => {
 			const reverseUrl = OpenStreetMapGeocoder.TPL_REVERSE_GEOCODING_URL.replace(
 				'{lat}',
 				location.lat

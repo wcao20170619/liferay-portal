@@ -124,6 +124,24 @@ public class RedirectEntryServiceImpl extends RedirectEntryServiceBaseImpl {
 	}
 
 	@Override
+	public void updateChainedRedirectEntries(
+			long groupId, String destinationURL, String sourceURL)
+		throws PortalException {
+
+		List<RedirectEntry> redirectEntries =
+			redirectEntryLocalService.
+				getRedirectEntriesByGroupIdAndDestinationURL(
+					groupId, sourceURL);
+
+		for (RedirectEntry redirectEntry : redirectEntries) {
+			updateRedirectEntry(
+				redirectEntry.getRedirectEntryId(), destinationURL,
+				redirectEntry.getExpirationDate(), redirectEntry.isPermanent(),
+				redirectEntry.getSourceURL());
+		}
+	}
+
+	@Override
 	public RedirectEntry updateRedirectEntry(
 			long redirectEntryId, String destinationURL, Date expirationDate,
 			boolean permanent, String sourceURL)

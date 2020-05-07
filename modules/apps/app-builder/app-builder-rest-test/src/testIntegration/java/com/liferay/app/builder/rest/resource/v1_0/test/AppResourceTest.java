@@ -29,6 +29,7 @@ import com.liferay.dynamic.data.mapping.test.util.DDMStructureLayoutTestHelper;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -42,8 +43,6 @@ import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -67,24 +66,6 @@ public class AppResourceTest extends BaseAppResourceTestCase {
 			testGroup.getCreatorUserId(), StringPool.BLANK,
 			_ddmStructure.getStructureId(), StringPool.BLANK, null,
 			StringPool.BLANK);
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLDeleteApp() {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetApp() {
-	}
-
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetSiteAppsPage() {
 	}
 
 	@Override
@@ -161,8 +142,13 @@ public class AppResourceTest extends BaseAppResourceTestCase {
 
 	@Override
 	protected App testGetApp_addApp() throws Exception {
+		return testGetAppsPage_addApp(randomApp());
+	}
+
+	@Override
+	protected App testGetAppsPage_addApp(App app) throws Exception {
 		return appResource.postDataDefinitionApp(
-			_ddmStructure.getStructureId(), randomApp());
+			_ddmStructure.getStructureId(), app);
 	}
 
 	@Override
@@ -176,6 +162,12 @@ public class AppResourceTest extends BaseAppResourceTestCase {
 
 		return appResource.postDataDefinitionApp(
 			app.getDataDefinitionId(), app);
+	}
+
+	@Override
+	protected App testGraphQLApp_addApp() throws Exception {
+		return appResource.postDataDefinitionApp(
+			_ddmStructure.getStructureId(), randomApp());
 	}
 
 	@Override
@@ -222,13 +214,19 @@ public class AppResourceTest extends BaseAppResourceTestCase {
 		return StringUtil.read(inputStream);
 	}
 
+	@DeleteAfterTestRun
 	private DDMStructure _ddmStructure;
+
+	@DeleteAfterTestRun
 	private DDMStructureLayout _ddmStructureLayout;
+
+	@DeleteAfterTestRun
 	private DEDataListView _deDataListView;
 
 	@Inject
 	private DEDataListViewLocalService _deDataListViewLocalService;
 
+	@DeleteAfterTestRun
 	private DDMStructure _irrelevantDDMStructure;
 
 }

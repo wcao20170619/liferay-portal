@@ -192,8 +192,6 @@ definition {
 
 	@priority = "4"
 	test AddBlogsEntryWithSamePageScope {
-		property portal.upstream = "quarantine";
-
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONLayout.addPublicLayout(
@@ -577,8 +575,6 @@ definition {
 
 	@priority = "5"
 	test DeleteBlogsEntries {
-		property portal.upstream = "quarantine";
-
 		for (var entryCount : list "1,2,3") {
 			Navigator.gotoPage(pageName = "Blogs Page");
 
@@ -619,8 +615,6 @@ definition {
 
 	@priority = "4"
 	test DeleteBlogsEntryComment {
-		property portal.release = "false";
-
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
@@ -1036,7 +1030,6 @@ definition {
 
 	@priority = "4"
 	test UserFlagsEntryAndAdminViewsNotificationInMockMock {
-		property portal.upstream = "quarantine";
 		property test.smtp.server.enabled = "true";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
@@ -1072,11 +1065,11 @@ definition {
 			userEmailAddress = "userea@liferay.com");
 
 		MockMock.viewMail(
-			asset = "Inappropriate Content Flagged in Liferay",
+			asset = "Inappropriate Content Flagged in ${siteName}",
 			content = "flagged as inappropriate by Test Test",
 			recipient = "Test Test",
 			sender = "Joe Bloggs",
-			subject = "Inappropriate Content Flagged in Liferay");
+			subject = "Inappropriate Content Flagged in ${siteName}");
 	}
 
 	@priority = "5"
@@ -1357,8 +1350,6 @@ definition {
 	@ignore = "true"
 	@priority = "4"
 	test ViewBlogsEntryRSS {
-		property portal.upstream = "quarantine";
-
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		JSONBlog.addEntry(
@@ -1522,8 +1513,6 @@ definition {
 
 	@priority = "4"
 	test ViewBlogsEntryWithGuestPermissionsRemoved {
-		property portal.upstream = "quarantine";
-
 		Blogs.addEntry(
 			entryContent = "Blogs Entry1 Content",
 			entryTitle = "Blogs Entry1 Title");
@@ -1582,8 +1571,6 @@ definition {
 
 	@priority = "3"
 	test ViewBlogsEntryWithUploadedCoverImage {
-		property portal.upstream = "quarantine";
-
 		Blogs.addEntryWithUploadedCoverImage(
 			coverImageName = "Document_1",
 			entryContent = "Blogs Entry Content",

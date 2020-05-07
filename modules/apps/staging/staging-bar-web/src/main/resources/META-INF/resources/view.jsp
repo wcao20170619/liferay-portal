@@ -140,7 +140,7 @@ if (liveLayout != null) {
 		<c:if test="<%= !layout.isSystem() || layout.isTypeControlPanel() || !Objects.equals(layout.getFriendlyURL(), PropsValues.CONTROL_PANEL_LAYOUT_FRIENDLY_URL) %>">
 			<div class="staging-bar">
 				<div class="container-fluid container-fluid-max-xl">
-					<div class="row">
+					<clay:row>
 						<c:choose>
 							<c:when test="<%= group.isStagingGroup() || group.isStagedRemotely() %>">
 								<c:if test="<%= stagingGroup != null %>">
@@ -152,30 +152,38 @@ if (liveLayout != null) {
 
 									<c:choose>
 										<c:when test="<%= branchingEnabled %>">
-											<div class="col">
+											<clay:col>
 												<liferay-util:include page="/view_layout_set_branch_details.jsp" servletContext="<%= application %>" />
-											</div>
+											</clay:col>
 
-											<div class="col">
+											<clay:col>
 												<c:if test="<%= !layoutRevision.isIncomplete() %>">
 													<liferay-util:include page="/view_layout_branch_details.jsp" servletContext="<%= application %>" />
 												</c:if>
-											</div>
+											</clay:col>
 
-											<div class="col staging-alert-container" id="<portlet:namespace />layoutRevisionStatus">
+											<clay:col
+												className="staging-alert-container"
+												id='<%= renderResponse.getNamespace() + "layoutRevisionStatus" %>'
+											>
 												<aui:model-context bean="<%= layoutRevision %>" model="<%= LayoutRevision.class %>" />
 
 												<liferay-util:include page="/view_layout_revision_status.jsp" servletContext="<%= application %>" />
-											</div>
+											</clay:col>
 
-											<div class="col" id="<portlet:namespace />layoutRevisionDetails">
+											<clay:col
+												className="staging-alert-container"
+												id='<%= renderResponse.getNamespace() + "layoutRevisionDetails" %>'
+											>
 												<aui:model-context bean="<%= layoutRevision %>" model="<%= LayoutRevision.class %>" />
 
 												<liferay-util:include page="/view_layout_revision_details.jsp" servletContext="<%= application %>" />
-											</div>
+											</clay:col>
 										</c:when>
 										<c:otherwise>
-											<div class="col staging-alert-container">
+											<clay:col
+												className="staging-alert-container"
+											>
 												<c:choose>
 													<c:when test="<%= liveLayout == null %>">
 														<span class="last-publication-branch">
@@ -186,29 +194,35 @@ if (liveLayout != null) {
 														<liferay-util:include page="/last_publication_date_message.jsp" servletContext="<%= application %>" />
 													</c:otherwise>
 												</c:choose>
-											</div>
+											</clay:col>
 
-											<div class="col-md-2 col-sm-3 staging-button-container">
+											<clay:col
+												className="staging-button-container"
+												md="2"
+												sm="3"
+											>
 												<liferay-staging:menu
 													cssClass="publish-link test5"
 													onlyActions="<%= true %>"
 												/>
-											</div>
+											</clay:col>
 										</c:otherwise>
 									</c:choose>
 								</c:if>
 							</c:when>
 							<c:otherwise>
-								<div class="col staging-alert-container">
+								<clay:col
+									className="staging-alert-container"
+								>
 									<div class="alert alert-warning hide warning-content" id="<portlet:namespace />warningMessage">
 										<liferay-ui:message key="an-inital-staging-publication-is-in-progress" />
 									</div>
 
 									<liferay-util:include page="/last_publication_date_message.jsp" servletContext="<%= application %>" />
-								</div>
+								</clay:col>
 							</c:otherwise>
 						</c:choose>
-					</div>
+					</clay:row>
 				</div>
 			</div>
 		</c:if>
@@ -230,7 +244,7 @@ if (liveLayout != null) {
 			var stagingToggle = document.querySelector('.staging-toggle');
 
 			if (stagingToggle) {
-				stagingToggle.addEventListener('click', function(event) {
+				stagingToggle.addEventListener('click', function (event) {
 					event.preventDefault();
 
 					staging.classList.toggle('staging-show');
@@ -243,7 +257,7 @@ if (liveLayout != null) {
 			'<portlet:namespace />warningMessage'
 		);
 
-		var checkBackgroundTasks = function() {
+		var checkBackgroundTasks = function () {
 			Liferay.Service(
 				'/backgroundtask.backgroundtask/get-background-tasks-count',
 				{
@@ -252,7 +266,7 @@ if (liveLayout != null) {
 					taskExecutorClassName:
 						'<%= BackgroundTaskExecutorNames.LAYOUT_STAGING_BACKGROUND_TASK_EXECUTOR %>',
 				},
-				function(obj) {
+				function (obj) {
 					var incomplete = obj > 0;
 
 					if (incomplete) {

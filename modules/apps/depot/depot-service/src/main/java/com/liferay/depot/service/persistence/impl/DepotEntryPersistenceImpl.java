@@ -16,6 +16,7 @@ package com.liferay.depot.service.persistence.impl;
 
 import com.liferay.depot.exception.NoSuchEntryException;
 import com.liferay.depot.model.DepotEntry;
+import com.liferay.depot.model.DepotEntryTable;
 import com.liferay.depot.model.impl.DepotEntryImpl;
 import com.liferay.depot.model.impl.DepotEntryModelImpl;
 import com.liferay.depot.service.persistence.DepotEntryPersistence;
@@ -1668,16 +1669,18 @@ public class DepotEntryPersistenceImpl
 		"depotEntry.groupId = ?";
 
 	public DepotEntryPersistenceImpl() {
-		setModelClass(DepotEntry.class);
-
-		setModelImplClass(DepotEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DepotEntry.class);
+
+		setModelImplClass(DepotEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DepotEntryTable.INSTANCE);
 	}
 
 	/**

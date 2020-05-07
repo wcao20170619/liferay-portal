@@ -15,13 +15,13 @@
 /**
  * The Sortable Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-sortable
  */
 
 AUI.add(
 	'liferay-sortable',
-	A => {
+	(A) => {
 		var Sortable = A.Sortable;
 
 		var STR_CONT = 'container';

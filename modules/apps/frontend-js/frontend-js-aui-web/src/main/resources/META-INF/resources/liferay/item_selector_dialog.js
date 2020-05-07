@@ -13,13 +13,13 @@
  */
 
 /**
- * @deprecated As of Athanasius(7.3.x), replaced by ItemSelectorDialog.es.js
+ * @deprecated As of Athanasius (7.3.x), replaced by ItemSelectorDialog.es.js
  * @module liferay-item-selector-dialog
  */
 
 AUI.add(
 	'liferay-item-selector-dialog',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var Util = Liferay.Util;
@@ -91,7 +91,7 @@ AUI.add(
 				},
 
 				/*
-				 * @deprecated since 7.2, unused
+				 * @deprecated As of Mueller (7.2.x), with no direct replacement
 				 */
 				close() {
 					var instance = this;

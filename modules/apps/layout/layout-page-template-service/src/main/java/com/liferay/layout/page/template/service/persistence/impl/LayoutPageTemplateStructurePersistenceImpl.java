@@ -16,6 +16,7 @@ package com.liferay.layout.page.template.service.persistence.impl;
 
 import com.liferay.layout.page.template.exception.NoSuchPageTemplateStructureException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructureTable;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructurePersistence;
@@ -2272,16 +2273,18 @@ public class LayoutPageTemplateStructurePersistenceImpl
 		"layoutPageTemplateStructure.classPK = ?";
 
 	public LayoutPageTemplateStructurePersistenceImpl() {
-		setModelClass(LayoutPageTemplateStructure.class);
-
-		setModelImplClass(LayoutPageTemplateStructureImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(LayoutPageTemplateStructure.class);
+
+		setModelImplClass(LayoutPageTemplateStructureImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(LayoutPageTemplateStructureTable.INSTANCE);
 	}
 
 	/**

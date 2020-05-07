@@ -24,7 +24,9 @@ const INSTANCE_MAP = new WeakMap();
  * component wrappers from a DOM element.
  */
 function getElement(element) {
+
 	// Remove jQuery wrapper, if any.
+
 	if (element && element.jquery) {
 		if (element.length > 1) {
 			throw new Error(
@@ -35,6 +37,7 @@ function getElement(element) {
 	}
 
 	// Remove Metal wrapper, if any.
+
 	if (element && !(element instanceof HTMLElement)) {
 		element = element.element;
 	}
@@ -81,7 +84,7 @@ function getUniqueSelector(element) {
 
 	const attributes = Array.from(element.attributes)
 		.map(({name, value}) => {
-			const isIdentifying = IDENTITY_ATTRIBUTES.some(regExp => {
+			const isIdentifying = IDENTITY_ATTRIBUTES.some((regExp) => {
 				return regExp.test(name);
 			});
 
@@ -113,12 +116,16 @@ function setClasses(element, classes) {
 	element = getElement(element);
 
 	if (element) {
+
 		// One at a time because IE 11: https://caniuse.com/#feat=classlist
+
 		Object.entries(classes).forEach(([className, present]) => {
+
 			// Some callers use multiple space-separated classNames for
 			// `openClass`/`data-open-class`. (Looking at you,
 			// product-navigation-simulation-web...)
-			className.split(/\s+/).forEach(name => {
+
+			className.split(/\s+/).forEach((name) => {
 				if (present) {
 					element.classList.add(name);
 				}
@@ -134,7 +141,8 @@ function hasClass(element, className) {
 	element = getElement(element);
 
 	// Again, product-navigation-simulation-web passes multiple classNames.
-	return className.split(/\s+/).every(name => {
+
+	return className.split(/\s+/).every((name) => {
 		return element.classList.contains(name);
 	});
 }
@@ -187,17 +195,19 @@ function offsetLeft(element) {
 const eventNamesToSelectors = {};
 
 function handleEvent(eventName, event) {
-	Object.keys(eventNamesToSelectors[eventName]).forEach(selector => {
+	Object.keys(eventNamesToSelectors[eventName]).forEach((selector) => {
 		let matches = false;
 		let target = event.target;
 
 		while (target) {
+
 			// In IE11 SVG elements have no `parentElement`, only a
 			// `parentNode`, so we have to search up the DOM using
 			// the latter. This in turn requires us to check for the
 			// existence of `target.matches` before using it.
 			//
 			// See: https://stackoverflow.com/a/36270354/2103996
+
 			matches = target.matches && target.matches(selector);
 
 			if (matches) {
@@ -220,11 +230,13 @@ function handleEvent(eventName, event) {
  */
 function subscribe(elementOrSelector, eventName, handler) {
 	if (elementOrSelector) {
+
 		// Add only one listener per `eventName`.
+
 		if (!eventNamesToSelectors[eventName]) {
 			eventNamesToSelectors[eventName] = {};
 
-			document.body.addEventListener(eventName, event =>
+			document.body.addEventListener(eventName, (event) =>
 				handleEvent(eventName, event)
 			);
 		}
@@ -240,7 +252,7 @@ function subscribe(elementOrSelector, eventName, handler) {
 		}
 
 		const emitter = emitters[selector];
-		const subscription = emitter.on(eventName, event => {
+		const subscription = emitter.on(eventName, (event) => {
 			if (!event.defaultPrevented) {
 				handler(event);
 			}
@@ -359,19 +371,20 @@ SideNavigation.prototype = {
 			instance._fetchPromise = Liferay.Util.fetch(url);
 
 			instance._fetchPromise
-				.then(response => {
+				.then((response) => {
 					if (!response.ok) {
 						throw new Error(`Failed to fetch ${url}`);
 					}
 
 					return response.text();
 				})
-				.then(text => {
+				.then((text) => {
 					const range = document.createRange();
 
 					range.selectNode(sidebar);
 
 					// Unlike `.innerHTML`, this will eval scripts.
+
 					const fragment = range.createContextualFragment(text);
 
 					sidebar.removeChild(loading);
@@ -380,7 +393,7 @@ SideNavigation.prototype = {
 
 					instance.setHeight();
 				})
-				.catch(err => {
+				.catch((err) => {
 					console.error(err);
 				});
 		}
@@ -452,6 +465,7 @@ SideNavigation.prototype = {
 		}
 
 		// Force Reflow for IE11 Browser Bug
+
 		setStyles(container, {
 			display: '',
 		});
@@ -514,7 +528,7 @@ SideNavigation.prototype = {
 			const navigation = container.querySelector(options.navigation);
 			const menu = container.querySelector('.sidenav-menu');
 
-			[content, navigation, menu].forEach(element => {
+			[content, navigation, menu].forEach((element) => {
 				setStyles(element, {
 					height: '',
 					'min-height': '',
@@ -636,7 +650,7 @@ SideNavigation.prototype = {
 				`[data-target="${target}"], [href="${target}"]`
 			);
 
-			Array.from(nodes).forEach(node => {
+			Array.from(nodes).forEach((node) => {
 				setClasses(node, {
 					active: false,
 					[openClass]: false,
@@ -932,7 +946,9 @@ SideNavigation.prototype = {
 			}
 
 			if (instance.mobile) {
+
 				// ios 8 fixed element disappears when trying to scroll
+
 				menu.focus();
 			}
 		});
@@ -1058,7 +1074,7 @@ SideNavigation.instance = getInstance;
 const defaults = {
 	breakpoint: 768,
 	content: '.sidenav-content',
-	gutter: '15px',
+	gutter: '0px',
 	loadingIndicatorTPL:
 		'<div class="loading-animation loading-animation-md"></div>',
 	navigation: '.sidenav-menu-slider',
@@ -1078,7 +1094,9 @@ function onReady() {
 }
 
 if (document.readyState !== 'loading') {
+
 	// readyState is "interactive" or "complete".
+
 	onReady();
 }
 else {

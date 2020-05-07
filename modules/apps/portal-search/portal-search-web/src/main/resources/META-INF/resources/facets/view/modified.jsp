@@ -184,7 +184,10 @@ int index = 0;
 					%>
 
 					<div class="<%= !fieldParamSelection.equals(String.valueOf(index + 1)) ? "hide" : StringPool.BLANK %> modified-custom-range" id="<%= randomNamespace %>customRange">
-						<div class="col-md-6" id="<%= randomNamespace %>customRangeFrom">
+						<clay:col
+							id='<%= randomNamespace + "customRangeFrom" %>'
+							md="6"
+						>
 							<aui:field-wrapper label="from">
 								<liferay-ui:input-date
 									dayParam='<%= HtmlUtil.escapeJS(facet.getFieldId()) + "dayFrom" %>'
@@ -198,9 +201,12 @@ int index = 0;
 									yearValue="<%= fromCalendar.get(Calendar.YEAR) %>"
 								/>
 							</aui:field-wrapper>
-						</div>
+						</clay:col>
 
-						<div class="col-md-6" id="<%= randomNamespace %>customRangeTo">
+						<clay:col
+							id='<%= randomNamespace + "customRangeTo" %>'
+							md="6"
+						>
 							<aui:field-wrapper label="to">
 								<liferay-ui:input-date
 									dayParam='<%= HtmlUtil.escapeJS(facet.getFieldId()) + "dayTo" %>'
@@ -214,7 +220,7 @@ int index = 0;
 									yearValue="<%= toCalendar.get(Calendar.YEAR) %>"
 								/>
 							</aui:field-wrapper>
-						</div>
+						</clay:col>
 
 						<%
 						String taglibSearchCustomRange = "window['" + renderResponse.getNamespace() + HtmlUtil.escapeJS(facet.getFieldId()) + "searchCustomRange'](" + (index + 1) + ");";
@@ -322,7 +328,7 @@ int index = 0;
 	);
 	var searchButton = A.one('#<portlet:namespace />searchCustomRangeButton');
 
-	var preventKeyboardDateChange = function(event) {
+	var preventKeyboardDateChange = function (event) {
 		if (!event.isKey('TAB')) {
 			event.preventDefault();
 		}
@@ -349,7 +355,7 @@ int index = 0;
 	A.mix(
 		DEFAULTS_FORM_VALIDATOR.RULES,
 		{
-			<portlet:namespace />dateRange: function(val, fieldNode, ruleValue) {
+			<portlet:namespace />dateRange: function (val, fieldNode, ruleValue) {
 				return A.Date.isGreaterOrEqual(
 					customRangeTo.getDate(),
 					customRangeFrom.getDate()
@@ -363,10 +369,10 @@ int index = 0;
 		boundingBox: document.<portlet:namespace />fm,
 		fieldContainer: 'div',
 		on: {
-			errorField: function(event) {
+			errorField: function (event) {
 				Util.toggleDisabled(searchButton, true);
 			},
-			validField: function(event) {
+			validField: function (event) {
 				Util.toggleDisabled(searchButton, false);
 			},
 		},
@@ -380,14 +386,14 @@ int index = 0;
 		},
 	});
 
-	var onRangeSelectionChange = function(event) {
+	var onRangeSelectionChange = function (event) {
 		customRangeValidator.validate();
 	};
 
 	customRangeFrom.on('selectionChange', onRangeSelectionChange);
 	customRangeTo.on('selectionChange', onRangeSelectionChange);
 
-	A.one('.<%= randomNamespace %>custom-range-toggle').on('click', function(
+	A.one('.<%= randomNamespace %>custom-range-toggle').on('click', function (
 		event
 	) {
 		event.halt();

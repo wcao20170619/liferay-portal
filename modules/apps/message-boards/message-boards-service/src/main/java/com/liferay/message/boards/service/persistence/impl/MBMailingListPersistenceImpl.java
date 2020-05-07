@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchMailingListException;
 import com.liferay.message.boards.model.MBMailingList;
+import com.liferay.message.boards.model.MBMailingListTable;
 import com.liferay.message.boards.model.impl.MBMailingListImpl;
 import com.liferay.message.boards.model.impl.MBMailingListModelImpl;
 import com.liferay.message.boards.service.persistence.MBMailingListPersistence;
@@ -2199,17 +2200,19 @@ public class MBMailingListPersistenceImpl
 		"mbMailingList.categoryId = ?";
 
 	public MBMailingListPersistenceImpl() {
-		setModelClass(MBMailingList.class);
-
-		setModelImplClass(MBMailingListImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBMailingList.class);
+
+		setModelImplClass(MBMailingListImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBMailingListTable.INSTANCE);
 	}
 
 	/**

@@ -63,6 +63,7 @@ const pendingCallbacks = {};
  * @review
  */
 class MapBase extends State {
+
 	/**
 	 * MapBase constructor
 	 * @param  {Array} args List of arguments to be sent to State constructor
@@ -271,11 +272,11 @@ class MapBase extends State {
 	 */
 	_getControlsConfig() {
 		const config = {};
-		const availableControls = this.controls.map(item => {
+		const availableControls = this.controls.map((item) => {
 			return typeof item === 'string' ? item : item.name;
 		});
 
-		Object.keys(this.constructor.CONTROLS_MAP).forEach(key => {
+		Object.keys(this.constructor.CONTROLS_MAP).forEach((key) => {
 			const controlIndex = availableControls.indexOf(key);
 			const value = this.constructor.CONTROLS_MAP[key];
 
@@ -344,10 +345,12 @@ class MapBase extends State {
 	_handleGeoJSONLayerFeaturesAdded({features}) {
 		const bounds = this.getBounds();
 
-		const locations = features.map(feature => feature.getGeometry().get());
+		const locations = features.map((feature) =>
+			feature.getGeometry().get()
+		);
 
 		if (locations.length > 1) {
-			locations.forEach(location => bounds.extend(location));
+			locations.forEach((location) => bounds.extend(location));
 		}
 		else {
 			this.position = {location: locations[0]};
@@ -637,7 +640,7 @@ class MapBase extends State {
  * @param {function} callback Callback being executed
  * @review
  */
-MapBase.get = function(id, callback) {
+MapBase.get = function (id, callback) {
 	const map = Liferay.component(id);
 
 	if (map) {
@@ -660,7 +663,7 @@ MapBase.get = function(id, callback) {
  * @param {string} portletId Id of the portlet that registers the map
  * @review
  */
-MapBase.register = function(id, map, portletId) {
+MapBase.register = function (id, map, portletId) {
 	const componentConfig = portletId ? {portletId} : {destroyOnNavigate: true};
 
 	Liferay.component(id, map, componentConfig);
@@ -668,7 +671,7 @@ MapBase.register = function(id, map, portletId) {
 	const idPendingCallbacks = pendingCallbacks[id];
 
 	if (idPendingCallbacks) {
-		idPendingCallbacks.forEach(callback => callback(map));
+		idPendingCallbacks.forEach((callback) => callback(map));
 
 		idPendingCallbacks.length = 0;
 	}
@@ -768,6 +771,7 @@ MapBase.POSITION_MAP = {};
  * @type {!Object}
  */
 MapBase.STATE = {
+
 	/**
 	 * DOM node selector identifying the element that will be used
 	 * for rendering the map

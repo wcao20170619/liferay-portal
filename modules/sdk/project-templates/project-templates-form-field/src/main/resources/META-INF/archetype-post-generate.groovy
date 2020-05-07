@@ -24,18 +24,47 @@ Files.deleteIfExists buildGradlePath
 
 Properties properties = request.properties
 
+String buildType = properties.get("buildType");
+
 String liferayVersion = properties.get("liferayVersion")
 
-if (!liferayVersion.startsWith("7.1")) {
-	String artifactId = properties.get("artifactId")
+if (liferayVersion.startsWith("7.2") && buildType.equals("maven")) {
+	throw new IllegalArgumentException(
+		"Form Field project is not supported 7.2 for Maven")
+}
 
-	List<String> fileNames = [".babelrc", ".npmbundlerrc", "package.json", "src/main/resources/META-INF/resources/${artifactId}.es.js"]
+List<String> fileNames = []
 
-	for (fileName in fileNames) {
-		Path resourcePath = Paths.get(fileName)
+String artifactId = properties.get("artifactId")
 
-		Path resourceFullPath = projectPath.resolve(resourcePath)
+if (liferayVersion.startsWith("7.0")) {
+	fileNames = [".babelrc", ".npmbundlerrc", "package.json", "src/main/resources/META-INF/resources/"+ artifactId + ".es.js"]
+}
 
-		Files.deleteIfExists resourceFullPath
+if (liferayVersion.startsWith("7.2")) {
+	fileNames.add("src/main/resources/META-INF/resources/config.js")
+	fileNames.add("src/main/resources/META-INF/resources/"+ artifactId + "_field.js")
+
+	String [] folders = artifactId.split("-")
+
+	String directory = folders.length > 0 ? "" : artifactId
+
+	for (String folder : folders) {
+		directory += folder + "/"
 	}
+
+	String className = properties.get("className")
+
+	fileNames.add("src/main/java/"+ directory + "form/field/" + className + "DDMFormFieldRenderer.java")
+}
+else {
+	fileNames.add("src/main/resources/META-INF/resources/" + artifactId + "Register.soy")
+}
+
+for (fileName in fileNames) {
+	Path resourcePath = Paths.get(fileName)
+
+	Path resourceFullPath = projectPath.resolve(resourcePath)
+
+	Files.deleteIfExists resourceFullPath
 }

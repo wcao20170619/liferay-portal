@@ -448,6 +448,11 @@ public class JournalManagementToolbarDisplayContext
 	}
 
 	@Override
+	protected String getDisplayStyle() {
+		return _journalDisplayContext.getDisplayStyle();
+	}
+
+	@Override
 	protected String[] getDisplayViews() {
 		return _journalDisplayContext.getDisplayViews();
 	}

@@ -101,6 +101,8 @@ public class DDMFormTemplateContextProcessor {
 
 		DDMFormField ddmFormField = new DDMFormField(name, type);
 
+		setDDMFormFieldCollapsible(
+			jsonObject.getBoolean("collapsible"), ddmFormField);
 		setDDMFormFieldDataProviderSettings(
 			jsonObject.getLong("ddmDataProviderInstanceId"),
 			jsonObject.getString("ddmDataProviderInstanceOutput"),
@@ -240,6 +242,12 @@ public class DDMFormTemplateContextProcessor {
 
 	protected void setDDMFormDefaultLocale() {
 		_ddmForm.setDefaultLocale(_locale);
+	}
+
+	protected void setDDMFormFieldCollapsible(
+		boolean collapsible, DDMFormField ddmFormField) {
+
+		ddmFormField.setProperty("collapsible", collapsible);
 	}
 
 	protected void setDDMFormFieldDataProviderSettings(

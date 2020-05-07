@@ -23,17 +23,15 @@ import {updateLanguageId} from '../actions/index';
 import {BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/backgroundImageFragmentEntryProcessor';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../config/constants/editableFragmentEntryProcessor';
 import {TRANSLATION_STATUS_TYPE} from '../config/constants/translationStatusType';
-import selectPrefixedSegmentsExperienceId from '../selectors/selectPrefixedSegmentsExperienceId';
-import {useSelector} from '../store/index';
 
-const getEditableValues = fragmentEntryLinks =>
+const getEditableValues = (fragmentEntryLinks) =>
 	Object.values(fragmentEntryLinks)
 		.filter(
-			fragmentEntryLink =>
+			(fragmentEntryLink) =>
 				!fragmentEntryLink.masterLayout &&
 				fragmentEntryLink.editableValues
 		)
-		.map(fragmentEntryLink => [
+		.map((fragmentEntryLink) => [
 			...Object.values(
 				fragmentEntryLink.editableValues[
 					EDITABLE_FRAGMENT_ENTRY_PROCESSOR
@@ -53,14 +51,7 @@ const getEditableValues = fragmentEntryLinks =>
 			[]
 		);
 
-const isTranslated = (
-	editableValue,
-	languageId,
-	prefixedSegmentsExperienceId
-) =>
-	editableValue[languageId] ||
-	(prefixedSegmentsExperienceId in editableValue &&
-		editableValue[prefixedSegmentsExperienceId][languageId]);
+const isTranslated = (editableValue, languageId) => editableValue[languageId];
 
 const getTranslationStatus = ({
 	editableValuesLength,
@@ -138,9 +129,6 @@ export default function Translation({
 	languageId,
 }) {
 	const [active, setActive] = useState(false);
-	const prefixedSegmentsExperienceId = useSelector(
-		selectPrefixedSegmentsExperienceId
-	);
 	const editableValues = useMemo(
 		() => getEditableValues(fragmentEntryLinks),
 		[fragmentEntryLinks]
@@ -155,22 +143,13 @@ export default function Translation({
 		return Object.keys({
 			[defaultLanguageId]: defaultLanguage,
 			...availableLanguagesMut,
-		}).map(languageId => ({
+		}).map((languageId) => ({
 			languageId,
-			values: editableValues.filter(editableValue =>
-				isTranslated(
-					editableValue,
-					languageId,
-					prefixedSegmentsExperienceId
-				)
+			values: editableValues.filter((editableValue) =>
+				isTranslated(editableValue, languageId)
 			),
 		}));
-	}, [
-		availableLanguages,
-		defaultLanguageId,
-		editableValues,
-		prefixedSegmentsExperienceId,
-	]);
+	}, [availableLanguages, defaultLanguageId, editableValues]);
 
 	const {languageIcon, languageLabel} = availableLanguages[languageId];
 
@@ -195,7 +174,7 @@ export default function Translation({
 			}
 		>
 			<ClayDropDown.ItemList>
-				{languageValues.map(language => (
+				{languageValues.map((language) => (
 					<TranslationItem
 						editableValuesLength={editableValues.length}
 						isDefault={language.languageId === defaultLanguageId}

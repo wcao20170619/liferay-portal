@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.base;
 
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -45,6 +47,7 @@ import com.liferay.portal.kernel.service.persistence.LayoutSetBranchPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.service.persistence.VirtualHostPersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -125,6 +128,11 @@ public abstract class LayoutSetLocalServiceBaseImpl
 	@Override
 	public LayoutSet deleteLayoutSet(LayoutSet layoutSet) {
 		return layoutSetPersistence.remove(layoutSet);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return layoutSetPersistence.dslQuery(dslQuery);
 	}
 
 	@Override
@@ -713,8 +721,22 @@ public abstract class LayoutSetLocalServiceBaseImpl
 		return LayoutSetLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<LayoutSet> getCTPersistence() {
+		return layoutSetPersistence;
+	}
+
+	@Override
+	public Class<LayoutSet> getModelClass() {
 		return LayoutSet.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<LayoutSet>, R, E> updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(layoutSetPersistence);
 	}
 
 	protected String getModelClassName() {

@@ -70,7 +70,7 @@ public class GroupIdQueryPreFilterContributor
 
 			Group group = _getGroup(groupId);
 
-			if (!groupLocalService.isLiveGroupActive(group)) {
+			if (!_groupLocalService.isLiveGroupActive(group)) {
 				continue;
 			}
 
@@ -99,27 +99,30 @@ public class GroupIdQueryPreFilterContributor
 				scopeGroupIdsTermsFilter, BooleanClauseOccur.MUST);
 		}
 
-		booleanFilter.add(scopeBooleanFilter, BooleanClauseOccur.MUST);
+		if (scopeBooleanFilter.hasClauses()) {
+			booleanFilter.add(scopeBooleanFilter, BooleanClauseOccur.MUST);
+		}
 	}
 
-	@Reference
-	protected GroupLocalService groupLocalService;
+	@Reference(unbind = "-")
+	public void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
+	}
 
 	private void _addInactiveGroupsBooleanFilter(
 		BooleanFilter booleanFilter, SearchContext searchContext) {
 
-		List<Group> inactiveGroups = groupLocalService.getActiveGroups(
+		List<Long> inactiveGroupIds = _groupLocalService.getGroupIds(
 			searchContext.getCompanyId(), false);
 
-		if (ListUtil.isEmpty(inactiveGroups)) {
+		if (ListUtil.isEmpty(inactiveGroupIds)) {
 			return;
 		}
 
 		TermsFilter groupIdTermsFilter = new TermsFilter(Field.GROUP_ID);
 
 		groupIdTermsFilter.addValues(
-			ArrayUtil.toStringArray(
-				ListUtil.toArray(inactiveGroups, Group.GROUP_ID_ACCESSOR)));
+			ArrayUtil.toStringArray(inactiveGroupIds.toArray(new Long[0])));
 
 		booleanFilter.add(groupIdTermsFilter, BooleanClauseOccur.MUST_NOT);
 	}
@@ -136,11 +139,13 @@ public class GroupIdQueryPreFilterContributor
 
 	private Group _getGroup(long groupId) {
 		try {
-			return groupLocalService.getGroup(groupId);
+			return _groupLocalService.getGroup(groupId);
 		}
 		catch (PortalException portalException) {
 			throw new SystemException(portalException);
 		}
 	}
+
+	private GroupLocalService _groupLocalService;
 
 }

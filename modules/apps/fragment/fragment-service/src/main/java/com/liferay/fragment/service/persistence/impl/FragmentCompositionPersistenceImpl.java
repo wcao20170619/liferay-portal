@@ -16,6 +16,7 @@ package com.liferay.fragment.service.persistence.impl;
 
 import com.liferay.fragment.exception.NoSuchCompositionException;
 import com.liferay.fragment.model.FragmentComposition;
+import com.liferay.fragment.model.FragmentCompositionTable;
 import com.liferay.fragment.model.impl.FragmentCompositionImpl;
 import com.liferay.fragment.model.impl.FragmentCompositionModelImpl;
 import com.liferay.fragment.service.persistence.FragmentCompositionPersistence;
@@ -5232,17 +5233,19 @@ public class FragmentCompositionPersistenceImpl
 		"fragmentComposition.status = ?";
 
 	public FragmentCompositionPersistenceImpl() {
-		setModelClass(FragmentComposition.class);
-
-		setModelImplClass(FragmentCompositionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("data", "data_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(FragmentComposition.class);
+
+		setModelImplClass(FragmentCompositionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(FragmentCompositionTable.INSTANCE);
 	}
 
 	/**

@@ -117,7 +117,7 @@ const MillerColumnsItem = ({
 	const dropdownActions = useMemo(() => {
 		const dropdownActions = [];
 
-		actions.forEach(action => {
+		actions.forEach((action) => {
 			if (!action.quickAction) {
 				const onClick = action.handler || actionHandlers[action.id];
 
@@ -136,7 +136,7 @@ const MillerColumnsItem = ({
 	const quickActions = useMemo(() => {
 		const quickActions = [];
 
-		actions.forEach(action => {
+		actions.forEach((action) => {
 			if (action.quickAction && action.url) {
 				quickActions.push({
 					...action,
@@ -150,7 +150,7 @@ const MillerColumnsItem = ({
 	}, [actions, actionHandlers]);
 
 	const [{isDragging}, drag] = useDrag({
-		collect: monitor => ({
+		collect: (monitor) => ({
 			isDragging: !!monitor.isDragging(),
 		}),
 		item: {
@@ -174,7 +174,7 @@ const MillerColumnsItem = ({
 				dropZone
 			);
 		},
-		collect: monitor => ({
+		collect: (monitor) => ({
 			isOver: !!monitor.isOver(),
 		}),
 		drop(source, monitor) {
@@ -211,7 +211,9 @@ const MillerColumnsItem = ({
 	useEffect(() => {
 		if (!active && dropZone === DROP_ZONES.ELEMENT && !timeoutRef.current) {
 			timeoutRef.current = setTimeout(() => {
-				onItemStayHover(itemId);
+				if (isOver) {
+					onItemStayHover(itemId);
+				}
 			}, ITEM_HOVER_TIMEOUT);
 		}
 		else if (
@@ -245,7 +247,7 @@ const MillerColumnsItem = ({
 			</a>
 
 			{draggable && (
-				<div className="autofit-col autofit-padded-no-gutters h2 miller-columns-item-drag-handler">
+				<div className="autofit-col miller-columns-item-drag-handler pl-0">
 					<ClayIcon symbol="drag" />
 				</div>
 			)}
@@ -271,7 +273,7 @@ const MillerColumnsItem = ({
 					<h5 className="list-group-subtitle small text-truncate">
 						{description}
 
-						{states.map(state => (
+						{states.map((state) => (
 							<ClayLabel
 								className="inline-item-after"
 								displayType={ITEM_STATES_COLORS[state.id]}
@@ -284,7 +286,7 @@ const MillerColumnsItem = ({
 				)}
 			</div>
 
-			{quickActions.map(action => (
+			{quickActions.map((action) => (
 				<div
 					className="autofit-col miller-columns-item-quick-action"
 					key={action.id}
@@ -316,7 +318,7 @@ const MillerColumnsItem = ({
 						}
 					>
 						<ClayDropDown.ItemList>
-							{dropdownActions.map(action => (
+							{dropdownActions.map((action) => (
 								<ClayDropDown.Item
 									disabled={!action.url}
 									href={action.href}
@@ -333,7 +335,7 @@ const MillerColumnsItem = ({
 			)}
 
 			{hasChild && (
-				<div className="autofit-col autofit-padded-no-gutters miller-columns-item-child-indicator text-muted">
+				<div className="autofit-col miller-columns-item-child-indicator">
 					<ClayIcon symbol="caret-right" />
 				</div>
 			)}

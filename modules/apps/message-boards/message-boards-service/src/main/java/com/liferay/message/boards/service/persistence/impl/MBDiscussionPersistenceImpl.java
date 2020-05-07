@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchDiscussionException;
 import com.liferay.message.boards.model.MBDiscussion;
+import com.liferay.message.boards.model.MBDiscussionTable;
 import com.liferay.message.boards.model.impl.MBDiscussionImpl;
 import com.liferay.message.boards.model.impl.MBDiscussionModelImpl;
 import com.liferay.message.boards.service.persistence.MBDiscussionPersistence;
@@ -2401,16 +2402,18 @@ public class MBDiscussionPersistenceImpl
 		"mbDiscussion.classPK = ?";
 
 	public MBDiscussionPersistenceImpl() {
-		setModelClass(MBDiscussion.class);
-
-		setModelImplClass(MBDiscussionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBDiscussion.class);
+
+		setModelImplClass(MBDiscussionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBDiscussionTable.INSTANCE);
 	}
 
 	/**

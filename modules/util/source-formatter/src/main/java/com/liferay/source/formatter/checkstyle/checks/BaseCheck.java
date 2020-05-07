@@ -745,6 +745,18 @@ public abstract class BaseCheck extends AbstractCheck {
 			null, getBaseDirName());
 	}
 
+	protected boolean isJSPFile() {
+		FileContents fileContents = getFileContents();
+
+		if (StringUtil.endsWith(fileContents.getFileName(), ".jsp") ||
+			StringUtil.endsWith(fileContents.getFileName(), ".jspf")) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	protected static final int ALL_TYPES = DetailASTUtil.ALL_TYPES;
 
 	protected static final int[] ARITHMETIC_OPERATOR_TOKEN_TYPES = {

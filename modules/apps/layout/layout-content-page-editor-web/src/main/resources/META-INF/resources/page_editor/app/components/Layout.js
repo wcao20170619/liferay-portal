@@ -60,6 +60,7 @@ const LAYOUT_DATA_ITEMS = {
 	[LAYOUT_DATA_ITEM_TYPES.container]: ContainerWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: DropZoneWithControls,
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: FragmentWithControls,
+	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: Root,
 	[LAYOUT_DATA_ITEM_TYPES.root]: Root,
 	[LAYOUT_DATA_ITEM_TYPES.row]: RowWithControls,
 };
@@ -67,23 +68,23 @@ const LAYOUT_DATA_ITEMS = {
 export default function Layout({mainItemId}) {
 	const activeItemId = useActiveItemId();
 	const dispatch = useDispatch();
-	const fragmentEntryLinks = useSelector(state => state.fragmentEntryLinks);
-	const layoutData = useSelector(state => state.layoutData);
+	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
+	const layoutData = useSelector((state) => state.layoutData);
 	const mainItem = layoutData.items[mainItemId];
 	const layoutRef = useRef(null);
 	const selectItem = useSelectItem();
 	const sidebarOpen = useSelector(
-		state => state.sidebar.panelId && state.sidebar.open
+		(state) => state.sidebar.panelId && state.sidebar.open
 	);
-	const store = useSelector(state => state);
+	const store = useSelector((state) => state);
 
-	const onClick = event => {
+	const onClick = (event) => {
 		if (event.target === event.currentTarget) {
 			selectItem(null);
 		}
 	};
 
-	const getDirection = keycode => {
+	const getDirection = (keycode) => {
 		let direction = null;
 
 		if (keycode === ARROW_UP_KEYCODE) {
@@ -97,7 +98,7 @@ export default function Layout({mainItemId}) {
 	};
 
 	const onKeyUp = useCallback(
-		event => {
+		(event) => {
 			event.preventDefault();
 
 			if (!activeItemId) {
@@ -152,7 +153,7 @@ export default function Layout({mainItemId}) {
 	useEffect(() => {
 		const layout = layoutRef.current;
 
-		const preventLinkClick = event => {
+		const preventLinkClick = (event) => {
 			const closestElement = closest(event.target, '[href]');
 
 			if (
@@ -201,7 +202,7 @@ export default function Layout({mainItemId}) {
 					{hasWarningMessages && (
 						<ClayAlert displayType="warning" variant="stripe">
 							{config.layoutConversionWarningMessages.map(
-								message => (
+								(message) => (
 									<>
 										{message}
 										<br />
@@ -235,7 +236,6 @@ export default function Layout({mainItemId}) {
 
 Layout.propTypes = {
 	mainItemId: PropTypes.string.isRequired,
-	withinMasterPage: PropTypes.bool,
 };
 
 class LayoutDataItem extends React.PureComponent {
@@ -302,7 +302,7 @@ function LayoutDataItemContent({
 
 	return (
 		<Component item={item} layoutData={layoutData} ref={componentRef}>
-			{item.children.map(childId => {
+			{item.children.map((childId) => {
 				return (
 					<LayoutDataItem
 						{...otherProps}

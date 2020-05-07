@@ -109,6 +109,34 @@ public class App {
 	protected Long dataDefinitionId;
 
 	@Schema
+	public String getDataDefinitionName() {
+		return dataDefinitionName;
+	}
+
+	public void setDataDefinitionName(String dataDefinitionName) {
+		this.dataDefinitionName = dataDefinitionName;
+	}
+
+	@JsonIgnore
+	public void setDataDefinitionName(
+		UnsafeSupplier<String, Exception> dataDefinitionNameUnsafeSupplier) {
+
+		try {
+			dataDefinitionName = dataDefinitionNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected String dataDefinitionName;
+
+	@Schema
 	public Long getDataLayoutId() {
 		return dataLayoutId;
 	}
@@ -419,6 +447,20 @@ public class App {
 			sb.append(dataDefinitionId);
 		}
 
+		if (dataDefinitionName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dataDefinitionName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(dataDefinitionName));
+
+			sb.append("\"");
+		}
+
 		if (dataLayoutId != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -553,9 +595,44 @@ public class App {
 			sb.append("\"");
 			sb.append(entry.getKey());
 			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
+
+			Object value = entry.getValue();
+
+			Class<?> clazz = value.getClass();
+
+			if (clazz.isArray()) {
+				sb.append("[");
+
+				Object[] valueArray = (Object[])value;
+
+				for (int i = 0; i < valueArray.length; i++) {
+					if (valueArray[i] instanceof String) {
+						sb.append("\"");
+						sb.append(valueArray[i]);
+						sb.append("\"");
+					}
+					else {
+						sb.append(valueArray[i]);
+					}
+
+					if ((i + 1) < valueArray.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else if (value instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)value));
+			}
+			else if (value instanceof String) {
+				sb.append("\"");
+				sb.append(value);
+				sb.append("\"");
+			}
+			else {
+				sb.append(value);
+			}
 
 			if (iterator.hasNext()) {
 				sb.append(",");

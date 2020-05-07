@@ -22,6 +22,7 @@ import {Config} from 'metal-state';
  * @review
  */
 class MoveEntries extends PortletBase {
+
 	/**
 	 * @inheritdoc
 	 * @review
@@ -72,7 +73,7 @@ class MoveEntries extends PortletBase {
 			url: this.selectFolderURL,
 		});
 
-		itemSelectorDialog.on('selectedItemChange', event => {
+		itemSelectorDialog.on('selectedItemChange', (event) => {
 			const selectedItem = event.selectedItem;
 
 			if (selectedItem) {
@@ -100,6 +101,7 @@ class MoveEntries extends PortletBase {
  * @static
  */
 MoveEntries.STATE = {
+
 	/**
 	 * @default undefined
 	 * @memberof MoveEntries

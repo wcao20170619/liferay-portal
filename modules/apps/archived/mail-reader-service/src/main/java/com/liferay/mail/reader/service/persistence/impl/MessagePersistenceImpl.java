@@ -16,6 +16,7 @@ package com.liferay.mail.reader.service.persistence.impl;
 
 import com.liferay.mail.reader.exception.NoSuchMessageException;
 import com.liferay.mail.reader.model.Message;
+import com.liferay.mail.reader.model.MessageTable;
 import com.liferay.mail.reader.model.impl.MessageImpl;
 import com.liferay.mail.reader.model.impl.MessageModelImpl;
 import com.liferay.mail.reader.service.persistence.MessagePersistence;
@@ -1325,17 +1326,19 @@ public class MessagePersistenceImpl
 		"message.remoteMessageId = ?";
 
 	public MessagePersistenceImpl() {
-		setModelClass(Message.class);
-
-		setModelImplClass(MessageImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("to", "to_");
 		dbColumnNames.put("size", "size_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Message.class);
+
+		setModelImplClass(MessageImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MessageTable.INSTANCE);
 	}
 
 	/**

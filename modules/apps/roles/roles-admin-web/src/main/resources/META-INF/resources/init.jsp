@@ -207,8 +207,8 @@ private String _getActionLabel(HttpServletRequest request, ThemeDisplay themeDis
 	return actionLabel;
 }
 
-private String _getAssigneesMessage(HttpServletRequest request, Role role) throws Exception {
-	if (_isImpliedRole(role)) {
+private String _getAssigneesMessage(HttpServletRequest request, Role role, RoleDisplayContext roleDisplayContext) throws Exception {
+	if (roleDisplayContext.isAutomaticallyAssigned(role)) {
 		return LanguageUtil.get(request, "this-role-is-automatically-assigned");
 	}
 
@@ -232,16 +232,6 @@ private StringBundler _getResourceHtmlId(String resource) {
 	sb.append(StringUtil.replace(resource, '.', '_'));
 
 	return sb;
-}
-
-private boolean _isImpliedRole(Role role) {
-	String name = role.getName();
-
-	if (name.equals(RoleConstants.GUEST) || name.equals(RoleConstants.ORGANIZATION_USER) || name.equals(RoleConstants.OWNER) || name.equals(RoleConstants.SITE_MEMBER) || name.equals(RoleConstants.USER)) {
-		return true;
-	}
-
-	return false;
 }
 
 private boolean _isShowScope(HttpServletRequest request, Role role, String curModelResource, String curPortletResource) throws SystemException {

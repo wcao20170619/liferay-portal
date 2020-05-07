@@ -1,12 +1,13 @@
 @import 'atlas-variables';
 
 .page-editor__page-structure {
+	overflow: auto;
 	padding-left: 20px;
 	padding-right: 16px;
 
 	.lfr-treeview {
 		&-node-list {
-			border-left: 1px solid $secondary-l2;
+			border-left: 1px solid $gray-300;
 
 			&-item {
 				margin: 4px 0;

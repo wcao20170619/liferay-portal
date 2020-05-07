@@ -27,13 +27,11 @@ import com.liferay.info.item.renderer.InfoItemTemplatedRenderer;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Tuple;
-import com.liferay.segments.constants.SegmentsExperienceConstants;
-import com.liferay.segments.constants.SegmentsWebKeys;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,9 +85,12 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 		HttpServletResponse httpServletResponse) {
 
 		JSONObject jsonObject = _getFieldValueJSONObject(
-			fragmentRendererContext, httpServletRequest);
+			fragmentRendererContext);
 
-		if (jsonObject == null) {
+		Optional<Object> displayObjectOptional =
+			fragmentRendererContext.getDisplayObjectOptional();
+
+		if (!displayObjectOptional.isPresent() && (jsonObject == null)) {
 			if (FragmentRendererUtil.isEditMode(httpServletRequest)) {
 				FragmentRendererUtil.printPortletMessageInfo(
 					httpServletRequest, httpServletResponse,
@@ -99,8 +100,16 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 			return;
 		}
 
-		Object displayObject = _getDisplayObject(
-			jsonObject.getString("className"), jsonObject.getLong("classPK"));
+		Object displayObject = null;
+
+		if (jsonObject != null) {
+			displayObject = _getDisplayObject(
+				jsonObject.getString("className"),
+				jsonObject.getLong("classPK"), displayObjectOptional);
+		}
+		else {
+			displayObject = displayObjectOptional.orElse(null);
+		}
 
 		if (displayObject == null) {
 			if (FragmentRendererUtil.isEditMode(httpServletRequest)) {
@@ -114,8 +123,7 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 		}
 
 		Tuple tuple = _getTuple(
-			displayObject.getClass(), fragmentRendererContext,
-			httpServletRequest);
+			displayObject.getClass(), fragmentRendererContext);
 
 		InfoItemRenderer infoItemRenderer = (InfoItemRenderer)tuple.getObject(
 			0);
@@ -145,7 +153,10 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 		}
 	}
 
-	private Object _getDisplayObject(String className, long classPK) {
+	private Object _getDisplayObject(
+		String className, long classPK,
+		Optional<Object> displayObjectOptional) {
+
 		InfoDisplayContributor infoDisplayContributor =
 			_infoDisplayContributorTracker.getInfoDisplayContributor(className);
 
@@ -154,7 +165,7 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 				infoDisplayContributor.getInfoDisplayObjectProvider(classPK);
 
 			if (infoDisplayObjectProvider == null) {
-				return null;
+				return displayObjectOptional.orElse(null);
 			}
 
 			return infoDisplayObjectProvider.getDisplayObject();
@@ -162,31 +173,23 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 		catch (Exception exception) {
 		}
 
-		return null;
+		return displayObjectOptional.orElse(null);
 	}
 
 	private JSONObject _getFieldValueJSONObject(
-		FragmentRendererContext fragmentRendererContext,
-		HttpServletRequest httpServletRequest) {
+		FragmentRendererContext fragmentRendererContext) {
 
 		FragmentEntryLink fragmentEntryLink =
 			fragmentRendererContext.getFragmentEntryLink();
 
-		long[] segmentsExperienceIds = GetterUtil.getLongValues(
-			httpServletRequest.getAttribute(
-				SegmentsWebKeys.SEGMENTS_EXPERIENCE_IDS),
-			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
-
 		return (JSONObject)_fragmentEntryConfigurationParser.getFieldValue(
 			getConfiguration(fragmentRendererContext),
-			fragmentEntryLink.getEditableValues(), segmentsExperienceIds,
-			"itemSelector");
+			fragmentEntryLink.getEditableValues(), "itemSelector");
 	}
 
 	private Tuple _getTuple(
 		Class<?> displayObjectClass,
-		FragmentRendererContext fragmentRendererContext,
-		HttpServletRequest httpServletRequest) {
+		FragmentRendererContext fragmentRendererContext) {
 
 		List<InfoItemRenderer> infoItemRenderers =
 			FragmentRendererUtil.getInfoItemRenderers(
@@ -199,7 +202,7 @@ public class ContentObjectFragmentRenderer implements FragmentRenderer {
 		InfoItemRenderer defaultInfoItemRenderer = infoItemRenderers.get(0);
 
 		JSONObject jsonObject = _getFieldValueJSONObject(
-			fragmentRendererContext, httpServletRequest);
+			fragmentRendererContext);
 
 		if (jsonObject == null) {
 			return new Tuple(defaultInfoItemRenderer);

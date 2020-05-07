@@ -66,6 +66,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -731,92 +732,6 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return new File(buildProperties.getProperty("base.repository.dir"));
-	}
-
-	public static String getBatchTestSuiteProperty(
-		Properties properties, String basePropertyName, String batchName,
-		String testSuiteName) {
-
-		if ((batchName != null) && !batchName.isEmpty() &&
-			(testSuiteName != null) && !testSuiteName.isEmpty()) {
-
-			String propertyValue = getProperty(
-				properties,
-				combine(
-					basePropertyName, "[", batchName, "]", "[", testSuiteName,
-					"]"));
-
-			if (propertyValue != null) {
-				return propertyValue;
-			}
-
-			String batchTestSuitePropertyNameRegex = combine(
-				Pattern.quote(basePropertyName), "\\[([^\\]]+)\\]\\[",
-				Pattern.quote(testSuiteName), "\\]");
-
-			for (String propertyName : properties.stringPropertyNames()) {
-				if (!propertyName.matches(batchTestSuitePropertyNameRegex)) {
-					continue;
-				}
-
-				String batchNameRegex = propertyName.replaceAll(
-					batchTestSuitePropertyNameRegex, "$1");
-
-				batchNameRegex = batchNameRegex.replaceAll(
-					"[^\\*]+", "\\\\Q$0\\\\E");
-
-				batchNameRegex = batchNameRegex.replace("*", ".+");
-
-				if (!batchName.matches(batchNameRegex)) {
-					continue;
-				}
-
-				return getProperty(properties, propertyName);
-			}
-		}
-
-		if ((batchName != null) && !batchName.isEmpty()) {
-			String propertyValue = getProperty(
-				properties, combine(basePropertyName, "[", batchName, "]"));
-
-			if (propertyValue != null) {
-				return propertyValue;
-			}
-
-			String batchPropertyNameRegex =
-				Pattern.quote(basePropertyName) + "\\[([^\\]]+)\\]";
-
-			for (String propertyName : properties.stringPropertyNames()) {
-				if (!propertyName.matches(batchPropertyNameRegex)) {
-					continue;
-				}
-
-				String batchNameRegex = propertyName.replaceAll(
-					batchPropertyNameRegex, "$1");
-
-				batchNameRegex = batchNameRegex.replaceAll(
-					"[^\\*]+", "\\\\Q$0\\\\E");
-
-				batchNameRegex = batchNameRegex.replace("*", ".+");
-
-				if (!batchName.matches(batchNameRegex)) {
-					continue;
-				}
-
-				return getProperty(properties, propertyName);
-			}
-		}
-
-		if ((testSuiteName != null) && !testSuiteName.isEmpty()) {
-			String propertyValue = getProperty(
-				properties, combine(basePropertyName, "[", testSuiteName, "]"));
-
-			if (propertyValue != null) {
-				return propertyValue;
-			}
-		}
-
-		return getProperty(properties, basePropertyName);
 	}
 
 	public static String getBuildParameter(String buildURL, String key) {
@@ -1615,30 +1530,86 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getProperty(
-		Properties properties, String name, String... opts) {
+		Properties properties, String basePropertyName, String... opts) {
 
-		StringBuilder sb = new StringBuilder();
+		if ((opts == null) || (opts.length == 0)) {
+			return _getProperty(
+				properties, new ArrayList<String>(), basePropertyName);
+		}
 
-		sb.append(name);
+		Set<String> optSet = new LinkedHashSet<>(Arrays.asList(opts));
 
-		if (opts != null) {
-			for (String opt : opts) {
-				sb.append("[");
-				sb.append(opt);
-				sb.append("]");
+		optSet.remove(null);
+
+		opts = optSet.toArray(new String[0]);
+
+		Properties matchingProperties = new Properties();
+
+		for (Object key : properties.keySet()) {
+			String keyString = key.toString();
+
+			if (!keyString.startsWith(basePropertyName)) {
+				continue;
+			}
+
+			matchingProperties.setProperty(
+				keyString, properties.getProperty(keyString));
+		}
+
+		Set<Set<String>> targetOptSets = _getOrderedOptSets(opts);
+
+		String propertyName = null;
+
+		Map<String, Set<String>> propertyOptRegexSets =
+			_getPropertyOptRegexSets(matchingProperties.stringPropertyNames());
+
+		for (Map.Entry<String, Set<String>> entry :
+				propertyOptRegexSets.entrySet()) {
+
+			Set<String> propertyOptRegexSet = entry.getValue();
+
+			for (Set<String> targetOptSet : targetOptSets) {
+				if (propertyOptRegexSet.size() > targetOptSet.size()) {
+					continue;
+				}
+
+				boolean matchesAllPropertyOptRegexes = true;
+
+				for (String targetOpt : targetOptSet) {
+					boolean matchesPropertyOptRegex = false;
+
+					for (String propertyOptRegex : propertyOptRegexSet) {
+						if (!targetOpt.matches(propertyOptRegex)) {
+							continue;
+						}
+
+						matchesPropertyOptRegex = true;
+
+						break;
+					}
+
+					if (!matchesPropertyOptRegex) {
+						matchesAllPropertyOptRegexes = false;
+					}
+				}
+
+				if (matchesAllPropertyOptRegexes) {
+					propertyName = entry.getKey();
+
+					break;
+				}
+			}
+
+			if (propertyName != null) {
+				break;
 			}
 		}
 
-		if (properties.containsKey(sb.toString())) {
-			return getProperty(properties, sb.toString());
+		if (propertyName == null) {
+			propertyName = basePropertyName;
 		}
 
-		if ((opts != null) && (opts.length > 0)) {
-			return getProperty(
-				properties, name, Arrays.copyOf(opts, opts.length - 1));
-		}
-
-		return null;
+		return _getProperty(properties, new ArrayList<String>(), propertyName);
 	}
 
 	public static String getRandomGitHubDevNodeHostname() {
@@ -2525,21 +2496,29 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String toDurationString(long duration) {
+		long remainingDuration = duration;
+
 		StringBuilder sb = new StringBuilder();
 
-		duration = _appendDurationStringForUnit(
-			duration, _MILLIS_DAY, sb, "day", "days");
+		remainingDuration = _appendDurationStringForUnit(
+			remainingDuration, _MILLIS_DAY, false, sb, "day", "days");
 
-		duration = _appendDurationStringForUnit(
-			duration, _MILLIS_HOUR, sb, "hour", "hours");
+		remainingDuration = _appendDurationStringForUnit(
+			remainingDuration, _MILLIS_HOUR, false, sb, "hour", "hours");
 
-		duration = _appendDurationStringForUnit(
-			duration, _MILLIS_MINUTE, sb, "minute", "minutes");
+		remainingDuration = _appendDurationStringForUnit(
+			remainingDuration, _MILLIS_MINUTE, true, sb, "minute", "minutes");
 
-		duration = _appendDurationStringForUnit(
-			duration, _MILLIS_SECOND, sb, "second", "seconds");
+		if (duration < 60000) {
+			remainingDuration = _appendDurationStringForUnit(
+				remainingDuration, _MILLIS_SECOND, true, sb, "second",
+				"seconds");
+		}
 
-		duration = _appendDurationStringForUnit(duration, 1, sb, "ms", "ms");
+		if (duration < 1000) {
+			_appendDurationStringForUnit(
+				remainingDuration, 1, true, sb, "ms", "ms");
+		}
 
 		String durationString = sb.toString();
 
@@ -3056,11 +3035,17 @@ public class JenkinsResultsParserUtil {
 	}
 
 	private static long _appendDurationStringForUnit(
-		long duration, long millisInUnit, StringBuilder sb,
+		long duration, long millisInUnit, boolean round, StringBuilder sb,
 		String unitDescriptionSingular, String unitDescriptionPlural) {
 
 		if (duration >= millisInUnit) {
 			long units = duration / millisInUnit;
+
+			long remainder = duration % millisInUnit;
+
+			if (round && (remainder >= (millisInUnit / 2))) {
+				units++;
+			}
 
 			sb.append(units);
 
@@ -3073,7 +3058,7 @@ public class JenkinsResultsParserUtil {
 
 			sb.append(" ");
 
-			return duration % millisInUnit;
+			return remainder;
 		}
 
 		return duration;
@@ -3212,6 +3197,45 @@ public class JenkinsResultsParserUtil {
 		return sb.toString();
 	}
 
+	private static Set<Set<String>> _getOrderedOptSets(String... opts) {
+		Set<Set<String>> optSets = new LinkedHashSet<>();
+
+		optSets.add(new LinkedHashSet<>(Arrays.asList(opts)));
+
+		int optCount = opts.length;
+
+		for (int i = optCount - 1; i >= 0; i--) {
+			String[] childOpts = new String[optCount - 1];
+
+			if (childOpts.length == 0) {
+				continue;
+			}
+
+			for (int j = 0; j < optCount; j++) {
+				if (j < i) {
+					childOpts[j] = opts[j];
+				}
+				else if (j > i) {
+					childOpts[j - 1] = opts[j];
+				}
+			}
+
+			optSets.addAll(_getOrderedOptSets(childOpts));
+		}
+
+		Set<Set<String>> orderedOptSet = new LinkedHashSet<>();
+
+		for (int i = optCount; i > 0; i--) {
+			for (Set<String> optSet : optSets) {
+				if (optSet.size() == i) {
+					orderedOptSet.add(optSet);
+				}
+			}
+		}
+
+		return orderedOptSet;
+	}
+
 	private static Properties _getProperties(File basePropertiesFile) {
 		if (!basePropertiesFile.exists()) {
 			throw new RuntimeException(
@@ -3315,6 +3339,69 @@ public class JenkinsResultsParserUtil {
 		}
 
 		return newValue;
+	}
+
+	private static Map<String, Set<String>> _getPropertyOptRegexSets(
+		Set<String> propertyNames) {
+
+		Map<String, Set<String>> propertyOptSets = new HashMap<>();
+		Map<String, Integer> propertyOptSetSizes = new HashMap<>();
+		Map<String, Integer> propertyRegexCounts = new HashMap<>();
+
+		int maxOptCount = 0;
+
+		for (String propertyName : propertyNames) {
+			Matcher matcher = _propertyNamePattern.matcher(propertyName);
+
+			Set<String> optSet = new LinkedHashSet<>();
+
+			while (matcher.find()) {
+				String opt = matcher.group("opt");
+
+				opt = Pattern.quote(opt);
+
+				optSet.add(opt.replaceAll("\\*", "\\\\E.+\\\\Q"));
+			}
+
+			if (optSet.size() > maxOptCount) {
+				maxOptCount = optSet.size();
+			}
+
+			propertyOptSetSizes.put(propertyName, optSet.size());
+			propertyOptSets.put(propertyName, optSet);
+
+			int regexCount = 0;
+
+			for (String opt : optSet) {
+				if (opt.contains(".+")) {
+					regexCount++;
+				}
+			}
+
+			propertyRegexCounts.put(propertyName, regexCount);
+		}
+
+		Map<String, Set<String>> propertyOptRegexSets = new LinkedHashMap<>();
+
+		for (int i = maxOptCount; i >= 0; i--) {
+			for (int j = 0; j <= i; j++) {
+				for (Map.Entry<String, Set<String>> entry :
+						propertyOptSets.entrySet()) {
+
+					String propertyName = entry.getKey();
+
+					int optSetSize = propertyOptSetSizes.get(propertyName);
+					int regexCount = propertyRegexCounts.get(propertyName);
+
+					if ((optSetSize == i) && (regexCount == j)) {
+						propertyOptRegexSets.put(
+							propertyName, entry.getValue());
+					}
+				}
+			}
+		}
+
+		return propertyOptRegexSets;
 	}
 
 	private static String _getRedactTokenKey(int index) {
@@ -3431,6 +3518,8 @@ public class JenkinsResultsParserUtil {
 		"http://(test-[0-9]+-[0-9]+)/");
 	private static final Pattern _nestedPropertyPattern = Pattern.compile(
 		"\\$\\{([^\\}]+)\\}");
+	private static final Pattern _propertyNamePattern = Pattern.compile(
+		"\\[(?<opt>[^\\]]+)\\]");
 	private static final Set<String> _redactTokens = new HashSet<>();
 	private static final Pattern _remoteURLAuthorityPattern1 = Pattern.compile(
 		"https://test.liferay.com/([0-9]+)/");

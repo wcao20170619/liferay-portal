@@ -15,23 +15,18 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.fieldset;
 
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldTypeSettingsTestCase;
-import com.liferay.dynamic.data.mapping.model.DDMFormField;
-import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.StringUtil;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.powermock.api.support.membermodification.MemberMatcher;
 
 /**
  * @author Leonardo Barros
@@ -44,26 +39,24 @@ public class FieldSetDDMFormFieldTemplateContextContributorTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		setUpJSONFactory();
+		_setUpJSONFactoryUtil();
 	}
 
 	@Test
-	public void testCreateRowJSONObject() {
-		List<Object> nestedFields = Arrays.<Object>asList(
-			HashMapBuilder.<String, Object>put(
-				"fieldName", "field0"
-			).build(),
-			HashMapBuilder.<String, Object>put(
-				"fieldName", "field1"
-			).build());
+	public void testGetRows() throws Exception {
+		String ddmFormLayoutDefinition = read("ddm-structure-layout.json");
 
-		JSONObject rowJSONObject =
-			_fieldSetDDMFormFieldTemplateContextContributor.createRowJSONObject(
-				nestedFields);
+		JSONArray rowsJSONArray =
+			_fieldSetDDMFormFieldTemplateContextContributor.getRowsJSONArray(
+				ddmFormLayoutDefinition);
 
-		Assert.assertTrue(rowJSONObject.has("columns"));
+		Assert.assertEquals(2, rowsJSONArray.length());
 
-		JSONArray columnsJSONArray = rowJSONObject.getJSONArray("columns");
+		JSONObject row0JSONObject = rowsJSONArray.getJSONObject(0);
+
+		Assert.assertTrue(row0JSONObject.has("columns"));
+
+		JSONArray columnsJSONArray = row0JSONObject.getJSONArray("columns");
 
 		Assert.assertEquals(2, columnsJSONArray.length());
 
@@ -75,7 +68,7 @@ public class FieldSetDDMFormFieldTemplateContextContributorTest
 			firstColumnJSONObject.getJSONArray("fields");
 
 		Assert.assertEquals(1, firstColumnFieldsJSONArray.length());
-		Assert.assertEquals("field0", firstColumnFieldsJSONArray.getString(0));
+		Assert.assertEquals("field1", firstColumnFieldsJSONArray.getString(0));
 
 		Assert.assertTrue(firstColumnJSONObject.has("size"));
 		Assert.assertEquals(6, firstColumnJSONObject.getInt("size"));
@@ -88,65 +81,52 @@ public class FieldSetDDMFormFieldTemplateContextContributorTest
 			secondColumnJSONObject.getJSONArray("fields");
 
 		Assert.assertEquals(1, secondColumnFieldsJSONArray.length());
-		Assert.assertEquals("field1", secondColumnFieldsJSONArray.getString(0));
+		Assert.assertEquals("field2", secondColumnFieldsJSONArray.getString(0));
 
 		Assert.assertTrue(secondColumnJSONObject.has("size"));
 		Assert.assertEquals(6, secondColumnJSONObject.getInt("size"));
+
+		JSONObject row1JSONObject = rowsJSONArray.getJSONObject(1);
+
+		Assert.assertTrue(row0JSONObject.has("columns"));
+
+		columnsJSONArray = row1JSONObject.getJSONArray("columns");
+
+		Assert.assertEquals(1, columnsJSONArray.length());
+
+		firstColumnJSONObject = columnsJSONArray.getJSONObject(0);
+
+		Assert.assertTrue(firstColumnJSONObject.has("fields"));
+
+		firstColumnFieldsJSONArray = firstColumnJSONObject.getJSONArray(
+			"fields");
+
+		Assert.assertEquals(3, firstColumnFieldsJSONArray.length());
+		Assert.assertEquals("field3", firstColumnFieldsJSONArray.getString(0));
+		Assert.assertEquals("field4", firstColumnFieldsJSONArray.getString(1));
+		Assert.assertEquals("field5", firstColumnFieldsJSONArray.getString(2));
+
+		Assert.assertTrue(firstColumnJSONObject.has("size"));
+		Assert.assertEquals(12, firstColumnJSONObject.getInt("size"));
 	}
 
-	@Test
-	public void testGetRowsJSONArray() {
-		DDMFormField ddmFormField = DDMFormTestUtil.createDDMFormField(
-			"field0", "Field 0", "text", "string", false, false, false);
+	protected String read(String fileName) throws IOException {
+		Class<?> clazz = getClass();
 
-		Map<String, Object> ddmFormFieldProperties =
-			ddmFormField.getProperties();
+		InputStream inputStream = clazz.getResourceAsStream(
+			"dependencies/" + fileName);
 
-		ddmFormFieldProperties.put("rows", "");
-
-		JSONArray rowsWithInvisibleFieldJSONArray =
-			_fieldSetDDMFormFieldTemplateContextContributor.getRowsJSONArray(
-				ddmFormField,
-				Arrays.<Object>asList(
-					HashMapBuilder.<String, Object>put(
-						"fieldName", "field0"
-					).build(),
-					HashMapBuilder.<String, Object>put(
-						"fieldName", "field1"
-					).build(),
-					HashMapBuilder.<String, Object>put(
-						"fieldName", "field2"
-					).put(
-						"visible", false
-					).build()));
-
-		Assert.assertEquals(2, rowsWithInvisibleFieldJSONArray.length());
-
-		JSONArray rowsWithoutInvisibleFieldJSONArray =
-			_fieldSetDDMFormFieldTemplateContextContributor.getRowsJSONArray(
-				ddmFormField,
-				Arrays.<Object>asList(
-					HashMapBuilder.<String, Object>put(
-						"fieldName", "field0"
-					).build(),
-					HashMapBuilder.<String, Object>put(
-						"fieldName", "field1"
-					).build()));
-
-		Assert.assertEquals(1, rowsWithoutInvisibleFieldJSONArray.length());
+		return StringUtil.read(inputStream);
 	}
 
-	protected void setUpJSONFactory() throws Exception {
-		MemberMatcher.field(
-			FieldSetDDMFormFieldTemplateContextContributor.class, "jsonFactory"
-		).set(
-			_fieldSetDDMFormFieldTemplateContextContributor, _jsonFactory
-		);
+	private void _setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	private final FieldSetDDMFormFieldTemplateContextContributor
 		_fieldSetDDMFormFieldTemplateContextContributor =
 			new FieldSetDDMFormFieldTemplateContextContributor();
-	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

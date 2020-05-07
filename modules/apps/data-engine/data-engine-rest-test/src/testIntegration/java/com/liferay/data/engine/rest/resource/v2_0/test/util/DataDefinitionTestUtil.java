@@ -78,11 +78,15 @@ public class DataDefinitionTestUtil {
 							).build();
 							fieldType = "text";
 							label = HashMapBuilder.<String, Object>put(
-								"label", RandomTestUtil.randomString()
+								"en_US", RandomTestUtil.randomString()
+							).put(
+								"pt_BR", RandomTestUtil.randomString()
 							).build();
 							name = RandomTestUtil.randomString();
 							tip = HashMapBuilder.<String, Object>put(
-								"tip", RandomTestUtil.randomString()
+								"en_US", RandomTestUtil.randomString()
+							).put(
+								"pt_BR", RandomTestUtil.randomString()
 							).build();
 						}
 					}

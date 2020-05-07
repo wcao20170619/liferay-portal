@@ -37,8 +37,10 @@ if (organization != null) {
 
 <aui:model-context bean="<%= organization %>" model="<%= Organization.class %>" />
 
-<div class="row">
-	<div class="col-md-7">
+<clay:row>
+	<clay:col
+		md="7"
+	>
 		<liferay-ui:error exception="<%= DuplicateOrganizationException.class %>" message="the-organization-name-is-already-taken" />
 
 		<liferay-ui:error exception="<%= OrganizationNameException.class %>">
@@ -91,9 +93,11 @@ if (organization != null) {
 
 			<aui:select label="region" name="regionId" />
 		</div>
-	</div>
+	</clay:col>
 
-	<div class="col-md-5">
+	<clay:col
+		md="5"
+	>
 		<div align="middle">
 			<c:if test="<%= organization != null %>">
 
@@ -115,8 +119,8 @@ if (organization != null) {
 				/>
 			</c:if>
 		</div>
-	</div>
-</div>
+	</clay:col>
+</clay:row>
 
 <aui:script use="liferay-dynamic-select">
 	new Liferay.DynamicSelect([
@@ -144,7 +148,7 @@ if (organization != null) {
 		var typeSelect = document.getElementById('<portlet:namespace />type');
 
 		if (typeSelect) {
-			typeSelect.addEventListener('change', function(event) {
+			typeSelect.addEventListener('change', function (event) {
 				var countryDiv = document.getElementById(
 					'<portlet:namespace />countryDiv'
 				);

@@ -30,28 +30,25 @@ public class OAuth2ConnectedApplicationsPortletDisplayContext
 	extends BaseOAuth2PortletDisplayContext {
 
 	public OAuth2ConnectedApplicationsPortletDisplayContext(
-		AssignableScopes assignableScopes, PortletRequest portletRequest,
+		AssignableScopes assignableScopes, DLURLHelper dlURLHelper,
 		OAuth2ApplicationService oAuth2ApplicationService,
-		OAuth2Authorization oAuth2Authorization, DLURLHelper dlURLHelper) {
+		OAuth2Authorization oAuth2Authorization,
+		PortletRequest portletRequest) {
 
-		this(portletRequest, dlURLHelper);
+		this(dlURLHelper, oAuth2ApplicationService, portletRequest);
 
 		_assignableScopes = assignableScopes;
 		_oAuth2Authorization = oAuth2Authorization;
-
-		super.oAuth2ApplicationService = oAuth2ApplicationService;
-		super.dlURLHelper = dlURLHelper;
 	}
 
 	public OAuth2ConnectedApplicationsPortletDisplayContext(
-		PortletRequest portletRequest, DLURLHelper dlURLHelper) {
+		DLURLHelper dlURLHelper,
+		OAuth2ApplicationService oAuth2ApplicationService,
+		PortletRequest portletRequest) {
 
-		this.dlURLHelper = dlURLHelper;
-
-		super.portletRequest = portletRequest;
-
-		super.themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		super(
+			dlURLHelper, oAuth2ApplicationService, portletRequest,
+			(ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY));
 	}
 
 	public AssignableScopes getAssignableScopes() {

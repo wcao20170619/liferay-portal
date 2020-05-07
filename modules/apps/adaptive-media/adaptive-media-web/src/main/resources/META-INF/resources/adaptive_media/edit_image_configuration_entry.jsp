@@ -83,8 +83,10 @@ if (amImageConfigurationEntry != null) {
 			<liferay-ui:icon-help message="leave-a-size-field-empty-to-get-images-scaled-proportionally" />
 		</label>
 
-		<div class="row">
-			<div class="col-md-3">
+		<clay:row>
+			<clay:col
+				md="3"
+			>
 
 				<%
 				String maxWidth = StringPool.BLANK;
@@ -101,9 +103,11 @@ if (amImageConfigurationEntry != null) {
 				<aui:input disabled="<%= !configurationEntryEditable %>" label="max-width-px" min="0" name="maxWidth" type="number" value="<%= maxWidth %>">
 					<aui:validator name="number" />
 				</aui:input>
-			</div>
+			</clay:col>
 
-			<div class="col-md-3">
+			<clay:col
+				md="3"
+			>
 
 				<%
 				String maxHeight = StringPool.BLANK;
@@ -120,8 +124,8 @@ if (amImageConfigurationEntry != null) {
 				<aui:input disabled="<%= !configurationEntryEditable %>" label="max-height-px" min="0" name="maxHeight" type="number" value="<%= maxHeight %>">
 					<aui:validator name="number" />
 				</aui:input>
-			</div>
-		</div>
+			</clay:col>
+		</clay:row>
 
 		<c:if test="<%= amImageConfigurationEntry == null %>">
 			<aui:input label="add-a-resolution-for-high-density-displays" name="addHighResolution" type="checkbox" />

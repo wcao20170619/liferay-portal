@@ -16,8 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:row id="grouping">
-	<aui:col width="<%= 30 %>">
+<clay:row
+	id='<%= renderResponse.getNamespace() + "grouping" %>'
+>
+	<clay:col
+		md="4"
+	>
 
 		<%
 		long assetVocabularyId = GetterUtil.getLong(portletPreferences.getValue("assetVocabularyId", null));
@@ -80,5 +84,5 @@
 			%>
 
 		</aui:select>
-	</aui:col>
-</aui:row>
+	</clay:col>
+</clay:row>

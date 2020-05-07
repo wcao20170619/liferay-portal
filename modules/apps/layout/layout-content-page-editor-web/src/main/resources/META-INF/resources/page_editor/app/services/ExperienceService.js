@@ -30,6 +30,7 @@ function getExperienceUsedPortletIds({body, dispatch}) {
 }
 
 export default {
+
 	/**
 	 * Asks backend to create a new experience
 	 * @param {object} options
@@ -58,16 +59,13 @@ export default {
 	 * Asks backend to remove an experience
 	 * @param {object} options
 	 * @param {object} options.body
-	 * @param {number[]} options.body.fragmentEntryLinkIds List of fragment entry ids unique to the  experience to delete
 	 * @param {string} options.body.segmentsExperienceId Id of the experience to be deleted
 	 * @param {function} options.dispatch
 	 */
 	removeExperience({body, dispatch}) {
-		const {fragmentEntryLinkIds, segmentsExperienceId} = body;
+		const {segmentsExperienceId} = body;
 
 		const payload = {
-			deleteSegmentsExperience: true,
-			fragmentEntryLinkIds: JSON.stringify(fragmentEntryLinkIds),
 			segmentsExperienceId,
 		};
 

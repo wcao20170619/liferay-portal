@@ -15,6 +15,7 @@
 package com.liferay.layout.taglib.internal.display.context;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
@@ -22,6 +23,7 @@ import com.liferay.info.pagination.Pagination;
 import com.liferay.layout.list.retriever.DefaultLayoutListRetrieverContext;
 import com.liferay.layout.list.retriever.LayoutListRetriever;
 import com.liferay.layout.list.retriever.LayoutListRetrieverTracker;
+import com.liferay.layout.list.retriever.ListObjectReference;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactory;
 import com.liferay.layout.list.retriever.ListObjectReferenceFactoryTracker;
 import com.liferay.layout.util.structure.CollectionLayoutStructureItem;
@@ -35,6 +37,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletJSONUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -45,8 +48,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -162,19 +167,18 @@ public class RenderFragmentLayoutDisplayContext {
 			return Collections.emptyList();
 		}
 
-		String type = collectionJSONObject.getString("type");
+		ListObjectReference listObjectReference = _getListObjectReference(
+			collectionJSONObject);
 
-		LayoutListRetriever layoutListRetriever =
-			_layoutListRetrieverTracker.getLayoutListRetriever(type);
-
-		if (layoutListRetriever == null) {
+		if (listObjectReference == null) {
 			return Collections.emptyList();
 		}
 
-		ListObjectReferenceFactory listObjectReferenceFactory =
-			_listObjectReferenceFactoryTracker.getListObjectReference(type);
+		LayoutListRetriever layoutListRetriever =
+			_layoutListRetrieverTracker.getLayoutListRetriever(
+				collectionJSONObject.getString("type"));
 
-		if (listObjectReferenceFactory == null) {
+		if (layoutListRetriever == null) {
 			return Collections.emptyList();
 		}
 
@@ -187,20 +191,116 @@ public class RenderFragmentLayoutDisplayContext {
 			Pagination.of(collectionLayoutStructureItem.getNumberOfItems(), 0));
 
 		return layoutListRetriever.getList(
-			listObjectReferenceFactory.getListObjectReference(
-				collectionJSONObject),
-			defaultLayoutListRetrieverContext);
+			listObjectReference, defaultLayoutListRetrieverContext);
 	}
 
-	public String getPortletPaths() {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+	public InfoDisplayContributor getCollectionInfoDisplayContributor(
+		CollectionLayoutStructureItem collectionLayoutStructureItem) {
 
+		ListObjectReference listObjectReference = _getListObjectReference(
+			collectionLayoutStructureItem.getCollectionJSONObject());
+
+		if (listObjectReference == null) {
+			return null;
+		}
+
+		String className = listObjectReference.getItemType();
+
+		if (Objects.equals(className, DLFileEntry.class.getName())) {
+			className = FileEntry.class.getName();
+		}
+
+		return _infoDisplayContributorTracker.getInfoDisplayContributor(
+			className);
+	}
+
+	public String getPortletFooterPaths() {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		PipingServletResponse pipingServletResponse = new PipingServletResponse(
 			_httpServletResponse, unsyncStringWriter);
+
+		for (Portlet portlet : _getPortlets()) {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+			try {
+				PortletJSONUtil.populatePortletJSONObject(
+					_httpServletRequest, StringPool.BLANK, portlet, jsonObject);
+
+				PortletJSONUtil.writeHeaderPaths(
+					pipingServletResponse, jsonObject);
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to write portlet footer paths " +
+						portlet.getPortletId(),
+					exception);
+			}
+		}
+
+		return unsyncStringWriter.toString();
+	}
+
+	public String getPortletHeaderPaths() {
+		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+		PipingServletResponse pipingServletResponse = new PipingServletResponse(
+			_httpServletResponse, unsyncStringWriter);
+
+		for (Portlet portlet : _getPortlets()) {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+			try {
+				PortletJSONUtil.populatePortletJSONObject(
+					_httpServletRequest, StringPool.BLANK, portlet, jsonObject);
+
+				PortletJSONUtil.writeFooterPaths(
+					pipingServletResponse, jsonObject);
+			}
+			catch (Exception exception) {
+				_log.error(
+					"Unable to write portlet header paths " +
+						portlet.getPortletId(),
+					exception);
+			}
+		}
+
+		return unsyncStringWriter.toString();
+	}
+
+	private ListObjectReference _getListObjectReference(
+		JSONObject collectionJSONObject) {
+
+		String type = collectionJSONObject.getString("type");
+
+		LayoutListRetriever layoutListRetriever =
+			_layoutListRetrieverTracker.getLayoutListRetriever(type);
+
+		if (layoutListRetriever == null) {
+			return null;
+		}
+
+		ListObjectReferenceFactory listObjectReferenceFactory =
+			_listObjectReferenceFactoryTracker.getListObjectReference(type);
+
+		if (listObjectReferenceFactory == null) {
+			return null;
+		}
+
+		return listObjectReferenceFactory.getListObjectReference(
+			collectionJSONObject);
+	}
+
+	private List<Portlet> _getPortlets() {
+		if (_portlets != null) {
+			return _portlets;
+		}
+
+		_portlets = new ArrayList<>();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		List<PortletPreferences> portletPreferencesList =
 			PortletPreferencesLocalServiceUtil.getPortletPreferences(
@@ -211,26 +311,10 @@ public class RenderFragmentLayoutDisplayContext {
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(
 				themeDisplay.getCompanyId(), portletPreferences.getPortletId());
 
-			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-			try {
-				PortletJSONUtil.populatePortletJSONObject(
-					_httpServletRequest, StringPool.BLANK, portlet, jsonObject);
-
-				PortletJSONUtil.writeHeaderPaths(
-					pipingServletResponse, jsonObject);
-
-				PortletJSONUtil.writeFooterPaths(
-					pipingServletResponse, jsonObject);
-			}
-			catch (Exception exception) {
-				_log.error(
-					"Unable to write portlet paths " + portlet.getPortletId(),
-					exception);
-			}
+			_portlets.add(portlet);
 		}
 
-		return unsyncStringWriter.toString();
+		return _portlets;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -242,5 +326,6 @@ public class RenderFragmentLayoutDisplayContext {
 	private final LayoutListRetrieverTracker _layoutListRetrieverTracker;
 	private final ListObjectReferenceFactoryTracker
 		_listObjectReferenceFactoryTracker;
+	private List<Portlet> _portlets;
 
 }

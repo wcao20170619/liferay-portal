@@ -15,15 +15,28 @@
 import ClayForm from '@clayui/form';
 import {useIsMounted} from 'frontend-js-react-web';
 import PropTypes from 'prop-types';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import ItemSelector from '../../../common/components/ItemSelector';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import InfoItemService from '../../services/InfoItemService';
 import {useDispatch} from '../../store/index';
+import {CollectionItemContext} from '../CollectionItemContext';
 
 export const ItemSelectorField = ({field, onValueSelect, value}) => {
+	const collectionItemContext = useContext(CollectionItemContext);
+
 	const {typeOptions = {}} = field;
+
+	const collectionItem = collectionItemContext.collectionItem;
+
+	const isWithinCollection = collectionItem !== null;
+
+	const className = isWithinCollection
+		? collectionItem.className
+		: value.className;
+
+	const classPK = isWithinCollection ? collectionItem.classPK : value.classPK;
 
 	return (
 		<>
@@ -31,7 +44,7 @@ export const ItemSelectorField = ({field, onValueSelect, value}) => {
 				<ItemSelector
 					itemSelectorURL={typeOptions.infoItemSelectorURL}
 					label={field.label}
-					onItemSelect={item => {
+					onItemSelect={(item) => {
 						onValueSelect(field.name, {
 							className: item.className,
 							classNameId: item.classNameId,
@@ -39,15 +52,22 @@ export const ItemSelectorField = ({field, onValueSelect, value}) => {
 							title: item.title,
 						});
 					}}
-					selectedItemTitle={value.title}
+					selectedItemTitle={
+						isWithinCollection
+							? collectionItem.title ||
+							  Liferay.Language.get('collection-item')
+							: value.title
+					}
+					showAddButton={!isWithinCollection}
 				/>
 			</ClayForm.Group>
 
-			{typeOptions.enableSelectTemplate && value.className && (
+			{typeOptions.enableSelectTemplate && className && (
 				<ClayForm.Group small>
 					<TemplateSelector
-						item={value}
-						onTemplateSelect={template => {
+						className={className}
+						classPK={classPK}
+						onTemplateSelect={(template) => {
 							onValueSelect(field.name, {...value, template});
 						}}
 						selectedTemplate={value.template}
@@ -69,7 +89,12 @@ ItemSelectorField.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };
 
-const TemplateSelector = ({item, onTemplateSelect, selectedTemplate}) => {
+const TemplateSelector = ({
+	className,
+	classPK,
+	onTemplateSelect,
+	selectedTemplate,
+}) => {
 	const dispatch = useDispatch();
 	const [availableTemplates, setAvailableTemplates] = useState([]);
 	const isMounted = useIsMounted();
@@ -77,14 +102,14 @@ const TemplateSelector = ({item, onTemplateSelect, selectedTemplate}) => {
 	useEffect(() => {
 		if (isMounted()) {
 			InfoItemService.getAvailableTemplates({
-				className: item.className,
-				classPK: item.classPK,
+				className,
+				classPK,
 				onNetworkStatus: dispatch,
-			}).then(response => {
+			}).then((response) => {
 				setAvailableTemplates(response);
 			});
 		}
-	}, [dispatch, isMounted, item.className, item.classPK]);
+	}, [className, classPK, dispatch, isMounted]);
 
 	return (
 		<>
@@ -96,18 +121,18 @@ const TemplateSelector = ({item, onTemplateSelect, selectedTemplate}) => {
 				<select
 					className="form-control"
 					id="itemSelectorTemplateSelect"
-					onChange={event => {
+					onChange={(event) => {
 						onTemplateSelect(
 							event.target.options[event.target.selectedIndex]
 								.dataset
 						);
 					}}
 				>
-					{availableTemplates.map(entry => {
+					{availableTemplates.map((entry) => {
 						if (entry.templates) {
 							return (
 								<optgroup key={entry.label} label={entry.label}>
-									{entry.templates.map(template => (
+									{entry.templates.map((template) => (
 										<option
 											data-info-item-renderer-key={
 												template.infoItemRendererKey
@@ -157,7 +182,8 @@ const TemplateSelector = ({item, onTemplateSelect, selectedTemplate}) => {
 };
 
 TemplateSelector.propTypes = {
-	item: PropTypes.shape(ConfigurationFieldPropTypes).isRequired,
+	className: PropTypes.string.isRequired,
+	classPK: PropTypes.string.isRequired,
 	onTemplateSelect: PropTypes.func.isRequired,
 	selectedTemplate: PropTypes.shape({
 		infoItemRendererKey: PropTypes.string,

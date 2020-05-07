@@ -91,6 +91,20 @@ public class AppSerDes {
 			sb.append(app.getDataDefinitionId());
 		}
 
+		if (app.getDataDefinitionName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dataDefinitionName\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(app.getDataDefinitionName()));
+
+			sb.append("\"");
+		}
+
 		if (app.getDataLayoutId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -229,6 +243,15 @@ public class AppSerDes {
 				"dataDefinitionId", String.valueOf(app.getDataDefinitionId()));
 		}
 
+		if (app.getDataDefinitionName() == null) {
+			map.put("dataDefinitionName", null);
+		}
+		else {
+			map.put(
+				"dataDefinitionName",
+				String.valueOf(app.getDataDefinitionName()));
+		}
+
 		if (app.getDataLayoutId() == null) {
 			map.put("dataLayoutId", null);
 		}
@@ -243,13 +266,23 @@ public class AppSerDes {
 			map.put("dataListViewId", String.valueOf(app.getDataListViewId()));
 		}
 
-		map.put(
-			"dateCreated",
-			liferayToJSONDateFormat.format(app.getDateCreated()));
+		if (app.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(app.getDateCreated()));
+		}
 
-		map.put(
-			"dateModified",
-			liferayToJSONDateFormat.format(app.getDateModified()));
+		if (app.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(app.getDateModified()));
+		}
 
 		if (app.getId() == null) {
 			map.put("id", null);
@@ -321,6 +354,13 @@ public class AppSerDes {
 				if (jsonParserFieldValue != null) {
 					app.setDataDefinitionId(
 						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "dataDefinitionName")) {
+
+				if (jsonParserFieldValue != null) {
+					app.setDataDefinitionName((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dataLayoutId")) {

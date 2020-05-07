@@ -16,17 +16,29 @@ import ClayButton from '@clayui/button';
 import ClayModal, {useModal} from '@clayui/modal';
 import {render} from 'frontend-js-react-web';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import './Modal.scss';
 
-const openModal = props => {
+const openModal = (props) => {
+	if (
+		props &&
+		props.url &&
+		props.bodyHTML &&
+		process.env.NODE_ENV === 'development'
+	) {
+		console.warn(
+			'url and bodyHTML props are both set. bodyHTML will be ignored. Please use one or another.'
+		);
+	}
+
 	// Mount in detached node; Clay will take care of appending to `document.body`.
 	// See: https://github.com/liferay/clay/blob/master/packages/clay-shared/src/Portal.tsx
+
 	render(Modal, props, document.createElement('div'));
 };
 
-const Modal = ({buttons, id, onClose, size, title, url}) => {
+const Modal = ({bodyHTML, buttons, id, onClose, size, title, url}) => {
 	const [visible, setVisible] = useState(true);
 
 	const {observer} = useModal({
@@ -93,6 +105,22 @@ const Modal = ({buttons, id, onClose, size, title, url}) => {
 		}
 	};
 
+	const BodyHTML = () => {
+		const bodyRef = useRef();
+
+		useEffect(() => {
+			const fragment = document
+				.createRange()
+				.createContextualFragment(bodyHTML);
+
+			bodyRef.current.innerHTML = '';
+
+			bodyRef.current.appendChild(fragment);
+		}, []);
+
+		return <div ref={bodyRef}></div>;
+	};
+
 	return (
 		<>
 			{visible && (
@@ -103,7 +131,9 @@ const Modal = ({buttons, id, onClose, size, title, url}) => {
 					size={url && !size ? 'full-screen' : size}
 				>
 					<ClayModal.Header>{title}</ClayModal.Header>
-					<ClayModal.Body url={getIframeUrl()} />
+					<ClayModal.Body url={getIframeUrl()}>
+						{bodyHTML && <BodyHTML />}
+					</ClayModal.Body>
 					{buttons && (
 						<ClayModal.Footer
 							last={
@@ -150,6 +180,7 @@ const Modal = ({buttons, id, onClose, size, title, url}) => {
 };
 
 Modal.propTypes = {
+	bodyHTML: PropTypes.string,
 	buttons: PropTypes.arrayOf(
 		PropTypes.shape({
 			displayType: PropTypes.oneOf([

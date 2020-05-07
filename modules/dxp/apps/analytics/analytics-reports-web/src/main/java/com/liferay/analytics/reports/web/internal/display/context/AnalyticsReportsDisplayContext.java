@@ -15,8 +15,10 @@
 package com.liferay.analytics.reports.web.internal.display.context;
 
 import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItem;
+import com.liferay.analytics.reports.web.internal.configuration.AnalyticsReportsConfiguration;
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
+import com.liferay.analytics.reports.web.internal.model.TimeRange;
 import com.liferay.analytics.reports.web.internal.model.TimeSpan;
 import com.liferay.analytics.reports.web.internal.model.TrafficSource;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,16 +29,16 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
+import java.time.format.DateTimeFormatter;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,12 +56,14 @@ import javax.portlet.ResourceURL;
 public class AnalyticsReportsDisplayContext {
 
 	public AnalyticsReportsDisplayContext(
+		AnalyticsReportsConfiguration analyticsReportsConfiguration,
 		AnalyticsReportsDataProvider analyticsReportsDataProvider,
 		AnalyticsReportsInfoItem analyticsReportsInfoItem,
 		Object analyticsReportsInfoItemObject, String canonicalURL,
 		Portal portal, RenderResponse renderResponse,
 		ResourceBundle resourceBundle, ThemeDisplay themeDisplay) {
 
+		_analyticsReportsConfiguration = analyticsReportsConfiguration;
 		_analyticsReportsDataProvider = analyticsReportsDataProvider;
 		_analyticsReportsInfoItem = analyticsReportsInfoItem;
 		_analyticsReportsInfoItemObject = analyticsReportsInfoItemObject;
@@ -83,7 +87,7 @@ public class AnalyticsReportsDisplayContext {
 		_data = HashMapBuilder.<String, Object>put(
 			"context", _getContext()
 		).put(
-			"props", getProps()
+			"props", _getProps()
 		).build();
 
 		return _data;
@@ -93,38 +97,26 @@ public class AnalyticsReportsDisplayContext {
 		return PrefsPropsUtil.getString(companyId, "liferayAnalyticsURL");
 	}
 
-	protected Map<String, Object> getProps() {
-		return HashMapBuilder.<String, Object>put(
-			"authorName",
-			_analyticsReportsInfoItem.getAuthorName(
-				_analyticsReportsInfoItemObject)
-		).put(
-			"publishDate",
-			() -> {
-				Date publishDate = _analyticsReportsInfoItem.getPublishDate(
-					_analyticsReportsInfoItemObject);
-
-				Layout layout = _themeDisplay.getLayout();
-
-				if (DateUtil.compareTo(publishDate, layout.getPublishDate()) >
-						0) {
-
-					return publishDate;
-				}
-
-				return layout.getPublishDate();
-			}
-		).put(
-			"title",
-			_analyticsReportsInfoItem.getTitle(
-				_analyticsReportsInfoItemObject, _themeDisplay.getLocale())
-		).put(
-			"trafficSources", _getTrafficSourcesJSONArray()
-		).build();
-	}
-
 	private Map<String, Object> _getContext() {
 		return HashMapBuilder.<String, Object>put(
+			"defaultTimeRange",
+			() -> {
+				TimeSpan defaultTimeSpan = TimeSpan.of(
+					TimeSpan.defaultTimeSpanKey());
+
+				TimeRange defaultTimeRange = defaultTimeSpan.toTimeRange(0);
+
+				return HashMapBuilder.<String, Object>put(
+					"endDate",
+					DateTimeFormatter.ISO_DATE.format(
+						defaultTimeRange.getEndLocalDate())
+				).put(
+					"startDate",
+					DateTimeFormatter.ISO_DATE.format(
+						defaultTimeRange.getStartLocalDate())
+				).build();
+			}
+		).put(
 			"defaultTimeSpanKey", TimeSpan.defaultTimeSpanKey()
 		).put(
 			"endpoints",
@@ -195,9 +187,36 @@ public class AnalyticsReportsDisplayContext {
 				}
 			).build()
 		).put(
+			"readsEnabled", _analyticsReportsConfiguration.readsEnabled()
+		).put(
 			"timeSpans", _getTimeSpansJSONArray()
 		).put(
 			"validAnalyticsConnection", _validAnalyticsConnection
+		).build();
+	}
+
+	private Map<String, Object> _getProps() {
+		return HashMapBuilder.<String, Object>put(
+			"authorName",
+			_analyticsReportsInfoItem.getAuthorName(
+				_analyticsReportsInfoItemObject)
+		).put(
+			"publishDate",
+			() -> _analyticsReportsInfoItem.getPublishDate(
+				_analyticsReportsInfoItemObject)
+		).put(
+			"title",
+			_analyticsReportsInfoItem.getTitle(
+				_analyticsReportsInfoItemObject, _themeDisplay.getLocale())
+		).put(
+			"trafficSources",
+			() -> {
+				if (_analyticsReportsConfiguration.trafficSourcesEnabled()) {
+					return _getTrafficSourcesJSONArray();
+				}
+
+				return JSONFactoryUtil.createJSONArray();
+			}
 		).build();
 	}
 
@@ -206,7 +225,9 @@ public class AnalyticsReportsDisplayContext {
 
 		Stream<TimeSpan> stream = Arrays.stream(TimeSpan.values());
 
-		stream.sorted(
+		stream.filter(
+			timeSpan -> timeSpan != TimeSpan.TODAY
+		).sorted(
 			Comparator.comparingInt(TimeSpan::getDays)
 		).forEach(
 			timeSpan -> timeSpansJSONArray.put(
@@ -293,6 +314,7 @@ public class AnalyticsReportsDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		AnalyticsReportsDisplayContext.class);
 
+	private final AnalyticsReportsConfiguration _analyticsReportsConfiguration;
 	private final AnalyticsReportsDataProvider _analyticsReportsDataProvider;
 	private final AnalyticsReportsInfoItem _analyticsReportsInfoItem;
 	private final Object _analyticsReportsInfoItemObject;

@@ -12,8 +12,6 @@
  * details.
  */
 
-import './GridRegister.soy';
-
 import {ClayInput, ClayRadio} from '@clayui/form';
 import ClayTable from '@clayui/table';
 import React, {useState} from 'react';
@@ -21,7 +19,6 @@ import React, {useState} from 'react';
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './GridAdapter.soy';
 
 const TableHead = ({columns}) => (
 	<ClayTable.Head>
@@ -146,10 +143,10 @@ const GridProxy = connectStore(
 					columns={columns}
 					disabled={readOnly}
 					name={name}
-					onBlur={event =>
+					onBlur={(event) =>
 						emit('fieldBlurred', event, event.target.value)
 					}
-					onChange={event => {
+					onChange={(event) => {
 						const {target} = event;
 						const value = {
 							[target.name]: target.value,
@@ -161,7 +158,7 @@ const GridProxy = connectStore(
 
 						emit('fieldEdited', event, newState);
 					}}
-					onFocus={event =>
+					onFocus={(event) =>
 						emit('fieldFocused', event, event.target.value)
 					}
 					rows={rows}
@@ -172,10 +169,7 @@ const GridProxy = connectStore(
 	}
 );
 
-const ReactGridAdapter = getConnectedReactComponentAdapter(
-	GridProxy,
-	templates
-);
+const ReactGridAdapter = getConnectedReactComponentAdapter(GridProxy, 'grid');
 
 export {ReactGridAdapter};
 

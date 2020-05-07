@@ -69,6 +69,7 @@ boolean newCustomObject = ParamUtil.getBoolean(request, "newCustomObject");
 					contentType="app-builder"
 					dataDefinitionId="<%= dataDefinitionId %>"
 					dataLayoutId="<%= dataLayoutId %>"
+					fieldSetContentType="app-builder-fieldset"
 					namespace="<%= renderResponse.getNamespace() %>"
 					scopes='<%= SetUtil.fromCollection(Arrays.asList("app-builder")) %>'
 				/>

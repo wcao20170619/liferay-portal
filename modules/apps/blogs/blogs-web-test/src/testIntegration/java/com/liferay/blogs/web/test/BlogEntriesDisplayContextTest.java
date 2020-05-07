@@ -70,8 +70,6 @@ import javax.portlet.WindowState;
 import javax.portlet.WindowStateException;
 import javax.portlet.annotations.PortletSerializable;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -226,18 +224,20 @@ public class BlogEntriesDisplayContextTest {
 	}
 
 	private SearchContainer _getSearchContainer(
-			HttpServletRequest httpServletRequest)
+			MockHttpServletRequest mockHttpServletRequest)
 		throws PortletException {
 
 		MVCRenderCommand mvcRenderCommand = _serviceTracker.getService();
 
-		MockRenderRequest mockRenderRequest = new MockRenderRequest(
-			httpServletRequest);
+		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+			new MockLiferayPortletRenderRequest(mockHttpServletRequest);
 
-		mvcRenderCommand.render(mockRenderRequest, new MockRenderResponse());
+		mvcRenderCommand.render(
+			mockLiferayPortletRenderRequest, new MockRenderResponse());
 
-		Object blogEntriesDisplayContext = mockRenderRequest.getAttribute(
-			"BLOG_ENTRIES_DISPLAY_CONTEXT");
+		Object blogEntriesDisplayContext =
+			mockLiferayPortletRenderRequest.getAttribute(
+				"BLOG_ENTRIES_DISPLAY_CONTEXT");
 
 		return ReflectionTestUtil.invoke(
 			blogEntriesDisplayContext, "getSearchContainer", new Class<?>[0],
@@ -514,22 +514,6 @@ public class BlogEntriesDisplayContextTest {
 		@Override
 		public void write(Writer out, boolean escapeXML) throws IOException {
 		}
-
-	}
-
-	private static class MockRenderRequest
-		extends MockLiferayPortletRenderRequest {
-
-		public MockRenderRequest(HttpServletRequest httpServletRequest) {
-			_httpServletRequest = httpServletRequest;
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return _httpServletRequest;
-		}
-
-		private final HttpServletRequest _httpServletRequest;
 
 	}
 

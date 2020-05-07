@@ -12,14 +12,23 @@
  * details.
  */
 
+import '@testing-library/jest-dom/extend-expect';
+import {fireEvent, getByTestId, waitForElement} from '@testing-library/react';
+import ReactDOM from 'react';
+
 import Select from '../../../src/main/resources/META-INF/resources/Select/Select.es';
+import withContextMock from '../__mocks__/withContextMock.es';
 
 let component;
 const spritemap = 'icons.svg';
 
+const SelectWithContextMock = withContextMock(Select);
+
 describe('Select', () => {
-	beforeEach(() => {
-		jest.useFakeTimers();
+	beforeAll(() => {
+		ReactDOM.createPortal = jest.fn((element) => {
+			return element;
+		});
 	});
 
 	afterEach(() => {
@@ -29,15 +38,19 @@ describe('Select', () => {
 	});
 
 	it('is not editable', () => {
-		component = new Select({
-			readOnly: false,
+		component = new SelectWithContextMock({
+			readOnly: true,
 			spritemap,
 		});
 
-		expect(component).toMatchSnapshot();
+		const dropdownTrigger = document.body.querySelector(
+			'.select-field-trigger'
+		);
+
+		expect(dropdownTrigger).toHaveClass('disabled');
 	});
 
-	it('has a helptext', () => {
+	it('has a help text', () => {
 		component = new Select({
 			spritemap,
 			tip: 'Type something',
@@ -184,45 +197,191 @@ describe('Select', () => {
 		expect(component).toMatchSnapshot();
 	});
 
-	it('emits a field edit event when an item is selected', () => {
-		const handleFieldEdited = jest.fn();
+	it('emits a field edit event when an item is selected', async () => {
+		const handleFieldEdited = (data) => {
+			expect(data).toEqual(
+				expect.objectContaining({
+					fieldInstance: expect.any(Object),
+					originalEvent: expect.any(Object),
+					value: [''],
+				})
+			);
+		};
 
 		const events = {fieldEdited: handleFieldEdited};
 
-		jest.useFakeTimers();
-
-		component = new Select({
+		component = new SelectWithContextMock({
 			dataSourceType: 'manual',
 			events,
 			options: [
 				{
-					checked: false,
-					disabled: false,
-					id: 'id',
-					inline: false,
 					label: 'label',
-					name: 'name',
-					showLabel: true,
 					value: 'item',
+				},
+				{
+					label: 'label2',
+					value: 'item2',
 				},
 			],
 			spritemap,
 		});
 
-		const spy = jest.spyOn(component, 'emit');
+		const dropdownTrigger = component.element.querySelector(
+			'.form-builder-select-field.input-group-container'
+		);
 
-		jest.runAllTimers();
+		fireEvent.click(dropdownTrigger);
 
-		component._handleItemClicked({
-			data: {
-				item: {
-					value: 'Liferay',
+		const dropdownItem = await waitForElement(() =>
+			getByTestId(document.body, 'dropdownItem-0')
+		);
+
+		fireEvent.click(dropdownItem);
+	});
+
+	it('emits a field edit event when an item is selected using multiselect', async () => {
+		const handleFieldEdited = (data) => {
+			expect(data).toEqual(
+				expect.objectContaining({
+					fieldInstance: expect.any(Object),
+					originalEvent: expect.any(Object),
+					value: ['item7'],
+				})
+			);
+		};
+
+		const events = {fieldEdited: handleFieldEdited};
+
+		component = new SelectWithContextMock({
+			dataSourceType: 'manual',
+			events,
+			multiple: true,
+			options: [
+				{
+					label: 'label1',
+					name: 'name1',
+					value: 'item1',
 				},
-			},
-			preventDefault: () => 0,
+				{
+					label: 'label2',
+					name: 'name2',
+					value: 'item2',
+				},
+				{
+					label: 'label3',
+					name: 'name3',
+					value: 'item3',
+				},
+				{
+					label: 'label4',
+					name: 'name4',
+					value: 'item4',
+				},
+				{
+					label: 'label5',
+					name: 'name5',
+					value: 'item5',
+				},
+				{
+					label: 'label6',
+					name: 'name6',
+					value: 'item6',
+				},
+				{
+					label: 'label7',
+					name: 'name7',
+					value: 'item7',
+				},
+			],
+			spritemap,
 		});
 
-		expect(spy).toHaveBeenCalled();
+		const dropdownTrigger = component.element.querySelector(
+			'.form-builder-select-field.input-group-container'
+		);
+
+		fireEvent.click(dropdownTrigger);
+
+		const labelItem = await waitForElement(() =>
+			getByTestId(document.body, 'labelItem-item7')
+		);
+
+		fireEvent.click(labelItem);
+
+		expect(component).toMatchSnapshot();
+	});
+
+	it('emits a field edit event when an item is selected using multiselect', async (done) => {
+		const handleFieldEdited = (data) => {
+			expect(data).toEqual(
+				expect.objectContaining({
+					fieldInstance: expect.any(Object),
+					originalEvent: expect.any(Object),
+					value: ['item7', 'item2'],
+				})
+			);
+
+			done();
+		};
+
+		const events = {fieldEdited: handleFieldEdited};
+
+		component = new SelectWithContextMock({
+			dataSourceType: 'manual',
+			events,
+			multiple: true,
+			options: [
+				{
+					label: 'label1',
+					name: 'name1',
+					value: 'item1',
+				},
+				{
+					label: 'label2',
+					name: 'name2',
+					value: 'item2',
+				},
+				{
+					label: 'label3',
+					name: 'name3',
+					value: 'item3',
+				},
+				{
+					label: 'label4',
+					name: 'name4',
+					value: 'item4',
+				},
+				{
+					label: 'label5',
+					name: 'name5',
+					value: 'item5',
+				},
+				{
+					label: 'label6',
+					name: 'name6',
+					value: 'item6',
+				},
+				{
+					label: 'label7',
+					name: 'name7',
+					value: 'item7',
+				},
+			],
+			spritemap,
+			value: ['item7', 'item3', 'item2'],
+		});
+
+		const dropdownTrigger = component.element.querySelector(
+			'.form-builder-select-field.input-group-container'
+		);
+
+		fireEvent.click(dropdownTrigger);
+
+		const labelItemCloseButton = await waitForElement(() => {
+			return getByTestId(dropdownTrigger, 'closeButtonitem3');
+		});
+
+		fireEvent.click(labelItemCloseButton);
 	});
 
 	it('renders the dropdown with search when there are more than six options', () => {

@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -67,22 +68,21 @@ public final class GetSharepointObjectsByQueryOperation extends BaseOperation {
 			String... queryFieldNames)
 		throws SharepointException {
 
-		GetListItemsResponseDocument getListItemsResponseDocument = null;
-
 		try {
-			getListItemsResponseDocument = listsSoap12Stub.getListItems(
-				getGetListItemsDocument(
-					query, _getQueryOptionsList(queryOptionsList),
-					queryFieldNames));
+			GetListItemsResponseDocument getListItemsResponseDocument =
+				listsSoap12Stub.getListItems(
+					getGetListItemsDocument(
+						query, _getQueryOptionsList(queryOptionsList),
+						queryFieldNames));
+
+			log(query, queryOptionsList, getListItemsResponseDocument);
+
+			return getSharepointObjects(getListItemsResponseDocument);
 		}
 		catch (RemoteException remoteException) {
 			throw RemoteExceptionSharepointExceptionMapper.map(
 				remoteException, sharepointConnectionInfo);
 		}
-
-		log(query, queryOptionsList, getListItemsResponseDocument);
-
-		return getSharepointObjects(getListItemsResponseDocument);
 	}
 
 	protected GetListItemsDocument getGetListItemsDocument(
@@ -188,12 +188,20 @@ public final class GetSharepointObjectsByQueryOperation extends BaseOperation {
 
 		Node getListItemsResultNode = getListItemsResult.getDomNode();
 
-		List<SharepointObject> sharepointObjects = new ArrayList<>();
-
 		Node dataElement = XMLUtil.getNode(
 			"Data", getListItemsResultNode.getFirstChild());
 
+		if (dataElement == null) {
+			return Collections.emptyList();
+		}
+
 		NodeList nodeList = dataElement.getChildNodes();
+
+		if (nodeList == null) {
+			return Collections.emptyList();
+		}
+
+		List<SharepointObject> sharepointObjects = new ArrayList<>();
 
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
@@ -311,9 +319,7 @@ public final class GetSharepointObjectsByQueryOperation extends BaseOperation {
 		QueryField[] queryFields = new QueryField[queryFieldNames.length];
 
 		for (int i = 0; i < queryFieldNames.length; i++) {
-			String queryFieldName = queryFieldNames[i];
-
-			queryFields[i++] = new QueryField(queryFieldName);
+			queryFields[i] = new QueryField(queryFieldNames[i]);
 		}
 
 		return queryFields;

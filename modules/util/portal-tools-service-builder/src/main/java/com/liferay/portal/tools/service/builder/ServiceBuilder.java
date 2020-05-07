@@ -1818,6 +1818,18 @@ public class ServiceBuilder {
 		return true;
 	}
 
+	public boolean isDSLEnabled() {
+		if (isVersionGTE_7_4_0()) {
+			return true;
+		}
+
+		if (ArrayUtil.contains(_incubationFeatures, "DSL")) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean isHBMCamelCasePropertyAccessor(String propertyName) {
 		if (propertyName.length() < 3) {
 			return false;
@@ -2366,9 +2378,7 @@ public class ServiceBuilder {
 			String classDeprecatedComment, List<String> modelNames)
 		throws Exception {
 
-		if (!isVersionGTE_7_4_0() &&
-			!ArrayUtil.contains(_incubationFeatures, "DSL")) {
-
+		if (!isDSLEnabled()) {
 			return;
 		}
 
@@ -4945,6 +4955,13 @@ public class ServiceBuilder {
 			sb.append("\tctCollectionId LONG default 0 not null,\n");
 			sb.append("\tctChangeType BOOLEAN,\n");
 		}
+		else if (entities[1].isChangeTrackingEnabled() ||
+				 entities[2].isChangeTrackingEnabled()) {
+
+			throw new ServiceBuilderException(
+				"Must enable change tracking for both sides of mapping table " +
+					tableName);
+		}
 
 		sb.append("\tprimary key (");
 
@@ -6008,6 +6025,10 @@ public class ServiceBuilder {
 			columnElement.addAttribute("type", "long");
 
 			derivedColumnElements.add(columnElement);
+		}
+
+		if (columnElements.isEmpty()) {
+			changeTrackingEnabled = false;
 		}
 
 		if (changeTrackingEnabled) {

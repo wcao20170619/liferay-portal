@@ -52,8 +52,12 @@ renderResponse.setTitle(definition.getName(locale));
 
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
-			<aui:row cssClass="lfr-asset-column lfr-asset-column-details">
-				<aui:col width="<%= 50 %>">
+			<clay:row
+				className="lfr-asset-column lfr-asset-column-details"
+			>
+				<clay:col
+					md="6"
+				>
 					<aui:field-wrapper label="requested-report-id">
 						<%= entry.getEntryId() %>
 					</aui:field-wrapper>
@@ -74,9 +78,11 @@ renderResponse.setTitle(definition.getName(locale));
 
 						<%= (source == null) ? ReportDataSourceType.PORTAL.getValue() : HtmlUtil.escape(source.getName(locale)) %>
 					</aui:field-wrapper>
-				</aui:col>
+				</clay:col>
 
-				<aui:col width="<%= 50 %>">
+				<clay:col
+					md="6"
+				>
 					<c:if test="<%= entry.isScheduleRequest() %>">
 						<aui:field-wrapper label="is-schedule-request">
 
@@ -122,8 +128,8 @@ renderResponse.setTitle(definition.getName(locale));
 					<aui:field-wrapper label="completion-date">
 						<%= entry.getModifiedDate() %>
 					</aui:field-wrapper>
-				</aui:col>
-			</aui:row>
+				</clay:col>
+			</clay:row>
 		</aui:fieldset>
 
 		<%

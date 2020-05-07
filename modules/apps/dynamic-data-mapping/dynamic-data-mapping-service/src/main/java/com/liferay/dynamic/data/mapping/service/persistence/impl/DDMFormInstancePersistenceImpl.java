@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchFormInstanceException;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstancePersistence;
@@ -2823,17 +2824,19 @@ public class DDMFormInstancePersistenceImpl
 		"ddmFormInstance.groupId IN (";
 
 	public DDMFormInstancePersistenceImpl() {
-		setModelClass(DDMFormInstance.class);
-
-		setModelImplClass(DDMFormInstanceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("settings", "settings_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMFormInstance.class);
+
+		setModelImplClass(DDMFormInstanceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMFormInstanceTable.INSTANCE);
 	}
 
 	/**

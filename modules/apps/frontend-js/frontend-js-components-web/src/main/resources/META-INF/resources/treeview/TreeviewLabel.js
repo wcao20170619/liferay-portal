@@ -24,7 +24,9 @@ export default function TreeviewLabel({node}) {
 				className="sr-only"
 				id={inputId}
 				onChange={() => {
+
 					// Let NodeListItem handle checked state.
+
 				}}
 				type="checkbox"
 			/>
@@ -34,7 +36,7 @@ export default function TreeviewLabel({node}) {
 					node.selected ? 'font-weight-bold' : 'font-weight-normal'
 				}
 				htmlFor={inputId}
-				onClick={event => event.preventDefault()}
+				onClick={(event) => event.preventDefault()}
 			>
 				{node.name}
 			</label>

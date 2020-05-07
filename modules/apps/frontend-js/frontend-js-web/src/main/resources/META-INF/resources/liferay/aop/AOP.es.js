@@ -24,6 +24,7 @@ const PREVENT = 'prevent';
  * AOP class
  */
 class AOP {
+
 	/**
 	 * Constructor for AOP class.
 	 * @param {!Object} obj The object containing the displaced function.
@@ -31,6 +32,7 @@ class AOP {
 	 * @constructor
 	 */
 	constructor(obj, fnName) {
+
 		/**
 		 * Array of listeners that will invoke after the displaced function.
 		 * @type {!Array}
@@ -224,7 +226,7 @@ class AOP {
 		if (!aopObj[fnName]) {
 			aopObj[fnName] = new AOP(obj, fnName);
 
-			obj[fnName] = function(...args) {
+			obj[fnName] = function (...args) {
 				return aopObj[fnName].exec(...args);
 			};
 		}

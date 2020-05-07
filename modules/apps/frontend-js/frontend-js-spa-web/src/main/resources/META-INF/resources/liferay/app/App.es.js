@@ -38,6 +38,7 @@ const PROPAGATED_PARAMS = ['bodyCssClass'];
  */
 
 class LiferayApp extends App {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -144,7 +145,7 @@ class LiferayApp extends App {
 	 */
 
 	isInPortletBlacklist(element) {
-		return Object.keys(this.portletsBlacklist).some(portletId => {
+		return Object.keys(this.portletsBlacklist).some((portletId) => {
 			const boundaryId = Utils.getPortletBoundaryId(portletId);
 
 			const portlets = document.querySelectorAll(
@@ -153,7 +154,7 @@ class LiferayApp extends App {
 
 			return Array.prototype.slice
 				.call(portlets)
-				.some(portlet => dom.contains(portlet, element));
+				.some((portlet) => dom.contains(portlet, element));
 		});
 	}
 
@@ -404,7 +405,7 @@ class LiferayApp extends App {
 	 */
 
 	_createNotification(config) {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			resolve(
 				openToast({
 					type: 'warning',
@@ -436,7 +437,7 @@ class LiferayApp extends App {
 		const nextPpid = nextUri.searchParams.get('p_p_id');
 
 		if (nextPpid && nextPpid === activePpid) {
-			PROPAGATED_PARAMS.forEach(paramKey => {
+			PROPAGATED_PARAMS.forEach((paramKey) => {
 				const paramName = `_${nextPpid}_${paramKey}`;
 				const paramValue = activeUri.searchParams.get(paramName);
 
@@ -471,7 +472,7 @@ class LiferayApp extends App {
 					message: Liferay.SPA.userNotification.message,
 					title: Liferay.SPA.userNotification.title,
 					type: 'warning',
-				}).then(alert => {
+				}).then((alert) => {
 					this.timeoutAlert = alert;
 				});
 			}, Liferay.SPA.userNotification.timeout);

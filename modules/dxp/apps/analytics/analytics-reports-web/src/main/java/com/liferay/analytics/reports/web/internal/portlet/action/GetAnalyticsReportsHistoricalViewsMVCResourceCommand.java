@@ -79,7 +79,7 @@ public class GetAnalyticsReportsHistoricalViewsMVCResourceCommand
 					_layoutSEOLinkManager, _portal);
 
 			HistoricalMetric historicalMetric =
-				analyticsReportsDataProvider.getHistoricalViewsHistogram(
+				analyticsReportsDataProvider.getHistoricalViewsHistoricalMetric(
 					_portal.getCompanyId(resourceRequest),
 					timeSpan.toTimeRange(timeSpanOffset),
 					canonicalURLProvider.getCanonicalURL());

@@ -2,21 +2,29 @@ definition {
 
 	@summary = "This calls the JSON WS API to add a Blog entry"
 	macro addEntry {
+		Variables.assertDefined(parameterList = "${entryContent},${entryTitle}");
+
 		var portalURL = JSONCompany.getPortalURL();
 
-		if (!(isSet(entryContent))) {
-			var entryContent = "";
-		}
+		var contentXML = JSONBlogSetter.setContentXML(content = "${entryContent}");
 
 		if (!(isSet(entrySubtitle))) {
 			var entrySubtitle = "";
 		}
 
 		if (isSet(groupName)) {
-			var serviceContext = JSONBlogSetter.setServiceContext(groupName = "${groupName}");
+			var serviceContext = JSONBlogSetter.setServiceContext(
+				assetCategoryIds = "${assetCategoryIds}",
+				assetTagNames = "${assetTagNames}",
+				groupName = "${groupName}",
+				workflowAction = "${workflowAction}");
 		}
 		else {
-			var serviceContext = JSONBlogSetter.setServiceContext(groupName = "Guest");
+			var serviceContext = JSONBlogSetter.setServiceContext(
+				assetCategoryIds = "${assetCategoryIds}",
+				assetTagNames = "${assetTagNames}",
+				groupName = "Guest",
+				workflowAction = "${workflowAction}");
 		}
 
 		var curl = '''
@@ -24,8 +32,8 @@ definition {
 			-u test@liferay.com:test \
 			-d title=${entryTitle} \
 			-d subtitle=${entrySubtitle} \
-			-d description='' \
-			-d content=${entryContent} \
+			-d description= \
+			-d content=${contentXML} \
 			-d displayDateMonth=01 \
 			-d displayDateDay=01 \
 			-d displayDateYear=2004 \

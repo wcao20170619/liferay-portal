@@ -15,6 +15,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 
+import {AppNavigationBar} from '../../App.es';
 import {AppContext} from '../../AppContext.es';
 import Button from '../../components/button/Button.es';
 import ControlMenu from '../../components/control-menu/ControlMenu.es';
@@ -122,7 +123,7 @@ export default ({history}) => {
 		getItem(
 			`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}/data-record-collection`
 		).then(({id: dataRecordCollectionId}) => {
-			setCustomObjectPermissionsModalState(prevState => ({
+			setCustomObjectPermissionsModalState((prevState) => ({
 				...prevState,
 				endpoint: `/o/data-engine/v2.0/data-record-collections/${dataRecordCollectionId}/permissions`,
 			}));
@@ -158,9 +159,11 @@ export default ({history}) => {
 		<>
 			<ControlMenu
 				title={Liferay.Language.get(
-					'javax.portlet.title.com_liferay_app_builder_web_internal_portlet_CustomObjectsPortlet'
+					'javax.portlet.title.com_liferay_app_builder_web_internal_portlet_ObjectsPortlet'
 				)}
 			/>
+
+			<AppNavigationBar />
 
 			<ListView
 				actions={[
@@ -192,7 +195,7 @@ export default ({history}) => {
 						action: ({id}) =>
 							Promise.resolve(
 								setCustomObjectPermissionsModalState(
-									prevState => ({
+									(prevState) => ({
 										...prevState,
 										dataDefinitionId: id,
 									})
@@ -240,7 +243,7 @@ export default ({history}) => {
 				}}
 				endpoint={`/o/data-engine/v2.0/data-definitions/by-content-type/app-builder`}
 			>
-				{item => ({
+				{(item) => ({
 					...item,
 					dateCreated: fromNow(item.dateCreated),
 					dateModified: fromNow(item.dateModified),
@@ -291,7 +294,7 @@ export default ({history}) => {
 						endpoint: null,
 					})
 				}
-				onSave={permissions => {
+				onSave={(permissions) => {
 					const dataDefinitionPermissions = [];
 
 					Object.values(permissions).forEach(

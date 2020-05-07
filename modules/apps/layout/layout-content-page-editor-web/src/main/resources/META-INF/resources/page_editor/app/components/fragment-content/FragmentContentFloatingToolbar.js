@@ -13,7 +13,7 @@
  */
 
 import PropTypes from 'prop-types';
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 
 import {EDITABLE_FLOATING_TOOLBAR_BUTTONS} from '../../config/constants/editableFloatingToolbarButtons';
 import {EDITABLE_FLOATING_TOOLBAR_CLASSNAMES} from '../../config/constants/editableFloatingToolbarClassNames';
@@ -44,7 +44,7 @@ export default function FragmentContentFloatingToolbar({
 
 		if (editables) {
 			activeEditable =
-				editables.find(editable =>
+				editables.find((editable) =>
 					isActive(
 						getEditableUniqueId(
 							fragmentEntryLinkId,
@@ -57,7 +57,7 @@ export default function FragmentContentFloatingToolbar({
 		return activeEditable;
 	}, [editables, fragmentEntryLinkId, isActive]);
 
-	const state = useSelector(state => state);
+	const state = useSelector((state) => state);
 
 	const editableValue = selectEditableValue(
 		state,
@@ -115,6 +115,11 @@ export default function FragmentContentFloatingToolbar({
 		return buttons;
 	}, [editable.editableId, editable.type, editableValue]);
 
+	const handleButtonClick = useCallback(
+		(buttonId) => onButtonClick(buttonId, editable.editableId),
+		[editable.editableId, onButtonClick]
+	);
+
 	return (
 		editable.editableId &&
 		editableHasActiveProcessor && (
@@ -130,9 +135,7 @@ export default function FragmentContentFloatingToolbar({
 					),
 				}}
 				itemRef={{current: editable.element}}
-				onButtonClick={buttonId =>
-					onButtonClick(buttonId, editable.editableId)
-				}
+				onButtonClick={handleButtonClick}
 			/>
 		)
 	);
@@ -143,7 +146,7 @@ FragmentContentFloatingToolbar.propTypes = {
 		PropTypes.shape({
 			editableId: PropTypes.string.isRequired,
 			editableValueNamespace: PropTypes.string.isRequired,
-			element: PropTypes.instanceOf(HTMLElement).isRequired,
+			element: PropTypes.object.isRequired,
 			processor: PropTypes.object,
 		})
 	),

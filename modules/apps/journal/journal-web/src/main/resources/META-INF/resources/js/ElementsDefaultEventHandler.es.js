@@ -12,7 +12,11 @@
  * details.
  */
 
-import {DefaultEventHandler, ItemSelectorDialog} from 'frontend-js-web';
+import {
+	DefaultEventHandler,
+	ItemSelectorDialog,
+	addParams,
+} from 'frontend-js-web';
 import {Config} from 'metal-state';
 
 class ElementsDefaultEventHandler extends DefaultEventHandler {
@@ -31,14 +35,14 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 				title: Liferay.Language.get('compare-versions'),
 				uri: itemData.compareVersionsURL,
 			},
-			event => {
+			(event) => {
 				let uri = itemData.redirectURL;
 
-				uri = Liferay.Util.addParams(
+				uri = addParams(
 					namespace + 'sourceVersion=' + event.sourceversion,
 					uri
 				);
-				uri = Liferay.Util.addParams(
+				uri = addParams(
 					namespace + 'targetVersion=' + event.targetversion,
 					uri
 				);
@@ -73,7 +77,7 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 			Liferay.Language.get('delete'),
 			Liferay.Language.get('delete-translations'),
 			itemData.selectArticleTranslationsURL,
-			selectedItems => {
+			(selectedItems) => {
 				if (
 					confirm(
 						Liferay.Language.get(
@@ -81,7 +85,7 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 						)
 					)
 				) {
-					selectedItems.forEach(item => {
+					selectedItems.forEach((item) => {
 						document.hrefFm.appendChild(item);
 					});
 				}
@@ -169,7 +173,7 @@ class ElementsDefaultEventHandler extends DefaultEventHandler {
 			url: selectArticleTranslationsURL,
 		});
 
-		itemSelectorDialog.on('selectedItemChange', event => {
+		itemSelectorDialog.on('selectedItemChange', (event) => {
 			if (event.selectedItem) {
 				callback(event.selectedItem);
 			}

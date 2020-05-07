@@ -52,7 +52,7 @@ definition {
 	@priority = "4"
 	test AddBlogsEntryWithHTML {
 		JSONBlog.addEntry(
-			entryContent = '''<b>Bold Type</b> <i>Italics</i>''',
+			entryContent = "<b>Bold Type</b> <i>Italics</i>",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title");
 
@@ -193,13 +193,13 @@ definition {
 
 	@priority = "3"
 	test ChangeBlogsEntryCoverImage {
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
 		for (var entryCount : list "1,2") {
-			DMDocument.addCP(
+			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
-				dmDocumentFile = "Document_${entryCount}.jpg",
-				dmDocumentTitle = "Document_${entryCount}.jpg");
+				dmDocumentTitle = "Document_${entryCount}.jpg",
+				groupName = "Guest",
+				mimeType = "image/jpeg",
+				sourceFileName = "Document_${entryCount}.jpg");
 		}
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
@@ -608,7 +608,6 @@ definition {
 
 	@priority = "4"
 	test ViewBlogsEntriesAsGuestViaAP {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "BlogsUsecase#ViewBlogsEntriesAsGuestViaAP";
 
 		Portlet.deletePG(portletName = "Blogs");
@@ -811,7 +810,6 @@ definition {
 
 	@priority = "4"
 	test ViewBlogsEntryOnMultiplePagesWithDefaultAndPageScope {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "BlogsUsecase#ViewBlogsEntryOnMultiplePagesWithDefaultAndPageScope";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
@@ -1205,6 +1203,8 @@ definition {
 			password = "test",
 			specificURL = "http://www.baker.com:8080/group/guest",
 			userEmailAddress = "test@liferay.com");
+
+		Navigator.openSpecificURL(url = "http://www.baker.com:8080/private-blogs-page");
 
 		Portlet.addPG(portletName = "Blogs");
 

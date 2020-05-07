@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.site.navigation.exception.NoSuchMenuException;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
+import com.liferay.site.navigation.model.SiteNavigationMenuTable;
 import com.liferay.site.navigation.model.impl.SiteNavigationMenuImpl;
 import com.liferay.site.navigation.model.impl.SiteNavigationMenuModelImpl;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuPersistence;
@@ -6579,11 +6580,6 @@ public class SiteNavigationMenuPersistenceImpl
 		"siteNavigationMenu.auto_ = ?";
 
 	public SiteNavigationMenuPersistenceImpl() {
-		setModelClass(SiteNavigationMenu.class);
-
-		setModelImplClass(SiteNavigationMenuImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -6591,6 +6587,13 @@ public class SiteNavigationMenuPersistenceImpl
 		dbColumnNames.put("auto", "auto_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SiteNavigationMenu.class);
+
+		setModelImplClass(SiteNavigationMenuImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SiteNavigationMenuTable.INSTANCE);
 	}
 
 	/**

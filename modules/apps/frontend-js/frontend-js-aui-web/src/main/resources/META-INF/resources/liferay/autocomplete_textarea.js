@@ -15,13 +15,13 @@
 /**
  * The Autocomplete Textarea Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-autocomplete-textarea
  */
 
 AUI.add(
 	'liferay-autocomplete-textarea',
-	A => {
+	(A) => {
 		var KeyMap = A.Event.KeyMap;
 		var Lang = A.Lang;
 
@@ -33,7 +33,7 @@ AUI.add(
 
 		var STR_SPACE = ' ';
 
-		var AutoCompleteTextarea = function() {};
+		var AutoCompleteTextarea = function () {};
 
 		AutoCompleteTextarea.prototype = {
 			_bindUIACTextarea() {
@@ -106,7 +106,7 @@ AUI.add(
 				if (caretIndex) {
 					val = val.substring(0, caretIndex.start);
 
-					instance._getTriggers().forEach(item => {
+					instance._getTriggers().forEach((item) => {
 						var lastTriggerIndex = val.lastIndexOf(item);
 
 						if (lastTriggerIndex >= 0) {

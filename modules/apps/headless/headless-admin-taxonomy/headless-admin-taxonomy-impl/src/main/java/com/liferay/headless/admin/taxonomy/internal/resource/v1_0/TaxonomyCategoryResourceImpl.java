@@ -61,6 +61,7 @@ import com.liferay.portlet.asset.service.permission.AssetCategoryPermission;
 import java.sql.Timestamp;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 
@@ -115,21 +116,26 @@ public class TaxonomyCategoryResourceImpl
 
 		DynamicQuery dynamicQuery = _assetCategoryLocalService.dynamicQuery();
 
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"companyId", contextCompany.getCompanyId()));
+
 		if (siteId != null) {
 			dynamicQuery.add(RestrictionsFactoryUtil.eq("groupId", siteId));
 		}
 
-		dynamicQuery.addOrder(OrderFactoryUtil.desc("count"));
-		dynamicQuery.setLimit(
-			pagination.getStartPosition(), pagination.getEndPosition());
+		dynamicQuery.addOrder(OrderFactoryUtil.desc("assetCount"));
 		dynamicQuery.setProjection(_getProjectionList(), true);
 
 		return Page.of(
 			transform(
 				transform(
-					_assetCategoryLocalService.dynamicQuery(dynamicQuery),
+					_assetCategoryLocalService.dynamicQuery(
+						dynamicQuery, pagination.getStartPosition(),
+						pagination.getEndPosition()),
 					this::_toAssetCategory),
-				this::_toTaxonomyCategory));
+				this::_toTaxonomyCategory),
+			pagination, _getTotalCount(siteId));
 	}
 
 	@Override
@@ -288,22 +294,26 @@ public class TaxonomyCategoryResourceImpl
 
 		AssetCategory assetCategory = _getAssetCategory(taxonomyCategoryId);
 
-		_validateI18n(
-			false, assetCategory.getDefaultLanguageId(), taxonomyCategory);
+		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyCategory.getName(), taxonomyCategory.getName_i18n(),
+			assetCategory.getTitleMap());
+		Map<Locale, String> descriptionMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyCategory.getDescription(),
+			taxonomyCategory.getDescription_i18n(),
+			assetCategory.getDescriptionMap());
 
-		assetCategory.setDescriptionMap(
-			LocalizedMapUtil.getLocalizedMap(
-				contextAcceptLanguage.getPreferredLocale(),
-				taxonomyCategory.getDescription(),
-				taxonomyCategory.getDescription_i18n(),
-				assetCategory.getTitleMap()));
+		LocalizedMapUtil.validateI18n(
+			false,
+			LocaleUtil.fromLanguageId(assetCategory.getDefaultLanguageId()),
+			"Taxonomy category", titleMap,
+			new HashSet<>(descriptionMap.keySet()));
+
 		assetCategory.setExternalReferenceCode(
 			taxonomyCategory.getExternalReferenceCode());
-		assetCategory.setTitleMap(
-			LocalizedMapUtil.getLocalizedMap(
-				contextAcceptLanguage.getPreferredLocale(),
-				taxonomyCategory.getName(), taxonomyCategory.getName_i18n(),
-				assetCategory.getTitleMap()));
+		assetCategory.setTitleMap(titleMap);
+		assetCategory.setDescriptionMap(descriptionMap);
 
 		AssetCategoryPermission.check(
 			PermissionThreadLocal.getPermissionChecker(),
@@ -318,17 +328,20 @@ public class TaxonomyCategoryResourceImpl
 			long taxonomyCategoryId, long taxonomyVocabularyId)
 		throws Exception {
 
-		_validateI18n(true, languageId, taxonomyCategory);
+		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyCategory.getName(), taxonomyCategory.getName_i18n());
+		Map<Locale, String> descriptionMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyCategory.getDescription(),
+			taxonomyCategory.getDescription_i18n());
+
+		LocalizedMapUtil.validateI18n(
+			true, LocaleUtil.fromLanguageId(languageId), "Taxonomy category",
+			titleMap, new HashSet<>(descriptionMap.keySet()));
 
 		AssetCategory assetCategory = _assetCategoryService.addCategory(
-			groupId, taxonomyCategoryId,
-			LocalizedMapUtil.getLocalizedMap(
-				contextAcceptLanguage.getPreferredLocale(),
-				taxonomyCategory.getName(), taxonomyCategory.getName_i18n()),
-			LocalizedMapUtil.getLocalizedMap(
-				contextAcceptLanguage.getPreferredLocale(),
-				taxonomyCategory.getDescription(),
-				taxonomyCategory.getDescription_i18n()),
+			groupId, taxonomyCategoryId, titleMap, descriptionMap,
 			taxonomyVocabularyId, null,
 			ServiceContextUtil.createServiceContext(
 				groupId, taxonomyCategory.getViewableByAsString()));
@@ -397,14 +410,17 @@ public class TaxonomyCategoryResourceImpl
 		projectionList.add(
 			ProjectionFactoryUtil.alias(
 				ProjectionFactoryUtil.sqlProjection(
-					"(select count(entryId) AS count from " +
-						"AssetEntries_AssetCategories where categoryId = " +
-							"this_.categoryId group by categoryId) AS count",
-					new String[] {"count"}, new Type[] {Type.INTEGER}),
-				"count"));
+					StringBundler.concat(
+						"(select count(assetEntryId) assetCount from ",
+						"AssetEntryAssetCategoryRel where assetCategoryId = ",
+						"this_.categoryId group by assetCategoryId) AS ",
+						"assetCount"),
+					new String[] {"assetCount"}, new Type[] {Type.INTEGER}),
+				"assetCount"));
 		projectionList.add(ProjectionFactoryUtil.property("categoryId"));
 		projectionList.add(ProjectionFactoryUtil.property("companyId"));
 		projectionList.add(ProjectionFactoryUtil.property("createDate"));
+		projectionList.add(ProjectionFactoryUtil.property("description"));
 		projectionList.add(ProjectionFactoryUtil.property("groupId"));
 		projectionList.add(ProjectionFactoryUtil.property("modifiedDate"));
 		projectionList.add(ProjectionFactoryUtil.property("name"));
@@ -413,16 +429,36 @@ public class TaxonomyCategoryResourceImpl
 		return projectionList;
 	}
 
+	private long _getTotalCount(Long siteId) {
+		DynamicQuery dynamicQuery = _assetCategoryLocalService.dynamicQuery();
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"companyId", contextCompany.getCompanyId()));
+
+		if (siteId != null) {
+			dynamicQuery.add(RestrictionsFactoryUtil.eq("groupId", siteId));
+		}
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.sqlRestriction(
+				"exists (select 1 from AssetEntryAssetCategoryRel where " +
+					"assetCategoryId = this_.categoryId)"));
+
+		return _assetCategoryLocalService.dynamicQueryCount(dynamicQuery);
+	}
+
 	private AssetCategory _toAssetCategory(Object[] assetCategory) {
 		return new AssetCategoryImpl() {
 			{
 				setCategoryId((long)assetCategory[1]);
 				setCompanyId((long)assetCategory[2]);
 				setCreateDate(_toDate((Timestamp)assetCategory[3]));
-				setGroupId((long)assetCategory[4]);
-				setModifiedDate(_toDate((Timestamp)assetCategory[5]));
-				setName((String)assetCategory[6]);
-				setUserId((long)assetCategory[7]);
+				setDescription((String)assetCategory[4]);
+				setGroupId((long)assetCategory[5]);
+				setModifiedDate(_toDate((Timestamp)assetCategory[6]));
+				setName((String)assetCategory[7]);
+				setUserId((long)assetCategory[8]);
 			}
 		};
 	}
@@ -459,32 +495,6 @@ public class TaxonomyCategoryResourceImpl
 				contextAcceptLanguage.getPreferredLocale(), contextUriInfo,
 				contextUser),
 			assetCategory);
-	}
-
-	private void _validateI18n(
-		boolean add, String languageId, TaxonomyCategory taxonomyCategory) {
-
-		Locale defaultLocale = LocaleUtil.fromLanguageId(languageId);
-
-		if (LocaleUtil.equals(
-				defaultLocale, contextAcceptLanguage.getPreferredLocale())) {
-
-			return;
-		}
-
-		Map<String, String> localizedNames = taxonomyCategory.getName_i18n();
-
-		if ((add && (localizedNames == null)) ||
-			(!add && (localizedNames != null) &&
-			 !localizedNames.containsKey(
-				 LocaleUtil.toBCP47LanguageId(defaultLocale)))) {
-
-			String w3cLanguageId = LocaleUtil.toW3cLanguageId(defaultLocale);
-
-			throw new BadRequestException(
-				"Taxonomy categories must include the default language " +
-					w3cLanguageId);
-		}
 	}
 
 	private static final EntityModel _entityModel = new CategoryEntityModel();

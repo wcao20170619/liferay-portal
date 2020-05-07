@@ -16,6 +16,7 @@ package com.liferay.mobile.device.rules.service.persistence.impl;
 
 import com.liferay.mobile.device.rules.exception.NoSuchActionException;
 import com.liferay.mobile.device.rules.model.MDRAction;
+import com.liferay.mobile.device.rules.model.MDRActionTable;
 import com.liferay.mobile.device.rules.model.impl.MDRActionImpl;
 import com.liferay.mobile.device.rules.model.impl.MDRActionModelImpl;
 import com.liferay.mobile.device.rules.service.persistence.MDRActionPersistence;
@@ -1981,17 +1982,19 @@ public class MDRActionPersistenceImpl
 			"mdrAction.ruleGroupInstanceId = ?";
 
 	public MDRActionPersistenceImpl() {
-		setModelClass(MDRAction.class);
-
-		setModelImplClass(MDRActionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MDRAction.class);
+
+		setModelImplClass(MDRActionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MDRActionTable.INSTANCE);
 	}
 
 	/**

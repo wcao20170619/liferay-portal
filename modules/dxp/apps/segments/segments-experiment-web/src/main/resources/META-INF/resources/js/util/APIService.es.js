@@ -93,7 +93,9 @@ function APIService({contentPageEditorNamespace, endpoints, namespace}) {
 	}
 
 	function publishExperience(body) {
+
 		// TODO somehow type this
+
 		return _fetchWithError(editSegmentsExperimentStatusURL, {
 			body: _getFormDataRequest(body, namespace),
 			credentials: 'include',
@@ -164,8 +166,8 @@ export function _getFormDataRequest(body, prefix, formData = new FormData()) {
  */
 function _fetchWithError(url, options = {}) {
 	return fetch(url, options)
-		.then(response => response.json())
-		.then(objectResponse => {
+		.then((response) => response.json())
+		.then((objectResponse) => {
 			if (objectResponse.error) {
 				throw objectResponse.error;
 			}

@@ -42,15 +42,19 @@
 				</div>
 			</c:when>
 			<c:otherwise>
-				<aui:row>
-					<aui:col cssClass="my-contacts" width="<%= 100 %>">
+				<clay:row>
+					<clay:col
+						className="my-contacts"
+					>
 
 						<%
 						for (User user2 : users) {
 						%>
 
-							<aui:row>
-								<aui:col cssClass="lfr-contact-grid-item" width="<%= 100 %>">
+							<clay:row>
+								<clay:col
+									className="lfr-contact-grid-item"
+								>
 									<div class="lfr-contact-thumb">
 										<a href="<%= user2.getDisplayURL(themeDisplay) %>"><img alt="<%= HtmlUtil.escapeAttribute(user2.getFullName()) %>" src="<%= user2.getPortraitURL(themeDisplay) %>" /></a>
 									</div>
@@ -66,8 +70,8 @@
 									</div>
 
 									<div class="clear"><!-- --></div>
-								</aui:col>
-							</aui:row>
+								</clay:col>
+							</clay:row>
 
 						<%
 						}
@@ -76,8 +80,8 @@
 						<c:if test="<%= portletURL != null %>">
 							<a class="lfr-contact-grid-item" href="<%= portletURL %>"><liferay-ui:message arguments="<%= HtmlUtil.escape(scopeGroup.getDescriptiveName(locale)) %>" key="view-all-x-connections" translateArguments="<%= false %>" /></a>
 						</c:if>
-					</aui:col>
-				</aui:row>
+					</clay:col>
+				</clay:row>
 			</c:otherwise>
 		</c:choose>
 	</c:when>

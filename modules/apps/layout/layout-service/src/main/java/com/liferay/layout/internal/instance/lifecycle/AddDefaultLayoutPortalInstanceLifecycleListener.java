@@ -15,7 +15,7 @@
 package com.liferay.layout.internal.instance.lifecycle;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributorRegistration;
-import com.liferay.layout.internal.util.DefaultLayoutDefinitionImporter;
+import com.liferay.layout.internal.importer.DefaultLayoutDefinitionImporter;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;

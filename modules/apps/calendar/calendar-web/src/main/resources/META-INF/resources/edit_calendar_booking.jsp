@@ -204,7 +204,7 @@ while (manageableCalendarsIterator.hasNext()) {
 %>
 
 <aui:script use="liferay-calendar-container,liferay-calendar-remote-services,liferay-component">
-	Liferay.component('<portlet:namespace />calendarContainer', function() {
+	Liferay.component('<portlet:namespace />calendarContainer', function () {
 		var calendarContainer = new Liferay.CalendarContainer({
 			groupCalendarResourceId: <%= groupCalendarResource.getCalendarResourceId() %>,
 
@@ -215,7 +215,7 @@ while (manageableCalendarsIterator.hasNext()) {
 			namespace: '<portlet:namespace />',
 		});
 
-		var destroyInstance = function(event) {
+		var destroyInstance = function (event) {
 			if (event.portletId === '<%= portletDisplay.getId() %>') {
 				calendarContainer.destroy();
 
@@ -229,7 +229,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		return calendarContainer;
 	});
 
-	Liferay.component('<portlet:namespace />remoteServices', function() {
+	Liferay.component('<portlet:namespace />remoteServices', function () {
 		var remoteServices = new Liferay.CalendarRemoteServices({
 			baseActionURL:
 				'<%= PortletURLFactoryUtil.create(request, portletDisplay.getId(), PortletRequest.ACTION_PHASE) %>',
@@ -239,7 +239,7 @@ while (manageableCalendarsIterator.hasNext()) {
 			namespace: '<portlet:namespace />',
 		});
 
-		var destroyInstance = function(event) {
+		var destroyInstance = function (event) {
 			if (event.portletId === '<%= portletDisplay.getId() %>') {
 				remoteServices.destroy();
 
@@ -385,42 +385,54 @@ while (manageableCalendarsIterator.hasNext()) {
 							<div class="separator"><!-- --></div>
 						</c:if>
 
-						<aui:row cssClass="calendar-booking-invitations">
-							<aui:col width="<%= (calendarBooking != null) ? 25 : 33 %>">
+						<clay:row
+							className="calendar-booking-invitations"
+						>
+							<clay:col
+								md="<%= (calendarBooking != null) ? String.valueOf(3) : String.valueOf(4) %>"
+							>
 								<label class="field-label">
 									<liferay-ui:message key="pending[calendar]" /> (<span id="<portlet:namespace />pendingCounter"><%= pendingCalendarsJSONArray.length() %></span>)
 								</label>
 
 								<div class="calendar-portlet-calendar-list" id="<portlet:namespace />calendarListPending"></div>
-							</aui:col>
+							</clay:col>
 
-							<aui:col width="<%= (calendarBooking != null) ? 25 : 33 %>">
+							<clay:col
+								md="<%= (calendarBooking != null) ? String.valueOf(3) : String.valueOf(4) %>"
+							>
 								<label class="field-label">
 									<liferay-ui:message key="accepted" /> (<span id="<portlet:namespace />acceptedCounter"><%= acceptedCalendarsJSONArray.length() %></span>)
 								</label>
 
 								<div class="calendar-portlet-calendar-list" id="<portlet:namespace />calendarListAccepted"></div>
-							</aui:col>
+							</clay:col>
 
-							<aui:col width="<%= (calendarBooking != null) ? 25 : 33 %>">
+							<clay:col
+								md="<%= (calendarBooking != null) ? String.valueOf(3) : String.valueOf(4) %>"
+							>
 								<label class="field-label">
 									<liferay-ui:message key="declined" /> (<span id="<portlet:namespace />declinedCounter"><%= declinedCalendarsJSONArray.length() %></span>)
 								</label>
 
 								<div class="calendar-portlet-calendar-list" id="<portlet:namespace />calendarListDeclined"></div>
-							</aui:col>
+							</clay:col>
 
 							<c:if test="<%= calendarBooking != null %>">
-								<aui:col width="<%= 25 %>">
+								<clay:col
+									md="6"
+								>
 									<label class="field-label">
 										<liferay-ui:message key="maybe" /> (<span id="<portlet:namespace />maybeCounter"><%= maybeCalendarsJSONArray.length() %></span>)
 									</label>
 
 									<div class="calendar-portlet-calendar-list" id="<portlet:namespace />calendarListMaybe"></div>
-								</aui:col>
+								</clay:col>
 							</c:if>
 
-							<aui:col width="<%= 100 %>">
+							<clay:col
+								size="12"
+							>
 								<div class="calendar-portlet-list-header toggler-header-collapsed" id="<portlet:namespace />checkAvailability">
 									<span class="calendar-portlet-list-arrow"></span>
 
@@ -442,8 +454,8 @@ while (manageableCalendarsIterator.hasNext()) {
 										</liferay-util:include>
 									</div>
 								</div>
-							</aui:col>
-						</aui:row>
+							</clay:col>
+						</clay:row>
 					</liferay-ui:panel>
 
 					<liferay-ui:panel
@@ -554,7 +566,7 @@ while (manageableCalendarsIterator.hasNext()) {
 	Liferay.provide(
 		window,
 		'<portlet:namespace />updateCalendarBooking',
-		function() {
+		function () {
 			var A = AUI();
 
 			<c:if test="<%= invitable %>">
@@ -618,19 +630,19 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	var scheduler = window.<portlet:namespace />scheduler;
 
-	A.one('#<portlet:namespace />saveButton').on('click', function() {
+	A.one('#<portlet:namespace />saveButton').on('click', function () {
 		A.one('#<portlet:namespace />workflowAction').val(
 			'<%= WorkflowConstants.ACTION_SAVE_DRAFT %>'
 		);
 	});
 
-	A.one('#<portlet:namespace />publishButton').on('click', function() {
+	A.one('#<portlet:namespace />publishButton').on('click', function () {
 		A.one('#<portlet:namespace />workflowAction').val(
 			'<%= WorkflowConstants.ACTION_PUBLISH %>'
 		);
 	});
 
-	var syncCalendarsMap = function() {
+	var syncCalendarsMap = function () {
 		calendarContainer.syncCalendarsMap([
 			window.<portlet:namespace />calendarListAccepted,
 			window.<portlet:namespace />calendarListDeclined,
@@ -642,7 +654,7 @@ while (manageableCalendarsIterator.hasNext()) {
 			window.<portlet:namespace />calendarListPending,
 		]);
 
-		A.each(calendarContainer.get('availableCalendars'), function(item, index) {
+		A.each(calendarContainer.get('availableCalendars'), function (item, index) {
 			item.set('disabled', true);
 		});
 	};
@@ -657,7 +669,7 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	window.<portlet:namespace />calendarListPending = new Liferay.CalendarList({
 		after: {
-			calendarsChange: function(event) {
+			calendarsChange: function (event) {
 				var instance = this;
 
 				A.one('#<portlet:namespace />pendingCounter').html(
@@ -681,7 +693,7 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	window.<portlet:namespace />calendarListAccepted = new Liferay.CalendarList({
 		after: {
-			calendarsChange: function(event) {
+			calendarsChange: function (event) {
 				var instance = this;
 
 				A.one('#<portlet:namespace />acceptedCounter').html(
@@ -707,7 +719,7 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	window.<portlet:namespace />calendarListDeclined = new Liferay.CalendarList({
 		after: {
-			calendarRemoved: function(event) {
+			calendarRemoved: function (event) {
 				var calendar = event.calendar;
 
 				if (calendar) {
@@ -718,7 +730,7 @@ while (manageableCalendarsIterator.hasNext()) {
 					);
 				}
 			},
-			calendarsChange: function(event) {
+			calendarsChange: function (event) {
 				var instance = this;
 
 				A.one('#<portlet:namespace />declinedCounter').html(
@@ -743,7 +755,7 @@ while (manageableCalendarsIterator.hasNext()) {
 	<c:if test="<%= calendarBooking != null %>">
 		window.<portlet:namespace />calendarListMaybe = new Liferay.CalendarList({
 			after: {
-				calendarsChange: function(event) {
+				calendarsChange: function (event) {
 					var instance = this;
 
 					A.one('#<portlet:namespace />maybeCounter').html(
@@ -827,7 +839,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		schedulerEvent: placeholderSchedulerEvent,
 	});
 
-	scheduler.after('*:load', function(event) {
+	scheduler.after('*:load', function (event) {
 		scheduler.addEvents(placeholderSchedulerEvent);
 
 		scheduler.syncEventsUI();
@@ -837,12 +849,12 @@ while (manageableCalendarsIterator.hasNext()) {
 		var manageableCalendars = {};
 
 		<%= CalendarUtil.toCalendarsJSONArray(themeDisplay, manageableCalendars) %>.forEach(
-			function(item, index) {
+			function (item, index) {
 				manageableCalendars[item.calendarId] = item;
 			}
 		);
 
-		A.one('#<portlet:namespace />calendarId').on('valueChange', function(event) {
+		A.one('#<portlet:namespace />calendarId').on('valueChange', function (event) {
 			var calendarId = parseInt(event.target.val(), 10);
 
 			var calendar = manageableCalendars[calendarId];
@@ -856,7 +868,7 @@ while (manageableCalendarsIterator.hasNext()) {
 				</c:if>
 
 				<portlet:namespace />calendarListPending,
-			].forEach(function(calendarList) {
+			].forEach(function (calendarList) {
 				calendarList.remove(calendarList.getCalendar(calendarId));
 				calendarList.remove(calendarList.getCalendar(defaultCalendarId));
 			});
@@ -892,7 +904,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		calendarContainer.createCalendarsAutoComplete(
 			'<%= calendarResourcesURL %>',
 			inviteResourcesInput,
-			function(event) {
+			function (event) {
 				var calendar = event.result.raw;
 
 				calendar.disabled = true;
@@ -903,7 +915,7 @@ while (manageableCalendarsIterator.hasNext()) {
 			}
 		);
 
-		var addToList = function(calendar) {
+		var addToList = function (calendar) {
 			if (
 				calendar.classNameId ==
 				<%= ClassNameLocalServiceUtil.getClassNameId(CalendarResource.class) %>
@@ -916,7 +928,7 @@ while (manageableCalendarsIterator.hasNext()) {
 					calendar.calendarId,
 					placeholderSchedulerEvent.get('startDate'),
 					placeholderSchedulerEvent.get('endDate'),
-					function(result) {
+					function (result) {
 						if (result) {
 							<portlet:namespace />calendarListDeclined.add(calendar);
 						}
@@ -960,7 +972,7 @@ while (manageableCalendarsIterator.hasNext()) {
 	A.one('#<portlet:namespace />endTime').set('maxLength', maxLength);
 	A.one('#<portlet:namespace />startTime').set('maxLength', maxLength);
 
-	allDayCheckbox.after('click', function() {
+	allDayCheckbox.after('click', function () {
 		var endDateContainer = A.one('#<portlet:namespace />endDateContainer');
 		var startDateContainer = A.one('#<portlet:namespace />startDateContainer');
 
@@ -1003,7 +1015,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		scheduler.syncEventsUI();
 	});
 
-	var updateTimePickersValues = function(
+	var updateTimePickersValues = function (
 		startTimeHours,
 		startTimeMinutes,
 		endTimeHours,

@@ -16,6 +16,7 @@ package com.liferay.document.library.sync.service.persistence.impl;
 
 import com.liferay.document.library.sync.exception.NoSuchEventException;
 import com.liferay.document.library.sync.model.DLSyncEvent;
+import com.liferay.document.library.sync.model.DLSyncEventTable;
 import com.liferay.document.library.sync.model.impl.DLSyncEventImpl;
 import com.liferay.document.library.sync.model.impl.DLSyncEventModelImpl;
 import com.liferay.document.library.sync.service.persistence.DLSyncEventPersistence;
@@ -776,16 +777,18 @@ public class DLSyncEventPersistenceImpl
 		"dlSyncEvent.typePK = ?";
 
 	public DLSyncEventPersistenceImpl() {
-		setModelClass(DLSyncEvent.class);
-
-		setModelImplClass(DLSyncEventImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DLSyncEvent.class);
+
+		setModelImplClass(DLSyncEventImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DLSyncEventTable.INSTANCE);
 	}
 
 	/**

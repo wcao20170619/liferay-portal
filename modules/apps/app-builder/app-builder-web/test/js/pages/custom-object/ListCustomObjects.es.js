@@ -16,27 +16,14 @@ import {waitForElementToBeRemoved} from '@testing-library/dom';
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 import {createMemoryHistory} from 'history';
 import React from 'react';
-import {HashRouter} from 'react-router-dom';
 
-import {AppContextProvider} from '../../../../src/main/resources/META-INF/resources/js/AppContext.es';
 import ListCustomObjects from '../../../../src/main/resources/META-INF/resources/js/pages/custom-object/ListCustomObjects.es';
 import * as time from '../../../../src/main/resources/META-INF/resources/js/utils/time.es';
 import * as toast from '../../../../src/main/resources/META-INF/resources/js/utils/toast.es';
+import AppContextProviderWrapper from '../../AppContextProviderWrapper.es';
 import {RESPONSES} from '../../constants.es';
 
-describe('ListCustomObject', () => {
-	const ListCustomObjectsWithRouter = ({history = createMemoryHistory()}) => (
-		<AppContextProvider value={{}}>
-			<div className="tools-control-group">
-				<div className="control-menu-level-1-heading" />
-			</div>
-
-			<HashRouter>
-				<ListCustomObjects history={history} />
-			</HashRouter>
-		</AppContextProvider>
-	);
-
+describe('ListCustomObjects', () => {
 	let spySuccessToast;
 	let spyFromNow;
 
@@ -63,7 +50,9 @@ describe('ListCustomObject', () => {
 	it('renders', async () => {
 		fetch.mockResponseOnce(JSON.stringify(RESPONSES.ONE_ITEM));
 
-		const {asFragment} = render(<ListCustomObjectsWithRouter />);
+		const {asFragment} = render(<ListCustomObjects />, {
+			wrapper: AppContextProviderWrapper,
+		});
 
 		await waitForElementToBeRemoved(() =>
 			document.querySelector('span.loading-animation')
@@ -77,9 +66,12 @@ describe('ListCustomObject', () => {
 			.mockResponseOnce(JSON.stringify(RESPONSES.NO_ITEMS))
 			.mockResponseOnce(JSON.stringify({}));
 
-		const {container, queryAllByRole, queryAllByText, queryByText} = render(
-			<ListCustomObjectsWithRouter />
-		);
+		const {
+			container,
+			queryAllByRole,
+			queryAllByText,
+			queryByText,
+		} = render(<ListCustomObjects />, {wrapper: AppContextProviderWrapper});
 
 		await waitForElementToBeRemoved(() =>
 			document.querySelector('span.loading-animation')
@@ -125,9 +117,9 @@ describe('ListCustomObject', () => {
 			.mockResponseOnce(JSON.stringify(RESPONSES.NO_ITEMS))
 			.mockResponseOnce(JSON.stringify({}));
 
-		const {container, queryAllByText} = render(
-			<ListCustomObjectsWithRouter />
-		);
+		const {container, queryAllByText} = render(<ListCustomObjects />, {
+			wrapper: AppContextProviderWrapper,
+		});
 
 		await waitForElementToBeRemoved(() =>
 			document.querySelector('span.loading-animation')
@@ -179,9 +171,9 @@ describe('ListCustomObject', () => {
 			.spyOn(window, 'confirm')
 			.mockImplementation(() => true);
 
-		const {container, queryByText} = render(
-			<ListCustomObjectsWithRouter />
-		);
+		const {container, queryByText} = render(<ListCustomObjects />, {
+			wrapper: AppContextProviderWrapper,
+		});
 
 		await waitForElementToBeRemoved(() =>
 			document.querySelector('span.loading-animation')
@@ -263,9 +255,9 @@ describe('ListCustomObject', () => {
 			.mockResponseOnce(JSON.stringify(permissionResponse))
 			.mockResponse(JSON.stringify({}));
 
-		const {queryAllByText, queryByText} = render(
-			<ListCustomObjectsWithRouter />
-		);
+		const {queryAllByText, queryByText} = render(<ListCustomObjects />, {
+			wrapper: AppContextProviderWrapper,
+		});
 
 		await waitForElementToBeRemoved(() =>
 			document.querySelector('span.loading-animation')
@@ -313,14 +305,16 @@ describe('ListCustomObject', () => {
 		expect(spySuccessToast.mock.calls.length).toBe(1);
 	});
 
-	it('renders with data and hit actions', async () => {
+	it('renders with data and click on actions', async () => {
 		fetch.mockResponseOnce(JSON.stringify(RESPONSES.ONE_ITEM));
 
 		const history = createMemoryHistory();
 
-		const {baseElement} = render(
-			<ListCustomObjectsWithRouter history={history} />
-		);
+		const {baseElement} = render(<ListCustomObjects />, {
+			wrapper: (props) => (
+				<AppContextProviderWrapper history={history} {...props} />
+			),
+		});
 
 		expect(history.length).toBe(1);
 		expect(history.location.pathname).toBe('/');

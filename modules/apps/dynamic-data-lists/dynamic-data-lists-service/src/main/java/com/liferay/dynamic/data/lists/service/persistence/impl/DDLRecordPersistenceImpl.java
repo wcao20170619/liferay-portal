@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.lists.service.persistence.impl;
 
 import com.liferay.dynamic.data.lists.exception.NoSuchRecordException;
 import com.liferay.dynamic.data.lists.model.DDLRecord;
+import com.liferay.dynamic.data.lists.model.DDLRecordTable;
 import com.liferay.dynamic.data.lists.model.impl.DDLRecordImpl;
 import com.liferay.dynamic.data.lists.model.impl.DDLRecordModelImpl;
 import com.liferay.dynamic.data.lists.service.persistence.DDLRecordPersistence;
@@ -4191,16 +4192,18 @@ public class DDLRecordPersistenceImpl
 		"ddlRecord.classPK = ?";
 
 	public DDLRecordPersistenceImpl() {
-		setModelClass(DDLRecord.class);
-
-		setModelImplClass(DDLRecordImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDLRecord.class);
+
+		setModelImplClass(DDLRecordImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDLRecordTable.INSTANCE);
 	}
 
 	/**

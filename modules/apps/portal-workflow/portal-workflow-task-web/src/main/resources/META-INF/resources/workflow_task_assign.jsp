@@ -44,7 +44,7 @@ boolean hasAssignableUsers = workflowTaskDisplayContext.hasAssignableUsers(workf
 						for (User assignableUser : workflowTaskDisplayContext.getAssignableUsers(workflowTask)) {
 						%>
 
-							<aui:option label="<%= HtmlUtil.escape(assignableUser.getFullName()) %>" selected="<%= workflowTask.getAssigneeUserId() == assignableUser.getUserId() %>" value="<%= String.valueOf(assignableUser.getUserId()) %>" />
+							<aui:option label="<%= HtmlUtil.escape(assignableUser.getScreenName()) + StringPool.SPACE + StringPool.OPEN_PARENTHESIS + HtmlUtil.escape(assignableUser.getFullName()) + StringPool.CLOSE_PARENTHESIS %>" selected="<%= workflowTask.getAssigneeUserId() == assignableUser.getUserId() %>" value="<%= String.valueOf(assignableUser.getUserId()) %>" />
 
 						<%
 						}
@@ -77,7 +77,7 @@ boolean hasAssignableUsers = workflowTaskDisplayContext.hasAssignableUsers(workf
 	var done = A.one('#<portlet:namespace />done');
 
 	if (done) {
-		done.on('click', function(event) {
+		done.on('click', function (event) {
 			var data = new FormData(
 				document.querySelector('#<portlet:namespace />assignFm')
 			);
@@ -85,7 +85,7 @@ boolean hasAssignableUsers = workflowTaskDisplayContext.hasAssignableUsers(workf
 			Liferay.Util.fetch('<%= assignURL.toString() %>', {
 				body: data,
 				method: 'POST',
-			}).then(function() {
+			}).then(function () {
 				Liferay.Util.getOpener().<portlet:namespace />refreshPortlet(
 					'<%= redirect.toString() %>'
 				);

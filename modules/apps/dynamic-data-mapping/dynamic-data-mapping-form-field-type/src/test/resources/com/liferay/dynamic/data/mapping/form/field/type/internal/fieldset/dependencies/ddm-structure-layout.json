@@ -1,0 +1,39 @@
+{
+	"pages": [
+		{
+			"rows": [
+				{
+					"columns": [
+						{
+							"fieldNames": [
+								"field1"
+							],
+							"size": 6
+						},
+						{
+							"fieldNames": [
+								"field2"
+							],
+							"size": 6
+						}
+					]
+				},
+				{
+					"columns": [
+						{
+							"fieldNames": [
+								"field3",
+								"field4",
+								"field5"
+							],
+							"size": 12
+						}
+					]
+				}
+			],
+			"title": {
+				"en_US": "Page 1"
+			}
+		}
+	]
+}

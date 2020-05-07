@@ -18,7 +18,7 @@ import {config} from '../config/index';
 
 const KEY_ENTER = 13;
 
-const defaultGetEditorWrapper = element => {
+const defaultGetEditorWrapper = (element) => {
 	const wrapper = document.createElement('div');
 
 	wrapper.innerHTML = element.innerHTML;
@@ -46,6 +46,7 @@ export default function getAlloyEditorProcessor(
 	let _editor;
 	let _eventHandlers;
 	let _element;
+	let _callbacks = {};
 
 	return {
 		createEditor: (
@@ -54,6 +55,9 @@ export default function getAlloyEditorProcessor(
 			destroyCallback,
 			clickPosition
 		) => {
+			_callbacks.changeCallback = changeCallback;
+			_callbacks.destroyCallback = destroyCallback;
+
 			if (_editor) {
 				return;
 			}
@@ -88,7 +92,7 @@ export default function getAlloyEditorProcessor(
 
 					itemSelectorDialog.open();
 
-					itemSelectorDialog.on('selectedItemChange', event => {
+					itemSelectorDialog.on('selectedItemChange', (event) => {
 						const selectedItem = event.selectedItem;
 
 						if (selectedItem) {
@@ -118,7 +122,7 @@ export default function getAlloyEditorProcessor(
 			const nativeEditor = _editor.get('nativeEditor');
 
 			_eventHandlers = [
-				nativeEditor.on('key', event => {
+				nativeEditor.on('key', (event) => {
 					if (
 						event.data.keyCode === KEY_ENTER &&
 						_element &&
@@ -128,21 +132,18 @@ export default function getAlloyEditorProcessor(
 					}
 				}),
 
-				nativeEditor.on(
-					'change',
-					debounce(() => {
-						changeCallback(nativeEditor.getData());
-					}, 500)
-				),
-
 				nativeEditor.on('blur', () => {
 					if (_editor._mainUI.state.hidden) {
-						changeCallback(nativeEditor.getData());
-
-						requestAnimationFrame(() => {
-							destroyCallback();
-						});
+						if (_callbacks.changeCallback) {
+							_callbacks.changeCallback(nativeEditor.getData());
+						}
 					}
+
+					requestAnimationFrame(() => {
+						if (_callbacks.destroyCallback) {
+							_callbacks.destroyCallback();
+						}
+					});
 				}),
 
 				nativeEditor.on('instanceReady', () => {
@@ -160,6 +161,35 @@ export default function getAlloyEditorProcessor(
 				_stopEventPropagation(element, 'keyup'),
 				_stopEventPropagation(element, 'keypress'),
 			];
+
+			if (config.undoEnabled) {
+				_eventHandlers.push(
+					nativeEditor.on(
+						'saveSnapshot',
+						debounce(() => {
+							if (_callbacks.changeCallback) {
+								_callbacks.changeCallback(
+									nativeEditor.getData()
+								);
+							}
+						}, 100)
+					)
+				);
+			}
+			else {
+				_eventHandlers.push(
+					nativeEditor.on(
+						'change',
+						debounce(() => {
+							if (_callbacks.changeCallback) {
+								_callbacks.changeCallback(
+									nativeEditor.getData()
+								);
+							}
+						}, 500)
+					)
+				);
+			}
 		},
 
 		/**
@@ -170,7 +200,7 @@ export default function getAlloyEditorProcessor(
 
 				_editor.destroy();
 
-				_eventHandlers.forEach(handler => {
+				_eventHandlers.forEach((handler) => {
 					handler.removeListener();
 				});
 
@@ -179,6 +209,7 @@ export default function getAlloyEditorProcessor(
 				_editor = null;
 				_eventHandlers = null;
 				_element = null;
+				_callbacks = {};
 			}
 		},
 
@@ -202,7 +233,7 @@ export default function getAlloyEditorProcessor(
  * @param {string} eventName
  */
 function _stopEventPropagation(element, eventName) {
-	const handler = event => event.stopPropagation();
+	const handler = (event) => event.stopPropagation();
 
 	element.addEventListener(eventName, handler);
 

@@ -1,0 +1,25 @@
+task runGradleTest
+
+allprojects {
+	repositories {
+		maven {
+			url "https://repository-cdn.liferay.com/nexus/content/groups/public"
+		}
+	}
+}
+
+runGradleTest {
+	dependsOn ":modules:foo-api:testLiferayTomcatVersion"
+
+	doLast {
+		String version = null
+
+		try {
+			version = project.property("app.server.tomcat.version")
+		}
+		catch (Exception exception) {
+		}
+
+		assert version == "9.0.31"
+	}
+}

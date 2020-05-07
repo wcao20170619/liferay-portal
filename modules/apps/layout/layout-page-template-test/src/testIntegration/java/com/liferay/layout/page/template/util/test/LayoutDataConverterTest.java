@@ -37,9 +37,13 @@ public class LayoutDataConverterTest {
 
 	@BeforeClass
 	public static void setUpClass() {
-		new FileUtil().setFile(new FileImpl());
+		FileUtil fileUtil = new FileUtil();
 
-		new JSONFactoryUtil().setJSONFactory(new JSONFactoryImpl());
+		fileUtil.setFile(new FileImpl());
+
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
+
+		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
 	}
 
 	@Test

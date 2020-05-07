@@ -14,6 +14,7 @@
 
 package com.liferay.dynamic.data.mapping.form.renderer.internal;
 
+import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluator;
 import com.liferay.dynamic.data.mapping.form.evaluator.DDMFormEvaluatorFieldContextKey;
 import com.liferay.dynamic.data.mapping.form.field.type.BaseDDMFormFieldRenderer;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldRenderer;
@@ -23,6 +24,8 @@ import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
@@ -51,6 +54,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 /**
@@ -111,8 +115,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues, true,
-				getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, true, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -173,8 +177,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues,
-				false, getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, false, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -244,8 +248,8 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			createDDMFormFieldTemplateContextFactory(
-				ddmForm, ddmFormFieldsPropertyChanges, ddmFormFieldValues,
-				false, getTextDDMFormFieldRenderer(),
+				ddmForm, ddmFormField.getName(), ddmFormFieldsPropertyChanges,
+				ddmFormFieldValues, false, getTextDDMFormFieldRenderer(),
 				getTextDDMFormFieldTemplateContextContributor());
 
 		List<Object> fields = ddmFormFieldTemplateContextFactory.create();
@@ -287,7 +291,7 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 	protected DDMFormFieldTemplateContextFactory
 		createDDMFormFieldTemplateContextFactory(
-			DDMForm ddmForm,
+			DDMForm ddmForm, String ddmFormFieldName,
 			Map<DDMFormEvaluatorFieldContextKey, Map<String, Object>>
 				ddmFormFieldsPropertyChanges,
 			List<DDMFormFieldValue> ddmFormFieldValues, boolean ddmFormReadOnly,
@@ -305,8 +309,11 @@ public class DDMFormFieldTemplateContextFactoryTest {
 
 		DDMFormFieldTemplateContextFactory ddmFormFieldTemplateContextFactory =
 			new DDMFormFieldTemplateContextFactory(
+				_ddmFormEvaluator, ddmFormFieldName,
 				ddmForm.getDDMFormFieldsMap(true), ddmFormFieldsPropertyChanges,
-				ddmFormFieldValues, ddmFormRenderingContext, true);
+				ddmFormFieldValues, ddmFormRenderingContext,
+				_ddmStructureLayoutLocalService, _ddmStructureLocalService,
+				true);
 
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker =
 			mockDDMFormFieldTypeServicesTracker(
@@ -424,6 +431,15 @@ public class DDMFormFieldTemplateContextFactoryTest {
 	private static final Locale _LOCALE = LocaleUtil.US;
 
 	private static final String _PORTLET_NAMESPACE = "_PORTLET_NAMESPACE_";
+
+	@Mock
+	private DDMFormEvaluator _ddmFormEvaluator;
+
+	@Mock
+	private DDMStructureLayoutLocalService _ddmStructureLayoutLocalService;
+
+	@Mock
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	private HttpServletRequest _httpServletRequest;
 

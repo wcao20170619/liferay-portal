@@ -16,6 +16,7 @@ package com.liferay.mobile.device.rules.service.persistence.impl;
 
 import com.liferay.mobile.device.rules.exception.NoSuchRuleGroupInstanceException;
 import com.liferay.mobile.device.rules.model.MDRRuleGroupInstance;
+import com.liferay.mobile.device.rules.model.MDRRuleGroupInstanceTable;
 import com.liferay.mobile.device.rules.model.impl.MDRRuleGroupInstanceImpl;
 import com.liferay.mobile.device.rules.model.impl.MDRRuleGroupInstanceModelImpl;
 import com.liferay.mobile.device.rules.service.persistence.MDRRuleGroupInstancePersistence;
@@ -4719,16 +4720,18 @@ public class MDRRuleGroupInstancePersistenceImpl
 		"mdrRuleGroupInstance.ruleGroupId = ?";
 
 	public MDRRuleGroupInstancePersistenceImpl() {
-		setModelClass(MDRRuleGroupInstance.class);
-
-		setModelImplClass(MDRRuleGroupInstanceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MDRRuleGroupInstance.class);
+
+		setModelImplClass(MDRRuleGroupInstanceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MDRRuleGroupInstanceTable.INSTANCE);
 	}
 
 	/**

@@ -43,7 +43,7 @@ OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManageme
 
 <portlet:actionURL name="/admin/revoke_oauth2_authorizations" var="revokeOAuth2AuthorizationsURL">
 	<portlet:param name="mvcRenderCommandName" value="/admin/view_oauth2_authorizations" />
-	<portlet:param name="appTab" value="application_authorizations" />
+	<portlet:param name="navigation" value="application_authorizations" />
 	<portlet:param name="backURL" value="<%= redirect %>" />
 	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
 </portlet:actionURL>

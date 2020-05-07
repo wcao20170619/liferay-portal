@@ -17,7 +17,6 @@ package com.liferay.portal.workflow.metrics.internal.search.index;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.workflow.metrics.search.index.TransitionWorkflowMetricsIndexer;
-import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
 
 import java.util.Date;
 
@@ -27,13 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(
-	immediate = true,
-	property = "workflow.metrics.index.entity.name=transition",
-	service = {
-		TransitionWorkflowMetricsIndexer.class, WorkflowMetricsIndex.class
-	}
-)
+@Component(immediate = true, service = TransitionWorkflowMetricsIndexer.class)
 public class TransitionWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer
 	implements TransitionWorkflowMetricsIndexer {
@@ -54,11 +47,11 @@ public class TransitionWorkflowMetricsIndexerImpl
 		documentBuilder.setLong(
 			"companyId", companyId
 		).setDate(
-			"createDate", formatDate(createDate)
+			"createDate", getDate(createDate)
 		).setValue(
 			"deleted", false
 		).setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setString(
 			"name", name
 		).setLong(
@@ -106,17 +99,15 @@ public class TransitionWorkflowMetricsIndexerImpl
 
 	@Override
 	public String getIndexName(long companyId) {
-		return _transitionWorkflowMetricsIndexNameBuilder.getIndexName(
-			companyId);
+		return _transitionWorkflowMetricsIndex.getIndexName(companyId);
 	}
 
 	@Override
 	public String getIndexType() {
-		return "WorkflowMetricsTransitionType";
+		return _transitionWorkflowMetricsIndex.getIndexType();
 	}
 
 	@Reference(target = "(workflow.metrics.index.entity.name=transition)")
-	private WorkflowMetricsIndexNameBuilder
-		_transitionWorkflowMetricsIndexNameBuilder;
+	private WorkflowMetricsIndex _transitionWorkflowMetricsIndex;
 
 }

@@ -43,7 +43,7 @@ export const EditEntry = ({
 		const {pages} = ddmForm;
 		const visitor = new PagesVisitor(pages);
 
-		ddmForm.validate().then(validForm => {
+		ddmForm.validate().then((validForm) => {
 			if (!validForm) {
 				return;
 			}
@@ -52,18 +52,33 @@ export const EditEntry = ({
 				dataRecordValues: {},
 			};
 
-			visitor.mapFields(({fieldName, localizable, value}) => {
+			const languageId = themeDisplay.getLanguageId();
+
+			visitor.mapFields(({fieldName, localizable, repeatable, value}) => {
 				if (localizable) {
-					dataRecord.dataRecordValues[fieldName] = {
-						[themeDisplay.getLanguageId()]: value,
-					};
+					if (!dataRecord.dataRecordValues[fieldName]) {
+						dataRecord.dataRecordValues[fieldName] = {
+							[languageId]: [],
+						};
+					}
+
+					if (repeatable) {
+						dataRecord.dataRecordValues[fieldName][languageId].push(
+							value
+						);
+					}
+					else {
+						dataRecord.dataRecordValues[fieldName] = {
+							[languageId]: value,
+						};
+					}
 				}
 				else {
 					dataRecord.dataRecordValues[fieldName] = value;
 				}
 			});
 
-			const openSuccessToast = isNew => {
+			const openSuccessToast = (isNew) => {
 				const message = isNew
 					? Liferay.Language.get('an-entry-was-added')
 					: Liferay.Language.get('an-entry-was-updated');

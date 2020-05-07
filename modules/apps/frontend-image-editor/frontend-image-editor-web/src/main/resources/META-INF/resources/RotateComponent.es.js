@@ -24,6 +24,7 @@ import './RotateControls.soy';
  * Creates a Rotate component.
  */
 class RotateComponent extends Component {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -80,7 +81,7 @@ class RotateComponent extends Component {
 	 * rotated.
 	 */
 	rotate_(imageData, rotationAngle) {
-		const cancellablePromise = new Promise(resolve => {
+		const cancellablePromise = new Promise((resolve) => {
 			const imageWidth = imageData.width;
 			const imageHeight = imageData.height;
 
@@ -146,6 +147,7 @@ class RotateComponent extends Component {
  * @type {!Object}
  */
 RotateComponent.STATE = {
+
 	/**
 	 * Path of this module.
 	 *

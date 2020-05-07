@@ -1,0 +1,567 @@
+@component-name = "portal-document-management"
+definition {
+
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property custom.properties = "default.layout.template.id=1_column";
+	property testray.main.component.name = "Online Editing";
+	var pageName = "Documents and Media Page";
+	var portletName = "Documents and Media";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		SystemSettings.openSystemSettingsAdmin();
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Documents and Media",
+			configurationName = "Google Drive",
+			configurationScope = "Virtual Instance Scope");
+
+		var googleClientID = PropsUtil.get("google.client.id.2");
+
+		Type(
+			key_text = "clientId",
+			locator1 = "TextArea#ANY",
+			value1 = "${googleClientID}");
+
+		var googleClientSecret = PropsUtil.get("google.client.secret.2");
+
+		Type(
+			key_text = "clientSecret",
+			locator1 = "TextArea#ANY",
+			value1 = "${googleClientSecret}");
+
+		ScrollWebElementIntoView(locator1 = "Button#SAVE");
+
+		AssertClick(
+			locator1 = "Button#SAVE",
+			value1 = "Save");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+	}
+
+	@description = "This test ensures that a Google Doc is autotagged once checked in."
+	@priority = "4"
+	test AutoTagGoogleDoc {
+		property test.name.skip.portal.instance = "GoogleDrive#AutoTagGoogleDoc";
+
+		AutoTagging.enableOpenNLP(
+			assetType = "Document",
+			confidenceThreshold = "0.001");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.addContent(
+			googleDocContent = "Alice",
+			insertLink = "true",
+			linkAddress = "https://www.adobe.com/be_en/active-use/pdf/Alice_in_Wonderland.pdf",
+			linkText = "Alice's Adventures in Wonderland.docx");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.viewPG(dmDocumentTitle = "Untitled");
+
+		AutoTagging.assertAutoTagPresent(tagName = "adventures");
+
+		AutoTagging.assertAutoTagPresent(tagName = "alice");
+	}
+
+	@description = "This test ensures no document is generated if a user cancels creating a Google Doc."
+	@priority = "5"
+	test CancelGoogleDocCreation {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleDocCreation";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.discardChanges();
+
+		AssertElementPresent(locator1 = "Message#EMPTY_INFO");
+	}
+
+	@description = "This test ensures the title of a document is not changed if a user cancels editing a Google Doc."
+	@priority = "5"
+	test CancelGoogleDocEdit {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleDocEdit";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Docs");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "This title should not be saved");
+
+		GoogleDoc.discardChanges();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Untitled",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Untitled");
+	}
+
+	@description = "This test ensures no document is generated if a user cancels creating a Google Doc."
+	@priority = "5"
+	test CancelGoogleSheetCreation {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleSheetCreation";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Sheet");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.discardChanges();
+
+		AssertElementPresent(locator1 = "Message#EMPTY_INFO");
+	}
+
+	@description = "This test ensures the title of a document is not changed if a user cancels editing a Google Sheet."
+	@priority = "5"
+	test CancelGoogleSheetEdit {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleSheetEdit";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Sheet");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Sheets");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "This title should not be saved");
+
+		GoogleDoc.discardChanges();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Untitled",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Untitled");
+	}
+
+	@description = "This test ensures no document is generated if a user cancels creating a Google Doc."
+	@priority = "5"
+	test CancelGoogleSlideCreation {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleSlideCreation";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Slide");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.discardChanges();
+
+		AssertElementPresent(locator1 = "Message#EMPTY_INFO");
+	}
+
+	@description = "This test ensures the title of a document is not changed if a user cancels editing a Google Slide."
+	@priority = "5"
+	test CancelGoogleSlideEdit {
+		property test.name.skip.portal.instance = "GoogleDrive#CancelGoogleSlideEdit";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Slide");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Slides");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "This title should not be saved");
+
+		GoogleDoc.discardChanges();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Untitled",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Untitled");
+	}
+
+	@description = "This test ensures a Google Doc title can be changed through the editor"
+	@priority = "4"
+	test EditGoogleDoc {
+		property test.name.skip.portal.instance = "GoogleDrive#EditGoogleDoc";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Docs");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "Edited Google Document");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Edited Google Document",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Edited Google Document");
+	}
+
+	@description = "This test ensures that special characters  can be saved through the Google Doc editor"
+	@priority = "4"
+	test EditGoogleDocWithSpecialCharacters {
+		property test.name.skip.portal.instance = "GoogleDrive#EditGoogleDocWithSpecialCharacters";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Docs");
+
+		var dmDocumentTitle = '''Special Characters Title 12345`~!@#$%^&*(){}[],.<>/?|''';
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "${dmDocumentTitle}");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		var dmDocumentTitle = '''Special Characters Title 12345`~!@#$%_&_(){}[],.__/__''';
+
+		AssertTextEquals(
+			key_dmDocumentTitle = '''Special Characters Title 12345`~!@#$%_&amp;_(){}[],.__/__''',
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}");
+	}
+
+	@description = "This test ensures a Google Sheet title can be changed through the editor"
+	@priority = "4"
+	test EditGoogleSheet {
+		property test.name.skip.portal.instance = "GoogleDrive#EditGoogleSheet";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Sheet");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Sheets");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "Edited Google Sheet");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Edited Google Sheet",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Edited Google Sheet");
+	}
+
+	@description = "This test ensures a Google Slide title can be changed through the editor"
+	@priority = "4"
+	test EditGoogleSlide {
+		property test.name.skip.portal.instance = "GoogleDrive#EditGoogleSlide";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Slide");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		GoogleDoc.gotoEdit(
+			dmDocumentTitle = "Untitled",
+			dmDocumentTypeName = "Google Slides");
+
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "Edited Google Slide");
+
+		GoogleDoc.saveAndExit();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		AssertTextEquals(
+			key_dmDocumentTitle = "Edited Google Slide",
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "Edited Google Slide");
+	}
+
+	@description = "This test ensures that a document is checked out when the Google Doc editor is being used"
+	@priority = "5"
+	test GoogleDocSmoke {
+		property test.name.skip.portal.instance = "GoogleDrive#GoogleDocSmoke";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.viewCheckedoutPG(
+			dmDocumentTitle = "Untitled",
+			status = "Draft");
+	}
+
+	@description = "This test ensures that a document is checked out when the Google Sheet editor is being used"
+	@priority = "5"
+	test GoogleSheetSmoke {
+		property test.name.skip.portal.instance = "GoogleDrive#GoogleSheetSmoke";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Sheet");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.viewCheckedoutPG(
+			dmDocumentTitle = "Untitled",
+			status = "Draft");
+	}
+
+	@description = "This test ensures that a document is checked out when the Google Slide editor is being used"
+	@priority = "5"
+	test GoogleSlideSmoke {
+		property test.name.skip.portal.instance = "GoogleDrive#GoogleSlideSmoke";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Slide");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		Navigator.openURL();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.viewCheckedoutPG(
+			dmDocumentTitle = "Untitled",
+			status = "Draft");
+	}
+
+	@description = "This test covers LPS-93897. It ensures that previously entered Google credentials can be cleared."
+	@priority = "5"
+	test RevokeGoogleDriveCredentials {
+		property test.name.skip.portal.instance = "GoogleDrive#RevokeGoogleDriveCredential";
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.saveAndExit();
+
+		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
+
+		UserNavigator.gotoGeneral();
+
+		Navigator.gotoNavNested(navNested = "Apps");
+
+		Click(
+			key_text = "Revoke",
+			locator1 = "Button#ANY");
+
+		Alert.viewSuccessMessage();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Sheet");
+
+		task ("Assert the request for credentials to be reentered") {
+			Google.signIn(
+				userEmailAddress = PropsUtil.get("email.address.3"),
+				userPassword = PropsUtil.get("email.password.3"),
+				windowTitle = "Documents and Media Page - Liferay");
+
+			GoogleDoc.saveAndExit();
+		}
+	}
+
+	@description = "This test covers LPS-91174. It ensures that a user cannot save a Google Doc in Portal after logging out."
+	@priority = "5"
+	test SaveGoogleDocAfterLoggingOut {
+		property test.name.skip.portal.instance = "GoogleDrive#SaveGoogleDocAfterLoggingOut";
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMNavigator.gotoAddDocumentTypePG(dmDocumentTypeName = "Google Doc");
+
+		Google.signIn(
+			userEmailAddress = PropsUtil.get("email.address.3"),
+			userPassword = PropsUtil.get("email.password.3"),
+			windowTitle = "Documents and Media Page - Liferay");
+
+		GoogleDoc.addContent(
+			googleDocContent = "Liferay",
+			insertLink = "true",
+			linkAddress = "http://localhost:8080/web/guest",
+			linkText = "Liferay");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#GOOGLE_DOC");
+
+		Click(
+			key_googleDocContent = "Liferay",
+			locator1 = "GoogleDoc#INSERT_LINK_DOCUMENT_CONTENT");
+
+		SelectWindow(locator1 = "title=Home - ${siteName}");
+
+		UserBar.signOut();
+
+		Close.closeWindow(locator1 = "title=Home - ${siteName}");
+
+		GoogleDoc.saveAndExit();
+
+		Pause(locator1 = "3000");
+
+		AssertElementPresent(locator1 = "UserBar#USER_SIGN_IN");
+
+		AssertConsoleTextNotPresent(value1 = "javax.portlet.PortletException:");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			DMDocument.tearDownCP();
+
+			DMFolder.tearDownCP();
+
+			DMDocumentType.tearDownCP();
+
+			Page.tearDownCP();
+		}
+	}
+
+}

@@ -14,6 +14,8 @@
 
 package com.liferay.depot.web.internal.display.context;
 
+import com.liferay.depot.constants.DepotRolesConstants;
+import com.liferay.depot.model.DepotEntry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -25,10 +27,15 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroupRole;
 import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.membershippolicy.SiteMembershipPolicyUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil;
+import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
+import com.liferay.portal.kernel.service.permission.OrganizationPermissionUtil;
+import com.liferay.portal.kernel.service.permission.RolePermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -38,19 +45,23 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.rolesadmin.search.RoleSearch;
 import com.liferay.portlet.rolesadmin.search.RoleSearchTerms;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
 import com.liferay.portlet.usersadmin.search.GroupSearchTerms;
 import com.liferay.roles.admin.kernel.util.RolesAdminUtil;
-import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -73,10 +84,44 @@ public class DepotAdminSelectRoleDisplayContext {
 		int step = ParamUtil.getInteger(renderRequest, "step", Step1.TYPE);
 
 		if (step == Step2.TYPE) {
-			_step = new Step2(renderRequest, renderResponse, _user);
+			_step = new Step2(null, renderRequest, renderResponse, _user);
 		}
 		else {
-			_step = new Step1(renderRequest, renderResponse, _user);
+			String keywords = ParamUtil.getString(renderRequest, "keywords");
+
+			if (Validator.isNotNull(keywords)) {
+				_step = new Step1(renderRequest, renderResponse, _user);
+			}
+			else {
+				long[] classNameIds = {
+					PortalUtil.getClassNameId(DepotEntry.class.getName())
+				};
+
+				LinkedHashMap<String, Object> groupParams =
+					LinkedHashMapBuilder.<String, Object>put(
+						"inherit", Boolean.FALSE
+					).put(
+						"types",
+						Collections.singletonList(GroupConstants.TYPE_DEPOT)
+					).put(
+						"usersGroups", _user.getUserId()
+					).build();
+
+				int searchCount = GroupServiceUtil.searchCount(
+					_user.getCompanyId(), classNameIds, keywords, groupParams);
+
+				if (searchCount == 1) {
+					List<Group> groups = GroupServiceUtil.search(
+						_user.getCompanyId(), classNameIds, keywords,
+						groupParams, 0, 1, null);
+
+					_step = new Step2(
+						groups.get(0), renderRequest, renderResponse, _user);
+				}
+				else {
+					_step = new Step1(renderRequest, renderResponse, _user);
+				}
+			}
 		}
 	}
 
@@ -206,15 +251,20 @@ public class DepotAdminSelectRoleDisplayContext {
 		public static final int TYPE = 2;
 
 		public Step2(
-				RenderRequest renderRequest, RenderResponse renderResponse,
-				User user)
+				Group group, RenderRequest renderRequest,
+				RenderResponse renderResponse, User user)
 			throws PortalException {
 
 			_renderRequest = renderRequest;
 			_renderResponse = renderResponse;
 			_user = user;
 
-			_group = _getGroup(renderRequest);
+			if (group == null) {
+				_group = _getGroup(renderRequest);
+			}
+			else {
+				_group = group;
+			}
 
 			_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -274,9 +324,7 @@ public class DepotAdminSelectRoleDisplayContext {
 				QueryUtil.ALL_POS, roleSearch.getOrderByComparator());
 
 			if (_group != null) {
-				roles = UsersAdminUtil.filterGroupRoles(
-					_themeDisplay.getPermissionChecker(), _group.getGroupId(),
-					roles);
+				roles = _filterGroupRoles(roles);
 			}
 
 			int rolesCount = roles.size();
@@ -340,6 +388,56 @@ public class DepotAdminSelectRoleDisplayContext {
 			}
 
 			return false;
+		}
+
+		private List<Role> _filterGroupRoles(List<Role> roles)
+			throws PortalException {
+
+			PermissionChecker permissionChecker =
+				_themeDisplay.getPermissionChecker();
+
+			if (permissionChecker.isCompanyAdmin() ||
+				permissionChecker.isGroupOwner(_group.getGroupId())) {
+
+				Stream<Role> stream = roles.stream();
+
+				return stream.filter(
+					role -> !Objects.equals(
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_MEMBER)
+				).collect(
+					Collectors.toList()
+				);
+			}
+
+			if (!GroupPermissionUtil.contains(
+					permissionChecker, _group, ActionKeys.ASSIGN_USER_ROLES) &&
+				!OrganizationPermissionUtil.contains(
+					permissionChecker, _group.getOrganizationId(),
+					ActionKeys.ASSIGN_USER_ROLES)) {
+
+				return Collections.emptyList();
+			}
+
+			Stream<Role> stream = roles.stream();
+
+			return stream.filter(
+				role ->
+					!Objects.equals(
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_MEMBER) &&
+					!Objects.equals(
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_ADMINISTRATOR) &&
+					!Objects.equals(
+						role.getName(),
+						DepotRolesConstants.ASSET_LIBRARY_OWNER) &&
+					RolePermissionUtil.contains(
+						permissionChecker, _group.getGroupId(),
+						role.getRoleId(), ActionKeys.ASSIGN_MEMBERS)
+			).collect(
+				Collectors.toList()
+			);
 		}
 
 		private Group _getGroup(RenderRequest renderRequest)

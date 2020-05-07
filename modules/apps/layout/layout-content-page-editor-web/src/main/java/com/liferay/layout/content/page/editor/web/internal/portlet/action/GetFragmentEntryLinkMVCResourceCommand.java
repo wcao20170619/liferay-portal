@@ -19,6 +19,10 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.info.constants.InfoDisplayWebKeys;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -29,6 +33,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ResourceRequest;
@@ -86,20 +91,63 @@ public class GetFragmentEntryLinkMVCResourceCommand
 			defaultFragmentRendererContext.setSegmentsExperienceIds(
 				new long[] {segmentsExperienceId});
 
+			String collectionItemClassName = ParamUtil.getString(
+				resourceRequest, "collectionItemClassName");
+			long collectionItemClassPK = ParamUtil.getLong(
+				resourceRequest, "collectionItemClassPK");
+
 			HttpServletRequest httpServletRequest =
 				_portal.getHttpServletRequest(resourceRequest);
 
-			String content = _fragmentRendererController.render(
-				defaultFragmentRendererContext, httpServletRequest,
-				_portal.getHttpServletResponse(resourceResponse));
+			InfoDisplayContributor currentInfoDisplayContributor =
+				(InfoDisplayContributor)httpServletRequest.getAttribute(
+					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR);
 
-			jsonObject.put(
-				"content", content
-			).put(
-				"editableValues",
-				JSONFactoryUtil.createJSONObject(
-					fragmentEntryLink.getEditableValues())
-			);
+			if (Validator.isNotNull(collectionItemClassName) &&
+				(collectionItemClassPK > 0)) {
+
+				InfoDisplayContributor infoDisplayContributor =
+					_infoDisplayContributorTracker.getInfoDisplayContributor(
+						collectionItemClassName);
+
+				if (infoDisplayContributor != null) {
+					InfoDisplayObjectProvider infoDisplayObjectProvider =
+						infoDisplayContributor.getInfoDisplayObjectProvider(
+							collectionItemClassPK);
+
+					defaultFragmentRendererContext.setDisplayObject(
+						infoDisplayObjectProvider.getDisplayObject());
+
+					httpServletRequest.setAttribute(
+						InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
+						infoDisplayContributor);
+					httpServletRequest.setAttribute(
+						InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT,
+						infoDisplayObjectProvider.getDisplayObject());
+				}
+			}
+
+			try {
+				String content = _fragmentRendererController.render(
+					defaultFragmentRendererContext, httpServletRequest,
+					_portal.getHttpServletResponse(resourceResponse));
+
+				jsonObject.put(
+					"content", content
+				).put(
+					"editableValues",
+					JSONFactoryUtil.createJSONObject(
+						fragmentEntryLink.getEditableValues())
+				);
+			}
+			finally {
+				httpServletRequest.removeAttribute(
+					InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT);
+
+				httpServletRequest.setAttribute(
+					InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR,
+					currentInfoDisplayContributor);
+			}
 
 			if (SessionErrors.contains(
 					httpServletRequest, "fragmentEntryContentInvalid")) {
@@ -119,6 +167,9 @@ public class GetFragmentEntryLinkMVCResourceCommand
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;
+
+	@Reference
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference
 	private Portal _portal;

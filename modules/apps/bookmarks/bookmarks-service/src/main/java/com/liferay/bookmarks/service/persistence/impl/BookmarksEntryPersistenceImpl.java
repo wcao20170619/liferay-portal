@@ -16,6 +16,7 @@ package com.liferay.bookmarks.service.persistence.impl;
 
 import com.liferay.bookmarks.exception.NoSuchEntryException;
 import com.liferay.bookmarks.model.BookmarksEntry;
+import com.liferay.bookmarks.model.BookmarksEntryTable;
 import com.liferay.bookmarks.model.impl.BookmarksEntryImpl;
 import com.liferay.bookmarks.model.impl.BookmarksEntryModelImpl;
 import com.liferay.bookmarks.service.persistence.BookmarksEntryPersistence;
@@ -12563,16 +12564,18 @@ public class BookmarksEntryPersistenceImpl
 		"bookmarksEntry.status = ?";
 
 	public BookmarksEntryPersistenceImpl() {
-		setModelClass(BookmarksEntry.class);
-
-		setModelImplClass(BookmarksEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(BookmarksEntry.class);
+
+		setModelImplClass(BookmarksEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(BookmarksEntryTable.INSTANCE);
 	}
 
 	/**

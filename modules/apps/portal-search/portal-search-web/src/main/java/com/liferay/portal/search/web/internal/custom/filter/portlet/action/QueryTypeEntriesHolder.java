@@ -24,6 +24,7 @@ public class QueryTypeEntriesHolder {
 
 	public QueryTypeEntriesHolder() {
 		add("bool", "Bool");
+		add("date_range", "Date Range");
 		add("exists", "Exists");
 		add("fuzzy", "Fuzzy");
 		add("match", "Match");
@@ -32,6 +33,7 @@ public class QueryTypeEntriesHolder {
 		add("multi_match", "Multi Match");
 		add("prefix", "Prefix");
 		add("query_string", "Query String");
+		add("range", "Range");
 		add("regexp", "Regexp");
 		add("script", "Script");
 		add("simple_query_string", "Simple Query String");

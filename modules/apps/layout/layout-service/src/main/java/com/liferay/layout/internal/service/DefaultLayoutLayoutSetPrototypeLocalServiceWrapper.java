@@ -15,7 +15,7 @@
 package com.liferay.layout.internal.service;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributorRegistration;
-import com.liferay.layout.internal.util.DefaultLayoutDefinitionImporter;
+import com.liferay.layout.internal.importer.DefaultLayoutDefinitionImporter;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;

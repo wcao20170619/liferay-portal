@@ -78,6 +78,12 @@ public class RedirectEntryLocalServiceUtil {
 		return getService().addRedirectEntry(redirectEntry);
 	}
 
+	public static boolean checkRedirectionChain(
+		long groupId, String destinationURL) {
+
+		return getService().checkRedirectionChain(groupId, destinationURL);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -135,6 +141,12 @@ public class RedirectEntryLocalServiceUtil {
 		com.liferay.redirect.model.RedirectEntry redirectEntry) {
 
 		return getService().deleteRedirectEntry(redirectEntry);
+	}
+
+	public static <T> T dslQuery(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return getService().dslQuery(dslQuery);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
@@ -318,6 +330,14 @@ public class RedirectEntryLocalServiceUtil {
 				<com.liferay.redirect.model.RedirectEntry> obc) {
 
 		return getService().getRedirectEntries(groupId, start, end, obc);
+	}
+
+	public static java.util.List<com.liferay.redirect.model.RedirectEntry>
+		getRedirectEntriesByGroupIdAndDestinationURL(
+			long groupId, String destinationURL) {
+
+		return getService().getRedirectEntriesByGroupIdAndDestinationURL(
+			groupId, destinationURL);
 	}
 
 	/**

@@ -15,6 +15,7 @@
 package com.liferay.headless.delivery.client.serdes.v1_0;
 
 import com.liferay.headless.delivery.client.dto.v1_0.PageWidgetInstanceDefinition;
+import com.liferay.headless.delivery.client.dto.v1_0.WidgetPermission;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -79,6 +81,34 @@ public class PageWidgetInstanceDefinitionSerDes {
 			sb.append(_toJSON(pageWidgetInstanceDefinition.getWidgetConfig()));
 		}
 
+		if (pageWidgetInstanceDefinition.getWidgetPermissions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"widgetPermissions\": ");
+
+			sb.append("[");
+
+			for (int i = 0;
+				 i < pageWidgetInstanceDefinition.getWidgetPermissions().length;
+				 i++) {
+
+				sb.append(
+					String.valueOf(
+						pageWidgetInstanceDefinition.getWidgetPermissions()
+							[i]));
+
+				if ((i + 1) < pageWidgetInstanceDefinition.
+						getWidgetPermissions().length) {
+
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -119,6 +149,16 @@ public class PageWidgetInstanceDefinitionSerDes {
 				String.valueOf(pageWidgetInstanceDefinition.getWidgetConfig()));
 		}
 
+		if (pageWidgetInstanceDefinition.getWidgetPermissions() == null) {
+			map.put("widgetPermissions", null);
+		}
+		else {
+			map.put(
+				"widgetPermissions",
+				String.valueOf(
+					pageWidgetInstanceDefinition.getWidgetPermissions()));
+		}
+
 		return map;
 	}
 
@@ -151,6 +191,19 @@ public class PageWidgetInstanceDefinitionSerDes {
 					pageWidgetInstanceDefinition.setWidgetConfig(
 						(Map)PageWidgetInstanceDefinitionSerDes.toMap(
 							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "widgetPermissions")) {
+				if (jsonParserFieldValue != null) {
+					pageWidgetInstanceDefinition.setWidgetPermissions(
+						Stream.of(
+							toStrings((Object[])jsonParserFieldValue)
+						).map(
+							object -> WidgetPermissionSerDes.toDTO(
+								(String)object)
+						).toArray(
+							size -> new WidgetPermission[size]
+						));
 				}
 			}
 			else {

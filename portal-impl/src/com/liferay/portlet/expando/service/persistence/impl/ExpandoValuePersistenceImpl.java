@@ -16,6 +16,7 @@ package com.liferay.portlet.expando.service.persistence.impl;
 
 import com.liferay.expando.kernel.exception.NoSuchValueException;
 import com.liferay.expando.kernel.model.ExpandoValue;
+import com.liferay.expando.kernel.model.ExpandoValueTable;
 import com.liferay.expando.kernel.service.persistence.ExpandoValuePersistence;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -4853,18 +4854,20 @@ public class ExpandoValuePersistenceImpl
 		"(expandoValue.data IS NULL OR CAST_CLOB_TEXT(expandoValue.data) = '')";
 
 	public ExpandoValuePersistenceImpl() {
-		setModelClass(ExpandoValue.class);
-
-		setModelImplClass(ExpandoValueImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(ExpandoValueModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("rowId", "rowId_");
 		dbColumnNames.put("data", "data_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(ExpandoValue.class);
+
+		setModelImplClass(ExpandoValueImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(ExpandoValueModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(ExpandoValueTable.INSTANCE);
 	}
 
 	/**

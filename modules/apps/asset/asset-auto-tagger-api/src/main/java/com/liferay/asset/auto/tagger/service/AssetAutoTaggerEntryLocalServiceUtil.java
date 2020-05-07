@@ -60,6 +60,15 @@ public class AssetAutoTaggerEntryLocalServiceUtil {
 		return getService().addAssetAutoTaggerEntry(assetEntry, assetTag);
 	}
 
+	public static com.liferay.asset.auto.tagger.model.AssetAutoTaggerEntry
+			addAssetAutoTaggerEntry(
+				com.liferay.asset.kernel.model.AssetEntry assetEntry,
+				String assetTagName)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addAssetAutoTaggerEntry(assetEntry, assetTagName);
+	}
+
 	/**
 	 * Creates a new asset auto tagger entry with the primary key. Does not add the asset auto tagger entry to the database.
 	 *
@@ -119,6 +128,12 @@ public class AssetAutoTaggerEntryLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static <T> T dslQuery(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return getService().dslQuery(dslQuery);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery

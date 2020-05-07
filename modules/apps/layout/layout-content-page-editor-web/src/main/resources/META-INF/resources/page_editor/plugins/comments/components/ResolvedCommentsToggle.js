@@ -13,7 +13,7 @@
  */
 
 import {ClayCheckbox} from '@clayui/form';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import toggleShowResolvedComments from '../../../app/actions/toggleShowResolvedComments';
 import {useDispatch, useSelector} from '../../../app/store/index';
@@ -22,16 +22,26 @@ export default function ResolvedCommentsToggle() {
 	const dispatch = useDispatch();
 
 	const showResolvedComments = useSelector(
-		state => !!state.showResolvedComments
+		(state) => !!state.showResolvedComments
 	);
 
-	const hasResolvedComments = useSelector(state =>
+	const hasResolvedComments = useSelector((state) =>
 		Object.values(state.fragmentEntryLinks || {}).some(
-			fragmentEntryLink =>
+			(fragmentEntryLink) =>
 				fragmentEntryLink.comments &&
-				fragmentEntryLink.comments.some(comment => comment.resolved)
+				fragmentEntryLink.comments.some((comment) => comment.resolved)
 		)
 	);
+
+	useEffect(() => {
+		if (!hasResolvedComments) {
+			dispatch(
+				toggleShowResolvedComments({
+					showResolvedComments: false,
+				})
+			);
+		}
+	}, [dispatch, hasResolvedComments]);
 
 	return (
 		<div className="pb-3 px-3">
@@ -39,7 +49,7 @@ export default function ResolvedCommentsToggle() {
 				checked={showResolvedComments}
 				disabled={!showResolvedComments && !hasResolvedComments}
 				label={Liferay.Language.get('show-resolved-comments')}
-				onChange={event =>
+				onChange={(event) =>
 					dispatch(
 						toggleShowResolvedComments({
 							showResolvedComments: Boolean(event.target.checked),

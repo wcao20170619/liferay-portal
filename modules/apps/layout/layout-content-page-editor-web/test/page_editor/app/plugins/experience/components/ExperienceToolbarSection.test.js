@@ -190,7 +190,7 @@ describe('ExperienceToolbarSection', () => {
 				},
 			},
 		};
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -221,6 +221,7 @@ describe('ExperienceToolbarSection', () => {
 		//      "TypeError: Cannot read property '_defaultView' of undefined"
 		//
 		// Caused by: https://github.com/jsdom/jsdom/issues/2499
+
 		document.activeElement.blur = () => {};
 
 		userEvent.click(lockIcon);
@@ -237,7 +238,7 @@ describe('ExperienceToolbarSection', () => {
 			})
 		);
 
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -313,7 +314,7 @@ describe('ExperienceToolbarSection', () => {
 			})
 		);
 
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -398,7 +399,7 @@ describe('ExperienceToolbarSection', () => {
 				return Promise.resolve([]);
 			});
 
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -436,6 +437,7 @@ describe('ExperienceToolbarSection', () => {
 
 		// Grab parentElement here to work around jsdom v13 issue.
 		// "TypeError: Cannot read property '_defaultView' of undefined"
+
 		userEvent.click(getByText('save').parentElement);
 
 		await wait(() => expect(serviceFetch).toHaveBeenCalledTimes(2));
@@ -466,7 +468,7 @@ describe('ExperienceToolbarSection', () => {
 			})
 		);
 
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -517,6 +519,7 @@ describe('ExperienceToolbarSection', () => {
 
 		// Grab parentElement here to work around jsdom v13 issue.
 		// "TypeError: Cannot read property '_defaultView' of undefined"
+
 		userEvent.click(getByText('save').parentElement);
 
 		await wait(() => expect(serviceFetch).toHaveBeenCalledTimes(1));
@@ -551,7 +554,7 @@ describe('ExperienceToolbarSection', () => {
 		 */
 		window.confirm = jest.fn(() => true);
 
-		const mockDispatch = jest.fn(a => {
+		const mockDispatch = jest.fn((a) => {
 			if (typeof a === 'function') {
 				return a(mockDispatch);
 			}
@@ -674,7 +677,6 @@ describe('ExperienceToolbarSection', () => {
 			expect.stringContaining(MOCK_DELETE_URL),
 			expect.objectContaining({
 				body: expect.objectContaining({
-					fragmentEntryLinkIds: '[2000]',
 					segmentsExperienceId: 'test-experience-id-01',
 				}),
 			}),

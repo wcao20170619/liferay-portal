@@ -14,17 +14,10 @@
 
 package com.liferay.sharepoint.soap.repository.constants;
 
-import com.liferay.sharepoint.soap.repository.connector.SharepointConnection;
-
 /**
  * @author Cristina González
  */
 public class SharepointWSConstants {
-
-	public static final String SHAREPOINT_2013_VALUE =
-		SharepointConnection.ServerVersion.SHAREPOINT_2013.getValue();
-
-	public static final String SHAREPOINT_CONFIGURATION_WS = "SHAREPOINT_WS";
 
 	public static final String SHAREPOINT_LIBRARY_NAME = "LIBRARY_NAME";
 

@@ -12,7 +12,6 @@
  * details.
  */
 
-import {globalEval} from 'metal-dom';
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -41,6 +40,38 @@ export default class UnsafeHTML extends React.PureComponent {
 	}
 
 	/**
+	 * Looks for script tags inside ref and executes
+	 * them inside this.props.globalContext.
+	 */
+	_runRefScripts() {
+		const doc = this.props.globalContext.document;
+
+		const scriptElements = Array.from(
+			this.state.ref.querySelectorAll('script')
+		);
+
+		const runNextScript = () => {
+			if (scriptElements.length) {
+				const nextScriptElement = doc.createElement('script');
+				const prevScriptElement = scriptElements.shift();
+
+				nextScriptElement.appendChild(
+					doc.createTextNode(prevScriptElement.innerHTML)
+				);
+
+				prevScriptElement.parentNode.replaceChild(
+					nextScriptElement,
+					prevScriptElement
+				);
+
+				requestAnimationFrame(runNextScript);
+			}
+		};
+
+		runNextScript();
+	}
+
+	/**
 	 * Syncs ref innerHTML and recreates portals.
 	 *
 	 * Everytime that markup property is updated ref innerHTML
@@ -52,15 +83,18 @@ export default class UnsafeHTML extends React.PureComponent {
 
 		ref.innerHTML = this.props.markup;
 
-		this.setState(
-			{
-				portals: this.props.getPortals(ref),
-			},
-			() => {
-				globalEval.runScriptsInElement(ref);
+		const portals = this.props.getPortals(ref);
+
+		if (portals.length || portals.length !== this.state.portals.length) {
+			this.setState({portals}, () => {
+				this._runRefScripts();
 				this.props.onRender(ref);
-			}
-		);
+			});
+		}
+		else {
+			this._runRefScripts();
+			this.props.onRender(ref);
+		}
 	}
 
 	/**
@@ -81,7 +115,7 @@ export default class UnsafeHTML extends React.PureComponent {
 	 * portals to prevent them from failing because their DOM nodes
 	 * are not linked to the document anymore.
 	 */
-	_updateRef = nextRef => {
+	_updateRef = (nextRef) => {
 		this.setState(({ref: prevRef}) => {
 			if (prevRef !== nextRef) {
 				if (typeof this.props.contentRef === 'function') {
@@ -122,6 +156,7 @@ UnsafeHTML.defaultProps = {
 	className: '',
 	contentRef: null,
 	getPortals: () => [],
+	globalContext: window,
 	markup: '',
 	onRender: () => {},
 };
@@ -131,9 +166,10 @@ UnsafeHTML.propTypes = {
 	className: PropTypes.string,
 	contentRef: PropTypes.oneOfType([
 		PropTypes.func,
-		PropTypes.shape({current: PropTypes.instanceOf(Element)}),
+		PropTypes.shape({current: PropTypes.object}),
 	]),
 	getPortals: PropTypes.func,
+	globalContext: PropTypes.object,
 	markup: PropTypes.string,
 	onRender: PropTypes.func,
 };

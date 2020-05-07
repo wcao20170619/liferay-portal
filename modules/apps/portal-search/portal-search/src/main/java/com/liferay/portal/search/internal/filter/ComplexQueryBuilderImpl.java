@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryBuilder;
 import com.liferay.portal.search.filter.ComplexQueryPart;
+import com.liferay.portal.search.internal.filter.range.RangeTermQueryValue;
+import com.liferay.portal.search.internal.filter.range.RangeTermQueryValueParser;
 import com.liferay.portal.search.internal.util.SearchStringUtil;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Queries;
@@ -143,6 +145,21 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 				return _queries.booleanQuery();
 			}
 
+			if (Objects.equals(type, "date_range")) {
+				RangeTermQueryValue rangeTermQueryValue =
+					_rangeTermQueryParser.parse(value);
+
+				if (rangeTermQueryValue == null) {
+					return null;
+				}
+
+				return _queries.dateRangeTerm(
+					field, rangeTermQueryValue.isIncludesLower(),
+					rangeTermQueryValue.isIncludesUpper(),
+					rangeTermQueryValue.getLowerBound(),
+					rangeTermQueryValue.getUpperBound());
+			}
+
 			if (Objects.equals(type, "exists")) {
 				return _queries.exists(field);
 			}
@@ -208,6 +225,21 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 				}
 
 				return stringQuery;
+			}
+
+			if (Objects.equals(type, "range")) {
+				RangeTermQueryValue rangeTermQueryValue =
+					_rangeTermQueryParser.parse(value);
+
+				if (rangeTermQueryValue == null) {
+					return null;
+				}
+
+				return _queries.rangeTerm(
+					field, rangeTermQueryValue.isIncludesLower(),
+					rangeTermQueryValue.isIncludesUpper(),
+					rangeTermQueryValue.getLowerBound(),
+					rangeTermQueryValue.getUpperBound());
 			}
 
 			if (Objects.equals(type, "regexp")) {
@@ -335,6 +367,8 @@ public class ComplexQueryBuilderImpl implements ComplexQueryBuilder {
 
 		private final Map<String, ComplexQueryPart> _complexQueryPartsMap;
 		private final Map<String, Query> _queriesMap = new HashMap<>();
+		private final RangeTermQueryValueParser _rangeTermQueryParser =
+			new RangeTermQueryValueParser();
 		private final BooleanQuery _rootBooleanQuery;
 
 	}

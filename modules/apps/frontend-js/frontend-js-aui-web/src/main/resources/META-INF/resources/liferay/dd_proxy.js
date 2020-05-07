@@ -12,9 +12,13 @@
  * details.
  */
 
+/**
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
+ * @module liferay-dd-proxy
+ */
 AUI.add(
 	'liferay-dd-proxy',
-	A => {
+	(A) => {
 		var body = A.getBody();
 
 		var DDM = A.DD.DDM;

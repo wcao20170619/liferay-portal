@@ -28,7 +28,7 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 	displayContext="<%= redirectManagementToolbarDisplayContext %>"
 />
 
-<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+<div class="closed container-fluid-1280 redirect-entries sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/redirect/info_panel" var="sidebarPanelURL" />
 
 	<liferay-frontend:sidebar-panel
@@ -54,29 +54,45 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 
 					<%
 					row.setData(HashMapBuilder.<String, Object>put("actions", redirectManagementToolbarDisplayContext.getAvailableActions(redirectEntry)).build());
+
+					String sourceURL = RedirectUtil.getGroupBaseURL(themeDisplay) + StringPool.SLASH + redirectEntry.getSourceURL();
 					%>
 
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-content"
 						name="source-url"
 					>
-
-						<%
-						String url = RedirectUtil.getGroupBaseURL(themeDisplay) + StringPool.SLASH + redirectEntry.getSourceURL();
-						%>
-
-						<aui:a href="<%= HtmlUtil.escapeAttribute(url) %>" target="_blank">
-							<%= HtmlUtil.escape(url) %>
-						</aui:a>
+						<span data-title="<%= sourceURL %>">
+							<%= HtmlUtil.escape(sourceURL) %>
+						</span>
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-content"
 						name="destination-url"
 					>
-						<aui:a href="<%= HtmlUtil.escapeAttribute(redirectEntry.getDestinationURL()) %>" target="_blank">
-							<%= HtmlUtil.escape(redirectEntry.getDestinationURL()) %>
-						</aui:a>
+
+						<%
+						String destinationUrl = HtmlUtil.escape(redirectEntry.getDestinationURL());
+
+						Map<String, String> data = HashMapBuilder.put(
+							"href", sourceURL
+						).build();
+						%>
+
+						<clay:button
+							data="<%= data %>"
+							elementClasses="icon-shortcut"
+							icon="shortcut"
+							monospaced="<%= true %>"
+							size="sm"
+							style="unstyled"
+							title='<%= LanguageUtil.get(request, "try-redirection") %>'
+						/>
+
+						<span data-title="<%= destinationUrl %>">
+							<%= destinationUrl %>
+						</span>
 					</liferay-ui:search-container-column-text>
 
 					<liferay-ui:search-container-column-text
@@ -124,3 +140,20 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 	context="<%= redirectManagementToolbarDisplayContext.getComponentContext() %>"
 	module="js/RedirectManagementToolbarDefaultEventHandler.es"
 />
+
+<aui:script require="metal-dom/src/all/dom as dom">
+	dom.delegate(
+		document.querySelector('#<portlet:namespace />fm'),
+		'click',
+		'.icon-shortcut',
+		function (event) {
+			var delegateTarget = event.delegateTarget;
+
+			var destinationUrl = delegateTarget.dataset.href;
+
+			if (destinationUrl) {
+				window.open(destinationUrl, '_blank');
+			}
+		}
+	);
+</aui:script>

@@ -31,7 +31,7 @@ export default ({aggregateRating, entityId, myRating, ratingChange, type}) => {
 		setUserRating(myRating === null ? 0 : normalize(myRating));
 	}, [myRating]);
 
-	const voteChange = value => {
+	const voteChange = (value) => {
 		if (userRating === value) {
 			return;
 		}
@@ -77,7 +77,6 @@ export default ({aggregateRating, entityId, myRating, ratingChange, type}) => {
 					'text-reset' + (userRating === -1 ? ' text-primary' : '')
 				}
 				displayType="unstyled"
-				// small={if-it-is-a-sub-comment}
 				monospaced
 				onClick={() => voteChange(-1)}
 			>

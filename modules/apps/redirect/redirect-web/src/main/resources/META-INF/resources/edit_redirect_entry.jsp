@@ -41,11 +41,12 @@ else {
 	action="<%= editRedirectEntryURL %>"
 	method="post"
 	name="fm"
-	onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveRedirectEntry();" %>'
+	onSubmit="event.preventDefault();"
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
+	<aui:input name="updateReferences" type="hidden" value="" />
 
 	<c:if test="<%= redirectEntry != null %>">
 		<aui:input name="redirectEntryId" type="hidden" value="<%= redirectEntry.getRedirectEntryId() %>" />
@@ -88,7 +89,7 @@ else {
 		%>
 
 		<div class="destination-url">
-			<aui:input autoFocus="<%= autoFocusDestination %>" name="destinationURL" value="<%= destinationURL %>" />
+			<aui:input name="destinationURL" value="<%= destinationURL %>" />
 
 			<react:component
 				data="<%= data %>"
@@ -110,24 +111,29 @@ else {
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<aui:button type="submit" />
+		<aui:button type="submit" value='<%= LanguageUtil.get(request, (redirectEntry == null) ? "create" : "save") %>' />
 
 		<aui:button href="<%= redirect %>" type="cancel" />
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
-<script>
-	function <portlet:namespace />saveRedirectEntry() {
-		var form = document.<portlet:namespace />fm;
+<div>
+	<react:component
+		data='<%=
+			HashMapBuilder.<String, Object>put(
+				"saveButtonLabel", LanguageUtil.get(request, (redirectEntry == null) ? "create" : "save")
+			).build() %>'
+		module="js/ChainedRedirections"
+	/>
+</div>
 
-		var destinationURL = form.elements['<portlet:namespace />destinationURL'];
+<portlet:actionURL name="/redirect/check_destination_url" var="checkDestinationURL" />
 
-		if (destinationURL.value) {
-			submitForm(form);
-		}
-		else {
-			destinationURL.focus();
-			destinationURL.blur();
-		}
-	}
-</script>
+<liferay-frontend:component
+	context='<%=
+		HashMapBuilder.<String, Object>put(
+			"checkDestinationURL", checkDestinationURL
+		).build()
+	%>'
+	module="js/editRedirectEntry"
+/>

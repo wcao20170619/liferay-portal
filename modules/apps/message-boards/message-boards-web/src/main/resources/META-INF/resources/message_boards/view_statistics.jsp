@@ -39,8 +39,10 @@ portletURL.setParameter("mbCategoryId", String.valueOf(categoryId));
 	<div class="statistics-panel">
 		<h3><liferay-ui:message key="overview" /></h3>
 
-		<div class="row">
-			<div class="col-md-4">
+		<clay:row>
+			<clay:col
+				md="4"
+			>
 				<div class="overview-container statistics-panel">
 					<div class="sticker sticker-categories sticker-user-icon">
 						<clay:icon
@@ -52,9 +54,11 @@ portletURL.setParameter("mbCategoryId", String.valueOf(categoryId));
 
 					<p class="statistics-number"><%= numberFormat.format(categoryDisplay.getAllCategoriesCount()) %></p>
 				</div>
-			</div>
+			</clay:col>
 
-			<div class="col-md-4">
+			<clay:col
+				md="4"
+			>
 				<div class="overview-container statistics-panel">
 					<div class="sticker sticker-posts sticker-user-icon">
 						<clay:icon
@@ -66,9 +70,11 @@ portletURL.setParameter("mbCategoryId", String.valueOf(categoryId));
 
 					<p class="statistics-number"><%= numberFormat.format(MBStatsUserLocalServiceUtil.getMessageCountByGroupId(scopeGroupId)) %></p>
 				</div>
-			</div>
+			</clay:col>
 
-			<div class="col-md-4">
+			<clay:col
+				md="4"
+			>
 				<div class="overview-container statistics-panel">
 					<div class="sticker sticker-participants sticker-user-icon">
 						<clay:icon
@@ -80,8 +86,8 @@ portletURL.setParameter("mbCategoryId", String.valueOf(categoryId));
 
 					<p class="statistics-number"><%= numberFormat.format(MBStatsUserLocalServiceUtil.getStatsUsersByGroupIdCount(scopeGroupId)) %></p>
 				</div>
-			</div>
-		</div>
+			</clay:col>
+		</clay:row>
 	</div>
 
 	<div class="statistics-panel">

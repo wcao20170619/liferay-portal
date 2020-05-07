@@ -1,7 +1,7 @@
 dependencies {
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.9.10"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.9.10"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.9.10.1"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.10.3"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.10.3"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.10.3"
 	compileOnly group: "com.liferay", name: "biz.aQute.bnd.annotation", version: "4.2.0.LIFERAY-PATCHED-1"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
@@ -13,8 +13,10 @@ dependencies {
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:application-list:application-list-api")
 	compileOnly project(":apps:asset:asset-display-page-api")
+	compileOnly project(":apps:document-library:document-library-api")
 	compileOnly project(":apps:export-import:export-import-api")
 	compileOnly project(":apps:fragment:fragment-api")
+	compileOnly project(":apps:fragment:fragment-entry-processor:fragment-entry-processor-api")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib-clay")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib-react")

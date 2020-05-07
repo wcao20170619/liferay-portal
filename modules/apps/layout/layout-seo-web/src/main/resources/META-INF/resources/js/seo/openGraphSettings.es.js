@@ -12,9 +12,9 @@
  * details.
  */
 
-import {ItemSelectorDialog} from 'frontend-js-web';
+import {ItemSelectorDialog, toggleDisabled} from 'frontend-js-web';
 
-export default function({namespace, uploadOpenGraphImageURL}) {
+export default function ({namespace, uploadOpenGraphImageURL}) {
 	const openGraphImageButton = document.getElementById(
 		`${namespace}openGraphImageButton`
 	);
@@ -47,7 +47,7 @@ export default function({namespace, uploadOpenGraphImageURL}) {
 		`[for="${namespace}openGraphImageAlt"`
 	);
 
-	itemSelectorDialog.on('selectedItemChange', event => {
+	itemSelectorDialog.on('selectedItemChange', (event) => {
 		const selectedItem = event.selectedItem;
 
 		if (selectedItem) {
@@ -57,18 +57,15 @@ export default function({namespace, uploadOpenGraphImageURL}) {
 			openGraphImageTitle.value = itemValue.title;
 			openGraphPreviewImage.src = itemValue.url;
 
-			Liferay.Util.toggleDisabled(openGraphImageAltField, false);
-			Liferay.Util.toggleDisabled(
-				openGraphImageAltFieldDefaultLocale,
-				false
-			);
-			Liferay.Util.toggleDisabled(openGraphImageAltLabel, false);
+			toggleDisabled(openGraphImageAltField, false);
+			toggleDisabled(openGraphImageAltFieldDefaultLocale, false);
+			toggleDisabled(openGraphImageAltLabel, false);
 
 			openGraphPreviewImage.classList.remove('hide');
 		}
 	});
 
-	openGraphImageButton.addEventListener('click', event => {
+	openGraphImageButton.addEventListener('click', (event) => {
 		event.preventDefault();
 		itemSelectorDialog.open();
 	});
@@ -82,9 +79,9 @@ export default function({namespace, uploadOpenGraphImageURL}) {
 		openGraphImageTitle.value = '';
 		openGraphPreviewImage.src = '';
 
-		Liferay.Util.toggleDisabled(openGraphImageAltField, true);
-		Liferay.Util.toggleDisabled(openGraphImageAltFieldDefaultLocale, true);
-		Liferay.Util.toggleDisabled(openGraphImageAltLabel, true);
+		toggleDisabled(openGraphImageAltField, true);
+		toggleDisabled(openGraphImageAltFieldDefaultLocale, true);
+		toggleDisabled(openGraphImageAltLabel, true);
 
 		openGraphPreviewImage.classList.add('hide');
 	});
@@ -96,27 +93,21 @@ export default function({namespace, uploadOpenGraphImageURL}) {
 		`${namespace}openGraphSettings`
 	);
 
-	openGraphEnabledCheck.addEventListener('click', event => {
+	openGraphEnabledCheck.addEventListener('click', (event) => {
 		const disabled = !event.target.checked;
 		const openGraphImageAltDisabled =
 			disabled || !openGraphImageTitle.value;
 
-		Liferay.Util.toggleDisabled(openGraphImageTitle, disabled);
-		Liferay.Util.toggleDisabled(openGraphImageButton, disabled);
-		Liferay.Util.toggleDisabled(openGraphClearImageButton, disabled);
+		toggleDisabled(openGraphImageTitle, disabled);
+		toggleDisabled(openGraphImageButton, disabled);
+		toggleDisabled(openGraphClearImageButton, disabled);
 
-		Liferay.Util.toggleDisabled(
-			openGraphImageAltField,
-			openGraphImageAltDisabled
-		);
-		Liferay.Util.toggleDisabled(
+		toggleDisabled(openGraphImageAltField, openGraphImageAltDisabled);
+		toggleDisabled(
 			openGraphImageAltFieldDefaultLocale,
 			openGraphImageAltDisabled
 		);
-		Liferay.Util.toggleDisabled(
-			openGraphImageAltLabel,
-			openGraphImageAltDisabled
-		);
+		toggleDisabled(openGraphImageAltLabel, openGraphImageAltDisabled);
 
 		openGraphSettings.classList.toggle('disabled');
 	});

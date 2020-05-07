@@ -17,30 +17,14 @@ package com.liferay.portal.portlet.bridge.mvc.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.portlet.LiferayPortletConfig;
-import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.kernel.util.JavaConstants;
-import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.spring.mock.web.portlet.MockActionRequest;
 import com.liferay.spring.mock.web.portlet.MockActionResponse;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.portlet.ActionParameters;
 import javax.portlet.ActionRequest;
-import javax.portlet.PortletConfig;
-import javax.portlet.PortletContext;
-import javax.portlet.PortletResponse;
-import javax.portlet.RenderParameters;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -54,8 +38,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-
-import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Manuel de la Peña
@@ -131,28 +113,30 @@ public class MVCActionCommandTest {
 	public void testMultipleMVCActionCommandsWithMultipleParameters()
 		throws Exception {
 
-		MockActionRequest mockActionRequest = new MockLiferayPortletRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
 
-		mockActionRequest.addParameter(
+		mockLiferayPortletActionRequest.addParameter(
 			ActionRequest.ACTION_NAME, _TEST_MVC_ACTION_COMMAND_NAME_1);
-		mockActionRequest.addParameter(
+		mockLiferayPortletActionRequest.addParameter(
 			ActionRequest.ACTION_NAME, _TEST_MVC_ACTION_COMMAND_NAME_2);
 
-		_portlet.processAction(mockActionRequest, new MockActionResponse());
+		_portlet.processAction(
+			mockLiferayPortletActionRequest, new MockActionResponse());
 
 		Assert.assertNotNull(
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 		Assert.assertEquals(
 			_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1,
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 		Assert.assertNotNull(
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2));
 		Assert.assertEquals(
 			_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2,
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2));
 	}
 
@@ -160,46 +144,50 @@ public class MVCActionCommandTest {
 	public void testMultipleMVCActionCommandsWithSingleParameter()
 		throws Exception {
 
-		MockActionRequest mockActionRequest = new MockLiferayPortletRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
 
-		mockActionRequest.addParameter(
+		mockLiferayPortletActionRequest.addParameter(
 			ActionRequest.ACTION_NAME,
 			_TEST_MVC_ACTION_COMMAND_NAME_1 + StringPool.COMMA +
 				_TEST_MVC_ACTION_COMMAND_NAME_2);
 
-		_portlet.processAction(mockActionRequest, new MockActionResponse());
+		_portlet.processAction(
+			mockLiferayPortletActionRequest, new MockActionResponse());
 
 		Assert.assertNotNull(
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 		Assert.assertEquals(
 			_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1,
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 		Assert.assertNotNull(
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2));
 		Assert.assertEquals(
 			_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2,
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_2));
 	}
 
 	@Test
 	public void testSingleMVCActionCommand() throws Exception {
-		MockActionRequest mockActionRequest = new MockLiferayPortletRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
 
-		mockActionRequest.addParameter(
+		mockLiferayPortletActionRequest.addParameter(
 			ActionRequest.ACTION_NAME, _TEST_MVC_ACTION_COMMAND_NAME_1);
 
-		_portlet.processAction(mockActionRequest, new MockActionResponse());
+		_portlet.processAction(
+			mockLiferayPortletActionRequest, new MockActionResponse());
 
 		Assert.assertNotNull(
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 		Assert.assertEquals(
 			_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1,
-			mockActionRequest.getAttribute(
+			mockLiferayPortletActionRequest.getAttribute(
 				_TEST_MVC_ACTION_COMMAND_ATTRIBUTE_1));
 	}
 
@@ -226,131 +214,5 @@ public class MVCActionCommandTest {
 	private static javax.portlet.Portlet _portlet;
 	private static ServiceRegistration<javax.portlet.Portlet>
 		_portletServiceRegistration;
-
-	private static class MockLiferayPortletRequest
-		extends MockActionRequest implements LiferayPortletRequest {
-
-		@Override
-		public void addParameter(String name, String value) {
-			_mockHttpServletRequest.addParameter(name, value);
-
-			super.addParameter(name, value);
-		}
-
-		@Override
-		public void cleanUp() {
-		}
-
-		@Override
-		public Map<String, String[]> clearRenderParameters() {
-			return null;
-		}
-
-		@Override
-		public void defineObjects(
-			PortletConfig portletConfig, PortletResponse portletResponse) {
-		}
-
-		@Override
-		public ActionParameters getActionParameters() {
-			return null;
-		}
-
-		@Override
-		public Object getAttribute(String name) {
-			if (name.equals(JavaConstants.JAVAX_PORTLET_CONFIG)) {
-				return ProxyUtil.newProxyInstance(
-					LiferayPortletConfig.class.getClassLoader(),
-					new Class<?>[] {LiferayPortletConfig.class},
-					(proxy, method, args) -> {
-						if (Objects.equals(method.getName(), "getPortletId")) {
-							return "testPortlet";
-						}
-
-						return null;
-					});
-			}
-
-			return super.getAttribute(name);
-		}
-
-		@Override
-		public long getContentLengthLong() {
-			return 0;
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return _mockHttpServletRequest;
-		}
-
-		@Override
-		public String getLifecycle() {
-			return null;
-		}
-
-		@Override
-		public HttpServletRequest getOriginalHttpServletRequest() {
-			return _mockHttpServletRequest;
-		}
-
-		@Override
-		public Part getPart(String name) {
-			return null;
-		}
-
-		@Override
-		public Collection<Part> getParts() {
-			return null;
-		}
-
-		@Override
-		public long getPlid() {
-			return 0;
-		}
-
-		@Override
-		public Portlet getPortlet() {
-			return null;
-		}
-
-		@Override
-		public PortletContext getPortletContext() {
-			return null;
-		}
-
-		@Override
-		public String getPortletName() {
-			return null;
-		}
-
-		@Override
-		public HttpServletRequest getPortletRequestDispatcherRequest() {
-			return null;
-		}
-
-		@Override
-		public RenderParameters getRenderParameters() {
-			return null;
-		}
-
-		@Override
-		public String getUserAgent() {
-			return null;
-		}
-
-		@Override
-		public void invalidateSession() {
-		}
-
-		@Override
-		public void setPortletRequestDispatcherRequest(
-			HttpServletRequest httpServletRequest) {
-		}
-
-		private final MockHttpServletRequest _mockHttpServletRequest =
-			new MockHttpServletRequest();
-
-	}
 
 }

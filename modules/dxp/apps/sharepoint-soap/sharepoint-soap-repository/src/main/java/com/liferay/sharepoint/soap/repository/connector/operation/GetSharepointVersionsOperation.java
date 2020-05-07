@@ -29,7 +29,6 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -54,27 +53,26 @@ public final class GetSharepointVersionsOperation extends BaseOperation {
 	public List<SharepointVersion> execute(String filePath)
 		throws SharepointException {
 
-		SharepointObject sharepointObject =
-			_getSharepointObjectByPathOperation.execute(filePath);
-
-		if (sharepointObject == null) {
-			throw new SharepointException(
-				"Unable to find Sharepoint object at " + filePath);
-		}
-
-		GetVersionsResponseDocument getVersionsResponseDocument = null;
-
 		try {
-			getVersionsResponseDocument = versionsSoap12Stub.getVersions(
-				getGetVersionsDocument(filePath));
+			SharepointObject sharepointObject =
+				_getSharepointObjectByPathOperation.execute(filePath);
+
+			if (sharepointObject == null) {
+				throw new SharepointException(
+					"Unable to find Sharepoint object at " + filePath);
+			}
+
+			GetVersionsResponseDocument getVersionsResponseDocument =
+				versionsSoap12Stub.getVersions(
+					getGetVersionsDocument(filePath));
+
+			return getSharepointVersions(
+				sharepointObject, getVersionsResponseDocument);
 		}
 		catch (RemoteException remoteException) {
 			throw RemoteExceptionSharepointExceptionMapper.map(
 				remoteException, sharepointConnectionInfo);
 		}
-
-		return getSharepointVersions(
-			sharepointObject, getVersionsResponseDocument);
 	}
 
 	protected Date getDate(String dateString) {
@@ -152,14 +150,14 @@ public final class GetSharepointVersionsOperation extends BaseOperation {
 			sharepointVersions.add(sharepointVersion);
 		}
 
-		Collections.sort(sharepointVersions, _comparator);
+		sharepointVersions.sort(_comparator);
 
 		return sharepointVersions;
 	}
 
 	protected String getVersion(String version) {
 		if (version.startsWith(StringPool.AT)) {
-			version = version.substring(1);
+			return version.substring(1);
 		}
 
 		return version;

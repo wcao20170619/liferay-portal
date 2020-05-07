@@ -151,7 +151,9 @@ describe('Analytics', () => {
 		sendDummyEvents(Analytics, 1);
 
 		setTimeout(async () => {
-			// flush should have happened at least once
+
+			// Flush should have happened at least once
+
 			const userId = getItem(STORAGE_KEY_USER_ID);
 
 			await Analytics.setIdentity({
@@ -187,6 +189,7 @@ describe('Analytics', () => {
 	// Skipping this test because it was broken in the old
 	// Karma-based implementation (the `expect` was failing but it
 	// did so asynchronously after the test has "finished").
+
 	it.skip('regenerates the user id on logouts or session expirations ', async () => {
 		fetchMock.mock(/ac-server/i, () => Promise.resolve(200));
 		fetchMock.mock(/identity$/, () => Promise.resolve(200));

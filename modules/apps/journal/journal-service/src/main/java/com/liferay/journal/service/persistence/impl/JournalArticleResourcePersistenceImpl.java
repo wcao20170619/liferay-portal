@@ -16,6 +16,7 @@ package com.liferay.journal.service.persistence.impl;
 
 import com.liferay.journal.exception.NoSuchArticleResourceException;
 import com.liferay.journal.model.JournalArticleResource;
+import com.liferay.journal.model.JournalArticleResourceTable;
 import com.liferay.journal.model.impl.JournalArticleResourceImpl;
 import com.liferay.journal.model.impl.JournalArticleResourceModelImpl;
 import com.liferay.journal.service.persistence.JournalArticleResourcePersistence;
@@ -2350,16 +2351,18 @@ public class JournalArticleResourcePersistenceImpl
 		"(journalArticleResource.articleId IS NULL OR journalArticleResource.articleId = '')";
 
 	public JournalArticleResourcePersistenceImpl() {
-		setModelClass(JournalArticleResource.class);
-
-		setModelImplClass(JournalArticleResourceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(JournalArticleResource.class);
+
+		setModelImplClass(JournalArticleResourceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(JournalArticleResourceTable.INSTANCE);
 	}
 
 	/**

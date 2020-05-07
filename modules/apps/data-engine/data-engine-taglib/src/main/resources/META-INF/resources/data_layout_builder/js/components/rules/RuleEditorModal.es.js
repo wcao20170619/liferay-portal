@@ -16,7 +16,13 @@ import ClayButton from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import ClayModal, {useModal} from '@clayui/modal';
 import {RuleEditor} from 'dynamic-data-mapping-form-builder';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react';
 
 import AppContext from '../../AppContext.es';
 import DataLayoutBuilderContext from '../../data-layout-builder/DataLayoutBuilderContext.es';
@@ -35,6 +41,7 @@ class RuleEditorWrapper extends RuleEditor {
 const RuleEditorModalContent = ({onClose, rule}) => {
 	const ruleEditorRef = useRef();
 	const [ruleEditor, setRuleEditor] = useState(null);
+	const [ruleName, setRuleName] = useState('');
 
 	const [
 		{
@@ -51,6 +58,16 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 		roles: [],
 	});
 
+	const onChangeRuleName = useCallback((value) => {
+		setRuleName(value);
+	}, []);
+
+	useEffect(() => {
+		if (rule) {
+			onChangeRuleName(rule.name.en_US);
+		}
+	}, [onChangeRuleName, rule]);
+
 	useEffect(() => {
 		const {isLoading, roles} = state;
 
@@ -64,13 +81,13 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 				actions: [],
 				conditions: [],
 				events: {
-					ruleAdded: rule => {
+					ruleAdded: (rule) => {
 						dataLayoutBuilder.dispatch('ruleAdded', rule);
 						onClose();
 					},
 					ruleCancelled: () => {},
 					ruleDeleted: () => {},
-					ruleEdited: rule => {
+					ruleEdited: (rule) => {
 						dataLayoutBuilder.dispatch('ruleEdited', rule);
 						onClose();
 					},
@@ -81,6 +98,7 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 				roles,
 				rule,
 				spritemap,
+				...(rule && {ruleEditedIndex: rule.ruleEditedIndex}),
 			},
 			ruleEditorRef.current
 		);
@@ -112,7 +130,7 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 					value: `${id}`,
 				}));
 
-				setState(prevState => ({
+				setState((prevState) => ({
 					...prevState,
 					isLoading: false,
 					roles,
@@ -134,8 +152,12 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 						<ClayInput
 							aria-label={Liferay.Language.get('untitled-rule')}
 							className="form-control-inline"
+							onChange={({target: {value}}) =>
+								onChangeRuleName(value)
+							}
 							placeholder={Liferay.Language.get('untitled-rule')}
 							type="text"
+							value={ruleName}
 						/>
 					</ClayInput.GroupItem>
 				</ClayInput.Group>
@@ -150,10 +172,11 @@ const RuleEditorModalContent = ({onClose, rule}) => {
 							{Liferay.Language.get('cancel')}
 						</ClayButton>
 						<ClayButton
+							disabled={!ruleName}
 							onClick={() =>
 								rule
-									? ruleEditor.handleRuleEdited()
-									: ruleEditor.handleRuleAdded()
+									? ruleEditor.handleRuleEdited({ruleName})
+									: ruleEditor.handleRuleAdded({ruleName})
 							}
 						>
 							{Liferay.Language.get('save')}

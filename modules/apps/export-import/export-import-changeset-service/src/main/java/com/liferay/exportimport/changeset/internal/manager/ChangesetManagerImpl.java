@@ -24,21 +24,23 @@ import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSe
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 
 import java.io.Serializable;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
@@ -47,37 +49,50 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Máté Thurzó
  */
-@Component(immediate = true, service = ChangesetManager.class)
-public class ChangesetManagerImpl implements ChangesetManager {
+@Component(immediate = true, service = AopService.class)
+public class ChangesetManagerImpl
+	implements AopService, ChangesetManager, IdentifiableOSGiService {
 
+	@Clusterable(onMaster = true)
 	@Override
 	public void addChangeset(Changeset changeset) {
-		Objects.nonNull(changeset);
+		_changesets.putIfAbsent(changeset.getUuid(), changeset);
+	}
 
-		String changesetUuid = changeset.getUuid();
-
-		if (_changesets.containsKey(changesetUuid)) {
-			return;
-		}
-
-		_changesets.put(changesetUuid, changeset);
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	@Override
+	public void clearChangesets() {
+		_changesets.clear();
 	}
 
 	@Override
-	public void clearChangesets() {
-		_changesets = new HashMap<>();
+	public String getOSGiServiceIdentifier() {
+		return ChangesetManager.class.getName();
 	}
 
+	@Clusterable(onMaster = true)
 	@Override
 	public boolean hasChangeset(String changesetUuid) {
 		return _changesets.containsKey(changesetUuid);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public Optional<Changeset> peekChangeset(String changesetUuid) {
 		return Optional.ofNullable(_changesets.get(changesetUuid));
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #removeChangeset(String changesetUuid)}
+	 */
+	@Deprecated
 	@Override
 	public Optional<Changeset> popChangeset(String changesetUuid) {
 		Changeset changeset = _changesets.remove(changesetUuid);
@@ -85,6 +100,10 @@ public class ChangesetManagerImpl implements ChangesetManager {
 		return Optional.ofNullable(changeset);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public long publishChangeset(
 		Changeset changeset, ChangesetEnvironment changesetEnvironment) {
@@ -162,10 +181,17 @@ public class ChangesetManagerImpl implements ChangesetManager {
 		}
 	}
 
+	@Clusterable(onMaster = true)
+	@Override
+	public Changeset removeChangeset(String changesetUuid) {
+		return _changesets.remove(changesetUuid);
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ChangesetManagerImpl.class);
 
-	private Map<String, Changeset> _changesets = new HashMap<>();
+	private final Map<String, Changeset> _changesets =
+		new ConcurrentHashMap<>();
 
 	@Reference
 	private ExportImportConfigurationLocalService

@@ -129,6 +129,11 @@ public class AppBuilderAppLocalServiceWrapper
 	}
 
 	@Override
+	public <T> T dslQuery(com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+		return _appBuilderAppLocalService.dslQuery(dslQuery);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
 		return _appBuilderAppLocalService.dynamicQuery();
 	}
@@ -400,6 +405,24 @@ public class AppBuilderAppLocalServiceWrapper
 
 		return _appBuilderAppLocalService.getAppBuilderAppsCount(
 			groupId, companyId, ddmStructureId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.app.builder.model.AppBuilderApp>
+		getCompanyAppBuilderApps(
+			long companyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.app.builder.model.AppBuilderApp>
+					orderByComparator) {
+
+		return _appBuilderAppLocalService.getCompanyAppBuilderApps(
+			companyId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getCompanyAppBuilderAppsCount(long companyId) {
+		return _appBuilderAppLocalService.getCompanyAppBuilderAppsCount(
+			companyId);
 	}
 
 	@Override

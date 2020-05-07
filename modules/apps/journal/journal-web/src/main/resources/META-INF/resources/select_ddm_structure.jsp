@@ -88,8 +88,10 @@ SearchContainer<DDMStructure> ddmStructureSearch = journalSelectDDMStructureDisp
 </aui:form>
 
 <aui:script>
-	Liferay.Util.selectEntityHandler(
-		'#<portlet:namespace />selectDDMStructureFm',
-		'<%= HtmlUtil.escapeJS(journalSelectDDMStructureDisplayContext.getEventName()) %>'
-	);
+	document.addEventListener('DOMContentLoaded', function () {
+		Liferay.Util.selectEntityHandler(
+			'#<portlet:namespace />selectDDMStructureFm',
+			'<%= HtmlUtil.escapeJS(journalSelectDDMStructureDisplayContext.getEventName()) %>'
+		);
+	});
 </aui:script>

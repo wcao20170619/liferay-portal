@@ -15,15 +15,25 @@
 package com.liferay.portal.workflow.metrics.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.Inject;
+import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.Task;
+import com.liferay.portal.workflow.metrics.rest.client.dto.v1_0.TaskBulkSelection;
+import com.liferay.portal.workflow.metrics.rest.client.pagination.Page;
+import com.liferay.portal.workflow.metrics.rest.client.pagination.Pagination;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.test.helper.WorkflowMetricsRESTTestHelper;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -43,6 +53,8 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 		_instance = _workflowMetricsRESTTestHelper.addInstance(
 			testGroup.getCompanyId(), false, _process.getId());
+
+		_user = UserTestUtil.addUser();
 	}
 
 	@After
@@ -61,10 +73,100 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 		}
 	}
 
-	@Ignore
 	@Override
 	@Test
-	public void testGraphQLGetProcessTask() throws Exception {
+	public void testPostProcessTasksPage() throws Exception {
+		Page<Task> page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					processId = _process.getId();
+				}
+			});
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		Task task1 = testGetProcessTask_addTask();
+
+		Task task2 = testGetProcessTask_addTask();
+
+		page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					assigneeIds = new Long[] {_user.getUserId()};
+				}
+			});
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task1, task2), (List<Task>)page.getItems());
+
+		page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					instanceIds = new Long[] {_instance.getId()};
+				}
+			});
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task1, task2), (List<Task>)page.getItems());
+
+		page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					processId = _process.getId();
+				}
+			});
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task1, task2), (List<Task>)page.getItems());
+
+		page = taskResource.postProcessTasksPage(
+			null,
+			new TaskBulkSelection() {
+				{
+					processId = _process.getId();
+				}
+			});
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task1, task2), (List<Task>)page.getItems());
+
+		page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					taskNames = new String[] {task1.getName()};
+				}
+			});
+
+		Assert.assertEquals(1, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task1), (List<Task>)page.getItems());
+
+		page = taskResource.postProcessTasksPage(
+			Pagination.of(1, 10),
+			new TaskBulkSelection() {
+				{
+					taskNames = new String[] {task2.getName()};
+				}
+			});
+
+		Assert.assertEquals(1, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(task2), (List<Task>)page.getItems());
 	}
 
 	@Override
@@ -91,12 +193,22 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 	@Override
 	protected Task testGetProcessTask_addTask() throws Exception {
 		return _workflowMetricsRESTTestHelper.addTask(
-			0, testGroup.getCompanyId(), _instance);
+			new Assignee() {
+				{
+					id = _user.getUserId();
+				}
+			},
+			testGroup.getCompanyId(), _instance);
 	}
 
 	@Override
 	protected Long testGetProcessTasksPage_getProcessId() throws Exception {
 		return _process.getId();
+	}
+
+	@Override
+	protected Task testGraphQLTask_addTask() throws Exception {
+		return testGetProcessTask_addTask();
 	}
 
 	@Override
@@ -112,6 +224,9 @@ public class TaskResourceTest extends BaseTaskResourceTestCase {
 
 	private Instance _instance;
 	private Process _process;
+
+	@DeleteAfterTestRun
+	private User _user;
 
 	@Inject
 	private WorkflowMetricsRESTTestHelper _workflowMetricsRESTTestHelper;

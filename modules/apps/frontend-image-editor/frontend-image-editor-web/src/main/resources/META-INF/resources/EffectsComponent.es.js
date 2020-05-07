@@ -24,6 +24,7 @@ import './EffectsControls.soy';
  * Creates an Effects component.
  */
 class EffectsComponent extends Component {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -32,10 +33,10 @@ class EffectsComponent extends Component {
 
 		async.nextTick(() => {
 			this.getImageEditorImageData()
-				.then(imageData =>
+				.then((imageData) =>
 					Promise.resolve(this.generateThumbnailImageData_(imageData))
 				)
-				.then(previewImageData =>
+				.then((previewImageData) =>
 					this.generateThumbnails_(previewImageData)
 				)
 				.then(() => this.prefetchEffects_());
@@ -80,7 +81,7 @@ class EffectsComponent extends Component {
 			imageData,
 		});
 
-		promise.then(imageData => {
+		promise.then((imageData) => {
 			const canvas = this.element.querySelector(
 				'#' + this.ref + effect + ' canvas'
 			);
@@ -99,7 +100,7 @@ class EffectsComponent extends Component {
 	 */
 	generateThumbnails_(imageData) {
 		return Promise.all(
-			this.effects.map(effect =>
+			this.effects.map((effect) =>
 				this.generateThumbnail_(effect, imageData)
 			)
 		);
@@ -151,10 +152,10 @@ class EffectsComponent extends Component {
 	 * are prefetched.
 	 */
 	prefetchEffects_() {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			if (!this.isDisposed()) {
 				const missingEffects = this.effects.filter(
-					effect => !this.cache_[effect]
+					(effect) => !this.cache_[effect]
 				);
 
 				if (!missingEffects.length) {
@@ -162,7 +163,7 @@ class EffectsComponent extends Component {
 				}
 				else {
 					this.getImageEditorImageData()
-						.then(imageData =>
+						.then((imageData) =>
 							this.process(imageData, missingEffects[0])
 						)
 						.then(() => this.prefetchEffects_());
@@ -258,12 +259,12 @@ class EffectsComponent extends Component {
 	 * finishes processing the image.
 	 */
 	spawnWorker_(message) {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			const processWorker = new Worker(
 				this.modulePath + '/EffectsWorker.js'
 			);
 
-			processWorker.onmessage = event => resolve(event.data);
+			processWorker.onmessage = (event) => resolve(event.data);
 			processWorker.postMessage(message);
 		});
 	}
@@ -276,6 +277,7 @@ class EffectsComponent extends Component {
  * @type {!Object}
  */
 EffectsComponent.STATE = {
+
 	/**
 	 * Offset in pixels (<code>px</code> postfix) for the carousel item.
 	 *

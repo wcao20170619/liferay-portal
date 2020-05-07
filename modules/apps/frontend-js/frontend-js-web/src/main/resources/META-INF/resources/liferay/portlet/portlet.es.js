@@ -14,6 +14,7 @@
 
 import fetch from '../util/fetch.es';
 import objectToFormData from '../util/form/object_to_form_data.es';
+import getPortletId from '../util/get_portlet_id';
 import createPortletURL from '../util/portlet_url/create_portlet_url.es';
 import register from './register.es';
 
@@ -79,7 +80,7 @@ export function minimizePortlet(portletSelector, trigger, options) {
 				}
 			}
 
-			const portletId = Liferay.Util.getPortletId(portlet.id);
+			const portletId = getPortletId(portlet.id);
 
 			const formData = objectToFormData({
 				cmd: 'minimize',
@@ -95,7 +96,7 @@ export function minimizePortlet(portletSelector, trigger, options) {
 				body: formData,
 				method: 'POST',
 			})
-				.then(response => {
+				.then((response) => {
 					if (response.ok && minimized) {
 						const params = {
 							doAsUserId: options.doAsUserId,
@@ -112,8 +113,8 @@ export function minimizePortlet(portletSelector, trigger, options) {
 								params
 							)
 						)
-							.then(response => response.text())
-							.then(response => {
+							.then((response) => response.text())
+							.then((response) => {
 								const range = document.createRange();
 
 								range.selectNode(portlet);
@@ -126,14 +127,14 @@ export function minimizePortlet(portletSelector, trigger, options) {
 
 								portlet.appendChild(fragment);
 							})
-							.catch(error => {
+							.catch((error) => {
 								if (process.env.NODE_ENV === 'development') {
 									console.error(error);
 								}
 							});
 					}
 				})
-				.catch(error => {
+				.catch((error) => {
 					if (process.env.NODE_ENV === 'development') {
 						console.error(error);
 					}

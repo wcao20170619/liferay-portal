@@ -15,13 +15,13 @@
 /**
  * The Hudcrumbs Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-hudcrumbs
  */
 
 AUI.add(
 	'liferay-hudcrumbs',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var NAME = 'hudcrumbs';

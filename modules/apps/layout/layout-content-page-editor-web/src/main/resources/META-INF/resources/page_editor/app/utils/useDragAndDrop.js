@@ -52,6 +52,13 @@ const LAYOUT_DATA_ALLOWED_CHILDREN_TYPES = {
 		LAYOUT_DATA_ITEM_TYPES.fragment,
 	],
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: [],
+	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: [
+		LAYOUT_DATA_ITEM_TYPES.collection,
+		LAYOUT_DATA_ITEM_TYPES.dropZone,
+		LAYOUT_DATA_ITEM_TYPES.container,
+		LAYOUT_DATA_ITEM_TYPES.row,
+		LAYOUT_DATA_ITEM_TYPES.fragment,
+	],
 };
 
 const DISTANCE = 0.2;
@@ -162,7 +169,7 @@ export default function useDragAndDrop({
 	const toControlsId = useToControlsId();
 
 	const [dragOptions, drag, preview] = useDrag({
-		collect: _monitor => {
+		collect: (_monitor) => {
 			return {
 				isDragging: _monitor.isDragging(),
 			};
@@ -251,16 +258,20 @@ export default function useDragAndDrop({
 			}
 
 			// Determine rectangle on screen
+
 			const hoverBoundingRect = containerRef.current.getBoundingClientRect();
 
 			// Get vertical middle
+
 			const hoverMiddleY =
 				(hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
 			// Determine mouse position
+
 			const clientOffset = _monitor.getClientOffset();
 
 			// Get pixels to the top
+
 			const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
 			const [
@@ -552,7 +563,7 @@ function droppingInSamePosition({
 	dropTargetItem,
 	targetPositionWithoutMiddle,
 }) {
-	const itemIndex = children.findIndex(id => id === dropItem.itemId);
+	const itemIndex = children.findIndex((id) => id === dropItem.itemId);
 	const hoverId = dropTargetItem.itemId;
 
 	return (
@@ -679,6 +690,7 @@ function getParentItemIdAndPositon({
 				: dropTargetItemIndex + 1;
 
 		// Moving an item in the same parent
+
 		if (parent.children.includes(dropItem.itemId)) {
 			const itemIndex = parent.children.indexOf(dropItem.itemId);
 

@@ -2,7 +2,7 @@
 definition {
 
 	property portal.release = "true";
-	property portal.upstream = "false";
+	property portal.upstream = "true";
 	property custom.properties = "default.layout.template.id=1_column${line.separator}company.default.time.zone=America/Los_Angeles";
 	property testray.main.component.name = "Workflow";
 
@@ -10,6 +10,13 @@ definition {
 		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Search");
+
+		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -80,9 +87,7 @@ definition {
 	test ApproveEventWithInvitedUser {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property environment.acceptance = "quarantine";
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		var siteName = TestCase.getSiteName();
 
@@ -132,7 +137,6 @@ definition {
 	@description = "This is a use case for LPS-59572."
 	@priority = "3"
 	test DeleteAndRestoreEvent {
-		property portal.upstream = "quarantine";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -225,6 +229,8 @@ definition {
 
 		Navigator.gotoPage(pageName = "Calendar Page");
 
+		CalendarNavigator.gotoView(viewType = "Week");
+
 		CalendarEvent.viewSiteRSVPWithUnapprovedWorkflow(
 			eventTitle = "Calendar Event Title",
 			siteCalendarName = "${siteName}");
@@ -258,7 +264,6 @@ definition {
 
 	@priority = "4"
 	test RejectEventWithInvitedUser {
-		property portal.upstream = "quarantine";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -298,7 +303,7 @@ definition {
 			eventTitle = "Calendar Event Title",
 			siteCalendarName = "${siteName}");
 
-		CalendarEvent.viewNoUserInviteWithUnapprovedWorkflow(
+		CalendarEvent.viewNotVisibleUserInviteWithUnapprovedWorkflow(
 			eventTitle = "Calendar Event Title",
 			siteCalendarName = "${siteName}",
 			userCalendarName = "Test Test");

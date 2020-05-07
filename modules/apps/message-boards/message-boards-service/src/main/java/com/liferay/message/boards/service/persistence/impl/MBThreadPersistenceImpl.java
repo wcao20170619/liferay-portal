@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchThreadException;
 import com.liferay.message.boards.model.MBThread;
+import com.liferay.message.boards.model.MBThreadTable;
 import com.liferay.message.boards.model.impl.MBThreadImpl;
 import com.liferay.message.boards.model.impl.MBThreadModelImpl;
 import com.liferay.message.boards.service.persistence.MBThreadPersistence;
@@ -13076,16 +13077,18 @@ public class MBThreadPersistenceImpl
 		"mbThread.status != ?";
 
 	public MBThreadPersistenceImpl() {
-		setModelClass(MBThread.class);
-
-		setModelImplClass(MBThreadImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBThread.class);
+
+		setModelImplClass(MBThreadImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBThreadTable.INSTANCE);
 	}
 
 	/**

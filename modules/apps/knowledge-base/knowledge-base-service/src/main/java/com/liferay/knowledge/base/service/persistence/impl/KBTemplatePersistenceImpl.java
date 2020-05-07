@@ -16,6 +16,7 @@ package com.liferay.knowledge.base.service.persistence.impl;
 
 import com.liferay.knowledge.base.exception.NoSuchTemplateException;
 import com.liferay.knowledge.base.model.KBTemplate;
+import com.liferay.knowledge.base.model.KBTemplateTable;
 import com.liferay.knowledge.base.model.impl.KBTemplateImpl;
 import com.liferay.knowledge.base.model.impl.KBTemplateModelImpl;
 import com.liferay.knowledge.base.service.persistence.KBTemplatePersistence;
@@ -2343,16 +2344,18 @@ public class KBTemplatePersistenceImpl
 		"kbTemplate.groupId = ?";
 
 	public KBTemplatePersistenceImpl() {
-		setModelClass(KBTemplate.class);
-
-		setModelImplClass(KBTemplateImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(KBTemplate.class);
+
+		setModelImplClass(KBTemplateImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(KBTemplateTable.INSTANCE);
 	}
 
 	/**

@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.InlineSQLHelperUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -15515,12 +15516,6 @@ public class LayoutPersistenceImpl
 		"layout.priority <= ? AND layout.system_ = [$FALSE$]";
 
 	public LayoutPersistenceImpl() {
-		setModelClass(Layout.class);
-
-		setModelImplClass(LayoutImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(LayoutModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -15529,6 +15524,14 @@ public class LayoutPersistenceImpl
 		dbColumnNames.put("system", "system_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Layout.class);
+
+		setModelImplClass(LayoutImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(LayoutModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(LayoutTable.INSTANCE);
 	}
 
 	/**

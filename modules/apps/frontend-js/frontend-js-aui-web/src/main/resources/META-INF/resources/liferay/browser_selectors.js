@@ -14,12 +14,12 @@
 
 YUI.add(
 	'liferay-browser-selectors',
-	A => {
+	(A) => {
 		var REGEX_VERSION_DOT = /\./g;
 
 		var YUI3_JS_ENABLED = 'yui3-js-enabled';
 
-		var parseVersionNumber = function(str) {
+		var parseVersionNumber = function (str) {
 			var count = 0;
 
 			return parseFloat(
@@ -31,7 +31,7 @@ YUI.add(
 
 		var DEFAULTS_VERSION = ['0', '0'];
 
-		var getVersion = function(regex, userAgent) {
+		var getVersion = function (regex, userAgent) {
 			var version = (userAgent.match(regex) || DEFAULTS_VERSION)[1];
 
 			return parseVersionNumber(version);
@@ -91,6 +91,7 @@ YUI.add(
 
 		var BrowserSelectors = {
 			getSelectors() {
+
 				// The methods in this if block only run once across all instances
 
 				if (!UA.selectors) {

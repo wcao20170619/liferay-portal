@@ -127,6 +127,12 @@ public class AppBuilderAppLocalServiceUtil {
 		return getService().deletePersistedModel(persistedModel);
 	}
 
+	public static <T> T dslQuery(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return getService().dslQuery(dslQuery);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery
 		dynamicQuery() {
 
@@ -377,6 +383,21 @@ public class AppBuilderAppLocalServiceUtil {
 
 		return getService().getAppBuilderAppsCount(
 			groupId, companyId, ddmStructureId);
+	}
+
+	public static java.util.List<com.liferay.app.builder.model.AppBuilderApp>
+		getCompanyAppBuilderApps(
+			long companyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.app.builder.model.AppBuilderApp>
+					orderByComparator) {
+
+		return getService().getCompanyAppBuilderApps(
+			companyId, start, end, orderByComparator);
+	}
+
+	public static int getCompanyAppBuilderAppsCount(long companyId) {
+		return getService().getCompanyAppBuilderAppsCount(companyId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery

@@ -18,18 +18,17 @@ import deleteExperienceAction from '../actions/deleteExperience';
 import selectExperienceAction from '../actions/selectExperience';
 
 export default function removeExperience({
-	fragmentEntryLinkIds,
 	segmentsExperienceId,
 	selectedExperienceId,
 }) {
-	return dispatch => {
+	return (dispatch) => {
 		if (segmentsExperienceId === selectedExperienceId) {
 			return ExperienceService.selectExperience({
 				body: {
 					segmentsExperienceId: config.defaultSegmentsExperienceId,
 				},
 				dispatch,
-			}).then(portletIds => {
+			}).then((portletIds) => {
 				dispatch(
 					selectExperienceAction({
 						portletIds,
@@ -40,7 +39,6 @@ export default function removeExperience({
 
 				ExperienceService.removeExperience({
 					body: {
-						fragmentEntryLinkIds,
 						segmentsExperienceId,
 					},
 					dispatch,
@@ -56,7 +54,6 @@ export default function removeExperience({
 		else {
 			return ExperienceService.removeExperience({
 				body: {
-					fragmentEntryLinkIds,
 					segmentsExperienceId,
 				},
 				dispatch,

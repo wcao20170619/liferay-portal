@@ -15,10 +15,13 @@
 import Component from 'metal-component';
 import {Config} from 'metal-state';
 
+import toggleDisabled from './util/toggle_disabled';
+
 /**
  * Shows a dialog and handles the selected item.
  */
 class ItemSelectorDialog extends Component {
+
 	/**
 	 * Closes the dialog.
 	 */
@@ -39,10 +42,10 @@ class ItemSelectorDialog extends Component {
 
 		const dialogEvents = {
 			on: {
-				click: event => {
+				click: (event) => {
 					event.domEvent.preventDefault();
 				},
-				visibleChange: event => {
+				visibleChange: (event) => {
 					if (!event.newVal) {
 						this.selectedItem = this._selectedItem;
 
@@ -132,7 +135,7 @@ class ItemSelectorDialog extends Component {
 				.get('boundingBox')
 				.one('#addButton');
 
-			Liferay.Util.toggleDisabled(addButton, !currentItem);
+			toggleDisabled(addButton, !currentItem);
 		}
 
 		this._currentItem = currentItem;
@@ -146,6 +149,7 @@ class ItemSelectorDialog extends Component {
  * @type {!Object}
  */
 ItemSelectorDialog.STATE = {
+
 	/**
 	 * Label for the Add button.
 	 *

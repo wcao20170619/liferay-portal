@@ -18,30 +18,33 @@
 
 <%
 LayoutStructure layoutStructure = (LayoutStructure)request.getAttribute("liferay-layout:render-fragment-layout:layoutStructure");
+String mainItemId = (String)request.getAttribute("liferay-layout:render-fragment-layout:mainItemId");
+
+RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = (RenderFragmentLayoutDisplayContext)request.getAttribute("liferay-layout:render-fragment-layout:renderFragmentLayoutDisplayContext");
 %>
 
-<div class="layout-content portlet-layout" id="main-content" role="main">
+<liferay-util:html-top>
+	<%= renderFragmentLayoutDisplayContext.getPortletHeaderPaths() %>
+</liferay-util:html-top>
 
-	<%
-	try {
-		request.setAttribute(WebKeys.SHOW_PORTLET_TOPPER, Boolean.TRUE);
+<%
+try {
+	request.setAttribute(WebKeys.SHOW_PORTLET_TOPPER, Boolean.TRUE);
 
-		LayoutStructureItem layoutStructureItem = layoutStructure.getMainLayoutStructureItem();
+	LayoutStructureItem layoutStructureItem = layoutStructure.getLayoutStructureItem(mainItemId);
 
-		request.setAttribute("render_layout_structure.jsp-childrenItemIds", layoutStructureItem.getChildrenItemIds());
+	request.setAttribute("render_layout_structure.jsp-childrenItemIds", layoutStructureItem.getChildrenItemIds());
+%>
 
-		RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = (RenderFragmentLayoutDisplayContext)request.getAttribute("liferay-layout:render-fragment-layout:renderFragmentLayoutDisplayContext");
-	%>
+	<liferay-util:include page="/render_fragment_layout/render_layout_structure.jsp" servletContext="<%= application %>" />
 
-		<%= renderFragmentLayoutDisplayContext.getPortletPaths() %>
+<%
+}
+finally {
+	request.removeAttribute(WebKeys.SHOW_PORTLET_TOPPER);
+}
+%>
 
-		<liferay-util:include page="/render_fragment_layout/render_layout_structure.jsp" servletContext="<%= application %>" />
-
-	<%
-	}
-	finally {
-		request.removeAttribute(WebKeys.SHOW_PORTLET_TOPPER);
-	}
-	%>
-
-</div>
+<liferay-util:html-bottom>
+	<%= renderFragmentLayoutDisplayContext.getPortletFooterPaths() %>
+</liferay-util:html-bottom>

@@ -73,6 +73,27 @@ public class App implements Cloneable {
 
 	protected Long dataDefinitionId;
 
+	public String getDataDefinitionName() {
+		return dataDefinitionName;
+	}
+
+	public void setDataDefinitionName(String dataDefinitionName) {
+		this.dataDefinitionName = dataDefinitionName;
+	}
+
+	public void setDataDefinitionName(
+		UnsafeSupplier<String, Exception> dataDefinitionNameUnsafeSupplier) {
+
+		try {
+			dataDefinitionName = dataDefinitionNameUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String dataDefinitionName;
+
 	public Long getDataLayoutId() {
 		return dataLayoutId;
 	}

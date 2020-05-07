@@ -16,25 +16,39 @@ package com.liferay.data.engine.rest.resource.v2_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinition;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinitionField;
 import com.liferay.data.engine.rest.client.dto.v2_0.DataLayout;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataLayoutColumn;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataLayoutPage;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataLayoutRow;
 import com.liferay.data.engine.rest.client.pagination.Page;
 import com.liferay.data.engine.rest.client.pagination.Pagination;
+import com.liferay.data.engine.rest.client.problem.Problem;
+import com.liferay.data.engine.rest.client.resource.v2_0.DataDefinitionResource;
 import com.liferay.data.engine.rest.resource.v2_0.test.util.DataDefinitionTestUtil;
 import com.liferay.data.engine.rest.resource.v2_0.test.util.DataLayoutTestUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  * @author Marcelo Mello
  */
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class DataLayoutResourceTest extends BaseDataLayoutResourceTestCase {
 
@@ -68,22 +82,88 @@ public class DataLayoutResourceTest extends BaseDataLayoutResourceTestCase {
 		_testGetDataDefinitionDataLayoutsPage("layo", "form layout");
 	}
 
-	@Ignore
 	@Override
 	@Test
-	public void testGraphQLDeleteDataLayout() {
+	public void testGraphQLGetDataLayout() throws Exception {
+		DataLayout dataLayout = testGraphQLDataLayout_addDataLayout();
+
+		JSONObject dataLayoutJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"dataLayout",
+					HashMapBuilder.<String, Object>put(
+						"dataLayoutId", dataLayout.getId()
+					).build(),
+					getGraphQLFields())),
+			"JSONObject/data", "JSONObject/dataLayout");
+
+		Assert.assertEquals(
+			GetterUtil.getLong(dataLayout.getDataDefinitionId()),
+			dataLayoutJSONObject.getLong("dataDefinitionId"));
+		Assert.assertEquals(
+			MapUtil.getString(dataLayout.getName(), "en_US"),
+			JSONUtil.getValue(
+				dataLayoutJSONObject, "JSONObject/name", "Object/en_US"));
 	}
 
-	@Ignore
 	@Override
 	@Test
-	public void testGraphQLGetDataLayout() {
-	}
+	public void testGraphQLGetSiteDataLayoutByContentTypeByDataLayoutKey()
+		throws Exception {
 
-	@Ignore
-	@Override
-	@Test
-	public void testGraphQLGetSiteDataLayoutByContentTypeByDataLayoutKey() {
+		DataLayout dataLayout = testGraphQLDataLayout_addDataLayout();
+
+		JSONObject dataLayoutJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(
+				new GraphQLField(
+					"dataLayoutByContentTypeByDataLayoutKey",
+					HashMapBuilder.<String, Object>put(
+						"contentType",
+						StringBundler.concat(
+							StringPool.QUOTE, "app-builder", StringPool.QUOTE)
+					).put(
+						"dataLayoutKey",
+						StringBundler.concat(
+							StringPool.QUOTE, dataLayout.getDataLayoutKey(),
+							StringPool.QUOTE)
+					).put(
+						"siteKey",
+						StringBundler.concat(
+							StringPool.QUOTE, dataLayout.getSiteId(),
+							StringPool.QUOTE)
+					).build(),
+					getGraphQLFields())),
+			"JSONObject/data",
+			"JSONObject/dataLayoutByContentTypeByDataLayoutKey");
+
+		Assert.assertEquals(
+			GetterUtil.getLong(dataLayout.getDataDefinitionId()),
+			dataLayoutJSONObject.getLong("dataDefinitionId"));
+		Assert.assertEquals(
+			MapUtil.getString(dataLayout.getName(), "en_US"),
+			JSONUtil.getValue(
+				dataLayoutJSONObject, "JSONObject/name", "Object/en_US"));
+
+		// Not Found
+
+		Assert.assertEquals(
+			"Not Found",
+			JSONUtil.getValueAsString(
+				invokeGraphQLQuery(
+					new GraphQLField(
+						"dataLayoutByContentTypeByDataLayoutKey",
+						HashMapBuilder.<String, Object>put(
+							"contentType", "\"native-object\""
+						).put(
+							"dataLayoutKey",
+							"\"" + RandomTestUtil.randomString() + "\""
+						).put(
+							"siteKey",
+							"\"" + irrelevantGroup.getGroupId() + "\""
+						).build(),
+						getGraphQLFields())),
+				"JSONArray/errors", "Object/0", "JSONObject/extensions",
+				"Object/code"));
 	}
 
 	@Override
@@ -102,6 +182,112 @@ public class DataLayoutResourceTest extends BaseDataLayoutResourceTestCase {
 
 			assertEquals(randomDataLayout, postDataLayout);
 			assertValid(postDataLayout);
+		}
+
+		// MustNotDuplicateFieldName
+
+		DataDefinitionResource dataDefinitionResource =
+			DataDefinitionResource.builder(
+			).build();
+
+		DataDefinition dataDefinition =
+			dataDefinitionResource.postSiteDataDefinitionByContentType(
+				testGroup.getGroupId(), "app-builder",
+				new DataDefinition() {
+					{
+						availableLanguageIds = new String[] {"en_US", "pt_BR"};
+						dataDefinitionFields = new DataDefinitionField[] {
+							new DataDefinitionField() {
+								{
+									fieldType = "text";
+									label = HashMapBuilder.<String, Object>put(
+										"en_US", RandomTestUtil.randomString()
+									).put(
+										"pt_BR", RandomTestUtil.randomString()
+									).build();
+									name = "text1";
+								}
+							},
+							new DataDefinitionField() {
+								{
+									fieldType = "text";
+									label = HashMapBuilder.<String, Object>put(
+										"en_US", RandomTestUtil.randomString()
+									).put(
+										"pt_BR", RandomTestUtil.randomString()
+									).build();
+									name = "text2";
+								}
+							}
+						};
+						dataDefinitionKey = RandomTestUtil.randomString();
+						defaultLanguageId = "en_US";
+						name = HashMapBuilder.<String, Object>put(
+							"en_US", RandomTestUtil.randomString()
+						).build();
+					}
+				});
+
+		try {
+			DataLayoutRow dataLayoutRow = new DataLayoutRow() {
+				{
+					dataLayoutColumns = new DataLayoutColumn[] {
+						new DataLayoutColumn() {
+							{
+								columnSize = 12;
+								fieldNames = new String[] {
+									"text1", "text2", "text1"
+								};
+							}
+						}
+					};
+				}
+			};
+
+			dataLayoutResource.postDataDefinitionDataLayout(
+				dataDefinition.getId(),
+				new DataLayout() {
+					{
+						dataLayoutKey = RandomTestUtil.randomString();
+						paginationMode = "wizard";
+
+						setDataDefinitionId(dataDefinition.getId());
+						setDataLayoutPages(
+							new DataLayoutPage[] {
+								new DataLayoutPage() {
+									{
+										dataLayoutRows = new DataLayoutRow[] {
+											dataLayoutRow
+										};
+										description =
+											HashMapBuilder.<String, Object>put(
+												"en_US", "Page Description"
+											).build();
+										title =
+											HashMapBuilder.<String, Object>put(
+												"en_US", "Page Title"
+											).build();
+									}
+								}
+							});
+						setName(
+							HashMapBuilder.<String, Object>put(
+								"en_US", RandomTestUtil.randomString()
+							).build());
+					}
+				});
+
+			Assert.fail("An exception must be thrown");
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("text1", problem.getDetail());
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals("MustNotDuplicateFieldName", problem.getType());
+		}
+		finally {
+			dataDefinitionResource.deleteDataDefinition(dataDefinition.getId());
 		}
 	}
 
@@ -166,6 +352,14 @@ public class DataLayoutResourceTest extends BaseDataLayoutResourceTestCase {
 		dataLayout.setContentType("app-builder");
 
 		return dataLayout;
+	}
+
+	@Override
+	protected DataLayout testGraphQLDataLayout_addDataLayout()
+		throws Exception {
+
+		return dataLayoutResource.postDataDefinitionDataLayout(
+			_dataDefinition.getId(), randomDataLayout());
 	}
 
 	@Override

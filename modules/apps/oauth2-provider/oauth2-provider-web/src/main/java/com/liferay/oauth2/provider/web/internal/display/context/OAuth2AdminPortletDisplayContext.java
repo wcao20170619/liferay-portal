@@ -43,22 +43,20 @@ public class OAuth2AdminPortletDisplayContext
 	extends BaseOAuth2PortletDisplayContext {
 
 	public OAuth2AdminPortletDisplayContext(
-		OAuth2ApplicationService oAuth2ApplicationService,
+		DLURLHelper dlURLHelper,
 		OAuth2ApplicationScopeAliasesLocalService
 			oAuth2ApplicationScopeAliasesLocalService,
+		OAuth2ApplicationService oAuth2ApplicationService,
 		OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
-		PortletRequest portletRequest, ThemeDisplay themeDisplay,
-		DLURLHelper dlURLHelper) {
+		PortletRequest portletRequest, ThemeDisplay themeDisplay) {
 
-		_oAuth2ProviderConfiguration = oAuth2ProviderConfiguration;
+		super(
+			dlURLHelper, oAuth2ApplicationService, portletRequest,
+			themeDisplay);
 
 		this.oAuth2ApplicationScopeAliasesLocalService =
 			oAuth2ApplicationScopeAliasesLocalService;
-
-		super.oAuth2ApplicationService = oAuth2ApplicationService;
-		super.portletRequest = portletRequest;
-		super.themeDisplay = themeDisplay;
-		super.dlURLHelper = dlURLHelper;
+		_oAuth2ProviderConfiguration = oAuth2ProviderConfiguration;
 	}
 
 	public List<GrantType> getGrantTypes(

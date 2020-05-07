@@ -16,6 +16,7 @@ package com.liferay.layout.seo.service.persistence.impl;
 
 import com.liferay.layout.seo.exception.NoSuchSiteException;
 import com.liferay.layout.seo.model.LayoutSEOSite;
+import com.liferay.layout.seo.model.LayoutSEOSiteTable;
 import com.liferay.layout.seo.model.impl.LayoutSEOSiteImpl;
 import com.liferay.layout.seo.model.impl.LayoutSEOSiteModelImpl;
 import com.liferay.layout.seo.service.persistence.LayoutSEOSitePersistence;
@@ -1677,16 +1678,18 @@ public class LayoutSEOSitePersistenceImpl
 		"layoutSEOSite.groupId = ?";
 
 	public LayoutSEOSitePersistenceImpl() {
-		setModelClass(LayoutSEOSite.class);
-
-		setModelImplClass(LayoutSEOSiteImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(LayoutSEOSite.class);
+
+		setModelImplClass(LayoutSEOSiteImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(LayoutSEOSiteTable.INSTANCE);
 	}
 
 	/**

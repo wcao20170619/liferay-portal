@@ -16,8 +16,12 @@
 
 <%@ include file="/init.jsp" %>
 
-<aui:row id="ordering">
-	<aui:col width="<%= 50 %>">
+<clay:row
+	id='<%= renderResponse.getNamespace() + "ordering" %>'
+>
+	<clay:col
+		md="6"
+	>
 
 		<%
 		String orderByColumn1 = assetPublisherDisplayContext.getOrderByColumn1();
@@ -65,9 +69,11 @@
 
 			<aui:input cssClass="order-by-type-field" name="preferences--orderByType1--" type="hidden" value="<%= orderByType1 %>" />
 		</aui:field-wrapper>
-	</aui:col>
+	</clay:col>
 
-	<aui:col width="<%= 50 %>">
+	<clay:col
+		md="6"
+	>
 
 		<%
 		String orderByColumn2 = assetPublisherDisplayContext.getOrderByColumn2();
@@ -112,13 +118,13 @@
 
 			<aui:input cssClass="order-by-type-field" name="preferences--orderByType2--" type="hidden" value="<%= orderByType2 %>" />
 		</aui:field-wrapper>
-	</aui:col>
-</aui:row>
+	</clay:col>
+</clay:row>
 
 <aui:script use="aui-base">
 	A.one('#<portlet:namespace />ordering').delegate(
 		'click',
-		function(event) {
+		function (event) {
 			var currentTarget = event.currentTarget;
 
 			var orderByTypeContainer = currentTarget.ancestor(

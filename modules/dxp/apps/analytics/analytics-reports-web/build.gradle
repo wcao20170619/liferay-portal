@@ -8,9 +8,9 @@ dependencies {
 	compileInclude group: "org.apache.httpcomponents", name: "httpclient", version: "4.5.3"
 	compileInclude group: "org.apache.httpcomponents", name: "httpcore", version: "4.4.6"
 
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.9.10"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.9.10"
-	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.9.10.1"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-annotations", version: "2.10.3"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-core", version: "2.10.3"
+	compileOnly group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.10.3"
 	compileOnly group: "com.liferay", name: "biz.aQute.bnd.annotation", version: "4.2.0.LIFERAY-PATCHED-1"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "default"
@@ -19,11 +19,13 @@ dependencies {
 	compileOnly group: "javax.servlet.jsp", name: "javax.servlet.jsp-api", version: "2.3.1"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.http.servlet-api", version: "1.1.2"
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
+	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:asset:asset-display-page-api")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib-react")
 	compileOnly project(":apps:info:info-api")
 	compileOnly project(":apps:product-navigation:product-navigation-control-menu-api")
+	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
 	compileOnly project(":core:petra:petra-function")
 	compileOnly project(":core:petra:petra-lang")
 	compileOnly project(":core:petra:petra-reflect")

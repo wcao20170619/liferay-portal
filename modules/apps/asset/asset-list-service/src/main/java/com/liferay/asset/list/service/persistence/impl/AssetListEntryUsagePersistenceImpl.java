@@ -16,6 +16,7 @@ package com.liferay.asset.list.service.persistence.impl;
 
 import com.liferay.asset.list.exception.NoSuchEntryUsageException;
 import com.liferay.asset.list.model.AssetListEntryUsage;
+import com.liferay.asset.list.model.AssetListEntryUsageTable;
 import com.liferay.asset.list.model.impl.AssetListEntryUsageImpl;
 import com.liferay.asset.list.model.impl.AssetListEntryUsageModelImpl;
 import com.liferay.asset.list.service.persistence.AssetListEntryUsagePersistence;
@@ -2949,16 +2950,18 @@ public class AssetListEntryUsagePersistenceImpl
 		"(assetListEntryUsage.portletId IS NULL OR assetListEntryUsage.portletId = '')";
 
 	public AssetListEntryUsagePersistenceImpl() {
-		setModelClass(AssetListEntryUsage.class);
-
-		setModelImplClass(AssetListEntryUsageImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(AssetListEntryUsage.class);
+
+		setModelImplClass(AssetListEntryUsageImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(AssetListEntryUsageTable.INSTANCE);
 	}
 
 	/**

@@ -74,6 +74,7 @@ public class RedirectNotFoundEntryLocalServiceTest {
 			_addOrUpdateRedirectNotFoundEntry("url2");
 
 		Assert.assertNotEquals(redirectNotFoundEntry1, redirectNotFoundEntry2);
+
 		Assert.assertEquals(1, redirectNotFoundEntry1.getHits());
 		Assert.assertEquals(1, redirectNotFoundEntry2.getHits());
 	}
@@ -135,7 +136,6 @@ public class RedirectNotFoundEntryLocalServiceTest {
 		Assert.assertEquals(
 			activeRedirectNotFoundEntries.toString(), 1,
 			activeRedirectNotFoundEntries.size());
-
 		Assert.assertEquals(
 			activeRedirectNotFoundEntry, activeRedirectNotFoundEntries.get(0));
 	}

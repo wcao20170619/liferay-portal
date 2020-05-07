@@ -737,10 +737,17 @@ components:
             description:
                 ""
             properties:
-                contentSubtypeName:
-                    type: string
-                contentTypeClassName:
-                    type: string
+                contentSubtype:
+                    properties:
+                        classTypeId:
+                            format: int64
+                            type: integer
+                    type: object
+                contentType:
+                    properties:
+                        className:
+                            type: string
+                    type: object
                 key:
                     type: string
                 name:
@@ -988,7 +995,7 @@ components:
                 id:
                     type: string
                 value:
-                    oneOf:
+                    anyOf:
                         - $ref: "#/components/schemas/FragmentFieldBackgroundImage"
                         - $ref: "#/components/schemas/FragmentFieldHTML"
                         - $ref: "#/components/schemas/FragmentFieldImage"
@@ -1063,8 +1070,11 @@ components:
                     properties:
                         fieldKey:
                             type: string
-                        itemKey:
+                        itemClassName:
                             type: string
+                        itemClassPK:
+                            format: int64
+                            type: integer
                     type: object
             type: object
         FragmentSettingsAllowed:
@@ -1647,6 +1657,11 @@ components:
                     type: string
                 friendlyUrlPath:
                     type: string
+                hasValidAnswer:
+                    # @review
+                    description:
+                        A flag that indicates whether this thread has a message considered as valid
+                    type: boolean
                 headline:
                     description:
                         The thread's main title.
@@ -1873,7 +1888,8 @@ components:
                         $ref: "#/components/schemas/PageElement"
                     type: array
                 type:
-                    enum: [Collection, CollectionItem, Column, DropZone, Fragment, Root, Row, Section, Widget]
+                    enum: [Collection, CollectionItem, Column, DropZone, Fragment, FragmentDropZone, Root, Row, Section,
+                        Widget]
                     type: string
         PageFragmentInstanceDefinition:
             properties:
@@ -2005,6 +2021,17 @@ components:
                     additionalProperties:
                         type: object
                     type: object
+                widgetPermissions:
+                    items:
+                        properties:
+                            actionKeys:
+                                items:
+                                    type: string
+                                type: array
+                            roleKey:
+                                type: string
+                        type: object
+                    type: array
             type: object
         Rating:
             description:
@@ -2583,7 +2610,8 @@ components:
             type: object
 info:
     description:
-        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.headless.delivery.client', and version '2.0.1'."
+        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
+        'com.liferay.headless.delivery.client', and version '2.0.1'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -6716,36 +6744,6 @@ paths:
                     description:
                         ""
             tags: ["NavigationMenu"]
-    "/sites/{siteId}/page-definitions/preview":
-        # @review
-        post:
-            description:
-                Renders and retrieves HTML for the page definition using the theme of specified site.
-            operationId: postSitePageDefinitionPreview
-            parameters:
-                - in: path
-                  name: siteId
-                  required: true
-                  schema:
-                      format: int64
-                      type: integer
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/PageDefinition"
-                    application/xml:
-                        schema:
-                            $ref: "#/components/schemas/PageDefinition"
-            responses:
-                200:
-                    content:
-                        text/html:
-                            schema:
-                                type: string
-                    description:
-                        ""
-            tags: ["PageDefinition"]
     "/sites/{siteId}/structured-content-folders":
         get:
             description:

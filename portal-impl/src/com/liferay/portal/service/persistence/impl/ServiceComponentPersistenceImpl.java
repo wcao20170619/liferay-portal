@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchServiceComponentException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ServiceComponent;
+import com.liferay.portal.kernel.model.ServiceComponentTable;
 import com.liferay.portal.kernel.service.persistence.ServiceComponentPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -899,17 +900,19 @@ public class ServiceComponentPersistenceImpl
 		"serviceComponent.buildNumber = ?";
 
 	public ServiceComponentPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("data", "data_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(ServiceComponent.class);
 
 		setModelImplClass(ServiceComponentImpl.class);
 		setModelPKClass(long.class);
 		setEntityCacheEnabled(ServiceComponentModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("data", "data_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(ServiceComponentTable.INSTANCE);
 	}
 
 	/**

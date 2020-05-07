@@ -162,7 +162,7 @@ portletURL.setParameter("kaleoProcessId", String.valueOf(kaleoProcess.getKaleoPr
 	Liferay.provide(
 		window,
 		'<portlet:namespace />openPreviewDialog',
-		function(content) {
+		function (content) {
 			var Util = Liferay.Util;
 
 			var dialog = Util.getWindow('<portlet:namespace />previewDialog');
@@ -187,7 +187,7 @@ portletURL.setParameter("kaleoProcessId", String.valueOf(kaleoProcess.getKaleoPr
 </aui:script>
 
 <aui:script sandbox="<%= true %>">
-	var deleteRecords = function() {
+	var deleteRecords = function () {
 		if (
 			confirm(
 				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
@@ -211,6 +211,7 @@ portletURL.setParameter("kaleoProcessId", String.valueOf(kaleoProcess.getKaleoPr
 						<portlet:actionURL name="deleteDDLRecord" var="deleteDDLRecordURL">
 							<portlet:param name="mvcPath" value="/admin/view_kaleo_process.jsp" />
 							<portlet:param name="redirect" value="<%= currentURL %>" />
+							<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcess.getKaleoProcessId()) %>" />
 						</portlet:actionURL>
 
 						url: '<%= deleteDDLRecordURL %>',
@@ -224,10 +225,10 @@ portletURL.setParameter("kaleoProcessId", String.valueOf(kaleoProcess.getKaleoPr
 		deleteRecords: deleteRecords,
 	};
 
-	Liferay.componentReady('kaleoFormsRecordsManagementToolbar').then(function(
+	Liferay.componentReady('kaleoFormsRecordsManagementToolbar').then(function (
 		managementToolbar
 	) {
-		managementToolbar.on(['actionItemClicked'], function(event) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
 			var itemData = event.data.item.data;
 
 			if (itemData && itemData.action && ACTIONS[itemData.action]) {

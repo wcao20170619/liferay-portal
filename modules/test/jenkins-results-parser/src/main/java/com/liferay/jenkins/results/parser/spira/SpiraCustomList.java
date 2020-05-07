@@ -36,13 +36,14 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 	public static SpiraCustomList createSpiraCustomListByName(
 		SpiraProject spiraProject,
 		Class<? extends SpiraArtifact> spiraArtifactClass,
-		String spiraCustomListName) {
+		String customListName) {
 
-		SpiraCustomList cachedSpiraCustomList = getSpiraCustomListByName(
-			spiraProject, spiraArtifactClass, spiraCustomListName);
+		List<SpiraCustomList> spiraCustomLists = getSpiraCustomLists(
+			spiraProject, spiraArtifactClass,
+			new SearchQuery.SearchParameter("Name", customListName));
 
-		if (cachedSpiraCustomList != null) {
-			return cachedSpiraCustomList;
+		if (!spiraCustomLists.isEmpty()) {
+			return spiraCustomLists.get(0);
 		}
 
 		Map<String, String> urlPathReplacements = new HashMap<>();
@@ -55,7 +56,7 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 		JSONObject requestJSONObject = new JSONObject();
 
 		requestJSONObject.put("Active", true);
-		requestJSONObject.put("Name", spiraCustomListName);
+		requestJSONObject.put("Name", customListName);
 		requestJSONObject.put("ProjectTemplateId", projectTemplateID);
 		requestJSONObject.put("SortedOnValue", true);
 
@@ -76,12 +77,11 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 		SpiraProject spiraProject, SpiraCustomList spiraCustomList,
 		String value) {
 
-		for (Value spiraCustomListValue :
-				spiraCustomList.getSpiraCustomListValues()) {
+		Value spiraCustomListValue =
+			spiraCustomList.getSpiraCustomListValueByName(value);
 
-			if (value.equals(spiraCustomListValue.getName())) {
-				return spiraCustomListValue;
-			}
+		if (spiraCustomListValue != null) {
+			return spiraCustomListValue;
 		}
 
 		Map<String, String> urlPathReplacements = new HashMap<>();
@@ -100,16 +100,15 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 		requestJSONObject.put("ProjectId", spiraProject.getID());
 
 		try {
-			SpiraCustomList.Value spiraCustomListValue =
-				new SpiraCustomList.Value(
-					SpiraRestAPIUtil.requestJSONObject(
-						"project-templates/{project_template_id}/custom-lists" +
-							"/{custom_list_id}/values",
-						null, urlPathReplacements, HttpRequestMethod.POST,
-						requestJSONObject.toString()),
-					spiraProject, spiraCustomList);
+			spiraCustomListValue = new SpiraCustomList.Value(
+				SpiraRestAPIUtil.requestJSONObject(
+					"project-templates/{project_template_id}/custom-lists" +
+						"/{custom_list_id}/values",
+					null, urlPathReplacements, HttpRequestMethod.POST,
+					requestJSONObject.toString()),
+				spiraProject, spiraCustomList);
 
-			spiraCustomList.addSpiraCustomListValue(spiraCustomListValue);
+			spiraCustomList._addSpiraCustomListValue(spiraCustomListValue);
 
 			return spiraCustomListValue;
 		}
@@ -118,31 +117,61 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 		}
 	}
 
-	public List<SpiraCustomList.Value> getSpiraCustomListValues() {
-		SpiraCustomProperty spiraCustomProperty = getSpiraCustomProperty();
-
-		return spiraCustomProperty.getSpiraCustomListValues();
-	}
-
-	public SpiraCustomProperty getSpiraCustomProperty() {
-		if (_spiraCustomProperty != null) {
-			return _spiraCustomProperty;
+	public SpiraCustomList.Value getSpiraCustomListValueByName(String name) {
+		for (SpiraCustomList.Value value : getSpiraCustomListValues()) {
+			if (name.equals(value.getName())) {
+				return value;
+			}
 		}
 
-		_spiraCustomProperty = SpiraCustomProperty.createSpiraCustomProperty(
-			getSpiraProject(), _spiraArtifactClass, getName());
+		return null;
+	}
 
-		return _spiraCustomProperty;
+	public List<SpiraCustomList.Value> getSpiraCustomListValues() {
+		if (_spiraCustomListValues != null) {
+			return _spiraCustomListValues;
+		}
+
+		_spiraCustomListValues = new ArrayList<>();
+
+		SpiraProject spiraProject = getSpiraProject();
+
+		List<SpiraCustomProperty> spiraCustomProperties =
+			SpiraCustomProperty.getSpiraCustomProperties(
+				spiraProject, _spiraArtifactClass,
+				new SearchQuery.SearchParameter("Name", getName()));
+
+		if (spiraCustomProperties.isEmpty()) {
+			return _spiraCustomListValues;
+		}
+
+		SpiraCustomProperty spiraCustomProperty = spiraCustomProperties.get(0);
+
+		JSONObject spiraCustomPropertyJSONObject =
+			spiraCustomProperty.toJSONObject();
+
+		JSONObject customListJSONObject =
+			spiraCustomPropertyJSONObject.optJSONObject("CustomList");
+
+		if (customListJSONObject != JSONObject.NULL) {
+			JSONArray valuesJSONArray = customListJSONObject.getJSONArray(
+				"Values");
+
+			for (int i = 0; i < valuesJSONArray.length(); i++) {
+				JSONObject valueJSONObject = valuesJSONArray.getJSONObject(i);
+
+				_spiraCustomListValues.add(
+					new Value(valueJSONObject, spiraProject, this));
+			}
+		}
+
+		return _spiraCustomListValues;
 	}
 
 	public static class Value extends BaseSpiraArtifact {
 
 		public SpiraCustomList getSpiraCustomList() {
 			return _spiraCustomList;
-		}
-
-		public SpiraCustomProperty getSpiraCustomProperty() {
-			return _spiraCustomList.getSpiraCustomProperty();
 		}
 
 		protected Value(
@@ -160,22 +189,6 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 
 		private final SpiraCustomList _spiraCustomList;
 
-	}
-
-	protected static SpiraCustomList getSpiraCustomListByName(
-		SpiraProject spiraProject,
-		Class<? extends SpiraArtifact> spiraArtifactClass,
-		String spiraCustomListName) {
-
-		List<SpiraCustomList> spiraCustomLists = getSpiraCustomLists(
-			spiraProject, spiraArtifactClass,
-			new SearchQuery.SearchParameter("Name", spiraCustomListName));
-
-		if (!spiraCustomLists.isEmpty()) {
-			return spiraCustomLists.get(0);
-		}
-
-		return null;
 	}
 
 	protected static List<SpiraCustomList> getSpiraCustomLists(
@@ -213,14 +226,6 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 
 			},
 			customSearchParameters);
-	}
-
-	protected void addSpiraCustomListValue(
-		SpiraCustomList.Value spiraCustomListValue) {
-
-		SpiraCustomProperty spiraCustomProperty = getSpiraCustomProperty();
-
-		spiraCustomProperty.addSpiraCustomListValue(spiraCustomListValue);
 	}
 
 	protected static final String ARTIFACT_TYPE_NAME = "custompropertylist";
@@ -273,7 +278,16 @@ public class SpiraCustomList extends BaseSpiraArtifact {
 		cacheSpiraArtifact(SpiraCustomList.class, this);
 	}
 
+	private void _addSpiraCustomListValue(
+		SpiraCustomList.Value spiraCustomListValue) {
+
+		List<SpiraCustomList.Value> spiraCustomListValues =
+			getSpiraCustomListValues();
+
+		spiraCustomListValues.add(spiraCustomListValue);
+	}
+
 	private final Class<? extends SpiraArtifact> _spiraArtifactClass;
-	private SpiraCustomProperty _spiraCustomProperty;
+	private List<SpiraCustomList.Value> _spiraCustomListValues;
 
 }

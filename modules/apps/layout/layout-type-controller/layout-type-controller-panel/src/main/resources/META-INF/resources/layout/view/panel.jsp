@@ -18,8 +18,11 @@
 
 <c:choose>
 	<c:when test="<%= !themeDisplay.isStatePopUp() %>">
-		<aui:container class="lfr-panel-page" id="main-content">
-			<aui:row>
+		<clay:container
+			className="lfr-panel-page"
+			id='<%= renderResponse.getNamespace() + "main-content" %>'
+		>
+			<clay:row>
 
 				<%
 				String panelBodyCssClass = "panel-page-body";
@@ -32,7 +35,10 @@
 				}
 				%>
 
-				<aui:col cssClass="panel-page-menu" width="<%= 20 %>">
+				<clay:col
+					className="panel-page-menu"
+					md="3"
+				>
 
 					<%
 					PortletCategory portletCategory = (PortletCategory)WebAppPool.get(company.getCompanyId(), WebKeys.PORTLET_CATEGORY);
@@ -59,13 +65,16 @@
 					}
 					%>
 
-				</aui:col>
+				</clay:col>
 
-				<aui:col cssClass="<%= panelBodyCssClass %>" width="<%= 80 %>">
+				<clay:col
+					className="<%= panelBodyCssClass %>"
+					md="9"
+				>
 					<%@ include file="/layout/view/panel_description.jspf" %>
-				</aui:col>
-			</aui:row>
-		</aui:container>
+				</clay:col>
+			</clay:row>
+		</clay:container>
 	</c:when>
 	<c:otherwise>
 		<%@ include file="/layout/view/panel_description.jspf" %>

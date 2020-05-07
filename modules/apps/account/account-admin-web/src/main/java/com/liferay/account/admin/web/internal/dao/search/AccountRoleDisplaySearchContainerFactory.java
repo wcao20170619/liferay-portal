@@ -21,6 +21,7 @@ import com.liferay.account.service.AccountRoleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.comparator.RoleNameComparator;
@@ -31,13 +32,16 @@ import com.liferay.portal.vulcan.util.TransformUtil;
  */
 public class AccountRoleDisplaySearchContainerFactory {
 
-	public static SearchContainer create(
+	public static SearchContainer<AccountRoleDisplay> create(
 		long accountEntryId, LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		SearchContainer searchContainer = new SearchContainer(
-			liferayPortletRequest, liferayPortletResponse.createRenderURL(),
-			null, "there-are-no-roles");
+		SearchContainer<AccountRoleDisplay> searchContainer =
+			new SearchContainer(
+				liferayPortletRequest,
+				PortletURLUtil.getCurrent(
+					liferayPortletRequest, liferayPortletResponse),
+				null, "there-are-no-roles");
 
 		searchContainer.setId("accountRoles");
 		searchContainer.setOrderByCol("name");

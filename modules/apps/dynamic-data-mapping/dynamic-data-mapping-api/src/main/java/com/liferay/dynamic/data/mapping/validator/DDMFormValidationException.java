@@ -16,8 +16,10 @@ package com.liferay.dynamic.data.mapping.validator;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.SetUtil;
 
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,20 +46,42 @@ public class DDMFormValidationException extends PortalException {
 	public static class MustNotDuplicateFieldName
 		extends DDMFormValidationException {
 
-		public MustNotDuplicateFieldName(String fieldName) {
+		public MustNotDuplicateFieldName(Set<String> duplicatedFieldNames) {
 			super(
 				String.format(
-					"The field name %s cannot be defined more than once",
-					fieldName));
+					"Field names %s were defined more than once",
+					duplicatedFieldNames));
 
-			_fieldName = fieldName;
+			_duplicatedFieldNames = duplicatedFieldNames;
 		}
 
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link #MustNotDuplicateFieldName(Set)}
+		 */
+		@Deprecated
+		public MustNotDuplicateFieldName(String fieldName) {
+			this(SetUtil.fromArray(new String[] {fieldName}));
+		}
+
+		public Set<String> getDuplicatedFieldNames() {
+			return _duplicatedFieldNames;
+		}
+
+		/**
+		 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getDuplicatedFieldNames()}
+		 */
+		@Deprecated
 		public String getFieldName() {
-			return _fieldName;
+			String[] fieldNames = _duplicatedFieldNames.toArray(new String[0]);
+
+			if (fieldNames.length == 0) {
+				return null;
+			}
+
+			return fieldNames[0];
 		}
 
-		private String _fieldName;
+		private final Set<String> _duplicatedFieldNames;
 
 	}
 

@@ -37,13 +37,14 @@ definition {
 	macro gotoImportCollection {
 		if (IsElementPresent(locator1 = "NavNested#NAV_NESTED_ELLIPSIS")) {
 			Click.waitForMenuToggleJSClick(locator1 = "NavNested#NAV_NESTED_ELLIPSIS");
-
 		}
 		else {
 			Button.click(button = "New");
 		}
 
 		Button.click(button = "Import");
+
+		Pause(locator1 = "3000");
 
 		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
 	}

@@ -56,7 +56,7 @@ class RuleList extends Component {
 
 		return {
 			...states,
-			rules: rules.map(rule => {
+			rules: rules.map((rule) => {
 				let logicalOperator;
 
 				if (rule['logical-operator']) {
@@ -68,7 +68,7 @@ class RuleList extends Component {
 
 				return {
 					...rule,
-					actions: rule.actions.map(action => {
+					actions: rule.actions.map((action) => {
 						let newAction;
 
 						if (action.action === 'auto-fill') {
@@ -76,10 +76,10 @@ class RuleList extends Component {
 
 							const inputLabel = Object.values(
 								inputs
-							).map(input => this._getFieldLabel(input));
+							).map((input) => this._getFieldLabel(input));
 							const outputLabel = Object.values(
 								outputs
-							).map(output => this._getFieldLabel(output));
+							).map((output) => this._getFieldLabel(output));
 
 							newAction = {
 								...action,
@@ -102,7 +102,7 @@ class RuleList extends Component {
 
 						return newAction;
 					}),
-					conditions: rule.conditions.map(condition => {
+					conditions: rule.conditions.map((condition) => {
 						if (
 							condition.operands.length < 2 &&
 							condition.operands[0].type === 'list'
@@ -140,16 +140,16 @@ class RuleList extends Component {
 						};
 					}),
 					logicalOperator,
+					rulesCardOptions: this._getRulesCardOptions(rule),
 				};
 			}),
-			rulesCardOptions: this._getRulesCardOptions(),
 		};
 	}
 
 	_getDataProviderName(id) {
 		const {dataProvider} = this;
 
-		return dataProvider.find(data => data.uuid == id).label;
+		return dataProvider.find((data) => data.uuid == id).label;
 	}
 
 	_getFieldLabel(fieldName) {
@@ -171,7 +171,7 @@ class RuleList extends Component {
 		const fieldTarget = (parseInt(action.target, 10) + 1).toString();
 		const maxPageIndexRes = maxPageIndex(rule.conditions, pages);
 		const pageOptionsList = pageOptions(pages, maxPageIndexRes);
-		const selectedPage = pageOptionsList.find(option => {
+		const selectedPage = pageOptionsList.find((option) => {
 			return option.value == fieldTarget;
 		});
 
@@ -217,11 +217,11 @@ class RuleList extends Component {
 		if (pages && optionValue) {
 			const visitor = new PagesVisitor(pages);
 
-			visitor.findField(field => {
+			visitor.findField((field) => {
 				let found = false;
 
 				if (field.fieldName === fieldName && field.options) {
-					field.options.some(option => {
+					field.options.some((option) => {
 						if (option.value == optionValue) {
 							fieldLabel = option.label;
 
@@ -239,13 +239,17 @@ class RuleList extends Component {
 		return fieldLabel;
 	}
 
-	_getRulesCardOptions() {
+	_getRulesCardOptions(rule) {
+		const hasNestedCondition = this._hasNestedCondition(rule);
+
 		const rulesCardOptions = [
 			{
+				disabled: hasNestedCondition,
 				label: Liferay.Language.get('edit'),
 				settingsItem: 'edit',
 			},
 			{
+				confirm: hasNestedCondition,
 				label: Liferay.Language.get('delete'),
 				settingsItem: 'delete',
 			},
@@ -293,10 +297,29 @@ class RuleList extends Component {
 			});
 		}
 		else if (data.item.settingsItem == 'delete') {
-			this.emit('ruleDeleted', {
-				ruleId: cardId,
-			});
+			if (
+				!data.item.confirm ||
+				confirm(
+					Liferay.Language.get(
+						'you-cannot-create-rules-with-nested-functions.-are-you-sure-you-want-to-delete-this-rule'
+					)
+				)
+			) {
+				this.emit('ruleDeleted', {
+					ruleId: cardId,
+				});
+			}
 		}
+	}
+
+	_hasNestedCondition(rule) {
+		return (
+			rule.conditions.find((condition) =>
+				condition.operands.find((operand) =>
+					operand.value.match(/[aA-zZ]+[(].*[,]+.*[)]/)
+				)
+			) !== undefined
+		);
 	}
 
 	_setDataProviderNames(states) {
@@ -306,7 +329,7 @@ class RuleList extends Component {
 			for (let rule = 0; rule < rules.length; rule++) {
 				const actions = rules[rule].actions;
 
-				actions.forEach(action => {
+				actions.forEach((action) => {
 					if (action.action === 'auto-fill') {
 						const dataProviderName = this._getDataProviderName(
 							action.ddmDataProviderInstanceUUID

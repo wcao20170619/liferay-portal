@@ -14,8 +14,10 @@
 
 AUI.add(
 	'liferay-admin',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
+
+		var IN_PROGRESS_SELECTOR = '.background-task-status-in-progress';
 
 		var INTERVAL_RENDER_IDLE = 60000;
 
@@ -40,7 +42,13 @@ AUI.add(
 					value: null,
 				},
 
+				indexActionWrapperSelector: {
+					validator: Lang.isString,
+					value: null,
+				},
+
 				indexActionsPanel: {
+					validator: Lang.isString,
 					value: null,
 				},
 
@@ -99,9 +107,7 @@ AUI.add(
 
 					return !!(
 						indexActionsNode &&
-						indexActionsNode.one(
-							'.background-task-status-in-progress'
-						)
+						indexActionsNode.one(IN_PROGRESS_SELECTOR)
 					);
 				},
 
@@ -125,12 +131,6 @@ AUI.add(
 				_updateIndexActions() {
 					var instance = this;
 
-					var renderInterval = INTERVAL_RENDER_IDLE;
-
-					if (instance._isBackgroundTaskInProgress()) {
-						renderInterval = INTERVAL_RENDER_IN_PROGRESS;
-					}
-
 					var currentAdminIndexPanel = A.one(
 						instance.get(STR_INDEX_ACTIONS_PANEL)
 					);
@@ -139,45 +139,49 @@ AUI.add(
 						Liferay.Util.fetch(instance.get(STR_URL), {
 							method: 'POST',
 						})
-							.then(response => {
+							.then((response) => {
 								return response.text();
 							})
-							.then(response => {
+							.then((response) => {
 								var responseDataNode = A.Node.create(response);
+
+								// Replace each progress bar
 
 								var responseAdminIndexPanel = responseDataNode.one(
 									instance.get(STR_INDEX_ACTIONS_PANEL)
 								);
 
 								var responseAdminIndexNodeList = responseAdminIndexPanel.all(
-									'.index-action-wrapper'
+									instance.get('indexActionWrapperSelector')
 								);
 
 								var currentAdminIndexNodeList = currentAdminIndexPanel.all(
-									'.index-action-wrapper'
+									instance.get('indexActionWrapperSelector')
 								);
 
 								currentAdminIndexNodeList.each(
-									(item, index) => {
-										var inProgress = item.one('.progress');
-
+									(currentNode, index) => {
 										var responseAdminIndexNode = responseAdminIndexNodeList.item(
 											index
 										);
 
-										if (!inProgress) {
-											inProgress = responseAdminIndexNode.one(
-												'.progress'
+										var inProgress =
+											currentNode.one(
+												IN_PROGRESS_SELECTOR
+											) ||
+											responseAdminIndexNode.one(
+												IN_PROGRESS_SELECTOR
 											);
-										}
 
 										if (inProgress) {
-											item.replace(
+											currentNode.replace(
 												responseAdminIndexNode
 											);
 										}
 									}
 								);
+
+								// Replace control menu bar
 
 								var controlMenuId =
 									'#' + instance.ns('controlMenu');
@@ -193,14 +197,22 @@ AUI.add(
 										responseControlMenu
 									);
 								}
+
+								// Start timeout for refreshing the data
+
+								var renderInterval = INTERVAL_RENDER_IDLE;
+
+								if (instance._isBackgroundTaskInProgress()) {
+									renderInterval = INTERVAL_RENDER_IN_PROGRESS;
+								}
+
+								instance._laterTimeout = A.later(
+									renderInterval,
+									instance,
+									'_updateIndexActions'
+								);
 							});
 					}
-
-					instance._laterTimeout = A.later(
-						renderInterval,
-						instance,
-						'_updateIndexActions'
-					);
 				},
 
 				bindUI() {

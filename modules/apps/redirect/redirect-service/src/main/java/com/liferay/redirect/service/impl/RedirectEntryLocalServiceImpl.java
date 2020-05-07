@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.redirect.configuration.RedirectConfiguration;
@@ -128,6 +129,13 @@ public class RedirectEntryLocalServiceImpl
 	}
 
 	@Override
+	public boolean checkRedirectionChain(long groupId, String destinationURL) {
+		return ListUtil.isNotEmpty(
+			getRedirectEntriesByGroupIdAndDestinationURL(
+				groupId, destinationURL));
+	}
+
+	@Override
 	public RedirectEntry fetchRedirectEntry(long groupId, String sourceURL) {
 		return redirectEntryLocalService.fetchRedirectEntry(
 			groupId, sourceURL, false);
@@ -145,11 +153,7 @@ public class RedirectEntryLocalServiceImpl
 			groupId, sourceURL);
 
 		if (redirectEntry != null) {
-			Date expirationDate = redirectEntry.getExpirationDate();
-
-			if ((expirationDate != null) &&
-				(DateUtil.compareTo(expirationDate, DateUtil.newDate()) <= 0)) {
-
+			if (_isExpired(redirectEntry)) {
 				return null;
 			}
 
@@ -175,6 +179,15 @@ public class RedirectEntryLocalServiceImpl
 		OrderByComparator<RedirectEntry> obc) {
 
 		return redirectEntryPersistence.findByGroupId(groupId, start, end, obc);
+	}
+
+	@Override
+	public List<RedirectEntry> getRedirectEntriesByGroupIdAndDestinationURL(
+		long groupId, String destinationURL) {
+
+		return ListUtil.filter(
+			redirectEntryPersistence.findByG_D(groupId, destinationURL),
+			redirectEntry -> !_isExpired(redirectEntry));
 	}
 
 	@Override
@@ -215,6 +228,18 @@ public class RedirectEntryLocalServiceImpl
 		Instant instant = date.toInstant();
 
 		return instant.truncatedTo(ChronoUnit.DAYS);
+	}
+
+	private boolean _isExpired(RedirectEntry redirectEntry) {
+		Date expirationDate = redirectEntry.getExpirationDate();
+
+		if ((expirationDate != null) &&
+			(DateUtil.compareTo(expirationDate, DateUtil.newDate()) <= 0)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isInTheSameDay(Date date1, Date date2) {

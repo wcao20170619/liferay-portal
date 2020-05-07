@@ -32,7 +32,6 @@ import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
@@ -44,11 +43,8 @@ import com.liferay.trash.model.TrashEntry;
 import com.liferay.trash.service.TrashEntryLocalService;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.ActionRequest;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -58,8 +54,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @author Alicia García
@@ -110,7 +104,9 @@ public class EditEntryMVCActionCommandTest {
 	public void testDeleteEntries() throws PortalException {
 		BlogsEntry blogsEntry = _addBlogEntry(RandomTestUtil.randomString());
 
-		_deleteEntries(new MockActionRequest(blogsEntry.getEntryId()), false);
+		_deleteEntries(
+			_getMockLiferayPortletActionRequest(blogsEntry.getEntryId()),
+			false);
 
 		_blogsEntryService.getEntry(blogsEntry.getEntryId());
 	}
@@ -119,7 +115,8 @@ public class EditEntryMVCActionCommandTest {
 	public void testDeleteEntriesToTrash() throws PortalException {
 		BlogsEntry blogsEntry = _addBlogEntry(RandomTestUtil.randomString());
 
-		_deleteEntries(new MockActionRequest(blogsEntry.getEntryId()), true);
+		_deleteEntries(
+			_getMockLiferayPortletActionRequest(blogsEntry.getEntryId()), true);
 
 		Assert.assertNotNull(
 			_blogsEntryService.getEntry(blogsEntry.getEntryId()));
@@ -149,6 +146,18 @@ public class EditEntryMVCActionCommandTest {
 			moveToTrash);
 	}
 
+	private MockLiferayPortletActionRequest _getMockLiferayPortletActionRequest(
+		long entryId) {
+
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
+
+		mockLiferayPortletActionRequest.addParameter(
+			"entryId", new String[] {String.valueOf(entryId)});
+
+		return mockLiferayPortletActionRequest;
+	}
+
 	private static ServiceTracker<MVCActionCommand, MVCActionCommand>
 		_serviceTracker;
 
@@ -162,28 +171,5 @@ public class EditEntryMVCActionCommandTest {
 
 	@Inject
 	private TrashEntryLocalService _trashEntryLocalService;
-
-	private static class MockActionRequest
-		extends MockLiferayPortletActionRequest {
-
-		public MockActionRequest(long entryId) {
-			_entryId = entryId;
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return new MockHttpServletRequest();
-		}
-
-		@Override
-		public Map<String, String[]> getParameterMap() {
-			return HashMapBuilder.put(
-				"entryId", new String[] {String.valueOf(_entryId)}
-			).build();
-		}
-
-		private final long _entryId;
-
-	}
 
 }

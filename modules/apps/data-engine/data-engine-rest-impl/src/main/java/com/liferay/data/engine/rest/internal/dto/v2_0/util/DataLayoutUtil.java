@@ -126,6 +126,7 @@ public class DataLayoutUtil {
 
 		ddmFormLayout.setDDMFormLayoutPages(
 			_toDDMFormLayoutPages(dataLayout.getDataLayoutPages()));
+		ddmFormLayout.setDefaultLocale(ddmForm.getDefaultLocale());
 		ddmFormLayout.setPaginationMode(dataLayout.getPaginationMode());
 
 		ddmFormLayout.setDDMFormRules(

@@ -21,7 +21,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 	}
 
 	tearDown {
@@ -55,7 +55,7 @@ definition {
 			for (var roleTitle : list "Portal Content Reviewer,User") {
 				Permissions.removePermissionViaAPI(
 					resourceAction = "ACCESS_IN_CONTROL_PANEL",
-					resourceName = "com_liferay_app_builder_web_internal_portlet_CustomObjectsPortlet",
+					resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
 					roleTitle = "${roleTitle}");
 
 				Permissions.removePermissionViaAPI(
@@ -70,6 +70,7 @@ definition {
 	@description = "Access and set permissions for a custom object"
 	@priority = "4"
 	test AccessAndSetPermissionsForCustomObject {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -84,7 +85,7 @@ definition {
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "App Permissions");
 
-		AppBuilderAdmin.validatePermissionsFromRolesAreNotChecked(roleList = "Account Administrator,Account Owner,Analytics Administrator,Portal Content Reviewer,Power User,User");
+		AppBuilderAdmin.validatePermissionsFromRolesAreNotChecked(roleList = "Analytics Administrator,Portal Content Reviewer,Power User,User");
 
 		AppBuilderAdmin.addAllPermissionsFromRoles(roleList = "Portal Content Reviewer,User");
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "App Permissions");
@@ -115,6 +116,9 @@ definition {
 	@description = "This is a use case for LPS-104569."
 	@priority = "5"
 	test AddMultipleFormViewsToTheSameObject {
+		property test.name.skip.portal.instance = "AppBuilder#AddMultipleFormViewsToTheSameObject";
+		property portal.acceptance = "true";
+
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object 1",
 			isCreatingFormView = "false",
@@ -164,6 +168,8 @@ definition {
 	@description = "Add a Form View with a Date field"
 	@priority = "5"
 	test AddSimpleFormViewWithDateField {
+		property portal.acceptance = "true";
+
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
 			isCreatingFormView = "true",
@@ -177,6 +183,7 @@ definition {
 	@description = "Add a Form View with a Multiple Selection field"
 	@priority = "5"
 	test AddSimpleFormViewWithMultipleSelectionField {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -191,6 +198,7 @@ definition {
 	@description = "Add a Form View with a Numeric field"
 	@priority = "5"
 	test AddSimpleFormViewWithNumericField {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -205,6 +213,8 @@ definition {
 	@description = "Add a Form View with a Select From List field"
 	@priority = "5"
 	test AddSimpleFormViewWithSelectFromListField {
+		property test.name.skip.portal.instance = "AppBuilder#AddSimpleFormViewWithSelectFromListField";
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -219,6 +229,7 @@ definition {
 	@description = "Add a Form View with a Single Selection field"
 	@priority = "5"
 	test AddSimpleFormViewWithSingleSelectionField {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -248,6 +259,7 @@ definition {
 	@description = "Add a Form View with a Upload field"
 	@priority = "5"
 	test AddSimpleFormViewWithUploadField {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -297,6 +309,7 @@ definition {
 	@description = "Attempt to add a Custom Object without a valid name"
 	@priority = "5"
 	test AttemptToAddCustomObjectWithoutValidName {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "",
@@ -330,6 +343,7 @@ definition {
 	@description = "Change order of list from default most recent on top to oldest."
 	@priority = "5"
 	test ChangeFormViewsListOrderByDate {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -368,6 +382,7 @@ definition {
 	@description = "Order the list of Form Views by Name/Title (Asc or Desc)"
 	@priority = "5"
 	test ChangeFormViewsListOrderByName {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -406,6 +421,7 @@ definition {
 	@description = "Change order of Table Views list from the default of most recent on top to oldest."
 	@priority = "5"
 	test ChangeTableViewsListOrderByDate {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -446,6 +462,7 @@ definition {
 	@description = "Order the list of Table Views by Name/Title (Asc or Desc)"
 	@priority = "5"
 	test ChangeTableViewsListOrderByName {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -486,8 +503,8 @@ definition {
 	@description = "Create, Remove, Update and Delete entries of an application deployed as Product Menu"
 	@priority = "5"
 	test CreateRemoveUpdateDeleteEntriesOfProductMenuApp {
+		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfProductMenuApp";
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		var myFormViewName = "My Registration form";
 		var myTableViewName = "My display table";
@@ -740,8 +757,8 @@ definition {
 	@description = "Create, Remove, Update and Delete entries of an application deployed as a Standalone"
 	@priority = "5"
 	test CreateRemoveUpdateDeleteEntriesOfStandaloneApp {
+		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfStandaloneApp";
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		var myFormViewName = "My Registration form";
 		var myTableViewName = "My display table";
@@ -994,8 +1011,8 @@ definition {
 	@description = "Create, Remove, Update and Delete entries of an application deployed as a Widget"
 	@priority = "5"
 	test CreateRemoveUpdateDeleteEntriesOfWidgetApp {
+		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfWidgetApp";
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 
 		var myFormViewName = "My Registration form";
 		var myTableViewName = "My display table";
@@ -1170,6 +1187,8 @@ definition {
 	@description = "Create table views with a fixed entries filter of list field types (select from list and single selection)"
 	@priority = "5"
 	test CreateTableViewsWithFixedEntriesFilter {
+		property test.name.skip.portal.instance = "AppBuilder#CreateTableViewsWithFixedEntriesFilter";
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1360,7 +1379,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Table Views");
 		AppBuilderAdmin.openItem(itemName = "Table Filtered");
@@ -1394,7 +1413,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Table Views");
 		AppBuilderAdmin.openItem(itemName = "Table Filtered");
@@ -1435,7 +1454,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Table Views");
 		AppBuilderAdmin.openItem(itemName = "Table Filtered");
@@ -1471,6 +1490,7 @@ definition {
 	@description = "Delete an existing custom object with no associated relationships"
 	@priority = "5"
 	test DeleteCustomObjectWithAssociatedRelationship {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1506,7 +1526,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.deleteEntry(itemName = "my custom object");
 	}
@@ -1514,6 +1534,7 @@ definition {
 	@description = "Delete an existing custom object with no associated relationships"
 	@priority = "5"
 	test DeleteCustomObjectWithNoAssociatedRelationship {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1528,7 +1549,8 @@ definition {
 	@description = "Delete fields from the Form View through the Delete options and assert its affect on other Form and Table views"
 	@priority = "5"
 	test DeleteFormViewFieldFromObject {
-		property portal.upstream = "quarantine";
+		property test.name.skip.portal.instance = "AppBuilder#DeleteFormViewFieldFromObject";
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1649,6 +1671,7 @@ definition {
 	@description = "Delete an existing Form View with no active publishing through the kebab/action menu"
 	@priority = "5"
 	test DeleteFormViewThroughActionMenu {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1665,6 +1688,7 @@ definition {
 	@description = "Delete a publishing"
 	@priority = "5"
 	test DeletePublishing {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1698,6 +1722,7 @@ definition {
 	@description = "Delete an existing Table View with no active publishing through the kebab/action menu"
 	@priority = "5"
 	test DeleteTableViewThroughActionMenu {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1717,6 +1742,7 @@ definition {
 	@description = "Choose between the existing Form Views of an object when deploying an app"
 	@priority = "5"
 	test DeployAnAppChoosingBetweenTheExistingFormViews {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -1783,6 +1809,7 @@ definition {
 	@description = "Create more than one Table View and choose between the two when deploying an App"
 	@priority = "5"
 	test DeployAppChoosingBetweenDifferentTableViews {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -1800,9 +1827,13 @@ definition {
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
 
+		FormViewBuilder.closeSidebar();
+
 		FormViewBuilder.setName(formViewName = "Upload Form View");
 
 		FormViewBuilder.addFieldByDoubleClick(fieldType = "Upload");
+
+		FormViewBuilder.closeSidebar();
 
 		FormViewBuilder.save();
 
@@ -1872,7 +1903,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "Custom Object Title");
 
@@ -1895,7 +1926,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "Custom Object Title");
 
@@ -1919,6 +1950,7 @@ definition {
 	@description = "Deploy multiple apps using the same Form View and Table View"
 	@priority = "5"
 	test DeployAppsWithSameFVandTV {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -2000,6 +2032,7 @@ definition {
 	@description = "Clear search results when clicking the Clear button on the search results banner"
 	@priority = "5"
 	test FormViewClearSearchResults {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -2034,6 +2067,7 @@ definition {
 	@description = "Validate returns by search engine using a search term"
 	@priority = "5"
 	test FormViewSearchByTerm {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -2058,6 +2092,7 @@ definition {
 	@description = "No results found screen is shown when the search doesn't retrieve any results"
 	@priority = "5"
 	test FormViewSearchNoResultsFound {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -2123,6 +2158,8 @@ definition {
 	@description = "Place a widget in my page with only a Form View of my App"
 	@priority = "5"
 	test PlaceFormViewWidget {
+		property portal.acceptance = "true";
+
 		var myFormViewName = "My Registration form";
 		var myTableViewName = "My display table";
 		var myAppName = "My Registration app";
@@ -2200,6 +2237,100 @@ definition {
 		AppBuilderAdmin.validateTextBox(fieldName = "Nickname");
 	}
 
+	@description = "LRQA-56514: Make sure predefined values are persisted when creating a Form View"
+	@priority = "5"
+	test PredefinedValuesArePersistedInFormView {
+		property portal.acceptance = "true";
+		property portal.upstream = "quarantine";
+
+		AppBuilderAdmin.addCustomObject(
+			customObjectName = "My new object",
+			isCreatingFormView = "true",
+			isCreatingViaPlusIcon = "true");
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Text");
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.setFieldPredefinedText(fieldValue = "Predefined Text");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Numeric");
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.setFieldPredefinedText(fieldValue = "12345");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Date");
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.setFieldPredefinedDate(fieldValue = "03/02/2019");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Select from List");
+		for (var number : list "1,2,3") {
+			FormViewBuilder.editOptionsRow(
+				optionName = "Select${number}",
+				optionValue = "Select ${number}",
+				rowNumber = "${number}");
+		}
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.selectSelectOptionPredefined(selectOption = "Select 2");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Multiple Selection");
+		for (var number : list "1,2,3") {
+			FormViewBuilder.editOptionsRow(
+				optionName = "Multiple${number}",
+				optionValue = "Multiple ${number}",
+				rowNumber = "${number}");
+		}
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.selectSelectWithMultipleOptionsPredefined(
+			fieldName = "Multiple Selection",
+			selectOptionsList = "Multiple 1,Multiple 2,Multiple 3");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Single Selection");
+		for (var number : list "1,2,3") {
+			FormViewBuilder.editOptionsRow(
+				optionName = "Task${number}",
+				optionValue = "Task ${number}",
+				rowNumber = "${number}");
+		}
+		FormViewBuilder.switchToAdvancedTab();
+		FormViewBuilder.selectSelectOptionPredefined(selectOption = "Task 3");
+		FormViewBuilder.closeSidebar();
+
+		FormViewBuilder.setName(formViewName = "My Form View");
+
+		FormViewBuilder.save();
+
+		AppBuilderAdmin.validateItemNameOnTable(itemName = "My Form View");
+
+		AppBuilderAdmin.openItem(itemName = "My Form View");
+
+		FormViewBuilder.validatePredefinedText(
+			fieldName = "Text",
+			fieldValue = "Predefined Text");
+
+		FormViewBuilder.validatePredefinedText(
+			fieldName = "Numeric",
+			fieldValue = "12345");
+
+		FormViewBuilder.validatePredefinedDate(
+			fieldName = "Date",
+			fieldValue = "03/02/2019");
+
+		FormViewBuilder.validatePredefinedSelectList(
+			fieldName = "Select from List",
+			fieldValue = "Select 2");
+
+		FormViewBuilder.validatePredefinedMultipleSelection(
+			fieldName = "Multiple Selection",
+			selectOptionsList = "Multiple 1,Multiple 2,Multiple 3");
+
+		FormViewBuilder.validatePredefinedSingleSelection(
+			fieldName = "Single Selection",
+			fieldValue = "Task 3");
+	}
+
 	@description = "Publish my app as a widget and submit entry"
 	@priority = "5"
 	test PublishAppAsWidgetAndSubmitEntry {
@@ -2255,6 +2386,7 @@ definition {
 	@description = "Publish my app as a widget with only a Table View"
 	@priority = "5"
 	test PublishAppAsWidgetWithOnlyTableView {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -2329,6 +2461,7 @@ definition {
 	@description = "Publish my app in one or more sites"
 	@priority = "5"
 	test PublishAppsInOneOrMoreSites {
+		property portal.acceptance = "true";
 
 		JSONLayout.addPublicLayout(
 			groupName = "App Builder Site 1",
@@ -2378,7 +2511,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Table Views");
 
@@ -2409,7 +2542,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "Table Views");
 
@@ -2482,7 +2615,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object 1");
 
@@ -2522,6 +2655,7 @@ definition {
 	@description = "Publish apps in the product menu and reuse its views"
 	@priority = "5"
 	test PublishAppsInProductMenuAndReuseItsViews {
+		property portal.acceptance = "true";
 
 		var myFormViewName_1 = "My Form View 1";
 		var myFormViewName_2 = "My Form View 2";
@@ -2640,6 +2774,7 @@ definition {
 	@description = "Publish apps in standalone mode and reuse its views"
 	@priority = "4"
 	test PublishAppsInStandaloneAndReuseItsViews {
+		property portal.acceptance = "true";
 
 		var myFormViewName_1 = "My Form View 1";
 		var myFormViewName_2 = "My Form View 2";
@@ -2739,6 +2874,7 @@ definition {
 	@description = "Make sure removing a field from a specific Form View is not impacting another Form View"
 	@priority = "5"
 	test RemoveFieldInMultipleFormViews {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -2819,6 +2955,8 @@ definition {
 	@description = "Reuse my object's existing fields when creating a new form view"
 	@priority = "5"
 	test ReuseExistingFormViewFields {
+		property test.name.skip.portal.instance = "AppBuilder#ReuseExistingFormViewFields";
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -2894,18 +3032,14 @@ definition {
 			formViewName = "My Form View");
 
 		AppBuilderAdmin.openItem(itemName = "My Form View");
-		/*
-
-		// TODO: Remove this comment once LPS-110060 is fixed.
 
 		FormViewBuilder.addFieldByDoubleClickFromObjectSidebar(fieldLabel = "Hobbies");
 
 		FormViewBuilder.setFieldLabel(fieldLabel = "Hobbies edited");
 
 		FormViewBuilder.validateFormMultipleSelectionField(
-			fieldLabel = "Hobbies 2",
+			fieldLabel = "Hobby 2",
 			fieldName = "Hobbies edited");
-		*/
 
 		FormViewBuilder.addFieldByDoubleClickFromObjectSidebar(fieldLabel = "Marital Status");
 		FormViewBuilder.validateFormMultipleSelectionField(
@@ -2963,6 +3097,8 @@ definition {
 	@description = "Search for a column(field) in the columns list in Table View Builder"
 	@priority = "5"
 	test SearchColumnListInTableViewBuilder {
+		property test.name.skip.portal.instance = "AppBuilder#SearchColumnListInTableViewBuilder";
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -3043,6 +3179,7 @@ definition {
 	@description = "Search for a deployment in the deployment lists"
 	@priority = "5"
 	test SearchForDeployedItem {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -3140,6 +3277,7 @@ definition {
 	@description = "Search for an object in the object list"
 	@priority = "5"
 	test SearchForObject {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object 1",
@@ -3188,6 +3326,8 @@ definition {
 	@description = "Set App Builder manage permission for User and Portal Content Reviewer and perform CRUD operations"
 	@priority = "5"
 	test SetAppBuilderManagePermissionFor2RolesAndPerformCRUD {
+		property portal.acceptance = "true";
+		property portal.upstream = "quarantine";
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -3221,7 +3361,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ACCESS_IN_CONTROL_PANEL",
-			resourceName = "com_liferay_app_builder_web_internal_portlet_CustomObjectsPortlet",
+			resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
 			roleTitle = "User");
 
 		Permissions.definePermissionViaJSONAPI(
@@ -3232,7 +3372,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Admin object",
@@ -3266,7 +3406,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Admin object");
 
@@ -3306,7 +3446,7 @@ definition {
 
 		Permissions.removePermissionViaAPI(
 			resourceAction = "ACCESS_IN_CONTROL_PANEL",
-			resourceName = "com_liferay_app_builder_web_internal_portlet_CustomObjectsPortlet",
+			resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
 			roleTitle = "User");
 
 		Permissions.removePermissionViaAPI(
@@ -3320,7 +3460,7 @@ definition {
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "ACCESS_IN_CONTROL_PANEL",
-			resourceName = "com_liferay_app_builder_web_internal_portlet_CustomObjectsPortlet",
+			resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
 			roleTitle = "Portal Content Reviewer");
 
 		Permissions.definePermissionViaJSONAPI(
@@ -3334,6 +3474,7 @@ definition {
 	@description = "Set permissions for User and Portal Content Reviewer and perform CRUD operations in a deployed widget App"
 	@priority = "5"
 	test SetPermissionsFor2RolesAndPerformCRUD {
+		property portal.acceptance = "true";
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -3363,7 +3504,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -3432,7 +3573,7 @@ definition {
 				ProductMenu.gotoPortlet(
 					category = "App Builder",
 					panel = "Control Panel",
-					portlet = "Custom Objects");
+					portlet = "Objects");
 
 				LexiconEntry.gotoVerticalEllipsisMenuItemNoError(menuItem = "App Permissions");
 
@@ -3495,6 +3636,7 @@ definition {
 	@description = "Clear Table View search results when clicking the Clear button on the search results banner"
 	@priority = "5"
 	test TableViewClearSearchResults {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -3522,6 +3664,7 @@ definition {
 	@description = "Validate Table View search returns by search engine using a search term"
 	@priority = "5"
 	test TableViewSearchByTerm {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "My custom object",
@@ -3548,6 +3691,7 @@ definition {
 	@description = "No results found screen is shown when the Table View search doesn't retrieve any results"
 	@priority = "5"
 	test TableViewSearchNoResultsFound {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -3576,6 +3720,7 @@ definition {
 	@description = "Unpublish and Republish an App"
 	@priority = "5"
 	test UnpublishAndRepublish {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -3633,7 +3778,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3650,7 +3795,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3663,7 +3808,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3685,7 +3830,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3707,7 +3852,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3729,7 +3874,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3759,6 +3904,7 @@ definition {
 	@description = "Update an existing deployment"
 	@priority = "5"
 	test UpdateDeployment {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -3826,7 +3972,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3885,7 +4031,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3912,7 +4058,7 @@ definition {
 		ProductMenu.gotoPortlet(
 			category = "App Builder",
 			panel = "Control Panel",
-			portlet = "Custom Objects");
+			portlet = "Objects");
 
 		AppBuilderAdmin.openItem(itemName = "my custom object");
 
@@ -3954,6 +4100,7 @@ definition {
 	@description = "Make sure the search result show if the column is available to be added or already inserted in the table view"
 	@priority = "5"
 	test ValidateDisabledFieldInTableView {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "Custom Object Title",
@@ -3977,6 +4124,7 @@ definition {
 	@description = "Validate empty list state of Apps listing screen"
 	@priority = "5"
 	test ValidateEmptyStateOfAppsListingScreen {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -3995,6 +4143,7 @@ definition {
 	@description = "Validate empty list state of Custom Object listing screen"
 	@priority = "5"
 	test ValidateEmptyStateOfCustomObjectListingScreen {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.teardownAppBuilder();
 
@@ -4008,6 +4157,7 @@ definition {
 	@description = "Validate empty list state of Form View listing screen"
 	@priority = "5"
 	test ValidateEmptyStateOfFormViewListingScreen {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -4024,6 +4174,7 @@ definition {
 	@description = "Validate empty list state of Table View listing screen"
 	@priority = "5"
 	test ValidateEmptyStateOfTableViewListingScreen {
+		property portal.acceptance = "true";
 
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",

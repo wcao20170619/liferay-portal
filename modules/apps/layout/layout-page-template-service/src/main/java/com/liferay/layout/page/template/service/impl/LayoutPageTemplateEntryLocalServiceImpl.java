@@ -25,6 +25,7 @@ import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.exception.LayoutPageTemplateEntryNameException;
+import com.liferay.layout.page.template.internal.validator.LayoutPageTemplateEntryValidator;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.base.LayoutPageTemplateEntryLocalServiceBaseImpl;
 import com.liferay.petra.string.CharPool;
@@ -215,7 +216,8 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		if (plid == 0) {
 			Layout layout = _addLayout(
-				userId, groupId, name, type, masterLayoutPlid, serviceContext);
+				userId, groupId, name, type, masterLayoutPlid, status,
+				serviceContext);
 
 			if (layout != null) {
 				plid = layout.getPlid();
@@ -834,12 +836,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 				groupId);
 		}
 
-		for (char c : _BLACKLIST_CHAR) {
-			if (name.indexOf(c) >= 0) {
-				throw new LayoutPageTemplateEntryNameException.
-					MustNotContainInvalidCharacters(c);
-			}
-		}
+		LayoutPageTemplateEntryValidator.validateNameCharacters(name);
 
 		int nameMaxLength = ModelHintsUtil.getMaxLength(
 			LayoutPageTemplateEntry.class.getName(), "name");
@@ -868,7 +865,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 	private Layout _addLayout(
 			long userId, long groupId, String name, int type,
-			long masterLayoutPlid, ServiceContext serviceContext)
+			long masterLayoutPlid, int status, ServiceContext serviceContext)
 		throws PortalException {
 
 		boolean privateLayout = false;
@@ -887,7 +884,9 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		UnicodeProperties typeSettingsUnicodeProperties =
 			new UnicodeProperties();
 
-		typeSettingsUnicodeProperties.put("published", "true");
+		if (status == WorkflowConstants.STATUS_APPROVED) {
+			typeSettingsUnicodeProperties.put("published", "true");
+		}
 
 		if ((type == LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT) ||
 			(masterLayoutPlid > 0)) {
@@ -916,13 +915,21 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		serviceContext.setModifiedDate(layout.getModifiedDate());
 
-		layoutLocalService.addLayout(
+		Layout draftLayout = layoutLocalService.addLayout(
 			userId, groupId, privateLayout, layout.getParentLayoutId(),
 			classNameLocalService.getClassNameId(Layout.class),
 			layout.getPlid(), layout.getNameMap(), titleMap,
 			layout.getDescriptionMap(), layout.getKeywordsMap(),
 			layout.getRobotsMap(), layoutType, layout.getTypeSettings(), true,
 			true, masterLayoutPlid, Collections.emptyMap(), serviceContext);
+
+		if (status == WorkflowConstants.STATUS_DRAFT) {
+			layoutLocalService.updateStatus(
+				userId, draftLayout.getPlid(), status, serviceContext);
+
+			layout = layoutLocalService.updateStatus(
+				userId, layout.getPlid(), status, serviceContext);
+		}
 
 		return layout;
 	}
@@ -998,11 +1005,6 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		return name;
 	}
-
-	private static final char[] _BLACKLIST_CHAR = {
-		';', '/', '?', ':', '@', '=', '&', '\"', '<', '>', '#', '%', '{', '}',
-		'|', '\\', '^', '~', '[', ']', '`'
-	};
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;

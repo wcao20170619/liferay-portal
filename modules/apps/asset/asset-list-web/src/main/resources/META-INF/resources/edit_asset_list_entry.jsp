@@ -32,8 +32,10 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 %>
 
 <div class="container-fluid container-fluid-max-xl container-view">
-	<div class="row">
-		<div class="col-lg-3">
+	<clay:row>
+		<clay:col
+			lg="3"
+		>
 			<nav class="menubar menubar-transparent menubar-vertical-expand-lg">
 				<ul class="nav nav-nested">
 					<li class="nav-item">
@@ -114,9 +116,11 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 					</li>
 				</ul>
 			</nav>
-		</div>
+		</clay:col>
 
-		<div class="col-lg-9">
+		<clay:col
+			lg="9"
+		>
 
 			<%
 			AssetListEntry assetListEntry = assetListDisplayContext.getAssetListEntry();
@@ -130,8 +134,8 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 					<liferay-util:include page="/edit_asset_list_entry_manual.jsp" servletContext="<%= application %>" />
 				</c:otherwise>
 			</c:choose>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <script>
@@ -153,7 +157,7 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 				uri:
 					'<%= editAssetListDisplayContext.getSelectSegmentsEntryURL() %>',
 			},
-			function(event) {
+			function (event) {
 				Liferay.Util.postForm(document.<portlet:namespace />fm, {
 					data: {
 						segmentsEntryId: event.entityid,

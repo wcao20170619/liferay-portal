@@ -65,15 +65,24 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 	<liferay-util:include page="/edit_role_tabs.jsp" servletContext="<%= application %>" />
 </c:if>
 
-<aui:container cssClass="container-fluid container-fluid-max-xl container-form-lg" id="permissionContainer">
-	<aui:row>
+<clay:container
+	className="c-pt-md-5"
+	id='<%= renderResponse.getNamespace() + "permissionContainer" %>'
+>
+	<clay:row>
 		<c:if test="<%= !portletName.equals(PortletKeys.SERVER_ADMIN) %>">
-			<aui:col width="<%= 25 %>">
+			<clay:col
+				md="3"
+			>
 				<%@ include file="/edit_role_permissions_navigation.jspf" %>
-			</aui:col>
+			</clay:col>
 		</c:if>
 
-		<aui:col cssClass="lfr-permission-content-container" id="permissionContentContainer" width="<%= portletName.equals(PortletKeys.SERVER_ADMIN) ? 100 : 75 %>">
+		<clay:col
+			className="lfr-permission-content-container"
+			id='<%= renderResponse.getNamespace() + "permissionContentContainer" %>'
+			md="<%= portletName.equals(PortletKeys.SERVER_ADMIN) ? String.valueOf(12) : String.valueOf(9) %>"
+		>
 			<c:choose>
 				<c:when test="<%= cmd.equals(Constants.VIEW) %>">
 					<liferay-util:include page="/edit_role_permissions_summary.jsp" servletContext="<%= application %>" />
@@ -88,9 +97,9 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 					<liferay-util:include page="/edit_role_permissions_form.jsp" servletContext="<%= application %>" />
 				</c:otherwise>
 			</c:choose>
-		</aui:col>
-	</aui:row>
-</aui:container>
+		</clay:col>
+	</clay:row>
+</clay:container>
 
 <aui:script>
 	function <portlet:namespace />selectOrganization(
@@ -124,7 +133,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 			NAME: 'searchpermissioNnavigation',
 
 			prototype: {
-				initializer: function() {
+				initializer: function () {
 					var instance = this;
 
 					instance._bindUIACBase();
@@ -133,10 +142,10 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 			},
 		});
 
-		var getItems = function() {
+		var getItems = function () {
 			var results = [];
 
-			permissionNavigationItems.each(function(item, index, collection) {
+			permissionNavigationItems.each(function (item, index, collection) {
 				results.push({
 					data: item.text().trim(),
 					node: item,
@@ -146,7 +155,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 			return results;
 		};
 
-		var getNoResultsNode = function() {
+		var getNoResultsNode = function () {
 			if (!noResultsNode) {
 				noResultsNode = A.Node.create(
 					'<div class="alert"><liferay-ui:message key="there-are-no-results" /></div>'
@@ -175,7 +184,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 			source: getItems(),
 		});
 
-		permissionNavigationSearch.on('query', function(event) {
+		permissionNavigationSearch.on('query', function (event) {
 			if (event.query) {
 				togglerDelegate.expandAll();
 			}
@@ -184,18 +193,18 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 			}
 		});
 
-		permissionNavigationSearch.on('results', function(event) {
-			permissionNavigationItems.each(function(item, index, collection) {
+		permissionNavigationSearch.on('results', function (event) {
+			permissionNavigationItems.each(function (item, index, collection) {
 				item.addClass('hide');
 			});
 
-			event.results.forEach(function(item, index) {
+			event.results.forEach(function (item, index) {
 				item.raw.node.removeClass('hide');
 			});
 
 			var foundVisibleSection;
 
-			permissionNavigationSectionsNode.each(function(
+			permissionNavigationSectionsNode.each(function (
 				item,
 				index,
 				collection
@@ -239,7 +248,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 
 		permissionContainerNode.delegate(
 			'click',
-			function(event) {
+			function (event) {
 				event.preventDefault();
 
 				var href = event.currentTarget.attr('data-resource-href');
@@ -253,7 +262,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 				permissionContentContainerNode.unplug(AParseContent);
 
 				Liferay.Util.fetch(href)
-					.then(function(response) {
+					.then(function (response) {
 						if (response.status === 401) {
 							window.location.reload();
 						}
@@ -266,7 +275,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 							);
 						}
 					})
-					.then(function(response) {
+					.then(function (response) {
 						permissionContentContainerNode.loadingmask.hide();
 
 						permissionContentContainerNode.unplug(A.LoadingMask);
@@ -287,7 +296,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 
 						event.currentTarget.addClass('active');
 					})
-					.catch(function(error) {
+					.catch(function (error) {
 						permissionContentContainerNode.loadingmask.hide();
 
 						permissionContentContainerNode.unplug(A.LoadingMask);
@@ -317,7 +326,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 
 		permissionContainerNode.delegate(
 			'change',
-			function(event) {
+			function (event) {
 				var unselectedTargetsNode = permissionContainerNode.one(
 					'#<portlet:namespace />unselectedTargets'
 				);
@@ -326,7 +335,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 
 				var form = A.one(document.<portlet:namespace />fm);
 
-				form.all('input[type=checkbox]').each(function(item, index) {
+				form.all('input[type=checkbox]').each(function (item, index) {
 					var checkbox = A.one(item);
 
 					var value = checkbox.val();
@@ -351,7 +360,7 @@ if (!portletName.equals(PortletKeys.SERVER_ADMIN)) {
 		);
 	}
 
-	A.on('domready', function(event) {
+	A.on('domready', function (event) {
 		togglerDelegate = new A.TogglerDelegate({
 			container: <portlet:namespace />permissionNavigationDataContainer,
 			content: '.permission-navigation-item-content',

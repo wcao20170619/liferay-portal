@@ -116,7 +116,9 @@ if (Validator.isNotNull(keywords)) {
 	<liferay-ui:message key="<%= panelTitle %>" />
 </h4>
 
-<div class="m-1 row">
+<clay:row
+	className="m-1"
+>
 
 	<%
 	long[] availableClassNameIds = AssetRendererFactoryRegistryUtil.getClassNameIds(company.getCompanyId());
@@ -207,12 +209,12 @@ if (Validator.isNotNull(keywords)) {
 	}
 	%>
 
-</div>
+</clay:row>
 
 <aui:script use="aui-base">
 	A.one('#<portlet:namespace />numItemsContainer').delegate(
 		'click',
-		function(event) {
+		function (event) {
 			var delta = event.currentTarget.attr('data-delta');
 
 			Liferay.fire('AddContent:refreshContentList', {
@@ -224,7 +226,7 @@ if (Validator.isNotNull(keywords)) {
 
 	A.one('#<portlet:namespace />displayStyleContainer').delegate(
 		'click',
-		function(event) {
+		function (event) {
 			var displayStyle = event.currentTarget.attr('data-displaystyle');
 
 			Liferay.fire('AddContent:refreshContentList', {

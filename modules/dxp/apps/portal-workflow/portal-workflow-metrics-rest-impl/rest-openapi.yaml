@@ -78,7 +78,7 @@ components:
                         format: int64
                         type: integer
                     type: array
-                taskKeys:
+                taskNames:
                     items:
                         type: string
                     type: array
@@ -142,6 +142,18 @@ components:
                     format: double
                     type: number
             type: object
+        Index:
+            properties:
+                group:
+                    enum: [All, Metric, SLA]
+                    readOnly: true
+                    type: string
+                key:
+                    type: string
+                label:
+                    readOnly: true
+                    type: string
+            type: object
         Instance:
             description:
                 https://www.schema.org/Instance
@@ -201,10 +213,6 @@ components:
                     type: array
                 slaStatus:
                     enum: [OnTime, Overdue, Untracked]
-                    readOnly: true
-                    type: string
-                status:
-                    enum: [Completed, Pending]
                     readOnly: true
                     type: string
                 taskNames:
@@ -329,6 +337,18 @@ components:
                     format: int64
                     type: integer
             type: object
+        ReindexStatus:
+            description:
+                https://www.schema.org/ReindexStatus
+            properties:
+                completionPercentage:
+                    format: int64
+                    readOnly: true
+                    type: integer
+                key:
+                    readOnly: true
+                    type: string
+            type: object
         Role:
             description:
                 https://www.schema.org/Role
@@ -422,9 +442,22 @@ components:
             description:
                 https://www.schema.org/Task
             properties:
-                assigneeId:
-                    format: int64
-                    type: integer
+                assetTitle:
+                    readOnly: true
+                    type: string
+                assetTitle_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                assetType:
+                    readOnly: true
+                    type: string
+                assetType_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                assignee:
+                    $ref: "#/components/schemas/Assignee"
                 className:
                     type: string
                 classPK:
@@ -467,6 +500,33 @@ components:
                 processVersion:
                     type: string
             type: object
+        TaskBulkSelection:
+            description:
+                https://schema.org/TaskBulkSelection
+            properties:
+                assigneeIds:
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                instanceIds:
+                    items:
+                        format: int64
+                        type: integer
+                    type: array
+                processId:
+                    format: int64
+                    type: integer
+                slaStatuses:
+                    items:
+                        enum: [OnTime, Overdue, Untracked]
+                        type: string
+                    type: array
+                taskNames:
+                    items:
+                        type: string
+                    type: array
+            type: object
         TimeRange:
             description:
                 https://www.schema.org/TimeRange
@@ -497,7 +557,8 @@ components:
             type: object
 info:
     description:
-        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID 'com.liferay.portal.workflow.metrics.rest.client', and version '1.0.1'."
+        "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
+        'com.liferay.portal.workflow.metrics.rest.client', and version '1.0.1'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -524,6 +585,63 @@ paths:
                     description:
                         ""
             tags: ["Calendar"]
+    "/indexes":
+        get:
+            operationId: getIndexesPage
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Index"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Index"
+                                type: array
+                    description:
+                        ""
+            tags: ["Index"]
+    "/indexes/reindex":
+        patch:
+            operationId: patchIndexesReindex
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Index"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Index"
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+                    description:
+                        ""
+            tags: ["Index"]
+    "/indexes/reindex/status":
+        get:
+            operationId: getReindexStatusPage
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ReindexStatus"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ReindexStatus"
+                                type: array
+                    description:
+                        ""
+            tags: ["ReindexStatus"]
     "/processes":
         post:
             operationId: postProcess
@@ -783,6 +901,10 @@ paths:
                           type: integer
                       type: array
                 - in: query
+                  name: completed
+                  schema:
+                      type: boolean
+                - in: query
                   name: dateEnd
                   schema:
                       format: date-time
@@ -800,14 +922,7 @@ paths:
                           type: string
                       type: array
                 - in: query
-                  name: statuses
-                  schema:
-                      items:
-                          enum: [Completed, Pending]
-                          type: string
-                      type: array
-                - in: query
-                  name: taskKeys
+                  name: taskNames
                   schema:
                       items:
                           type: string
@@ -1524,6 +1639,42 @@ paths:
                     description:
                         ""
             tags: ["SLA"]
+    "/tasks":
+        post:
+            operationId: postProcessTasksPage
+            parameters:
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/TaskBulkSelection"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/TaskBulkSelection"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Task"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Task"
+                                type: array
+                    description:
+                        ""
+            tags: ["Task"]
     "/time-ranges":
         get:
             operationId: getTimeRangesPage

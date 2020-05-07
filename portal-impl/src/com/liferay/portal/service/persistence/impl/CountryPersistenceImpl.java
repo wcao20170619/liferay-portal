@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Country;
+import com.liferay.portal.kernel.model.CountryTable;
 import com.liferay.portal.kernel.service.persistence.CountryPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -1254,12 +1255,6 @@ public class CountryPersistenceImpl
 		"country.active = ?";
 
 	public CountryPersistenceImpl() {
-		setModelClass(Country.class);
-
-		setModelImplClass(CountryImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(CountryModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("number", "number_");
@@ -1267,6 +1262,14 @@ public class CountryPersistenceImpl
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Country.class);
+
+		setModelImplClass(CountryImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(CountryModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(CountryTable.INSTANCE);
 	}
 
 	/**

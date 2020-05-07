@@ -16,7 +16,7 @@ if (typeof deconcept.util == 'undefined') {
 if (typeof deconcept.SWFObjectUtil == 'undefined') {
 	deconcept.SWFObjectUtil = {};
 }
-deconcept.SWFObject = function(
+deconcept.SWFObject = function (
 	swf,
 	id,
 	w,
@@ -47,13 +47,14 @@ deconcept.SWFObject = function(
 	}
 	this.installedVer = deconcept.SWFObjectUtil.getPlayerVersion();
 	if (!window.opera && document.all && this.installedVer.major > 7) {
+
 		// only add the onunload cleanup if the Flash Player version supports External Interface and we are in IE
 		// fixes bug in some fp9 versions see http://blog.deconcept.com/2006/07/28/swfobject-143-released/
 
 		if (!deconcept.unloadSet) {
-			deconcept.SWFObjectUtil.prepUnload = function() {
-				__flash_unloadHandler = function() {};
-				__flash_savedUnloadHandler = function() {};
+			deconcept.SWFObjectUtil.prepUnload = function () {
+				__flash_unloadHandler = function () {};
+				__flash_savedUnloadHandler = function () {};
 				window.attachEvent(
 					'onunload',
 					deconcept.SWFObjectUtil.cleanupSWFs
@@ -79,32 +80,32 @@ deconcept.SWFObject = function(
 	}
 };
 deconcept.SWFObject.prototype = {
-	useExpressInstall: function(path) {
+	useExpressInstall: function (path) {
 		this.xiSWFPath = !path ? 'expressinstall.swf' : path;
 		this.setAttribute('useExpressInstall', true);
 	},
-	setAttribute: function(name, value) {
+	setAttribute: function (name, value) {
 		this.attributes[name] = value;
 	},
-	getAttribute: function(name) {
+	getAttribute: function (name) {
 		return this.attributes[name] || '';
 	},
-	addParam: function(name, value) {
+	addParam: function (name, value) {
 		this.params[name] = value;
 	},
-	getParams: function() {
+	getParams: function () {
 		return this.params;
 	},
-	addVariable: function(name, value) {
+	addVariable: function (name, value) {
 		this.variables[name] = value;
 	},
-	getVariable: function(name) {
+	getVariable: function (name) {
 		return this.variables[name] || '';
 	},
-	getVariables: function() {
+	getVariables: function () {
 		return this.variables;
 	},
-	getVariablePairs: function() {
+	getVariablePairs: function () {
 		var variablePairs = [];
 		var key;
 		var variables = this.getVariables();
@@ -113,14 +114,16 @@ deconcept.SWFObject.prototype = {
 		}
 		return variablePairs;
 	},
-	getSWFHTML: function() {
+	getSWFHTML: function () {
 		var swfNode = '';
 		if (
 			navigator.plugins &&
 			navigator.mimeTypes &&
 			navigator.mimeTypes.length
 		) {
+
 			// netscape plugin architecture
+
 			if (this.getAttribute('doExpressInstall')) {
 				this.addVariable('MMplayerType', 'PlugIn');
 				this.setAttribute('swf', this.xiSWFPath);
@@ -150,7 +153,9 @@ deconcept.SWFObject.prototype = {
 			swfNode += '/>';
 		}
 		else {
+
 			// PC IE
+
 			if (this.getAttribute('doExpressInstall')) {
 				this.addVariable('MMplayerType', 'ActiveX');
 				this.setAttribute('swf', this.xiSWFPath);
@@ -182,8 +187,9 @@ deconcept.SWFObject.prototype = {
 		}
 		return swfNode;
 	},
-	write: function(elementId) {
+	write: function (elementId) {
 		if (this.getAttribute('useExpressInstall')) {
+
 			// check to see if we need to do an express install
 
 			var expressInstallReqVer = new deconcept.PlayerVersion([6, 0, 65]);
@@ -223,7 +229,7 @@ deconcept.SWFObject.prototype = {
 };
 
 /* ---- detection functions ---- */
-deconcept.SWFObjectUtil.getPlayerVersion = function() {
+deconcept.SWFObjectUtil.getPlayerVersion = function () {
 	var PlayerVersion = new deconcept.PlayerVersion([0, 0, 0]);
 	if (navigator.plugins && navigator.mimeTypes.length) {
 		var x = navigator.plugins['Shockwave Flash'];
@@ -240,7 +246,9 @@ deconcept.SWFObjectUtil.getPlayerVersion = function() {
 		navigator.userAgent &&
 		navigator.userAgent.indexOf('Windows CE') >= 0
 	) {
+
 		// if Windows CE
+
 		var axo = 1;
 		var counter = 3;
 		while (axo) {
@@ -260,6 +268,7 @@ deconcept.SWFObjectUtil.getPlayerVersion = function() {
 		}
 	}
 	else {
+
 		// Win IE (non mobile)
 		// do minor version lookup in IE, but avoid fp6 crashing issues
 		// see http://blog.deconcept.com/2006/01/11/getvariable-setvariable-crash-internet-explorer-flash-6/
@@ -285,21 +294,18 @@ deconcept.SWFObjectUtil.getPlayerVersion = function() {
 		}
 		if (axo != null) {
 			PlayerVersion = new deconcept.PlayerVersion(
-				axo
-					.GetVariable('$version')
-					.split(' ')[1]
-					.split(',')
+				axo.GetVariable('$version').split(' ')[1].split(',')
 			);
 		}
 	}
 	return PlayerVersion;
 };
-deconcept.PlayerVersion = function(arrVersion) {
+deconcept.PlayerVersion = function (arrVersion) {
 	this.major = arrVersion[0] != null ? parseInt(arrVersion[0]) : 0;
 	this.minor = arrVersion[1] != null ? parseInt(arrVersion[1]) : 0;
 	this.rev = arrVersion[2] != null ? parseInt(arrVersion[2]) : 0;
 };
-deconcept.PlayerVersion.prototype.versionIsValid = function(fv) {
+deconcept.PlayerVersion.prototype.versionIsValid = function (fv) {
 	if (this.major < fv.major) {
 		return false;
 	}
@@ -320,7 +326,7 @@ deconcept.PlayerVersion.prototype.versionIsValid = function(fv) {
 
 /* ---- get value of query string param ---- */
 deconcept.util = {
-	getRequestParameter: function(param) {
+	getRequestParameter: function (param) {
 		var q = document.location.search || document.location.hash;
 		if (param == null) {
 		}
@@ -337,13 +343,13 @@ deconcept.util = {
 };
 
 /* fix for video streaming bug */
-deconcept.SWFObjectUtil.cleanupSWFs = function() {
+deconcept.SWFObjectUtil.cleanupSWFs = function () {
 	var objects = document.getElementsByTagName('OBJECT');
 	for (var i = objects.length - 1; i >= 0; i--) {
 		objects[i].style.display = 'none';
 		for (var x in objects[i]) {
 			if (typeof objects[i][x] == 'function') {
-				objects[i][x] = function() {};
+				objects[i][x] = function () {};
 			}
 		}
 	}
@@ -351,7 +357,7 @@ deconcept.SWFObjectUtil.cleanupSWFs = function() {
 
 /* add document.getElementById if needed (mobile IE < 5) */
 if (!document.getElementById && document.all) {
-	document.getElementById = function(id) {
+	document.getElementById = function (id) {
 		return document.all[id];
 	};
 }

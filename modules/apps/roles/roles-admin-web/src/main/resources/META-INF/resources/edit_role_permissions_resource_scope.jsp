@@ -51,7 +51,12 @@ String portletId = (String)objArray[9];
 
 			PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(liferayPortletRequest), liferayPortletResponse.getNamespace() + "selectGroup", groupItemSelectorCriterion);
 
-			Map<String, Object> data = HashMapBuilder.<String, Object>put("itemSelectorURL", itemSelectorURL.toString()).put("target", target).build();
+			Map<String, Object> data = HashMapBuilder.<String, Object>put(
+				"itemSelectorURL",
+				itemSelectorURL.toString()
+			).put(
+				"target", target
+			).build();
 		%>
 
 			<react:component

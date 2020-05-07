@@ -1,0 +1,17 @@
+{
+	"dependencies": {
+		"frontend-js-react-web": "*",
+		"frontend-js-web": "*",
+		"react": "16.12.0"
+	},
+	"description": "",
+	"main": "js/index.es.js",
+	"name": "dynamic-data-mapping-form-report-web",
+	"private": true,
+	"scripts": {
+		"build": "liferay-npm-scripts build",
+		"checkFormat": "liferay-npm-scripts check",
+		"format": "liferay-npm-scripts fix"
+	},
+	"version": "1.0.0"
+}

@@ -149,7 +149,7 @@ if (portletTitleBasedNavigation) {
 							<aui:script>
 								print();
 
-								setTimeout(function() {
+								setTimeout(function () {
 									window.close();
 								}, 100);
 							</aui:script>
@@ -194,11 +194,12 @@ if (portletTitleBasedNavigation) {
 					"viewURL", viewPageURL.toString()
 				).put(
 					"wikiPortletInstanceConfiguration", wikiPortletInstanceConfiguration
-				).build();
 
 				// Deprecated
 
-				contextObjects.put("wikiPortletInstanceOverriddenConfiguration", wikiPortletInstanceConfiguration);
+				).put(
+					"wikiPortletInstanceOverriddenConfiguration", wikiPortletInstanceConfiguration
+				).build();
 				%>
 
 				<c:if test="<%= !portletTitleBasedNavigation %>">

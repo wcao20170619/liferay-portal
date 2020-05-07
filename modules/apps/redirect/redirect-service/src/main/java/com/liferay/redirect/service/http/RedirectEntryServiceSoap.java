@@ -157,6 +157,21 @@ public class RedirectEntryServiceSoap {
 		}
 	}
 
+	public static void updateChainedRedirectEntries(
+			long groupId, String destinationURL, String sourceURL)
+		throws RemoteException {
+
+		try {
+			RedirectEntryServiceUtil.updateChainedRedirectEntries(
+				groupId, destinationURL, sourceURL);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static com.liferay.redirect.model.RedirectEntrySoap
 			updateRedirectEntry(
 				long redirectEntryId, String destinationURL,

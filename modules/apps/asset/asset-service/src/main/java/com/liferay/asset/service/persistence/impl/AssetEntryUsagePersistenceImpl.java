@@ -16,6 +16,7 @@ package com.liferay.asset.service.persistence.impl;
 
 import com.liferay.asset.exception.NoSuchEntryUsageException;
 import com.liferay.asset.model.AssetEntryUsage;
+import com.liferay.asset.model.AssetEntryUsageTable;
 import com.liferay.asset.model.impl.AssetEntryUsageImpl;
 import com.liferay.asset.model.impl.AssetEntryUsageModelImpl;
 import com.liferay.asset.service.persistence.AssetEntryUsagePersistence;
@@ -4121,17 +4122,19 @@ public class AssetEntryUsagePersistenceImpl
 		"assetEntryUsage.plid = ?";
 
 	public AssetEntryUsagePersistenceImpl() {
-		setModelClass(AssetEntryUsage.class);
-
-		setModelImplClass(AssetEntryUsageImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(AssetEntryUsage.class);
+
+		setModelImplClass(AssetEntryUsageImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(AssetEntryUsageTable.INSTANCE);
 	}
 
 	/**

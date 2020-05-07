@@ -92,7 +92,9 @@ public class CTCollectionLocalServiceUtil {
 		return getService().createPersistedModel(primaryKeyObj);
 	}
 
-	public static void deleteCompanyCTCollections(long companyId) {
+	public static void deleteCompanyCTCollections(long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
 		getService().deleteCompanyCTCollections(companyId);
 	}
 
@@ -105,10 +107,12 @@ public class CTCollectionLocalServiceUtil {
 	 *
 	 * @param ctCollection the ct collection
 	 * @return the ct collection that was removed
+	 * @throws PortalException
 	 */
 	public static com.liferay.change.tracking.model.CTCollection
-		deleteCTCollection(
-			com.liferay.change.tracking.model.CTCollection ctCollection) {
+			deleteCTCollection(
+				com.liferay.change.tracking.model.CTCollection ctCollection)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().deleteCTCollection(ctCollection);
 	}
@@ -136,6 +140,12 @@ public class CTCollectionLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static <T> T dslQuery(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return getService().dslQuery(dslQuery);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery

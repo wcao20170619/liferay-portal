@@ -15,7 +15,7 @@ import React from 'react';
 import ProcessStepFilter from '../../../src/main/resources/META-INF/resources/js/components/filter/ProcessStepFilter.es';
 import {MockRouter} from '../../mock/MockRouter.es';
 
-const query = '?filters.taskKeys%5B0%5D=update';
+const query = '?filters.taskNames%5B0%5D=update';
 
 const items = [
 	{label: 'Review', name: 'review'},
@@ -57,7 +57,7 @@ describe('The process step filter component should', () => {
 	test('Be rendered with active option "Update"', async () => {
 		const filterItems = getAllByTestId('filterItem');
 
-		const activeItem = filterItems.find(item =>
+		const activeItem = filterItems.find((item) =>
 			item.className.includes('active')
 		);
 		const activeItemName = await findByTestId(activeItem, 'filterItemName');

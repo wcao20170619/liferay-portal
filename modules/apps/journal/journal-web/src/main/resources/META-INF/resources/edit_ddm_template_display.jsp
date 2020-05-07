@@ -25,9 +25,15 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 <aui:input name="scriptContent" type="hidden" value="<%= journalEditDDMTemplateDisplayContext.getScript() %>" />
 
 <div id="templateScriptContainer">
-	<div class="form-group lfr-template-editor-container row">
+	<clay:row
+		className="form-group lfr-template-editor-container"
+	>
 		<c:if test="<%= journalEditDDMTemplateDisplayContext.isAutocompleteEnabled() %>">
-			<div class="col-md-3 lfr-template-palette-container" id="<portlet:namespace />templatePaletteContainer">
+			<clay:col
+				className="lfr-template-palette-container"
+				id='<%= renderResponse.getNamespace() + "templatePaletteContainer" %>'
+				md="3"
+			>
 				<div class="search" id="<portlet:namespace />paletteSearchContainer">
 					<input class="form-control mb-3" id="<portlet:namespace />paletteSearch" placeholder="<liferay-ui:message key="search" />" type="text" />
 				</div>
@@ -77,7 +83,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 						</liferay-frontend:fieldset-group>
 					</div>
 				</div>
-			</div>
+			</clay:col>
 		</c:if>
 
 		<%
@@ -119,7 +125,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 
 			<aui:input label="script-file" name="script" type="file" wrapperCssClass="mt-4" />
 		</div>
-	</div>
+	</clay:row>
 </div>
 
 <aui:script use="aui-ace-autocomplete-freemarker,aui-ace-autocomplete-plugin,aui-ace-autocomplete-velocity,aui-toggler,aui-tooltip,autocomplete-base,autocomplete-filters,event-mouseenter,event-outside,liferay-util-window,resize,transition">
@@ -163,7 +169,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 				NAME: 'searchpalette',
 
 				prototype: {
-					initializer: function() {
+					initializer: function () {
 						var instance = this;
 
 						instance._bindUIACBase();
@@ -172,10 +178,10 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 				},
 			});
 
-			var getItems = function() {
+			var getItems = function () {
 				var results = [];
 
-				paletteItems.each(function(item, index) {
+				paletteItems.each(function (item, index) {
 					results.push({
 						data: item.text().trim(),
 						node: item.ancestor(),
@@ -185,7 +191,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 				return results;
 			};
 
-			var getNoResultsNode = function() {
+			var getNoResultsNode = function () {
 				if (!noResultsNode) {
 					noResultsNode = A.Node.create(
 						'<div class="alert"><%= UnicodeLanguageUtil.get(request, "there-are-no-results") %></div>'
@@ -209,18 +215,18 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 				source: getItems(),
 			});
 
-			paletteSearch.on('results', function(event) {
-				paletteItems.each(function(item, index) {
+			paletteSearch.on('results', function (event) {
+				paletteItems.each(function (item, index) {
 					item.ancestor().addClass('hide');
 				});
 
-				event.results.forEach(function(item, index) {
+				event.results.forEach(function (item, index) {
 					item.raw.node.removeClass('hide');
 				});
 
 				var foundVisibleSection;
 
-				paletteSectionsNode.each(function(item, index) {
+				paletteSectionsNode.each(function (item, index) {
 					var visibleItem = item.one('.palette-item-container:not(.hide)');
 
 					if (visibleItem) {
@@ -257,7 +263,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 			var cursorPos;
 			var processed;
 
-			A.Object.each(fragments, function(item, index) {
+			A.Object.each(fragments, function (item, index) {
 				if (processed) {
 					cursorPos = editor.getCursorPosition();
 				}
@@ -344,7 +350,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 
 	A.on(
 		'domready',
-		function(event) {
+		function (event) {
 			richEditor = new A.AceEditor({
 				boundingBox: editorNode,
 				height: 400,
@@ -364,11 +370,11 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 				setEditorContent(editorContentElement.val());
 			}
 
-			Liferay.on('<portlet:namespace />saveTemplate', function(event) {
+			Liferay.on('<portlet:namespace />saveTemplate', function (event) {
 				editorContentElement.val(getEditorContent());
 			});
 
-			selectLanguageNode.on('change', function(event) {
+			selectLanguageNode.on('change', function (event) {
 				Liferay.fire('<portlet:namespace />refreshEditor');
 			});
 
@@ -407,7 +413,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 		'#<portlet:namespace />richEditor'
 	);
 
-	Liferay.on('<portlet:namespace />refreshEditor', function(event) {
+	Liferay.on('<portlet:namespace />refreshEditor', function (event) {
 		var form = A.one('#<portlet:namespace />fm');
 
 		<portlet:renderURL var="refreshDDMTemplateURL">
@@ -416,13 +422,7 @@ JournalDDMTemplateHelper journalDDMTemplateHelper = (JournalDDMTemplateHelper)re
 
 		form.attr('action', '<%= refreshDDMTemplateURL %>');
 
-		if (
-			richEditor
-				.getEditor()
-				.getSession()
-				.getUndoManager()
-				.hasUndo()
-		) {
+		if (richEditor.getEditor().getSession().getUndoManager().hasUndo()) {
 			Liferay.fire('<portlet:namespace />saveTemplate');
 		}
 		<c:if test="<%= journalEditDDMTemplateDisplayContext.getDDMTemplate() == null %>">

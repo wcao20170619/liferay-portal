@@ -36,6 +36,8 @@ Map<String, Object> data = HashMapBuilder.<String, Object>put(
 ).put(
 	"dataLayoutId", dataLayoutId
 ).put(
+	"fieldSetContentType", fieldSetContentType
+).put(
 	"fieldTypes", fieldTypesJSONArray
 ).put(
 	"fieldTypesModules", fieldTypesModules
@@ -49,6 +51,48 @@ Map<String, Object> data = HashMapBuilder.<String, Object>put(
 	"spritemap", themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
 ).build();
 %>
+
+<liferay-ui:error exception="<%= DataDefinitionValidationException.class %>" message="please-enter-a-valid-form-definition" />
+
+<liferay-ui:error exception="<%= DataDefinitionValidationException.MustNotDuplicateFieldName.class %>">
+
+	<%
+	DataDefinitionValidationException.MustNotDuplicateFieldName mndfn = (DataDefinitionValidationException.MustNotDuplicateFieldName)errorException;
+	%>
+
+	<liferay-ui:message arguments="<%= HtmlUtil.escape(StringUtil.merge(mndfn.getDuplicatedFieldNames(), StringPool.COMMA_AND_SPACE)) %>" key="the-definition-field-name-x-was-defined-more-than-once" translateArguments="<%= false %>" />
+</liferay-ui:error>
+
+<liferay-ui:error exception="<%= DataDefinitionValidationException.MustSetOptionsForField.class %>">
+
+	<%
+	DataDefinitionValidationException.MustSetOptionsForField msoff = (DataDefinitionValidationException.MustSetOptionsForField)errorException;
+	%>
+
+	<liferay-ui:message arguments="<%= HtmlUtil.escape(msoff.getFieldName()) %>" key="at-least-one-option-should-be-set-for-field-x" translateArguments="<%= false %>" />
+</liferay-ui:error>
+
+<liferay-ui:error exception="<%= DataDefinitionValidationException.MustSetValidCharactersForFieldName.class %>">
+
+	<%
+	DataDefinitionValidationException.MustSetValidCharactersForFieldName msvcffn = (DataDefinitionValidationException.MustSetValidCharactersForFieldName)errorException;
+	%>
+
+	<liferay-ui:message arguments="<%= HtmlUtil.escape(msvcffn.getFieldName()) %>" key="invalid-characters-were-defined-for-field-name-x" translateArguments="<%= false %>" />
+</liferay-ui:error>
+
+<liferay-ui:error exception="<%= DataDefinitionValidationException.MustSetValidName.class %>" message="please-enter-a-valid-name" />
+
+<liferay-ui:error exception="<%= DataLayoutValidationException.class %>" message="please-enter-a-valid-form-layout" />
+
+<liferay-ui:error exception="<%= DataLayoutValidationException.MustNotDuplicateFieldName.class %>">
+
+	<%
+	DataLayoutValidationException.MustNotDuplicateFieldName mndfn = (DataLayoutValidationException.MustNotDuplicateFieldName)errorException;
+	%>
+
+	<liferay-ui:message arguments="<%= HtmlUtil.escape(StringUtil.merge(mndfn.getDuplicatedFieldNames(), StringPool.COMMA_AND_SPACE)) %>" key="the-definition-field-name-x-was-defined-more-than-once" translateArguments="<%= false %>" />
+</liferay-ui:error>
 
 <div id="<%= componentId + "container" %>">
 	<react:component

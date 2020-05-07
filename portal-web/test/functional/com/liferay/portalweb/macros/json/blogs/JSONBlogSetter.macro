@@ -1,7 +1,18 @@
 definition {
 
+	macro setContentXML {
+		var contentXML = JSONBlogUtil._convertToXML(content = "${content}");
+
+		return "${contentXML}";
+	}
+
 	macro setServiceContext {
-		var serviceContext = JSONServiceContextUtil.setServiceContext(groupName = "${groupName}");
+		var serviceContext = JSONServiceContextUtil.setServiceContext(
+			addGuestPermissions = "true",
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			groupName = "${groupName}",
+			workflowAction = "${workflowAction}");
 
 		return "${serviceContext}";
 	}

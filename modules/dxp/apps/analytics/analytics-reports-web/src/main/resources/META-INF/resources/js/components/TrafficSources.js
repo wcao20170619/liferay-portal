@@ -10,10 +10,12 @@
  */
 
 import ClayButton from '@clayui/button';
+import className from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Cell, Pie, PieChart, Tooltip} from 'recharts';
 
+import {useWarning} from '../context/store';
 import {numberFormat} from '../utils/numberFormat';
 import EmptyPieChart from './EmptyPieChart';
 import Hint from './Hint';
@@ -36,7 +38,7 @@ const PIE_CHART_SIZES = {
  */
 const FALLBACK_COLOR = '#e92563';
 
-const getColorByName = name => COLORS_MAP[name] || FALLBACK_COLOR;
+const getColorByName = (name) => COLORS_MAP[name] || FALLBACK_COLOR;
 
 export default function TrafficSources({
 	languageTag,
@@ -45,11 +47,19 @@ export default function TrafficSources({
 }) {
 	const [highlighted, setHighlighted] = useState(null);
 
-	const fullPieChart = trafficSources.some(source => !!source.value);
+	const [, addWarning] = useWarning();
 
-	const missingTrafficSourceValue = trafficSources.some(trafficSource => {
-		return trafficSource.value === undefined;
-	});
+	const fullPieChart = trafficSources.some((source) => !!source.value);
+
+	const missingTrafficSourceValue = trafficSources.some(
+		(trafficSource) => trafficSource.value === undefined
+	);
+
+	useEffect(() => {
+		if (missingTrafficSourceValue) {
+			addWarning();
+		}
+	}, [addWarning, missingTrafficSourceValue]);
 
 	function handleLegendMouseEnter(name) {
 		setHighlighted(name);
@@ -61,6 +71,16 @@ export default function TrafficSources({
 
 	return (
 		<>
+			<h5 className="mt-2 sheet-subtitle text-secondary">
+				{Liferay.Language.get('search-engines-traffic')}
+				<Hint
+					message={Liferay.Language.get(
+						'search-engines-traffic-help'
+					)}
+					title={Liferay.Language.get('search-engines-traffic')}
+				/>
+			</h5>
+
 			{!fullPieChart && !missingTrafficSourceValue && (
 				<div className="mb-2 text-secondary">
 					{Liferay.Language.get(
@@ -72,7 +92,7 @@ export default function TrafficSources({
 				<div className="pie-chart-wrapper--legend">
 					<table>
 						<tbody>
-							{trafficSources.map(entry => {
+							{trafficSources.map((entry) => {
 								return (
 									<tr key={entry.name}>
 										<td
@@ -166,13 +186,15 @@ export default function TrafficSources({
 										entry.name
 									);
 
+									const cellClasses = className({
+										dim:
+											highlighted &&
+											entry.name !== highlighted,
+									});
+
 									return (
 										<Cell
-											className={{
-												dim:
-													highlighted &&
-													entry.name !== highlighted,
-											}}
+											className={cellClasses}
 											fill={fillColor}
 											key={i}
 											onMouseOut={handleLegendMouseLeave}
@@ -216,7 +238,7 @@ function TrafficSourcesCustomTooltip(props) {
 
 			<ul className="list-unstyled mb-0">
 				<>
-					{payload.map(item => {
+					{payload.map((item) => {
 						// eslint-disable-next-line no-unused-vars
 						const [value, _name, iconType] = formatter
 							? formatter(item.value, item.name, item.iconType)

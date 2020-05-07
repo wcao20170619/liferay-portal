@@ -16,6 +16,7 @@ package com.liferay.knowledge.base.service.persistence.impl;
 
 import com.liferay.knowledge.base.exception.NoSuchArticleException;
 import com.liferay.knowledge.base.model.KBArticle;
+import com.liferay.knowledge.base.model.KBArticleTable;
 import com.liferay.knowledge.base.model.impl.KBArticleImpl;
 import com.liferay.knowledge.base.model.impl.KBArticleModelImpl;
 import com.liferay.knowledge.base.service.persistence.KBArticlePersistence;
@@ -33734,16 +33735,18 @@ public class KBArticlePersistenceImpl
 		"kbArticle.status IN (";
 
 	public KBArticlePersistenceImpl() {
-		setModelClass(KBArticle.class);
-
-		setModelImplClass(KBArticleImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(KBArticle.class);
+
+		setModelImplClass(KBArticleImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(KBArticleTable.INSTANCE);
 	}
 
 	/**

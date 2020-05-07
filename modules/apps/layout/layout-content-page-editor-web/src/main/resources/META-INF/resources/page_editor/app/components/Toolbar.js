@@ -13,6 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
+import classNames from 'classnames';
 import {useIsMounted} from 'frontend-js-react-web';
 import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
@@ -24,12 +25,14 @@ import * as Actions from '../actions/index';
 import {PAGE_TYPES} from '../config/constants/pageTypes';
 import {config} from '../config/index';
 import {useDispatch, useSelector} from '../store/index';
+import undo from '../thunks/undo';
 import {useSelectItem} from './Controls';
 import ExperimentsLabel from './ExperimentsLabel';
 import NetworkStatusBar from './NetworkStatusBar';
 import Translation from './Translation';
-import Undo from './Undo';
 import UnsafeHTML from './UnsafeHTML';
+import ViewportSizeSelector from './ViewportSizeSelector';
+import Undo from './undo/Undo';
 
 const {Suspense, useCallback, useRef} = React;
 
@@ -39,13 +42,14 @@ function ToolbarBody() {
 	const isMounted = useIsMounted();
 	const load = useLoad();
 	const selectItem = useSelectItem();
-	const store = useSelector(state => state);
+	const store = useSelector((state) => state);
 
 	const {
 		layoutData,
 		network,
 		segmentsExperienceId,
 		segmentsExperimentStatus,
+		selectedViewportSize,
 	} = store;
 
 	const [enableDiscard, setEnableDiscard] = useState(false);
@@ -58,7 +62,7 @@ function ToolbarBody() {
 
 	const loading = useRef(() => {
 		Promise.all(
-			config.toolbarPlugins.map(toolbarPlugin => {
+			config.toolbarPlugins.map((toolbarPlugin) => {
 				const {pluginEntryPoint} = toolbarPlugin;
 				const promise = load(pluginEntryPoint, pluginEntryPoint);
 
@@ -72,7 +76,7 @@ function ToolbarBody() {
 				return register(pluginEntryPoint, promise, {
 					app,
 					toolbarPlugin,
-				}).then(plugin => {
+				}).then((plugin) => {
 					if (!plugin) {
 						throw new Error(
 							`Failed to get instance from ${pluginEntryPoint}`
@@ -85,7 +89,7 @@ function ToolbarBody() {
 					}
 				});
 			})
-		).catch(error => {
+		).catch((error) => {
 			if (process.env.NODE_ENV === 'development') {
 				console.error(error);
 			}
@@ -93,7 +97,9 @@ function ToolbarBody() {
 	});
 
 	if (loading.current) {
+
 		// Do this once only.
+
 		loading.current();
 		loading.current = null;
 	}
@@ -109,7 +115,7 @@ function ToolbarBody() {
 		}, [])
 	);
 
-	const handleDiscardDraft = event => {
+	const handleDiscardDraft = (event) => {
 		if (
 			!confirm(
 				Liferay.Language.get(
@@ -121,7 +127,7 @@ function ToolbarBody() {
 		}
 	};
 
-	const handleSubmit = event => {
+	const handleSubmit = (event) => {
 		if (
 			config.masterUsed &&
 			!confirm(
@@ -134,7 +140,11 @@ function ToolbarBody() {
 		}
 	};
 
-	const deselectItem = event => {
+	const onUndo = () => {
+		dispatch(undo({store}));
+	};
+
+	const deselectItem = (event) => {
 		if (event.target === event.currentTarget) {
 			selectItem(null);
 		}
@@ -166,7 +176,12 @@ function ToolbarBody() {
 			className="container-fluid container-fluid-max-xl"
 			onClick={deselectItem}
 		>
-			<ul className="navbar-nav" onClick={deselectItem}>
+			<ul
+				className={classNames('navbar-nav', {
+					'responsive-mode': config.responsiveEnabled,
+				})}
+				onClick={deselectItem}
+			>
 				{config.toolbarPlugins.map(
 					({loadingPlaceholder, pluginEntryPoint}) => {
 						return (
@@ -199,6 +214,13 @@ function ToolbarBody() {
 						segmentsExperienceId={segmentsExperienceId}
 					/>
 				</li>
+				{config.responsiveEnabled && (
+					<li className="nav-item">
+						<ViewportSizeSelector
+							selectedSize={selectedViewportSize}
+						/>
+					</li>
+				)}
 				{!config.singleSegmentsExperienceMode &&
 					segmentsExperimentStatus && (
 						<li className="nav-item pl-2">
@@ -212,7 +234,7 @@ function ToolbarBody() {
 
 			<ul className="navbar-nav" onClick={deselectItem}>
 				<NetworkStatusBar {...network} />
-				{config.undoEnabled && <Undo />}
+				{config.undoEnabled && <Undo onUndo={onUndo} />}
 				<li className="nav-item">
 					<form action={config.discardDraftURL} method="POST">
 						<input
@@ -289,7 +311,9 @@ export default function Toolbar() {
 	const isMounted = useIsMounted();
 
 	if (!isMounted()) {
+
 		// First time here, must empty JSP-rendered markup from container.
+
 		while (container.firstChild) {
 			container.removeChild(container.firstChild);
 		}

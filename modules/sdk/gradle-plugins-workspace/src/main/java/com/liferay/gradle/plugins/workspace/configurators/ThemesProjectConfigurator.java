@@ -15,7 +15,6 @@
 package com.liferay.gradle.plugins.workspace.configurators;
 
 import com.liferay.gradle.plugins.LiferayThemePlugin;
-import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.theme.builder.BuildThemeTask;
 import com.liferay.gradle.plugins.theme.builder.ThemeBuilderPlugin;
 import com.liferay.gradle.plugins.workspace.ProjectConfigurator;
@@ -86,7 +85,7 @@ public class ThemesProjectConfigurator extends BaseProjectConfigurator {
 		else {
 			GradleUtil.applyPlugin(project, LiferayThemePlugin.class);
 
-			_configureLiferay(project, workspaceExtension);
+			configureLiferay(project, workspaceExtension);
 
 			final Task assembleTask = GradleUtil.getTask(
 				project, BasePlugin.ASSEMBLE_TASK_NAME);
@@ -165,15 +164,6 @@ public class ThemesProjectConfigurator extends BaseProjectConfigurator {
 	}
 
 	protected static final String NAME = "themes";
-
-	private void _configureLiferay(
-		Project project, WorkspaceExtension workspaceExtension) {
-
-		LiferayExtension liferayExtension = GradleUtil.getExtension(
-			project, LiferayExtension.class);
-
-		liferayExtension.setAppServerParentDir(workspaceExtension.getHomeDir());
-	}
 
 	@SuppressWarnings({"serial", "unused"})
 	private void _configureRootTaskDistBundle(final Task assembleTask) {

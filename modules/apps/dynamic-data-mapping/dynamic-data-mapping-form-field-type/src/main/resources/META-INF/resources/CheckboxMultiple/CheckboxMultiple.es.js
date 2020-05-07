@@ -12,8 +12,6 @@
  * details.
  */
 
-import './CheckboxMultipleRegister.soy';
-
 import {ClayCheckbox} from '@clayui/form';
 import classNames from 'classnames';
 import React, {useState} from 'react';
@@ -22,7 +20,6 @@ import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
 import {setJSONArrayValue} from '../util/setters.es';
-import templates from './CheckboxMultipleAdapter.soy';
 
 const Switcher = ({
 	checked,
@@ -77,10 +74,10 @@ const CheckboxMultiple = ({
 	const displayValues = value && value.length > 0 ? value : predefinedValue;
 	const Toggle = isSwitcher ? Switcher : ClayCheckbox;
 
-	const handleChange = event => {
+	const handleChange = (event) => {
 		const {target} = event;
 		const newValue = value.filter(
-			currentValue => currentValue !== target.value
+			(currentValue) => currentValue !== target.value
 		);
 
 		if (target.checked) {
@@ -93,7 +90,7 @@ const CheckboxMultiple = ({
 
 	return (
 		<div className="lfr-ddm-checkbox-multiple">
-			{options.map(option => (
+			{options.map((option) => (
 				<Toggle
 					checked={displayValues.includes(option.value)}
 					disabled={disabled}
@@ -142,11 +139,11 @@ const CheckboxMultipleProxy = connectStore(
 				inline={inline}
 				isSwitcher={showAsSwitcher}
 				name={name}
-				onBlur={event =>
+				onBlur={(event) =>
 					emit('fieldBlurred', event, event.target.value)
 				}
 				onChange={(event, value) => emit('fieldEdited', event, value)}
-				onFocus={event => emit('fieldFocused', event)}
+				onFocus={(event) => emit('fieldFocused', event)}
 				options={options}
 				predefinedValue={setJSONArrayValue(predefinedValue)}
 				value={setJSONArrayValue(value)}
@@ -157,7 +154,7 @@ const CheckboxMultipleProxy = connectStore(
 
 const ReactCheckboxMultipleAdapter = getConnectedReactComponentAdapter(
 	CheckboxMultipleProxy,
-	templates
+	'checkbox_multiple'
 );
 
 export {ReactCheckboxMultipleAdapter};

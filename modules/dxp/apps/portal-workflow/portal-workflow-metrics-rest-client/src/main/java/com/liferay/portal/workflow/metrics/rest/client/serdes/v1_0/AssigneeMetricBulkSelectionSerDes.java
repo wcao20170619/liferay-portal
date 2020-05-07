@@ -167,27 +167,27 @@ public class AssigneeMetricBulkSelectionSerDes {
 			sb.append("]");
 		}
 
-		if (assigneeMetricBulkSelection.getTaskKeys() != null) {
+		if (assigneeMetricBulkSelection.getTaskNames() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"taskKeys\": ");
+			sb.append("\"taskNames\": ");
 
 			sb.append("[");
 
 			for (int i = 0;
-				 i < assigneeMetricBulkSelection.getTaskKeys().length; i++) {
+				 i < assigneeMetricBulkSelection.getTaskNames().length; i++) {
 
 				sb.append("\"");
 
 				sb.append(
-					_escape(assigneeMetricBulkSelection.getTaskKeys()[i]));
+					_escape(assigneeMetricBulkSelection.getTaskNames()[i]));
 
 				sb.append("\"");
 
 				if ((i + 1) <
-						assigneeMetricBulkSelection.getTaskKeys().length) {
+						assigneeMetricBulkSelection.getTaskNames().length) {
 
 					sb.append(", ");
 				}
@@ -230,15 +230,25 @@ public class AssigneeMetricBulkSelectionSerDes {
 				String.valueOf(assigneeMetricBulkSelection.getCompleted()));
 		}
 
-		map.put(
-			"dateEnd",
-			liferayToJSONDateFormat.format(
-				assigneeMetricBulkSelection.getDateEnd()));
+		if (assigneeMetricBulkSelection.getDateEnd() == null) {
+			map.put("dateEnd", null);
+		}
+		else {
+			map.put(
+				"dateEnd",
+				liferayToJSONDateFormat.format(
+					assigneeMetricBulkSelection.getDateEnd()));
+		}
 
-		map.put(
-			"dateStart",
-			liferayToJSONDateFormat.format(
-				assigneeMetricBulkSelection.getDateStart()));
+		if (assigneeMetricBulkSelection.getDateStart() == null) {
+			map.put("dateStart", null);
+		}
+		else {
+			map.put(
+				"dateStart",
+				liferayToJSONDateFormat.format(
+					assigneeMetricBulkSelection.getDateStart()));
+		}
 
 		if (assigneeMetricBulkSelection.getInstanceIds() == null) {
 			map.put("instanceIds", null);
@@ -267,13 +277,13 @@ public class AssigneeMetricBulkSelectionSerDes {
 				String.valueOf(assigneeMetricBulkSelection.getRoleIds()));
 		}
 
-		if (assigneeMetricBulkSelection.getTaskKeys() == null) {
-			map.put("taskKeys", null);
+		if (assigneeMetricBulkSelection.getTaskNames() == null) {
+			map.put("taskNames", null);
 		}
 		else {
 			map.put(
-				"taskKeys",
-				String.valueOf(assigneeMetricBulkSelection.getTaskKeys()));
+				"taskNames",
+				String.valueOf(assigneeMetricBulkSelection.getTaskNames()));
 		}
 
 		return map;
@@ -333,9 +343,9 @@ public class AssigneeMetricBulkSelectionSerDes {
 						toLongs((Object[])jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "taskKeys")) {
+			else if (Objects.equals(jsonParserFieldName, "taskNames")) {
 				if (jsonParserFieldValue != null) {
-					assigneeMetricBulkSelection.setTaskKeys(
+					assigneeMetricBulkSelection.setTaskNames(
 						toStrings((Object[])jsonParserFieldValue));
 				}
 			}

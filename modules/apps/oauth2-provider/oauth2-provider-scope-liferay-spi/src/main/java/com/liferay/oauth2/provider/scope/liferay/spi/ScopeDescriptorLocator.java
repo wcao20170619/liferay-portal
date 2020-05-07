@@ -24,6 +24,8 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface ScopeDescriptorLocator {
 
+	public ScopeDescriptor getScopeDescriptor(long companyId);
+
 	public ScopeDescriptor getScopeDescriptor(
 		long companyId, String applicationName);
 

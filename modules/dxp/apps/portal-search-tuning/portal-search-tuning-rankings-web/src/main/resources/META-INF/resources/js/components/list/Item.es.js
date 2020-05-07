@@ -12,6 +12,7 @@
 import ClayButton from '@clayui/button';
 import {ClayCheckbox} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
 import ClaySticker from '@clayui/sticker';
 import getCN from 'classnames';
 import {PropTypes} from 'prop-types';
@@ -238,6 +239,7 @@ class Item extends PureComponent {
 		author: PropTypes.string,
 		clicks: PropTypes.number,
 		date: PropTypes.string,
+		deleted: PropTypes.bool,
 		description: PropTypes.string,
 		focus: PropTypes.bool,
 		hidden: PropTypes.bool,
@@ -258,14 +260,14 @@ class Item extends PureComponent {
 		selected: PropTypes.bool,
 		title: PropTypes.string,
 		type: PropTypes.string,
-		url: PropTypes.string,
+		viewURL: PropTypes.string,
 	};
 
 	static defaultProps = {
 		author: '',
-		connectDragPreview: val => val,
-		connectDragSource: val => val,
-		connectDropTarget: val => val,
+		connectDragPreview: (val) => val,
+		connectDragSource: (val) => val,
+		connectDropTarget: (val) => val,
 		date: '',
 		onBlur: () => {},
 		onFocus: () => {},
@@ -318,7 +320,7 @@ class Item extends PureComponent {
 		this.props.onBlur();
 	};
 
-	_handleFocus = event => {
+	_handleFocus = (event) => {
 		if (event.target.classList.contains(ROOT_CLASS)) {
 			const {index, onFocus} = this.props;
 
@@ -338,7 +340,7 @@ class Item extends PureComponent {
 		}
 	};
 
-	_handleKeyDown = event => {
+	_handleKeyDown = (event) => {
 		const {focus} = this.props;
 
 		if (focus) {
@@ -384,6 +386,7 @@ class Item extends PureComponent {
 			connectDragSource,
 			connectDropTarget,
 			date,
+			deleted,
 			description,
 			dragging,
 			focus,
@@ -399,7 +402,7 @@ class Item extends PureComponent {
 			style,
 			title,
 			type,
-			url,
+			viewURL,
 		} = this.props;
 
 		const {hoverPosition} = this.state;
@@ -469,7 +472,28 @@ class Item extends PureComponent {
 					<section className="autofit-section">
 						<div className="list-group-title">
 							<span className="text-truncate-inline">
-								{url ? <a href={url}>{title}</a> : title}
+								{viewURL ? (
+									<a
+										href={viewURL}
+										rel="noopener noreferrer"
+										target="_blank"
+									>
+										{`${title} `}
+
+										<ClayIcon symbol="shortcut" />
+									</a>
+								) : (
+									title
+								)}
+
+								{deleted && (
+									<ClayLabel
+										className="delete-label"
+										displayType="danger"
+									>
+										{Liferay.Language.get('deleted')}
+									</ClayLabel>
+								)}
 							</span>
 						</div>
 

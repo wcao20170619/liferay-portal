@@ -12,7 +12,8 @@
  * details.
  */
 
-import dom from 'metal-dom';
+import {fireEvent, getByTestId, waitForElement} from '@testing-library/react';
+import ReactDOM from 'react-dom';
 
 import LocalizableText from '../../../src/main/resources/META-INF/resources/LocalizableText/LocalizableText.es';
 import withContextMock from '../__mocks__/withContextMock.es';
@@ -52,12 +53,27 @@ const defaultLocalizableTextConfig = {
 		{displayName: 'español (España)', icon: 'es-es', localeId: 'es_ES'},
 		{displayName: 'svenska (Sverige)', icon: 'sv-se', localeId: 'sv_SE'},
 	],
-	name: 'localizableTextField',
+	defaultLocale: {
+		displayName: 'English (United States)',
+		icon: 'en-us',
+		localeId: 'en_US',
+	},
+	name:
+		'_com_liferay_configuration_admin_web_portlet_SystemSettingsPortlet_ddm$$emailArticleAddedSubject$uoeJR4Me$0$$en_US',
 	spritemap,
 };
 const LocalizableTextWithContextMock = withContextMock(LocalizableText);
 
 describe('Field LocalizableText', () => {
+	beforeAll(() => {
+
+		// @ts-ignore
+
+		ReactDOM.createPortal = jest.fn((element) => {
+			return element;
+		});
+	});
+
 	beforeEach(() => {
 		jest.useFakeTimers();
 	});
@@ -72,6 +88,11 @@ describe('Field LocalizableText', () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			readOnly: false,
+			value: {
+				ca_ES: 'Teste ES',
+				en_US: 'Test EUA',
+				pt_BR: 'Teste BR',
+			},
 		});
 
 		expect(component).toMatchSnapshot();
@@ -81,6 +102,11 @@ describe('Field LocalizableText', () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			label: 'label',
+			value: {
+				ca_ES: 'Teste ES',
+				en_US: 'Test EUA',
+				pt_BR: 'Teste BR',
+			},
 		});
 
 		expect(component).toMatchSnapshot();
@@ -90,6 +116,11 @@ describe('Field LocalizableText', () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			placeholder: 'Placeholder',
+			value: {
+				ca_ES: 'Teste ES',
+				en_US: 'Test EUA',
+				pt_BR: 'Teste BR',
+			},
 		});
 
 		expect(component).toMatchSnapshot();
@@ -99,6 +130,11 @@ describe('Field LocalizableText', () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			required: false,
+			value: {
+				ca_ES: 'Teste ES',
+				en_US: 'Test EUA',
+				pt_BR: 'Teste BR',
+			},
 		});
 
 		expect(component).toMatchSnapshot();
@@ -136,14 +172,26 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		expect(component.editingLocale.localeId).toEqual('en_US');
-		expect(component._value).toEqual('Test EUA');
+		const triggerElement = getByTestId(component.element, 'triggerText');
+
+		expect(triggerElement.textContent).toEqual('en-us');
 
 		expect(component).toMatchSnapshot();
 	});
 
-	it('emits field edit event on field change', done => {
-		const handleFieldEdited = jest.fn();
+	it('emits field edit event on field change', (done) => {
+		const EXPECTED_VALUE =
+			'{"ca_ES":"Teste ES","en_US":"Test 2 EUA","pt_BR":"Teste BR"}';
+		const handleFieldEdited = (data) => {
+			expect(data).toEqual(
+				expect.objectContaining({
+					fieldInstance: expect.any(Object),
+					originalEvent: expect.any(Object),
+					value: EXPECTED_VALUE,
+				})
+			);
+			done();
+		};
 
 		const events = {fieldEdited: handleFieldEdited};
 
@@ -157,24 +205,21 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		component.on('fieldEdited', () => {
-			expect(handleFieldEdited).toHaveBeenCalled();
+		const inputComponent = getByTestId(
+			component.element,
+			'visibleChangeInput'
+		);
 
-			done();
-		});
-
-		component._handleFieldChanged({
+		fireEvent.change(inputComponent, {
 			target: {
 				value: 'Test 2 EUA',
 			},
 		});
 
-		jest.runAllTimers();
-
 		expect(component).toMatchSnapshot();
 	});
 
-	it('fills with the selected language value when the selected language is translated', () => {
+	it('fills with the selected language value when the selected language is translated', async () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			value: {
@@ -184,32 +229,32 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		expect(component.editingLocale.localeId).toEqual('en_US');
+		const triggerButton = getByTestId(component.element, 'triggerButton');
 
-		dom.triggerEvent(
-			component.element.querySelector('.input-group-item button'),
-			'click'
-		);
+		fireEvent.click(triggerButton);
 
 		jest.runAllTimers();
 
-		dom.triggerEvent(
-			component.element.querySelector('[data-locale-id="ca_ES"]'),
-			'click'
+		const dropdownItem = await waitForElement(() =>
+			getByTestId(component.element, 'availableLocalesDropdownca_ES')
 		);
+
+		fireEvent.click(dropdownItem);
 
 		jest.runAllTimers();
 
-		expect(component.editingLocale.localeId).toEqual('ca_ES');
-		expect(component._isDefaultLocale('ca_ES')).toEqual(false);
-		expect(component._isTranslated('ca_ES')).toEqual(true);
+		const inputElement = await waitForElement(() =>
+			getByTestId(component.element, 'visibleChangeInput')
+		);
 
-		expect(component._value).toEqual('Teste ES');
+		expect(inputElement.value).toEqual('Teste ES');
+
+		expect(triggerButton.textContent).toEqual('ca-es');
 
 		expect(component).toMatchSnapshot();
 	});
 
-	it('fills with the default language value when the selected language is not translated', () => {
+	it('fills with the default language value when the selected language is not translated', async () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			value: {
@@ -219,34 +264,35 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		expect(component.editingLocale.localeId).toEqual('en_US');
+		const triggerElement = getByTestId(component.element, 'triggerText');
 
-		dom.triggerEvent(
-			component.element.querySelector('.input-group-item button'),
-			'click'
-		);
+		expect(triggerElement.textContent).toEqual('en-us');
 
-		jest.runAllTimers();
-
-		dom.triggerEvent(
-			component.element.querySelector('[data-locale-id="ja_JP"]'),
-			'click'
-		);
+		fireEvent.click(triggerElement);
 
 		jest.runAllTimers();
 
-		expect(component._isDefaultLocale('en_US')).toEqual(true);
+		const dropdownItem = await waitForElement(() =>
+			getByTestId(component.element, 'availableLocalesDropdownja_JP')
+		);
 
-		expect(component.editingLocale.localeId).toEqual('ja_JP');
-		expect(component._isDefaultLocale('ja_JP')).toEqual(false);
-		expect(component._isTranslated('ja_JP')).toEqual(false);
+		fireEvent.click(dropdownItem);
 
-		expect(component._value).toEqual('Test EUA');
+		jest.runAllTimers();
+
+		const inputComponent = getByTestId(
+			component.element,
+			'visibleChangeInput'
+		);
+
+		expect(triggerElement.textContent).toEqual('ja-jp');
+
+		expect(inputComponent.value).toEqual('Test EUA');
 
 		expect(component).toMatchSnapshot();
 	});
 
-	it('adds a new translation for an untranslated item', () => {
+	it('adds a new translation for an untranslated item', async () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			value: {
@@ -256,23 +302,30 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		dom.triggerEvent(
-			component.element.querySelector('.input-group-item button'),
-			'click'
-		);
+		const triggerElement = getByTestId(component.element, 'triggerText');
+
+		expect(triggerElement.textContent).toEqual('en-us');
+
+		fireEvent.click(triggerElement);
 
 		jest.runAllTimers();
 
-		dom.triggerEvent(
-			component.element.querySelector('[data-locale-id="ja_JP"]'),
-			'click'
+		const dropdownItem = await waitForElement(() =>
+			getByTestId(component.element, 'availableLocalesDropdownja_JP')
 		);
+
+		fireEvent.click(dropdownItem);
 
 		jest.runAllTimers();
 
-		expect(component._isTranslated('ja_JP')).toEqual(false);
+		const inputComponent = getByTestId(
+			component.element,
+			'visibleChangeInput'
+		);
 
-		component._handleFieldChanged({
+		expect(inputComponent.textContent).toEqual('');
+
+		fireEvent.change(inputComponent, {
 			target: {
 				value: 'Test JP',
 			},
@@ -280,13 +333,12 @@ describe('Field LocalizableText', () => {
 
 		jest.runAllTimers();
 
-		expect(component._isTranslated('ja_JP')).toEqual(true);
-		expect(component._value).toEqual('Test JP');
+		expect(inputComponent.value).toEqual('Test JP');
 
 		expect(component).toMatchSnapshot();
 	});
 
-	it('removes the translation of an item already translated', () => {
+	it('removes the translation of an item already translated', async () => {
 		component = new LocalizableTextWithContextMock({
 			...defaultLocalizableTextConfig,
 			value: {
@@ -296,23 +348,28 @@ describe('Field LocalizableText', () => {
 			},
 		});
 
-		dom.triggerEvent(
-			component.element.querySelector('.input-group-item button'),
-			'click'
-		);
+		const triggerElement = getByTestId(component.element, 'triggerText');
+
+		fireEvent.click(triggerElement);
 
 		jest.runAllTimers();
 
-		dom.triggerEvent(
-			component.element.querySelector('[data-locale-id="pt_BR"]'),
-			'click'
+		const dropdownItem = await waitForElement(() =>
+			getByTestId(component.element, 'availableLocalesDropdownpt_BR')
 		);
+
+		fireEvent.click(dropdownItem);
 
 		jest.runAllTimers();
 
-		expect(component._isTranslated('pt_BR')).toEqual(true);
+		const inputComponent = getByTestId(
+			component.element,
+			'visibleChangeInput'
+		);
 
-		component._handleFieldChanged({
+		expect(inputComponent.value).toEqual('Teste BR');
+
+		fireEvent.change(inputComponent, {
 			target: {
 				value: '',
 			},
@@ -320,8 +377,7 @@ describe('Field LocalizableText', () => {
 
 		jest.runAllTimers();
 
-		expect(component._isTranslated('pt_BR')).toEqual(false);
-		expect(component._value).toEqual('');
+		expect(inputComponent.value).toEqual('');
 
 		expect(component).toMatchSnapshot();
 	});

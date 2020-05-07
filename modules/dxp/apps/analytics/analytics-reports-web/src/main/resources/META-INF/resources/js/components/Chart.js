@@ -25,8 +25,10 @@ import {
 	YAxis,
 } from 'recharts';
 
-import ConnectionContext from '../state/context';
-import {useChartState} from '../utils/chartState';
+import ConnectionContext from '../context/ConnectionContext';
+import {StoreContext, useHistoricalWarning} from '../context/store';
+import {useChartState} from '../state/chartState';
+import {generateDateFormatters as dateFormat} from '../utils/dateFormat';
 import {numberFormat} from '../utils/numberFormat';
 import {ActiveDot as CustomActiveDot, Dot as CustomDot} from './CustomDots';
 import CustomTooltip from './CustomTooltip';
@@ -49,11 +51,9 @@ const CHART_SIZES = {
 };
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
-
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 
 const LAST_24_HOURS = 'last-24-hours';
-const LAST_7_DAYS = 'last-7-days';
 
 const METRICS_STATIC_VALUES = {
 	analyticsReportsHistoricalReads: {
@@ -101,97 +101,13 @@ function thousandsToKilosFormater(value) {
 	return value;
 }
 
-/*
- * It generates a set of functions used to produce
- * internationalized date related content.
- */
-const generateDateFormatters = key => {
-	/*
-	 * Given 2 date objects it produces a user friendly date interval
-	 *
-	 * For 'en-US'
-	 * [Date, Date] => '16 - Jun 21, 2020'
-	 */
-	function formatChartTitle([initialDate, finalDate]) {
-		const singleDayDateRange =
-			finalDate - initialDate <= 1000 * 60 * 60 * 24;
-
-		const dateFormatter = (
-			date,
-			options = {
-				day: 'numeric',
-				month: 'short',
-				year: 'numeric',
-			}
-		) => Intl.DateTimeFormat([key], options).format(date);
-
-		const equalMonth = initialDate.getMonth() === finalDate.getMonth();
-		const equalYear = initialDate.getYear() === finalDate.getYear();
-
-		const initialDateOptions = {
-			day: 'numeric',
-			month: equalMonth && equalYear ? undefined : 'short',
-			year: equalYear ? undefined : 'numeric',
-		};
-
-		if (singleDayDateRange) {
-			return dateFormatter(finalDate);
-		}
-
-		return `${dateFormatter(
-			initialDate,
-			initialDateOptions
-		)} - ${dateFormatter(finalDate)}`;
-	}
-
-	/*
-	 * Given a date like string it produces a internationalized long date
-	 *
-	 * For 'en-US'
-	 * String => '06/17/2020'
-	 */
-	function formatLongDate(value) {
-		return Intl.DateTimeFormat([key]).format(new Date(value));
-	}
-
-	/*
-	 * Given a date like string produces the day of the month
-	 *
-	 * For 'en-US'
-	 * String => '16'
-	 */
-	function formatNumericDay(value) {
-		return Intl.DateTimeFormat([key], {
-			day: 'numeric',
-		}).format(new Date(value));
-	}
-
-	/*
-	 * Given a date like string produces the hour of the day
-	 *
-	 * For 'en-US'
-	 * String => '04 AM'
-	 */
-	function formatNumericHour(value) {
-		return Intl.DateTimeFormat([key], {
-			hour: 'numeric',
-		}).format(new Date(value));
-	}
-
-	return {
-		formatChartTitle,
-		formatLongDate,
-		formatNumericDay,
-		formatNumericHour,
-	};
-};
-
 function legendFormatterGenerator(
 	totals,
 	languageTag,
+	publishedToday,
 	validAnalyticsConnection
 ) {
-	return value => {
+	return (value) => {
 		const preformattedNumber = totals[value];
 
 		return (
@@ -205,13 +121,13 @@ function legendFormatterGenerator(
 				<span className="mr-2 text-secondary">
 					{keyToTranslatedLabelValue(value)}
 				</span>
-				{preformattedNumber !== null && (
-					<span className="font-weight-bold">
-						{validAnalyticsConnection
-							? numberFormat(languageTag, preformattedNumber)
-							: '-'}
-					</span>
-				)}
+				<span className="font-weight-bold">
+					{validAnalyticsConnection &&
+					preformattedNumber !== null &&
+					!publishedToday
+						? numberFormat(languageTag, preformattedNumber)
+						: '-'}
+				</span>
 			</span>
 		);
 	};
@@ -219,6 +135,7 @@ function legendFormatterGenerator(
 
 export default function Chart({
 	dataProviders = [],
+	defaultTimeRange,
 	defaultTimeSpanOption,
 	languageTag,
 	publishDate,
@@ -226,10 +143,15 @@ export default function Chart({
 }) {
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
+	const [hasHistoricalWarning, addHistoricalWarning] = useHistoricalWarning();
+
+	const [{publishedToday, readsEnabled}] = useContext(StoreContext);
+
 	const {actions, state: chartState} = useChartState({
 		defaultTimeSpanOption,
 		publishDate,
 	});
+
 	const isMounted = useIsMounted();
 
 	useEffect(() => {
@@ -237,29 +159,67 @@ export default function Chart({
 
 		actions.setLoading();
 
-		dataProviders.map(getter => {
-			getter({
-				timeSpanKey: chartState.timeSpanOption,
-				timeSpanOffset: chartState.timeSpanOffset,
-			}).then(data => {
-				if (!gone) {
-					if (isMounted()) {
-						const timeSpanComparator =
-							chartState.timeSpanOption === LAST_24_HOURS
-								? HOUR_IN_MILLISECONDS
-								: DAY_IN_MILLISECONDS;
+		const timeSpanComparator =
+			chartState.timeSpanOption === LAST_24_HOURS
+				? HOUR_IN_MILLISECONDS
+				: DAY_IN_MILLISECONDS;
 
-						Object.keys(data).map(key => {
-							actions.addDataSetItem({
-								dataSetItem: data[key],
-								key,
-								timeSpanComparator,
-							});
+		if (validAnalyticsConnection) {
+			dataProviders.map((getter) => {
+				getter({
+					timeSpanKey: chartState.timeSpanOption,
+					timeSpanOffset: chartState.timeSpanOffset,
+				})
+					.then((data) => {
+						if (!gone) {
+							if (isMounted()) {
+								Object.keys(data).map((key) => {
+									actions.addDataSetItem({
+										dataSetItem: data[key],
+										key,
+										timeSpanComparator,
+									});
+								});
+							}
+						}
+					})
+					.catch((_error) => {
+						let key = '';
+
+						if (getter.name === 'getHistoricalReads') {
+							key = 'analyticsReportsHistoricalReads';
+						}
+						else if (getter.name === 'getHistoricalViews') {
+							key = 'analyticsReportsHistoricalViews';
+						}
+
+						if (!hasHistoricalWarning) {
+							addHistoricalWarning();
+						}
+
+						actions.addDataSetItem({
+							dataSetItem: {histogram: [], value: null},
+							key,
+							timeSpanComparator,
 						});
-					}
-				}
+					});
 			});
-		});
+		}
+		else {
+			actions.addDataSetItem({
+				dataSetItem: {histogram: [], value: null},
+				key: 'analyticsReportsHistoricalViews',
+				timeSpanComparator,
+			});
+
+			if (readsEnabled) {
+				actions.addDataSetItem({
+					dataSetItem: {histogram: [], value: null},
+					key: 'analyticsReportsHistoricalReads',
+					timeSpanComparator,
+				});
+			}
+		}
 
 		return () => {
 			gone = true;
@@ -267,7 +227,7 @@ export default function Chart({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [chartState.timeSpanOption, chartState.timeSpanOffset]);
 
-	const dateFormatters = useMemo(() => generateDateFormatters(languageTag), [
+	const dateFormatters = useMemo(() => dateFormat(languageTag), [
 		languageTag,
 	]);
 
@@ -305,9 +265,15 @@ export default function Chart({
 				new Date(lastDateLabel),
 			]);
 		}
-	}, [histogram, dateFormatters]);
+		else {
+			return dateFormatters.formatChartTitle([
+				new Date(defaultTimeRange.startDate),
+				new Date(defaultTimeRange.endDate),
+			]);
+		}
+	}, [dateFormatters, defaultTimeRange, histogram]);
 
-	const handleTimeSpanChange = event => {
+	const handleTimeSpanChange = (event) => {
 		const {value} = event.target;
 
 		actions.changeTimeSpanOption({key: value});
@@ -324,6 +290,7 @@ export default function Chart({
 		legendFormatterGenerator(
 			dataSet.totals,
 			languageTag,
+			publishedToday,
 			validAnalyticsConnection
 		);
 
@@ -336,6 +303,10 @@ export default function Chart({
 
 	const lineChartWrapperClasses = className('line-chart-wrapper', {
 		'line-chart-wrapper--loading': chartState.loading,
+	});
+
+	const publishedTodayClasses = className({
+		'line-chart-wrapper--published-today text-center text-secondary': publishedToday,
 	});
 
 	return (
@@ -362,6 +333,16 @@ export default function Chart({
 						/>
 					)}
 
+					{validAnalyticsConnection &&
+						publishedToday &&
+						!hasHistoricalWarning && (
+							<div className={publishedTodayClasses}>
+								{Liferay.Language.get(
+									'no-data-is-available-yet'
+								)}
+							</div>
+						)}
+
 					{title && <h5>{title}</h5>}
 
 					<div className="line-chart mt-3">
@@ -371,6 +352,13 @@ export default function Chart({
 							width={CHART_SIZES.width}
 						>
 							<CartesianGrid
+								horizontalPoints={
+									validAnalyticsConnection &&
+									publishedToday &&
+									!hasHistoricalWarning
+										? [CHART_SIZES.dotRadius]
+										: []
+								}
 								stroke={CHART_COLORS.cartesianGrid}
 								strokeDasharray="0 0"
 								vertical={true}
@@ -384,28 +372,59 @@ export default function Chart({
 									stroke: CHART_COLORS.cartesianGrid,
 								}}
 								dataKey="label"
-								interval={
-									chartState.timeSpanOption === LAST_7_DAYS
-										? 'preserveStartEnd'
-										: 4
+								domain={
+									!validAnalyticsConnection ||
+									histogram.length === 0
+										? [
+												new Date(
+													defaultTimeRange.startDate
+												).getDate(),
+												new Date(
+													defaultTimeRange.endDate
+												).getDate(),
+										  ]
+										: []
 								}
-								tickFormatter={xAxisFormatter}
+								interval="preserveStartEnd"
+								tickCount={7}
+								tickFormatter={(value) => {
+									return validAnalyticsConnection &&
+										histogram.length !== 0
+										? xAxisFormatter(value)
+										: value;
+								}}
 								tickLine={false}
+								type={
+									validAnalyticsConnection &&
+									histogram.length !== 0
+										? 'category'
+										: 'number'
+								}
 							/>
 
-							<YAxis
-								allowDecimals={false}
-								axisLine={{
-									stroke: CHART_COLORS.cartesianGrid,
-								}}
-								minTickGap={3}
-								tickFormatter={thousandsToKilosFormater}
-								tickLine={false}
-								ticks={
-									!validAnalyticsConnection && [0, 50, 100]
-								}
-								width={CHART_SIZES.yAxisWidth}
-							/>
+							{!validAnalyticsConnection ||
+							publishedToday ||
+							histogram.length === 0 ? (
+								<YAxis
+									axisLine={{
+										stroke: CHART_COLORS.cartesianGrid,
+									}}
+									tickLine={false}
+									ticks={[0, 50, 100]}
+									width={CHART_SIZES.yAxisWidth}
+								/>
+							) : (
+								<YAxis
+									allowDecimals={false}
+									axisLine={{
+										stroke: CHART_COLORS.cartesianGrid,
+									}}
+									minTickGap={3}
+									tickFormatter={thousandsToKilosFormater}
+									tickLine={false}
+									width={CHART_SIZES.yAxisWidth}
+								/>
+							)}
 
 							<Tooltip
 								content={
@@ -418,6 +437,11 @@ export default function Chart({
 										}
 									/>
 								}
+								cursor={
+									validAnalyticsConnection &&
+									histogram.length !== 0 &&
+									!publishedToday
+								}
 								formatter={(value, name) => {
 									return [
 										numberFormat(languageTag, value),
@@ -427,15 +451,6 @@ export default function Chart({
 								}}
 								labelFormatter={dateFormatters.formatLongDate}
 								separator={': '}
-							/>
-
-							<ReferenceDot
-								fill={CHART_SIZES.referenceDotFill}
-								r={3}
-								stroke={CHART_COLORS.publishDate}
-								strokeWidth={CHART_SIZES.lineWidth}
-								x={referenceDotPosition}
-								y={0}
 							/>
 
 							<Legend
@@ -449,7 +464,7 @@ export default function Chart({
 								}}
 							/>
 
-							{keyList.map(keyName => {
+							{keyList.map((keyName) => {
 								const color = keyToHexColor(keyName);
 								const shape = keyToIconType(keyName);
 
@@ -468,6 +483,17 @@ export default function Chart({
 									/>
 								);
 							})}
+
+							{validAnalyticsConnection && !publishedToday && (
+								<ReferenceDot
+									isFront={true}
+									r={4}
+									stroke={CHART_COLORS.publishDate}
+									strokeWidth={CHART_SIZES.lineWidth}
+									x={referenceDotPosition}
+									y={0}
+								/>
+							)}
 						</LineChart>
 					</div>
 				</div>
@@ -478,6 +504,7 @@ export default function Chart({
 
 Chart.propTypes = {
 	dataProviders: PropTypes.arrayOf(PropTypes.func).isRequired,
+	defaultTimeRange: PropTypes.object.isRequired,
 	defaultTimeSpanOption: PropTypes.string.isRequired,
 	languageTag: PropTypes.string.isRequired,
 	publishDate: PropTypes.number.isRequired,

@@ -32,7 +32,7 @@ const RESULTS_LIST_ID = 'add-result-items';
 
 const START_ID = 100;
 
-const AddResultModalWithModalMock = props => {
+const AddResultModalWithModalMock = (props) => {
 	const {observer, onClose} = useModal({
 		onClose: jest.fn(),
 	});
@@ -82,12 +82,14 @@ describe('AddResultModal', () => {
 	});
 
 	it('prompts a message to search in the modal', async () => {
+
 		// This is a temporary mock to get the initial message to display.
 		// There currently isn't a way to disable the initial fetch, so the
 		// current workaround is showing an initial message if a refetch
 		// hasn't been called.
 		//
 		// This should be removed after disabling the initial fetch.
+
 		fetch.mockResponse(JSON.stringify({}));
 
 		const {getByTestId} = render(<AddResultModalWithModalMock />);

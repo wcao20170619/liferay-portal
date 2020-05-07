@@ -16,6 +16,7 @@ package com.liferay.microblogs.service.persistence.impl;
 
 import com.liferay.microblogs.exception.NoSuchEntryException;
 import com.liferay.microblogs.model.MicroblogsEntry;
+import com.liferay.microblogs.model.MicroblogsEntryTable;
 import com.liferay.microblogs.model.impl.MicroblogsEntryImpl;
 import com.liferay.microblogs.model.impl.MicroblogsEntryModelImpl;
 import com.liferay.microblogs.service.persistence.MicroblogsEntryPersistence;
@@ -7669,16 +7670,18 @@ public class MicroblogsEntryPersistenceImpl
 		"microblogsEntry.socialRelationType = ?";
 
 	public MicroblogsEntryPersistenceImpl() {
-		setModelClass(MicroblogsEntry.class);
-
-		setModelImplClass(MicroblogsEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MicroblogsEntry.class);
+
+		setModelImplClass(MicroblogsEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MicroblogsEntryTable.INSTANCE);
 	}
 
 	/**

@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchAddressException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Address;
+import com.liferay.portal.kernel.model.AddressTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -4575,18 +4576,20 @@ public class AddressPersistenceImpl
 		"address.primary = ?";
 
 	public AddressPersistenceImpl() {
-		setModelClass(Address.class);
-
-		setModelImplClass(AddressImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(AddressModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("primary", "primary_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Address.class);
+
+		setModelImplClass(AddressImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(AddressModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(AddressTable.INSTANCE);
 	}
 
 	/**

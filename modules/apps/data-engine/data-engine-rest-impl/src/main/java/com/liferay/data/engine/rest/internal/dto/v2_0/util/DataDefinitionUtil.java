@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -99,6 +100,10 @@ public class DataDefinitionUtil {
 	public static DDMForm toDDMForm(
 		DataDefinition dataDefinition,
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {
+
+		if (dataDefinition == null) {
+			return new DDMForm();
+		}
 
 		DDMForm ddmForm = new DDMForm();
 
@@ -207,14 +212,33 @@ public class DataDefinitionUtil {
 					}
 				}
 			}
-			else {
-				for (Map<String, String> option :
-						(List<Map<String, String>>)value) {
+			else if (value instanceof List) {
+				for (Object option : (List<Object>)value) {
+					if (option instanceof Map) {
+						ddmFormFieldOptions.addOptionLabel(
+							MapUtil.getString((Map<String, ?>)option, "value"),
+							LocaleUtil.fromLanguageId(entry.getKey()),
+							MapUtil.getString((Map<String, ?>)option, "label"));
+					}
+					else if (option instanceof String) {
+						try {
+							JSONObject optionJSONObject =
+								JSONFactoryUtil.createJSONObject(
+									option.toString());
 
-					ddmFormFieldOptions.addOptionLabel(
-						MapUtil.getString(option, "value"),
-						LocaleUtil.fromLanguageId(entry.getKey()),
-						MapUtil.getString(option, "label"));
+							ddmFormFieldOptions.addOptionLabel(
+								JSONUtil.getValueAsString(
+									optionJSONObject, "Object/value"),
+								LocaleUtil.fromLanguageId(entry.getKey()),
+								JSONUtil.getValueAsString(
+									optionJSONObject, "Object/label"));
+						}
+						catch (JSONException jsonException) {
+							if (_log.isDebugEnabled()) {
+								_log.debug(jsonException, jsonException);
+							}
+						}
+					}
 				}
 			}
 		}

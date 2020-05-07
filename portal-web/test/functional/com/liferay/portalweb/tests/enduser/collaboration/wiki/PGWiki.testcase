@@ -83,9 +83,11 @@ definition {
 
 		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
+		var wikiPageContent = '''<!DOCTYPE html> <html lang="en"> <body> <h1>My First Heading</h1> <p>My first paragraph.</p> </body> </html>''';
+
 		Type(
 			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-			value1 = '''<!DOCTYPE html> <html lang="en"> <body> <h1>My First Heading</h1> <p>My first paragraph.</p> </body> </html>''');
+			value1 = "${wikiPageContent}");
 
 		SelectFrame(value1 = "relative=top");
 
@@ -122,9 +124,11 @@ definition {
 
 		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
+		var wikiPageContent = '''<!DOCTYPE html> <html lang="en"> <body> <h1>Edited My First Heading</h1> <p>Edited My first paragraph.</p> </body> </html>''';
+
 		Type(
 			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-			value1 = '''<!DOCTYPE html> <html lang="en"> <body> <h1>Edited My First Heading</h1> <p>Edited My first paragraph.</p> </body> </html>''');
+			value1 = "${wikiPageContent}");
 
 		SelectFrame(value1 = "relative=top");
 
@@ -169,7 +173,7 @@ definition {
 		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
 		Type(
-			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_2",
+			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
 			value1 = "${welcomeToLiferay}");
 
 		SelectFrame(value1 = "relative=top");
@@ -305,11 +309,11 @@ definition {
 
 		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
+		var wikiPageContent = '''<p id='demo'>PASS</p> <script type='text/javascript'>document.getElementById('demo').innerHTML = 'this code should not be read by the client';</script>''';
+
 		Type(
 			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-			value1 = '''
-				<p id="demo">PASS</p><script type="text/javascript">document.getElementById('demo').innerHTML="this code should not be read by the client";</script>
-			''');
+			value1 = "${wikiPageContent}");
 
 		SelectFrame(value1 = "relative=top");
 
@@ -326,8 +330,6 @@ definition {
 
 	@priority = "4"
 	test AddFrontPageWithAttachments {
-		property portal.upstream = "quarantine";
-
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
 		WikiPage.addFrontPagePG(wikiPageContent = "Wiki FrontPage Content");
@@ -540,15 +542,13 @@ definition {
 
 		WikiNavigator.gotoBodyLinkPG(wikiPageContent = "This page is empty. Edit it to add some text.");
 
-		ItemSelector.gotoItemSelectorViaAlloyEditor();
+		ItemSelector.gotoItemSelectorViaCKEditor();
 
 		ItemSelector.addFromURL(
 			imageSourceURL = "https://raw.githubusercontent.com/liferay/liferay-portal/master/portal-web/test/functional/com/liferay/portalweb/dependencies/Document_1.jpg",
 			navTab = "URL");
 
-		AssertElementPresent(
-			key_contentImageName = "Document_1.jpg",
-			locator1 = "Wiki#CONTENT_IMAGE_NAME");
+		CKEditor.viewEntryContentImage(contentImageName = "Document_1.jpg");
 
 		PortletEntry.publish();
 
@@ -612,6 +612,7 @@ definition {
 
 		WikiPage.viewPageWithAttachment(
 			attachmentFileName = "Document_1.jpg",
+			inlineImage = "true",
 			wikiPageContent = "Wiki Page Content",
 			wikiPageTitle = "Wiki Page Title");
 	}

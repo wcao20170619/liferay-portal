@@ -16,7 +16,7 @@ import {useIsMounted} from 'frontend-js-react-web';
 import {debounce} from 'frontend-js-web';
 import {closest} from 'metal-dom';
 import PropTypes from 'prop-types';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {
 	LayoutDataPropTypes,
@@ -40,13 +40,14 @@ const LAYOUT_DATA_ITEMS = {
 	[LAYOUT_DATA_ITEM_TYPES.container]: Container,
 	[LAYOUT_DATA_ITEM_TYPES.dropZone]: DropZoneContainer,
 	[LAYOUT_DATA_ITEM_TYPES.fragment]: Fragment,
+	[LAYOUT_DATA_ITEM_TYPES.fragmentDropZone]: Root,
 	[LAYOUT_DATA_ITEM_TYPES.root]: Root,
 	[LAYOUT_DATA_ITEM_TYPES.row]: Row,
 };
 
 export default function MasterPage() {
-	const fragmentEntryLinks = useSelector(state => state.fragmentEntryLinks);
-	const masterLayoutData = useSelector(state => state.masterLayoutData);
+	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
+	const masterLayoutData = useSelector((state) => state.masterLayoutData);
 
 	const mainItem = masterLayoutData.items[masterLayoutData.rootItems.main];
 
@@ -74,7 +75,7 @@ function MasterLayoutDataItem({fragmentEntryLinks, item, layoutData}) {
 			item={item}
 			layoutData={layoutData}
 		>
-			{item.children.map(childId => {
+			{item.children.map((childId) => {
 				return (
 					<MasterLayoutDataItem
 						fragmentEntryLinks={fragmentEntryLinks}
@@ -95,7 +96,7 @@ MasterLayoutDataItem.propTypes = {
 };
 
 function DropZoneContainer() {
-	const mainItemId = useSelector(state => state.layoutData.rootItems.main);
+	const mainItemId = useSelector((state) => state.layoutData.rootItems.main);
 
 	return <Layout mainItemId={mainItemId} withinMasterPage />;
 }
@@ -126,14 +127,16 @@ const FragmentContent = React.memo(function FragmentContent({
 			return;
 		}
 
-		const handler = event => {
+		const handler = (event) => {
 			const element = event.target;
 
 			if (closest(element, '[href]')) {
 				event.preventDefault();
 			}
 
-			selectItem(null);
+			if (!closest(event.target, '.page-editor')) {
+				selectItem(null);
+			}
 		};
 
 		element.addEventListener('click', handler);
@@ -153,7 +156,7 @@ const FragmentContent = React.memo(function FragmentContent({
 			}
 		}, 50);
 
-		getAllEditables(element).forEach(editable => {
+		getAllEditables(element).forEach((editable) => {
 			resolveEditableValue(
 				editableValues,
 				editable.editableId,
@@ -184,10 +187,41 @@ const FragmentContent = React.memo(function FragmentContent({
 		getFieldValue,
 	]);
 
+	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
+	const masterLayoutData = useSelector((state) => state.masterLayoutData);
+
+	const getPortals = useCallback(
+		(element) =>
+			Array.from(element.querySelectorAll('lfr-drop-zone')).map(
+				(dropZoneElement) => {
+					const mainItemId =
+						dropZoneElement.getAttribute('uuid') || '';
+
+					const Component = () =>
+						mainItemId ? (
+							<MasterLayoutDataItem
+								fragmentEntryLinks={fragmentEntryLinks}
+								item={masterLayoutData.items[mainItemId]}
+								layoutData={masterLayoutData}
+							/>
+						) : null;
+
+					Component.displayName = `DropZone(${mainItemId})`;
+
+					return {
+						Component,
+						element: dropZoneElement,
+					};
+				}
+			),
+		[fragmentEntryLinks, masterLayoutData]
+	);
+
 	return (
 		<UnsafeHTML
 			className="page-editor__fragment-content page-editor__fragment-content--master"
 			contentRef={ref}
+			getPortals={getPortals}
 			markup={content}
 		/>
 	);
@@ -203,7 +237,7 @@ function Fragment({fragmentEntryLinks, item}) {
 	const fragmentEntryLink =
 		fragmentEntryLinks[item.config.fragmentEntryLinkId];
 
-	const languageId = useSelector(state => state.languageId);
+	const languageId = useSelector((state) => state.languageId);
 
 	return (
 		<FragmentContent

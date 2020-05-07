@@ -214,7 +214,7 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 					{
 						label: '<%= UnicodeLanguageUtil.get(request, "view-history") %>',
 						on: {
-							click: function(event) {
+							click: function (event) {
 								event.domEvent.preventDefault();
 
 								window.location.href = '<%= viewHistoryURL %>';
@@ -269,10 +269,14 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 						persistState="<%= true %>"
 						title='<%= LanguageUtil.get(request, "details") %>'
 					>
-						<aui:row cssClass="lfr-ddm-types-form-column">
+						<clay:row
+							className="lfr-ddm-types-form-column"
+						>
 							<c:choose>
 								<c:when test="<%= Validator.isNull(storageTypeValue) %>">
-									<aui:col width="<%= 50 %>">
+									<clay:col
+										md="6"
+									>
 										<aui:field-wrapper>
 											<aui:select disabled="<%= structure != null %>" name="storageType">
 
@@ -288,13 +292,13 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 
 											</aui:select>
 										</aui:field-wrapper>
-									</aui:col>
+									</clay:col>
 								</c:when>
 								<c:otherwise>
 									<aui:input name="storageType" type="hidden" value="<%= storageTypeValue %>" />
 								</c:otherwise>
 							</c:choose>
-						</aui:row>
+						</clay:row>
 
 						<c:if test="<%= !ddmDisplayContext.autogenerateStructureKey() %>">
 							<aui:input disabled="<%= (structure != null) ? true : false %>" label='<%= LanguageUtil.format(request, "x-key", HtmlUtil.escape(ddmDisplay.getStructureName(locale)), false) %>' name="structureKey" />
@@ -358,7 +362,7 @@ if (Validator.isNotNull(requestUpdateStructureURL)) {
 				showManageTemplates: false,
 				title: '<%= HtmlUtil.escapeJS(scopeTitle) %>',
 			},
-			function(event) {
+			function (event) {
 				var form = document.<portlet:namespace />fm;
 
 				Liferay.Util.setFormValues(form, {

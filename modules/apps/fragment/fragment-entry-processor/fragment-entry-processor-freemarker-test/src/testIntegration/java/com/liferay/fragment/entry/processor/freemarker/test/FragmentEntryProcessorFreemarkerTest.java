@@ -15,6 +15,8 @@
 package com.liferay.fragment.entry.processor.freemarker.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntryLocalService;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.fragment.exception.FragmentEntryContentException;
@@ -26,6 +28,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.service.FragmentCollectionService;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryService;
+import com.liferay.item.selector.criteria.InfoListItemSelectorReturnType;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
@@ -56,8 +59,10 @@ import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
@@ -66,6 +71,7 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.IOException;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -161,6 +167,89 @@ public class FragmentEntryProcessorFreemarkerTest {
 		String expectedProcessedHTML = _getProcessedHTML(
 			_getFileAsString(
 				"expected_processed_fragment_entry_with_configuration.html"));
+
+		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
+	}
+
+	@Test
+	public void testProcessFragmentEntryLinkHTMLWithConfigurationCollectionSelector()
+		throws Exception {
+
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.US, "t1"
+		).build();
+
+		Map<Locale, String> contentMap = HashMapBuilder.put(
+			LocaleUtil.US, "c1"
+		).build();
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(), 0,
+			PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
+			contentMap, LocaleUtil.getSiteDefault(), false, true,
+			serviceContext);
+
+		AssetListEntry assetListEntry =
+			_assetListEntryLocalService.addDynamicAssetListEntry(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				"Collection Title",
+				_getTypeSettings(
+					_group.getGroupId(), journalArticle.getClassNameId()),
+				serviceContext);
+
+		Map<String, String> editableValuesValues = HashMapBuilder.put(
+			"classNameId",
+			String.valueOf(
+				_portal.getClassNameId(AssetListEntry.class.getName()))
+		).put(
+			"classPK", String.valueOf(assetListEntry.getAssetListEntryId())
+		).put(
+			"itemType", assetListEntry.getAssetEntryType()
+		).put(
+			"title", assetListEntry.getTitle()
+		).put(
+			"type", InfoListItemSelectorReturnType.class.getName()
+		).build();
+
+		FragmentEntry fragmentEntry = _addFragmentEntry(
+			"fragment_entry_with_configuration_collectionselector_dynamic_" +
+				"collection.html",
+			"configuration_collectionselector.json", new HashMap<>());
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
+
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
+		fragmentEntryLink.setEditableValues(
+			_getJsonFileAsString(
+				"fragment_entry_link_editable_values_with_configuration_" +
+					"collectionselector_dynamic_collection.json",
+				editableValuesValues));
+
+		DefaultFragmentEntryProcessorContext
+			defaultFragmentEntryProcessorContext =
+				new DefaultFragmentEntryProcessorContext(
+					_getMockHttpServletRequest(), new MockHttpServletResponse(),
+					null, null);
+
+		String actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Map<String, String> expectedValues = HashMapBuilder.put(
+			"title", journalArticle.getTitle()
+		).build();
+
+		String expectedProcessedHTML = _getProcessedHTML(
+			_getFileAsString(
+				"expected_processed_fragment_entry_with_configuration_" +
+					"collectionselector_dynamic_collection.html",
+				expectedValues));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
 	}
@@ -320,152 +409,6 @@ public class FragmentEntryProcessorFreemarkerTest {
 	}
 
 	@Test
-	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorJournalArticleNondefaultSegmentId()
-		throws Exception {
-
-		Map<Locale, String> titleMap = HashMapBuilder.put(
-			LocaleUtil.SPAIN, RandomTestUtil.randomString(10)
-		).put(
-			LocaleUtil.US, RandomTestUtil.randomString(10)
-		).build();
-
-		Map<Locale, String> contentMap = HashMapBuilder.put(
-			LocaleUtil.SPAIN, RandomTestUtil.randomString(10)
-		).put(
-			LocaleUtil.US, RandomTestUtil.randomString(10)
-		).build();
-
-		Map<Locale, String> titleMap2 = HashMapBuilder.put(
-			LocaleUtil.SPAIN, "t2-es"
-		).put(
-			LocaleUtil.US, "t2"
-		).build();
-
-		Map<Locale, String> contentMap2 = HashMapBuilder.put(
-			LocaleUtil.SPAIN, "c2-es"
-		).put(
-			LocaleUtil.US, "c2"
-		).build();
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId());
-
-		JournalArticle journalArticle1 = JournalTestUtil.addArticle(
-			_group.getGroupId(), 0,
-			PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
-			contentMap, LocaleUtil.getSiteDefault(), false, true,
-			serviceContext);
-
-		JournalArticle journalArticle2 = JournalTestUtil.addArticle(
-			_group.getGroupId(), 0,
-			PortalUtil.getClassNameId(JournalArticle.class), titleMap2, null,
-			contentMap2, LocaleUtil.getSiteDefault(), false, true,
-			serviceContext);
-
-		Map<String, String> configurationDefaultValues = HashMapBuilder.put(
-			"classNameId", String.valueOf(journalArticle1.getClassNameId())
-		).put(
-			"classPK", String.valueOf(journalArticle1.getResourcePrimKey())
-		).build();
-
-		Map<String, String> editableValuesValues = HashMapBuilder.put(
-			"classNameId", String.valueOf(journalArticle2.getClassNameId())
-		).put(
-			"classPK", String.valueOf(journalArticle2.getResourcePrimKey())
-		).build();
-
-		FragmentEntry fragmentEntry = _addFragmentEntry(
-			"fragment_entry_with_configuration_itemselector_journal_article." +
-				"html",
-			"configuration_itemselector.json", configurationDefaultValues);
-
-		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
-
-		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
-		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
-		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
-				"fragment_entry_link_editable_values_with_configuration_" +
-					"itemselector_journal_article_nondefault_segment_id.json",
-				editableValuesValues));
-
-		DefaultFragmentEntryProcessorContext
-			defaultFragmentEntryProcessorContext =
-				new DefaultFragmentEntryProcessorContext(
-					_getMockHttpServletRequest(), new MockHttpServletResponse(),
-					null, null);
-
-		defaultFragmentEntryProcessorContext.setSegmentsExperienceIds(
-			new long[] {1});
-
-		String actualProcessedHTML = _getProcessedHTML(
-			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-				fragmentEntryLink, defaultFragmentEntryProcessorContext));
-
-		Map<String, String> expectedValues = HashMapBuilder.put(
-			"classNameId", String.valueOf(journalArticle2.getClassNameId())
-		).put(
-			"classPK", String.valueOf(journalArticle2.getResourcePrimKey())
-		).put(
-			"contentES", "c2-es"
-		).put(
-			"contentUS", "c2"
-		).put(
-			"titleES", "t2-es"
-		).put(
-			"titleUS", "t2"
-		).build();
-
-		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
-				"expected_processed_fragment_entry_with_configuration_" +
-					"itemselector_journal_article.html",
-				expectedValues));
-
-		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
-	}
-
-	@Test
-	public void testProcessFragmentEntryLinkHTMLWithConfigurationNondefaultSegmentId()
-		throws Exception {
-
-		FragmentEntry fragmentEntry = _addFragmentEntry(
-			"fragment_entry_with_configuration.html", "configuration.json");
-
-		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
-
-		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
-		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
-		fragmentEntryLink.setEditableValues(
-			_getJsonFileAsString(
-				"fragment_entry_link_editable_values_with_configuration_" +
-					"nondefault_segment_id.json"));
-
-		DefaultFragmentEntryProcessorContext
-			defaultFragmentEntryProcessorContext =
-				new DefaultFragmentEntryProcessorContext(
-					_getMockHttpServletRequest(), new MockHttpServletResponse(),
-					null, null);
-
-		defaultFragmentEntryProcessorContext.setSegmentsExperienceIds(
-			new long[] {1});
-
-		String actualProcessedHTML = _getProcessedHTML(
-			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
-				fragmentEntryLink, defaultFragmentEntryProcessorContext));
-
-		String expectedProcessedHTML = _getProcessedHTML(
-			_getFileAsString(
-				"expected_processed_fragment_entry_with_configuration_" +
-					"nondefault_segment_id.html"));
-
-		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
-	}
-
-	@Test
 	public void testProcessFragmentEntryLinkHTMLWithInvalidFreemarker()
 		throws Exception {
 
@@ -619,6 +562,33 @@ public class FragmentEntryProcessorFreemarkerTest {
 		return themeDisplay;
 	}
 
+	private String _getTypeSettings(long groupId, long classNameId) {
+		UnicodeProperties unicodeProperties = new UnicodeProperties(true);
+
+		unicodeProperties.put("anyAssetType", String.valueOf(classNameId));
+		unicodeProperties.put(
+			"anyClassTypeDLFileEntryAssetRendererFactory", "true");
+		unicodeProperties.put(
+			"anyClassTypeJournalArticleAssetRendererFactory", "true");
+		unicodeProperties.put("classNameIds", String.valueOf(classNameId));
+		unicodeProperties.put("groupIds", String.valueOf(groupId));
+		unicodeProperties.put("orderByColumn1", "modifiedDate");
+		unicodeProperties.put("orderByColumn2", "title");
+		unicodeProperties.put("orderByType1", "DESC");
+		unicodeProperties.put("orderByType2", "ASC");
+		unicodeProperties.put(
+			"subtypeFieldsFilterEnabledDLFileEntryAssetRendererFactory",
+			"false");
+		unicodeProperties.put(
+			"subtypeFieldsFilterEnabledJournalArticleAssetRendererFactory",
+			"false");
+
+		return unicodeProperties.toString();
+	}
+
+	@Inject
+	private AssetListEntryLocalService _assetListEntryLocalService;
+
 	@Inject
 	private ClassNameLocalService _classNameLocalService;
 
@@ -650,6 +620,9 @@ public class FragmentEntryProcessorFreemarkerTest {
 
 	@Inject
 	private LayoutSetLocalService _layoutSetLocalService;
+
+	@Inject
+	private Portal _portal;
 
 	@Inject
 	private ThemeLocalService _themeLocalService;

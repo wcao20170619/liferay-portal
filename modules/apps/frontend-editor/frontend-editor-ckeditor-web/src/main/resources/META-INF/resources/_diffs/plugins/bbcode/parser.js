@@ -12,10 +12,10 @@
  * details.
  */
 
-(function() {
+(function () {
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-	var isString = function(val) {
+	var isString = function (val) {
 		return typeof val == 'string';
 	};
 
@@ -56,7 +56,7 @@
 
 	var STR_TAG_CODE = 'code';
 
-	var Parser = function(config) {
+	var Parser = function (config) {
 		var instance = this;
 
 		config = config || {};
@@ -200,7 +200,7 @@
 
 			stack.last =
 				stack.last ||
-				function() {
+				function () {
 					var instance = this;
 
 					return instance[instance.length - 1];
@@ -233,7 +233,9 @@
 							(token = lexer.getNextToken()) &&
 							token[3] != STR_TAG_CODE
 						) {
+
 							// Continue.
+
 						}
 
 						instance._handleData(token, data);

@@ -19,32 +19,40 @@ import Collapse from '../../../common/components/Collapse';
 import SearchForm from '../../../common/components/SearchForm';
 import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
-import CollectionDisplay from './CollectionDisplay';
+import CollectionDisplay, {CollectionDisplayCard} from './CollectionDisplay';
 import FragmentCard from './FragmentCard';
 import LayoutElements from './LayoutElements';
 
+const CONTENT_DISPLAY_COLLECTION_ID = 'content-display';
+
 export default function FragmentsSidebar() {
-	const fragments = useSelector(state => state.fragments);
+	const fragments = useSelector((state) => state.fragments);
 
 	const [searchValue, setSearchValue] = useState('');
+
+	const contentDisplayCollectionIncluded = fragments.some(
+		(fragmentCollection) =>
+			fragmentCollection.fragmentCollectionId ===
+			CONTENT_DISPLAY_COLLECTION_ID
+	);
 
 	const filteredFragments = useMemo(() => {
 		const searchValueLowerCase = searchValue.toLowerCase();
 
 		return searchValue
 			? fragments
-					.map(fragmentCollection => {
+					.map((fragmentCollection) => {
 						return {
 							...fragmentCollection,
 							fragmentEntries: fragmentCollection.fragmentEntries.filter(
-								fragmentEntry =>
+								(fragmentEntry) =>
 									fragmentEntry.name
 										.toLowerCase()
 										.indexOf(searchValueLowerCase) !== -1
 							),
 						};
 					})
-					.filter(fragmentCollection => {
+					.filter((fragmentCollection) => {
 						return fragmentCollection.fragmentEntries.length > 0;
 					})
 			: fragments;
@@ -61,7 +69,7 @@ export default function FragmentsSidebar() {
 
 				{!searchValue.length && <LayoutElements />}
 
-				{filteredFragments.map(fragmentCollection => (
+				{filteredFragments.map((fragmentCollection) => (
 					<div key={fragmentCollection.fragmentCollectionId}>
 						<Collapse
 							label={fragmentCollection.name}
@@ -69,7 +77,7 @@ export default function FragmentsSidebar() {
 						>
 							<div className="align-items-start d-flex flex-wrap justify-content-between">
 								{fragmentCollection.fragmentEntries.map(
-									fragmentEntry => (
+									(fragmentEntry) => (
 										<FragmentCard
 											fragmentEntryKey={
 												fragmentEntry.fragmentEntryKey
@@ -84,12 +92,19 @@ export default function FragmentsSidebar() {
 										/>
 									)
 								)}
+
+								{fragmentCollection.fragmentCollectionId ===
+									CONTENT_DISPLAY_COLLECTION_ID && (
+									<CollectionDisplayCard />
+								)}
 							</div>
 						</Collapse>
 					</div>
 				))}
 
-				{!searchValue.length && <CollectionDisplay />}
+				{!searchValue.length && !contentDisplayCollectionIncluded && (
+					<CollectionDisplay />
+				)}
 			</SidebarPanelContent>
 		</>
 	);

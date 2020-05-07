@@ -37,14 +37,16 @@ export default function useLoad() {
 					new Promise((resolve, reject) => {
 						Liferay.Loader.require(
 							[entryPoint],
-							Plugin => {
+							(Plugin) => {
 								if (isMounted()) {
 									resolve(Plugin.default);
 								}
 							},
-							error => {
+							(error) => {
 								if (isMounted()) {
+
 									// Reset to allow future retries.
+
 									modules.current.delete(key);
 									reject(error);
 								}

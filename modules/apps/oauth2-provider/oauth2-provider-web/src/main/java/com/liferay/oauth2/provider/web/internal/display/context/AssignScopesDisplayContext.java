@@ -63,21 +63,22 @@ public class AssignScopesDisplayContext
 	extends OAuth2AdminPortletDisplayContext {
 
 	public AssignScopesDisplayContext(
-			OAuth2ApplicationService oAuth2ApplicationService,
+			ApplicationDescriptorLocator applicationDescriptorLocator,
+			DLURLHelper dlURLHelper,
 			OAuth2ApplicationScopeAliasesLocalService
 				oAuth2ApplicationScopeAliasesLocalService,
-			OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
+			OAuth2ApplicationService oAuth2ApplicationService,
 			OAuth2ProviderConfiguration oAuth2ProviderConfiguration,
-			PortletRequest portletRequest, ThemeDisplay themeDisplay,
-			ApplicationDescriptorLocator applicationDescriptorLocator,
+			OAuth2ScopeGrantLocalService oAuth2ScopeGrantLocalService,
+			PortletRequest portletRequest,
 			ScopeDescriptorLocator scopeDescriptorLocator,
-			ScopeLocator scopeLocator, DLURLHelper dlURLHelper)
+			ScopeLocator scopeLocator, ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		super(
-			oAuth2ApplicationService, oAuth2ApplicationScopeAliasesLocalService,
-			oAuth2ProviderConfiguration, portletRequest, themeDisplay,
-			dlURLHelper);
+			dlURLHelper, oAuth2ApplicationScopeAliasesLocalService,
+			oAuth2ApplicationService, oAuth2ProviderConfiguration,
+			portletRequest, themeDisplay);
 
 		_applicationDescriptorLocator = applicationDescriptorLocator;
 		_companyId = themeDisplay.getCompanyId();

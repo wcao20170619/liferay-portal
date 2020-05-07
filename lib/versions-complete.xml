@@ -6,7 +6,7 @@
 		<libraries>
 			<library>
 				<file-name>com.liferay.adaptive.media.image.impl.jar!metadata-extractor.jar</file-name>
-				<version>2.10.0</version>
+				<version>2.13.0</version>
 				<project-name>metadata-extractor</project-name>
 				<project-url>https://drewnoakes.com/code/exif/</project-url>
 				<licenses>
@@ -18,7 +18,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.adaptive.media.image.impl.jar!xmpcore.jar</file-name>
-				<version>5.1.3</version>
+				<version>6.0.6</version>
 				<project-name>XMP Library for Java</project-name>
 				<project-url>http://www.adobe.com/devnet/xmp.html</project-url>
 				<licenses>
@@ -1248,7 +1248,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-bmp.jar</file-name>
-				<version>3.5</version>
+				<version>3.4.3</version>
 				<project-name>TwelveMonkeys :: ImageIO :: BMP plugin</project-name>
 				<licenses>
 					<license>
@@ -1555,6 +1555,28 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.oauth2.provider.web.jar!jgrapht-core.jar</file-name>
+				<version>1.3.0</version>
+				<project-name>JGraphT - Core</project-name>
+				<licenses>
+					<license>
+						<license-name>http://jgrapht.sourceforge.net/LGPL.html, http://www.eclipse.org/legal/epl-v20.html</license-name>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.oauth2.provider.web.jar!jheaps.jar</file-name>
+				<version>0.9</version>
+				<project-name>JHeaps</project-name>
+				<project-url>http://www.jheaps.org</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.petra.doulos.jar!commons-lang3.jar</file-name>
 				<version>3.4</version>
 				<project-name>Apache Commons Lang</project-name>
@@ -1724,7 +1746,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.petra.json.web.service.client.jar!jackson-annotations.jar</file-name>
-				<version>2.9.10</version>
+				<version>2.10.3</version>
 				<project-name>Jackson-annotations</project-name>
 				<project-url>http://github.com/FasterXML/jackson</project-url>
 				<licenses>
@@ -1736,7 +1758,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.petra.json.web.service.client.jar!jackson-core.jar</file-name>
-				<version>2.9.10</version>
+				<version>2.10.3</version>
 				<project-name>Jackson-core</project-name>
 				<project-url>https://github.com/FasterXML/jackson-core</project-url>
 				<licenses>
@@ -1748,7 +1770,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.petra.json.web.service.client.jar!jackson-databind.jar</file-name>
-				<version>2.9.10.1</version>
+				<version>2.10.3</version>
 				<project-name>jackson-databind</project-name>
 				<project-url>http://github.com/FasterXML/jackson</project-url>
 				<licenses>
@@ -6284,7 +6306,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/jackson-databind.jar</file-name>
-				<version>2.10.0.LIFERAY-PATCHED-1</version>
+				<version>2.10.3.LIFERAY-PATCHED-1</version>
 				<project-name>Jackson Databind</project-name>
 				<project-url>https://github.com/FasterXML/jackson-databind</project-url>
 				<licenses>
@@ -6930,7 +6952,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/metadata-extractor.jar</file-name>
-				<version>2.11.0</version>
+				<version>2.13.0</version>
 				<project-name>Metadata Extractor</project-name>
 				<project-url>http://www.drewnoakes.com/code/exif</project-url>
 				<licenses>
@@ -7014,7 +7036,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/netty-all.jar</file-name>
-				<version>4.1.42.Final</version>
+				<version>4.1.48.Final</version>
 				<project-name>Netty</project-name>
 				<project-url>http://netty.io</project-url>
 				<licenses>
@@ -7307,6 +7329,16 @@
 						<license-url>http://www.apache.org/licenses/LICENSE-1.1</license-url>
 						<copyright-notice>Copyright (c) 1999 The Apache Software Foundation. All rights reserved.</copyright-notice>
 					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/sparse-bit-set.jar</file-name>
+				<version>1.2</version>
+				<project-name>SparseBitSet</project-name>
+				<project-url>https://github.com/brettwooldridge/SparseBitSet</project-url>
+				<licenses>
+					<license>Apache License 2.0</license>
+					<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 				</licenses>
 			</library>
 			<library>
@@ -7814,7 +7846,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/xmpcore.jar</file-name>
-				<version>5.1.3</version>
+				<version>6.0.6</version>
 				<project-name>Extensible Metadata Platform</project-name>
 				<project-url>http://www.adobe.com/devnet/xmp.html</project-url>
 				<licenses>

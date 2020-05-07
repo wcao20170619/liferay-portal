@@ -46,7 +46,7 @@ definition {
 			''';
 
 		var maliciousURL5 = '''
-				${portalURL}/web/guest/home?p_p_id=113&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_113_tabs1=background-styles
+				${portalURL}/web/guest/search?p_p_id=113&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_113_tabs1=background-styles
 			''';
 
 		Navigator.openSpecificURL(url = "${maliciousURL1}");
@@ -227,7 +227,7 @@ definition {
 
 		SitePages.gotoPageMenuItem(
 			menuItem = "Configure",
-			pageName = "Home");
+			pageName = "Search");
 
 		Navigator.gotoNavTab(navTab = "Advanced");
 
@@ -324,7 +324,9 @@ definition {
 
 		Navigator.openURL();
 
-		Portlet.addPG(portletName = "Sign In");
+		Click(locator1 = "Icon#EDIT_PENCIL");
+
+		PageEditor.addWidget(portletName = "Sign In");
 
 		PermissionsInline.gotoConfigurationPG(portletName = "Sign In");
 
@@ -447,7 +449,9 @@ definition {
 
 		Navigator.openURL();
 
-		Portlet.addPG(portletName = "Web Content Display");
+		Click(locator1 = "Icon#EDIT_PENCIL");
+
+		PageEditor.addWidget(portletName = "Web Content Display");
 
 		WebContentDisplayPortlet.selectWebContent(webContentTitle = '''<script>alert(123);</script>''');
 

@@ -15,7 +15,7 @@ import {ClayTooltipProvider} from '@clayui/tooltip';
 import PropTypes from 'prop-types';
 import React, {useContext} from 'react';
 
-import ConnectionContext from '../state/context';
+import ConnectionContext from '../context/ConnectionContext';
 
 export default function TimeSpanSelector({
 	disabledNextTimeSpan,
@@ -37,7 +37,7 @@ export default function TimeSpanSelector({
 				onChange={onTimeSpanChange}
 				value={timeSpanOption}
 			>
-				{timeSpanOptions.map(option => {
+				{timeSpanOptions.map((option) => {
 					return (
 						<ClaySelect.Option
 							key={option.key}

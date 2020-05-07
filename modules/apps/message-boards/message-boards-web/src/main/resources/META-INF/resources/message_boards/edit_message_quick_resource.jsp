@@ -149,7 +149,7 @@ boolean showPermanentLink = GetterUtil.getBoolean(request.getAttribute("edit-mes
 				editorName="<%= editorName %>"
 				name='<%= "replyMessageBody" + parentMessageId %>'
 				onChangeMethod='<%= "replyMessageOnChange" + parentMessageId %>'
-				placeholder='<%= LanguageUtil.get(request, "type-your-reply") %>'
+				placeholder="body"
 				showSource="<%= false %>"
 				skipEditorLoading="<%= true %>"
 			/>
@@ -228,7 +228,7 @@ boolean showPermanentLink = GetterUtil.getBoolean(request.getAttribute("edit-mes
 <aui:script>
 	window[
 		'<portlet:namespace />replyMessageOnChange' + <%= parentMessageId %>
-	] = function(html) {
+	] = function (html) {
 		Liferay.Util.toggleDisabled(
 			'#<portlet:namespace />replyMessageButton<%= parentMessageId %>',
 			html === ''

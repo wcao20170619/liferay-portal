@@ -12,8 +12,6 @@
  * details.
  */
 
-import './RadioRegister.soy';
-
 import {ClayRadio} from '@clayui/form';
 import React, {useMemo} from 'react';
 
@@ -21,7 +19,6 @@ import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
 import {setJSONArrayValue} from '../util/setters.es';
-import templates from './RadioAdapter.soy';
 
 const Radio = ({
 	disabled,
@@ -34,7 +31,7 @@ const Radio = ({
 	value,
 }) => (
 	<div className="ddm-radio" onBlur={onBlur} onFocus={onFocus}>
-		{options.map(option => (
+		{options.map((option) => (
 			<ClayRadio
 				checked={value === option.value}
 				disabled={disabled}
@@ -80,11 +77,11 @@ const RadioProxy = connectStore(
 					disabled={readOnly}
 					inline={inline}
 					name={name}
-					onBlur={event =>
+					onBlur={(event) =>
 						emit('fieldBlurred', event, event.target.value)
 					}
-					onChange={event => emit('fieldFocused', event)}
-					onFocus={event =>
+					onChange={(event) => emit('fieldFocused', event)}
+					onFocus={(event) =>
 						emit('fieldEdited', event, event.target.value)
 					}
 					options={options}
@@ -97,7 +94,7 @@ const RadioProxy = connectStore(
 
 const ReactRadioAdapter = getConnectedReactComponentAdapter(
 	RadioProxy,
-	templates
+	'radio'
 );
 
 export {ReactRadioAdapter};

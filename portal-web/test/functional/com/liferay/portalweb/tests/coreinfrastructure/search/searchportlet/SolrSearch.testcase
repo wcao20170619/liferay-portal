@@ -329,7 +329,11 @@ definition {
 
 		Navigator.openURL();
 
-		Portlet.addPG(portletName = "Language Selector");
+		ContentPages.clickPencil();
+
+		PageEditor.addWidget(portletName = "Language Selector");
+
+		PageEditor.clickPublish();
 
 		LanguagePortlet.selectLanguagePG(
 			locale = "de-DE",
@@ -352,7 +356,9 @@ definition {
 	test ModifyPaginationPortalProperties {
 		property custom.properties = "search.container.page.default.delta=2";
 
-		Portlet.addPG(portletName = "Search Results");
+		ContentPages.clickPencil();
+
+		PageEditor.addWidget(portletName = "Search Results");
 
 		Portlet.gotoPortletOptions(
 			portletName = "Search Results",
@@ -365,6 +371,8 @@ definition {
 			value1 = "2");
 
 		IFrame.closeFrame();
+
+		PageEditor.clickPublish();
 
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
@@ -547,6 +555,8 @@ definition {
 
 	@priority = "4"
 	test SearchBlogsEntryCategory {
+		property test.name.skip.portal.instance = "SolrSearch#SearchBlogsEntryCategory";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -778,6 +788,8 @@ definition {
 
 	@priority = "4"
 	test SearchBlogsEntryTag {
+		property test.name.skip.portal.instance = "SolrSearch#SearchBlogsEntryTag";
+
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(
@@ -1272,6 +1284,8 @@ definition {
 
 	@priority = "4"
 	test SearchUser {
+		property test.name.skip.portal.instance = "SolrSearch#SearchUser";
+
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
 		ProductMenu.gotoPortlet(
@@ -1460,6 +1474,8 @@ definition {
 
 	@priority = "4"
 	test SearchWebContent {
+		property test.name.skip.portal.instance = "SolrSearch#SearchWebContent";
+
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
 			groupName = "Guest",

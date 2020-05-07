@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.base;
 
+import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -41,6 +43,7 @@ import com.liferay.portal.kernel.service.persistence.GroupFinder;
 import com.liferay.portal.kernel.service.persistence.GroupPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.service.persistence.VirtualHostPersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -123,6 +126,11 @@ public abstract class VirtualHostLocalServiceBaseImpl
 	@Override
 	public VirtualHost deleteVirtualHost(VirtualHost virtualHost) {
 		return virtualHostPersistence.remove(virtualHost);
+	}
+
+	@Override
+	public <T> T dslQuery(DSLQuery dslQuery) {
+		return virtualHostPersistence.dslQuery(dslQuery);
 	}
 
 	@Override
@@ -571,8 +579,23 @@ public abstract class VirtualHostLocalServiceBaseImpl
 		return VirtualHostLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<VirtualHost> getCTPersistence() {
+		return virtualHostPersistence;
+	}
+
+	@Override
+	public Class<VirtualHost> getModelClass() {
 		return VirtualHost.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<VirtualHost>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(virtualHostPersistence);
 	}
 
 	protected String getModelClassName() {

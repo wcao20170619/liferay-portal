@@ -95,14 +95,18 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 					String value = reportParameterJSONObject.getString("value");
 				%>
 
-					<aui:row>
+					<clay:row>
 						<c:choose>
 							<c:when test='<%= type.equals("date") %>'>
-								<aui:col width="<%= 20 %>">
+								<clay:col
+									md="3"
+								>
 									<%= HtmlUtil.escape(key) %>
-								</aui:col>
+								</clay:col>
 
-								<aui:col width="<%= 80 %>">
+								<clay:col
+									md="9"
+								>
 
 									<%
 									String[] date = value.split("-");
@@ -124,21 +128,25 @@ renderResponse.setTitle(LanguageUtil.get(request, "new-report-entry"));
 										yearParam='<%= key +"Year" %>'
 										yearValue="<%= calendar.get(Calendar.YEAR) %>"
 									/>
-								</aui:col>
+								</clay:col>
 							</c:when>
 							<c:otherwise>
-								<aui:col width="<%= 20 %>">
+								<clay:col
+									md="3"
+								>
 									<%= HtmlUtil.escape(key) %>
-								</aui:col>
+								</clay:col>
 
-								<aui:col width="<%= 80 %>">
+								<clay:col
+									md="9"
+								>
 									<span class="field field-text">
 										<input class="form-control" name="<portlet:namespace /><%= "parameterValue" + HtmlUtil.escapeAttribute(key) %>" type="text" value="<%= HtmlUtil.escapeAttribute(value) %>" />
 									</span>
-								</aui:col>
+								</clay:col>
 							</c:otherwise>
 						</c:choose>
-					</aui:row>
+					</clay:row>
 
 				<%
 				}

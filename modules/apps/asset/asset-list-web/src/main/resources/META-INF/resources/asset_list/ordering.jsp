@@ -18,8 +18,12 @@
 
 <liferay-frontend:fieldset-group>
 	<liferay-frontend:fieldset>
-		<aui:row id="ordering">
-			<aui:col width="<%= 50 %>">
+		<clay:row
+			id='<%= renderResponse.getNamespace() + "ordering" %>'
+		>
+			<clay:col
+				md="6"
+			>
 
 				<%
 				String orderByColumn1 = editAssetListDisplayContext.getOrderByColumn1();
@@ -59,9 +63,11 @@
 
 					<aui:input cssClass="order-by-type-field" name="TypeSettingsProperties--orderByType1--" type="hidden" value="<%= orderByType1 %>" />
 				</aui:field-wrapper>
-			</aui:col>
+			</clay:col>
 
-			<aui:col width="<%= 50 %>">
+			<clay:col
+				md="6"
+			>
 
 				<%
 				String orderByColumn2 = editAssetListDisplayContext.getOrderByColumn2();
@@ -101,15 +107,15 @@
 
 					<aui:input cssClass="order-by-type-field" name="TypeSettingsProperties--orderByType2--" type="hidden" value="<%= orderByType2 %>" />
 				</aui:field-wrapper>
-			</aui:col>
-		</aui:row>
+			</clay:col>
+		</clay:row>
 	</liferay-frontend:fieldset>
 </liferay-frontend:fieldset-group>
 
 <aui:script use="aui-base">
 	A.one('#<portlet:namespace />ordering').delegate(
 		'click',
-		function(event) {
+		function (event) {
 			var currentTarget = event.currentTarget;
 
 			var orderByTypeContainer = currentTarget.ancestor(

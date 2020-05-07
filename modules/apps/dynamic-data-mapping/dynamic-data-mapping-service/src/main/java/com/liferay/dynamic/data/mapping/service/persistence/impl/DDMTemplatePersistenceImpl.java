@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchTemplateException;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.dynamic.data.mapping.model.DDMTemplateTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMTemplateImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMTemplateModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMTemplatePersistence;
@@ -12281,11 +12282,6 @@ public class DDMTemplatePersistenceImpl
 		"(ddmTemplate.mode_ IS NULL OR ddmTemplate.mode_ = '')";
 
 	public DDMTemplatePersistenceImpl() {
-		setModelClass(DDMTemplate.class);
-
-		setModelImplClass(DDMTemplateImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -12293,6 +12289,13 @@ public class DDMTemplatePersistenceImpl
 		dbColumnNames.put("mode", "mode_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMTemplate.class);
+
+		setModelImplClass(DDMTemplateImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMTemplateTable.INSTANCE);
 	}
 
 	/**

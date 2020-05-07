@@ -25,16 +25,20 @@ AccountEntryDisplay accountEntryDisplay = (AccountEntryDisplay)request.getAttrib
 		<%= LanguageUtil.get(request, "account-display-data") %>
 	</h3>
 
-	<aui:row>
-		<aui:col width="<%= 50 %>">
+	<clay:row>
+		<clay:col
+			md="6"
+		>
 			<aui:field-wrapper cssClass="form-group lfr-input-text-container">
 				<aui:input label="account-name" name="name" required="<%= true %>" type="text" value="<%= (accountEntryDisplay == null) ? StringPool.BLANK : accountEntryDisplay.getName() %>">
 					<aui:validator name="maxLength"><%= ModelHintsUtil.getMaxLength(AccountEntry.class.getName(), "name") %></aui:validator>
 				</aui:input>
 			</aui:field-wrapper>
-		</aui:col>
+		</clay:col>
 
-		<aui:col width="<%= 40 %>">
+		<clay:col
+			md="5"
+		>
 			<div class="text-center">
 				<liferay-ui:logo-selector
 					currentLogoURL='<%= ((accountEntryDisplay == null) || (accountEntryDisplay.getLogoId() == 0)) ? themeDisplay.getPathThemeImages() + "/lexicon/briefcase.svg" : accountEntryDisplay.getLogoURL(themeDisplay) %>'
@@ -43,8 +47,8 @@ AccountEntryDisplay accountEntryDisplay = (AccountEntryDisplay)request.getAttrib
 					tempImageFileName='<%= (accountEntryDisplay == null) ? "0" : String.valueOf(accountEntryDisplay.getAccountEntryId()) %>'
 				/>
 			</div>
-		</aui:col>
-	</aui:row>
+		</clay:col>
+	</clay:row>
 
 	<aui:field-wrapper cssClass="form-group lfr-input-text-container">
 		<aui:input name="description" type="textarea" value="<%= (accountEntryDisplay == null) ? StringPool.BLANK : accountEntryDisplay.getDescription() %>" />

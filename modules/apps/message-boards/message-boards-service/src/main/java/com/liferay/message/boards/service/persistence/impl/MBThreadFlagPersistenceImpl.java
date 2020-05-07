@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchThreadFlagException;
 import com.liferay.message.boards.model.MBThreadFlag;
+import com.liferay.message.boards.model.MBThreadFlagTable;
 import com.liferay.message.boards.model.impl.MBThreadFlagImpl;
 import com.liferay.message.boards.model.impl.MBThreadFlagModelImpl;
 import com.liferay.message.boards.service.persistence.MBThreadFlagPersistence;
@@ -2691,16 +2692,18 @@ public class MBThreadFlagPersistenceImpl
 		"mbThreadFlag.threadId = ?";
 
 	public MBThreadFlagPersistenceImpl() {
-		setModelClass(MBThreadFlag.class);
-
-		setModelImplClass(MBThreadFlagImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBThreadFlag.class);
+
+		setModelImplClass(MBThreadFlagImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBThreadFlagTable.INSTANCE);
 	}
 
 	/**

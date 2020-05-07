@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.yaml.graphql.GraphQLNamingUtil;
 
 import java.lang.annotation.Annotation;
@@ -166,49 +165,42 @@ public class ActionUtil {
 			}
 		}
 
-		String httpMethodName = _getHttpMethodName(clazz, methodName);
+		Method method = _getMethod(clazz, methodName);
+
+		String httpMethodName = _getHttpMethodName(clazz, method);
 
 		URI baseURI = uriInfo.getBaseUri();
 
 		String baseURIString = baseURI.toString();
 
 		if (baseURIString.contains("/graphql")) {
-			String field = null;
 			String operation = null;
+			String type = null;
 
 			if (httpMethodName.equals("GET")) {
+				Class<?> returnType = method.getReturnType();
+
 				Stream<Method> stream = Arrays.stream(clazz.getMethods());
 
-				field = GraphQLNamingUtil.getGraphQLPropertyName(
-					methodName,
-					stream.filter(
-						method -> StringUtil.equals(
-							method.getName(), methodName)
-					).findFirst(
-					).map(
-						Method::getReturnType
-					).map(
-						Class::getName
-					).orElse(
-						"Object"
-					),
+				operation = GraphQLNamingUtil.getGraphQLPropertyName(
+					methodName, returnType.getName(),
 					stream.map(
 						Method::getName
 					).collect(
 						Collectors.toList()
 					));
 
-				operation = "query";
+				type = "query";
 			}
 			else {
-				field = getGraphQLMutationName(methodName);
-				operation = "mutation";
+				operation = getGraphQLMutationName(methodName);
+				type = "mutation";
 			}
 
 			return HashMapBuilder.put(
-				"field", field
-			).put(
 				"operation", operation
+			).put(
+				"type", type
 			).build();
 		}
 
@@ -225,32 +217,38 @@ public class ActionUtil {
 		).build();
 	}
 
-	private static String _getHttpMethodName(Class clazz, String methodName)
+	private static String _getHttpMethodName(Class clazz, Method method)
 		throws NoSuchMethodException {
 
+		Class<?> superClass = clazz.getSuperclass();
+
+		Method superMethod = superClass.getMethod(
+			method.getName(), method.getParameterTypes());
+
+		for (Annotation annotation : superMethod.getAnnotations()) {
+			Class<? extends Annotation> annotationType =
+				annotation.annotationType();
+
+			Annotation[] annotations = annotationType.getAnnotationsByType(
+				HttpMethod.class);
+
+			if (annotations.length > 0) {
+				HttpMethod httpMethod = (HttpMethod)annotations[0];
+
+				return httpMethod.value();
+			}
+		}
+
+		return null;
+	}
+
+	private static Method _getMethod(Class clazz, String methodName) {
 		for (Method method : clazz.getMethods()) {
 			if (!methodName.equals(method.getName())) {
 				continue;
 			}
 
-			Class<?> superClass = clazz.getSuperclass();
-
-			Method superMethod = superClass.getMethod(
-				method.getName(), method.getParameterTypes());
-
-			for (Annotation annotation : superMethod.getAnnotations()) {
-				Class<? extends Annotation> annotationType =
-					annotation.annotationType();
-
-				Annotation[] annotations = annotationType.getAnnotationsByType(
-					HttpMethod.class);
-
-				if (annotations.length > 0) {
-					HttpMethod httpMethod = (HttpMethod)annotations[0];
-
-					return httpMethod.value();
-				}
-			}
+			return method;
 		}
 
 		return null;

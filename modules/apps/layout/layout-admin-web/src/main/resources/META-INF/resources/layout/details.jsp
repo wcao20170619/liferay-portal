@@ -89,6 +89,24 @@ String friendlyURLBase = StringPool.BLANK;
 
 		<c:choose>
 			<c:when test="<%= selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
+				<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/layout/get_friendly_url_entry_localizations" var="friendlyURLEntryLocalizationslURL">
+					<portlet:param name="plid" value="<%= String.valueOf(selLayout.getPlid()) %>" />
+				</liferay-portlet:resourceURL>
+
+				<div class="btn-url-history-wrapper">
+					<react:component
+						data='<%=
+							HashMapBuilder.<String, Object>put(
+								"defaultLanguageId",
+								LocaleUtil.toLanguageId(company.getDefaultUser().getLocale())
+							).put(
+								"friendlyURLEntryLocalizationslURL",
+								friendlyURLEntryLocalizationslURL
+							).build() %>'
+						module="js/friendly_url_history/FriendlyURLHistory"
+					/>
+				</div>
+
 				<div class="form-group friendly-url">
 					<label for="<portlet:namespace />friendlyURL"><liferay-ui:message key="friendly-url" /> <liferay-ui:icon-help message='<%= LanguageUtil.format(request, "for-example-x", "<em>/news</em>", false) %>' /></label>
 
@@ -181,7 +199,7 @@ String friendlyURLBase = StringPool.BLANK;
 	);
 
 	if (layoutPrototypeLinkEnabled) {
-		layoutPrototypeLinkEnabled.addEventListener('change', function(event) {
+		layoutPrototypeLinkEnabled.addEventListener('change', function (event) {
 			var layoutPrototypeLinkChecked = event.currentTarget.checked;
 
 			var layoutPrototypeInfoMessage = document.querySelector(
@@ -209,7 +227,7 @@ String friendlyURLBase = StringPool.BLANK;
 				'#<portlet:namespace />editLayoutFm .propagatable-field'
 			);
 
-			Array.prototype.forEach.call(propagatableFields, function(
+			Array.prototype.forEach.call(propagatableFields, function (
 				field,
 				index
 			) {

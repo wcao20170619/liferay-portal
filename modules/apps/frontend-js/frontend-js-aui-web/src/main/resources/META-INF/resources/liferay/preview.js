@@ -15,13 +15,13 @@
 /**
  * The Preview Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-preview
  */
 
 AUI.add(
 	'liferay-preview',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var ATTR_DATA_IMAGE_INDEX = 'data-imageIndex';

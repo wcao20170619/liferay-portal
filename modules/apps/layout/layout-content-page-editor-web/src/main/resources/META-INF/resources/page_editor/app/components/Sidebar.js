@@ -37,17 +37,18 @@ const {Suspense, useCallback, useEffect} = React;
  * Failure to preload is a non-critical failure, so we'll use this to swallow
  * rejected promises silently.
  */
-const swallow = [value => value, _error => undefined];
+const swallow = [(value) => value, (_error) => undefined];
 
 export default function Sidebar() {
 	const dispatch = useDispatch();
-	const store = useSelector(state => state);
+	const store = useSelector((state) => state);
 	const [hasError, setHasError] = useStateSafe(false);
 	const isMounted = useIsMounted();
 	const selectItem = useSelectItem();
 	const load = useLoad();
 	const {getInstance, register} = usePlugins();
 
+	const languageId = useSelector((state) => state.languageId);
 	const panels = useSelector(selectAvailablePanels(config.panels));
 	const sidebarPanels = useSelector(
 		selectAvailableSidebarPanels(config.sidebarPanels)
@@ -97,7 +98,7 @@ export default function Sidebar() {
 		);
 
 		if (sideNavigation) {
-			const onHandleSidebar = open => {
+			const onHandleSidebar = (open) => {
 				dispatch(
 					Actions.switchSidebarPanel({
 						sidebarOpen: open,
@@ -131,13 +132,13 @@ export default function Sidebar() {
 		}, [])
 	);
 
-	const deselectItem = event => {
+	const deselectItem = (event) => {
 		if (event.target === event.currentTarget) {
 			selectItem(null);
 		}
 	};
 
-	const handleClick = panel => {
+	const handleClick = (panel) => {
 		const open =
 			panel.sidebarPanelId === sidebarPanelId ? !sidebarOpen : true;
 		const productMenuToggle = document.querySelector(
@@ -162,7 +163,7 @@ export default function Sidebar() {
 		}
 
 		if (registerPanel) {
-			registerPanel.then(plugin => {
+			registerPanel.then((plugin) => {
 				if (
 					plugin &&
 					typeof plugin.activate === 'function' &&
@@ -185,7 +186,7 @@ export default function Sidebar() {
 					onClick={deselectItem}
 				>
 					{panels.reduce((elements, group, groupIndex) => {
-						const buttons = group.map(panelId => {
+						const buttons = group.map((panelId) => {
 							const panel = sidebarPanels[panelId];
 
 							const active =
@@ -236,6 +237,7 @@ export default function Sidebar() {
 						});
 
 						// Add separator between groups.
+
 						if (groupIndex === panels.length - 1) {
 							return elements.concat(buttons);
 						}
@@ -251,6 +253,7 @@ export default function Sidebar() {
 					className={classNames({
 						'page-editor__sidebar__content': true,
 						'page-editor__sidebar__content--open': sidebarOpen,
+						rtl: config.languageDirection[languageId] === 'rtl',
 					})}
 					onClick={deselectItem}
 				>

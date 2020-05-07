@@ -284,7 +284,7 @@ String navigation = ParamUtil.getString(request, "navigation");
 				}
 			);
 
-			var changeScopeHandles = function(event) {
+			var changeScopeHandles = function (event) {
 				documentLibrary.destroy();
 
 				Liferay.detach('changeScope', changeScopeHandles);
@@ -301,7 +301,7 @@ String navigation = ParamUtil.getString(request, "navigation");
 				<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 			</portlet:renderURL>
 
-			var editFileEntryHandler = function(event) {
+			var editFileEntryHandler = function (event) {
 				var uri = '<%= addFileEntryURL %>';
 
 				location.href = Liferay.Util.addParams(
@@ -314,10 +314,6 @@ String navigation = ParamUtil.getString(request, "navigation");
 		</aui:script>
 
 		<%
-		Map<String, Object> editTagsData = HashMapBuilder.<String, Object>put(
-			"context", Collections.singletonMap("namespace", liferayPortletResponse.getNamespace())
-		).build();
-
 		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(scopeGroupId);
 
 		Map<String, Object> editTagsProps = HashMapBuilder.<String, Object>put(
@@ -328,7 +324,11 @@ String navigation = ParamUtil.getString(request, "navigation");
 			"repositoryId", String.valueOf(repositoryId)
 		).build();
 
-		editTagsData.put("props", editTagsProps);
+		Map<String, Object> editTagsData = HashMapBuilder.<String, Object>put(
+			"context", Collections.singletonMap("namespace", liferayPortletResponse.getNamespace())
+		).put(
+			"props", editTagsProps
+		).build();
 		%>
 
 		<div>
@@ -339,10 +339,6 @@ String navigation = ParamUtil.getString(request, "navigation");
 		</div>
 
 		<%
-		Map<String, Object> editCategoriesData = HashMapBuilder.<String, Object>put(
-			"context", Collections.singletonMap("namespace", liferayPortletResponse.getNamespace())
-		).build();
-
 		Map<String, Object> editCategoriesProps = HashMapBuilder.<String, Object>put(
 			"groupIds", groupIds
 		).put(
@@ -353,7 +349,11 @@ String navigation = ParamUtil.getString(request, "navigation");
 			"selectCategoriesUrl", selectCategoriesURL.toString()
 		).build();
 
-		editCategoriesData.put("props", editCategoriesProps);
+		Map<String, Object> editCategoriesData = HashMapBuilder.<String, Object>put(
+			"context", Collections.singletonMap("namespace", liferayPortletResponse.getNamespace())
+		).put(
+			"props", editCategoriesProps
+		).build();
 		%>
 
 		<div>

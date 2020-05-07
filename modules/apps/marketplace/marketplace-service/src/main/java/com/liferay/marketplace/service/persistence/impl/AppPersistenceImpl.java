@@ -16,6 +16,7 @@ package com.liferay.marketplace.service.persistence.impl;
 
 import com.liferay.marketplace.exception.NoSuchAppException;
 import com.liferay.marketplace.model.App;
+import com.liferay.marketplace.model.AppTable;
 import com.liferay.marketplace.model.impl.AppImpl;
 import com.liferay.marketplace.model.impl.AppModelImpl;
 import com.liferay.marketplace.service.persistence.AppPersistence;
@@ -2450,16 +2451,18 @@ public class AppPersistenceImpl
 		"(app.category IS NULL OR app.category = '')";
 
 	public AppPersistenceImpl() {
-		setModelClass(App.class);
-
-		setModelImplClass(AppImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(App.class);
+
+		setModelImplClass(AppImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(AppTable.INSTANCE);
 	}
 
 	/**

@@ -38,6 +38,8 @@ import javax.portlet.ResourceURL;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.mock.web.MockHttpServletResponse;
+
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
@@ -46,6 +48,10 @@ import org.w3c.dom.Element;
  */
 public class MockLiferayPortletRenderResponse
 	implements LiferayPortletResponse, RenderResponse {
+
+	public MockLiferayPortletRenderResponse() {
+		_mockHttpServletResponse = new MockHttpServletResponse();
+	}
 
 	@Override
 	public void addDateHeader(String name, long date) {
@@ -206,7 +212,7 @@ public class MockLiferayPortletRenderResponse
 
 	@Override
 	public HttpServletResponse getHttpServletResponse() {
-		return null;
+		return _mockHttpServletResponse;
 	}
 
 	@Override
@@ -316,5 +322,7 @@ public class MockLiferayPortletRenderResponse
 	@Override
 	public void transferMarkupHeadElements() {
 	}
+
+	private final MockHttpServletResponse _mockHttpServletResponse;
 
 }

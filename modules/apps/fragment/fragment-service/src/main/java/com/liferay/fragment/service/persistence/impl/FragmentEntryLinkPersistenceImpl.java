@@ -16,6 +16,7 @@ package com.liferay.fragment.service.persistence.impl;
 
 import com.liferay.fragment.exception.NoSuchEntryLinkException;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.model.FragmentEntryLinkTable;
 import com.liferay.fragment.model.impl.FragmentEntryLinkImpl;
 import com.liferay.fragment.model.impl.FragmentEntryLinkModelImpl;
 import com.liferay.fragment.service.persistence.FragmentEntryLinkPersistence;
@@ -6074,16 +6075,18 @@ public class FragmentEntryLinkPersistenceImpl
 		"fragmentEntryLink.classPK = ?";
 
 	public FragmentEntryLinkPersistenceImpl() {
-		setModelClass(FragmentEntryLink.class);
-
-		setModelImplClass(FragmentEntryLinkImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(FragmentEntryLink.class);
+
+		setModelImplClass(FragmentEntryLinkImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(FragmentEntryLinkTable.INSTANCE);
 	}
 
 	/**

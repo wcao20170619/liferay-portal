@@ -746,30 +746,36 @@ public class DataLayoutTaglibUtil {
 				getDDMFormLayout();
 		}
 
-		private JSONArray _getDataRulesJSONArray() throws JSONException {
+		private JSONArray _getDataRulesJSONArray() {
 			JSONArray dataRulesJSONArray = _jsonFactory.createJSONArray();
 
 			for (DataRule dataRule : _dataLayout.getDataRules()) {
 				JSONObject dataRuleJSONObject = _jsonFactory.createJSONObject();
 
-				JSONArray actionsJSONArray = _jsonFactory.createJSONArray();
+				JSONArray jsonArray = _jsonFactory.createJSONArray();
 
-				for (Object action : dataRule.getActions()) {
-					actionsJSONArray.put(
-						_jsonFactory.createJSONObject((String)action));
+				for (Map<String, String> action : dataRule.getActions()) {
+					JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+					action.forEach(jsonObject::put);
+
+					jsonArray.put(jsonObject);
 				}
 
-				dataRuleJSONObject.put("actions", actionsJSONArray);
+				dataRuleJSONObject.put("actions", jsonArray);
 
-				JSONArray conditionsJSONArray = _jsonFactory.createJSONArray();
+				jsonArray = _jsonFactory.createJSONArray();
 
-				for (Object condition : dataRule.getConditions()) {
-					conditionsJSONArray.put(
-						_jsonFactory.createJSONObject((String)condition));
+				for (Map<String, String> condition : dataRule.getConditions()) {
+					JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+					condition.forEach(jsonObject::put);
+
+					jsonArray.put(jsonObject);
 				}
 
 				dataRuleJSONObject.put(
-					"conditions", conditionsJSONArray
+					"conditions", jsonArray
 				).put(
 					"logical-operator", dataRule.getLogicalOperator()
 				);

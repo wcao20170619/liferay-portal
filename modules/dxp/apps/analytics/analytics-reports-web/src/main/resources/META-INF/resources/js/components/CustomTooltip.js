@@ -11,6 +11,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+
 /**
  * Component to customize the content of recharts Tooltip
  * http://recharts.org/en-US/api/Tooltip#content
@@ -45,7 +46,7 @@ export default function CustomTooltip(props) {
 				</span>
 			)}
 			<ul className="list-unstyled mb-0">
-				{payload.map(item => {
+				{payload.map((item) => {
 					const [value, name, iconType] = formatter
 						? formatter(item.value, item.name, item.iconType)
 						: [item.value, item.name, item.iconType];

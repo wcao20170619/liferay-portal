@@ -1,5 +1,42 @@
 definition {
 
+	macro addCollectionDisplay {
+		Pause(locator1 = "10000");
+
+		PageEditor.gotoTab(tabName = "Fragments");
+
+		PageEditor.expandFragmentCollection(collectionName = "Collection Display");
+
+		if ("${scope}" == "Master") {
+			if ("${dropTarget}" == "Header") {
+				DragAndDrop.javaScriptDragAndDropToObject(
+					key_fragmentName = "${fragmentName}",
+					locator1 = "PageEditor#SECTION_BUILDER_FRAGMENTS",
+					locator2 = "PageEditor#FRAGMENT_DROP_TARGET",
+					value1 = "");
+			}
+			else if ("${dropTarget}" == "Footer") {
+				DragAndDrop.javaScriptDragAndDropToObject(
+					key_fragmentName = "${fragmentName}",
+					locator1 = "PageEditor#SECTION_BUILDER_FRAGMENTS",
+					locator2 = "PageEditor#FOOTER_DROP_TARGET",
+					value1 = "");
+			}
+		}
+		else {
+			DragAndDrop.javaScriptDragAndDropToObject(
+				key_fragmentName = "${fragmentName}",
+				locator1 = "PageEditor#SECTION_BUILDER_FRAGMENTS",
+				locator2 = "PageEditor#FRAGMENT_DROP_TARGET",
+				value1 = "");
+		}
+
+		AssertVisible(
+			key_fragmentName = "${fragmentName}",
+			key_message = "No Collection Selected Yet",
+			locator1 = "Fragment#NOT_COLLECTION_SELECTED_MESSAGE");
+	}
+
 	macro addComment {
 		Pause(locator1 = "10000");
 
@@ -488,6 +525,68 @@ definition {
 		AssertTextNotPresent(value1 = "${fragmentComment}");
 	}
 
+	macro editCollectionDisplay {
+		var key_fragmentName = "${fragmentName}";
+
+		Click(locator1 = "PageEditor#CONTENT_PAGE_DISABLED_HEADER");
+
+		Click(locator1 = "Fragment#FRAGMENT_BODY");
+
+		Click.clickNoMouseOver(
+			key_elementType = "Collection Display",
+			locator1 = "PageEditor#FRAGMENT_BODY_TOOLBAR_CONFIGURATION_BUTTON");
+
+		Click(locator1 = "PageEditor#FRAGMENT_BODY_FLOATING_TOOLBAR_PLUS_BUTTON");
+
+		SelectFrame(locator1 = "IFrame#DIALOG");
+
+		if (isSet(assetListName)) {
+			NavItem.click(navItem = "Collections");
+
+			LexiconCard.clickCard(card = "${assetListName}");
+
+			AssertElementPresent(
+				key_contentName = "${assetListName}",
+				locator1 = "FragmentEditor#FRAGMENTS_EDITOR_FLOATING_TOOLBAR_INPUT");
+
+			if (isSet(layout)) {
+				Select(
+					key_fieldLabel = "Layout",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${layout}");
+
+				Pause(locator1 = "3000");
+
+				AssertSelectedLabel(
+					key_fieldLabel = "Layout",
+					locator1 = "Select#GENERIC_SELECT_FIELD",
+					value1 = "${layout}");
+			}
+
+			if (isSet(maxNumberOfItems)) {
+				Type(
+					key_fieldLabel = "Max Number Of Items",
+					locator1 = "FormFields#NUMBER_FIELD",
+					value1 = "${maxNumberOfItems}");
+
+				AssertTextEquals(
+					key_fieldLabel = "Max Number Of Items",
+					locator1 = "FormFields#NUMBER_FIELD",
+					value1 = "${maxNumberOfItems}");
+			}
+		}
+
+		if (isSet(infoListProviderName)) {
+			NavItem.click(navItem = "Collections Providers");
+
+			LexiconCard.clickCard(card = "${infoListProviderName}");
+
+			AssertElementPresent(
+				key_contentName = "${infoListProviderName}",
+				locator1 = "FragmentEditor#FRAGMENTS_EDITOR_FLOATING_TOOLBAR_INPUT");
+		}
+	}
+
 	macro editComment {
 		MouseOver(locator1 = "PageEditor#FRAGMENT_SIDEBAR_ELLIPSIS");
 
@@ -687,15 +786,19 @@ definition {
 		}
 
 		if ("${spaceBetweenColumns}" == "true") {
-			Check.checkToggleSwitch(
-				checkboxName = "Columns Gutter",
-				locator1 = "Checkbox#ANY_CHECKBOX");
+			while (IsNotChecked.isNotCheckedNotVisible(checkboxName = "Columns Gutter", locator1 = "Checkbox#ANY_CHECKBOX")) {
+				Click.clickAtNotVisible(
+					checkboxName = "Columns Gutter",
+					locator1 = "Checkbox#ANY_CHECKBOX");
+			}
 		}
 
 		if ("${spaceBetweenColumns}" == "false") {
-			Uncheck.uncheckToggleSwitchAndPause(
-				checkboxName = "Columns Gutter",
-				locator1 = "Checkbox#ANY_CHECKBOX");
+			while (IsChecked(checkboxName = "Columns Gutter", locator1 = "Checkbox#ANY_CHECKBOX")) {
+				Click.clickAtNotVisible(
+					checkboxName = "Columns Gutter",
+					locator1 = "Checkbox#ANY_CHECKBOX");
+			}
 		}
 
 		PageEditor.waitForAutoSave();

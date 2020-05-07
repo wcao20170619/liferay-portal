@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchDataProviderInstanceException;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
+import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstanceTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMDataProviderInstanceModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMDataProviderInstancePersistence;
@@ -3373,17 +3374,19 @@ public class DDMDataProviderInstancePersistenceImpl
 		"ddmDataProviderInstance.companyId = ?";
 
 	public DDMDataProviderInstancePersistenceImpl() {
-		setModelClass(DDMDataProviderInstance.class);
-
-		setModelImplClass(DDMDataProviderInstanceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMDataProviderInstance.class);
+
+		setModelImplClass(DDMDataProviderInstanceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMDataProviderInstanceTable.INSTANCE);
 	}
 
 	/**

@@ -12,8 +12,6 @@
  * details.
  */
 
-import './TextRegister.soy';
-
 import ClayAutocomplete from '@clayui/autocomplete';
 import ClayDropDown from '@clayui/drop-down';
 import {ClayInput} from '@clayui/form';
@@ -21,38 +19,9 @@ import {normalizeFieldName} from 'dynamic-data-mapping-form-renderer';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
+import {useSyncValue} from '../hooks/useSyncValue.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './TextAdapter.soy';
-
-/**
- * Use Sync Value to synchronize the initial value with the current internal
- * value, only update the internal value with the new initial value if the
- * values are different and when the value is not changed for more than ms.
- */
-const useSyncValue = newValue => {
-	// Maintains the reference of the last value to check in later renderings if the
-	// value is new or keeps the same, it covers cases where the value typed by
-	// the user is sent to LayoutProvider but it does not descend with the new changes.
-	const previousValueRef = useRef(newValue);
-
-	const [value, setValue] = useState(newValue);
-
-	useEffect(() => {
-		const handler = setTimeout(() => {
-			if (value !== newValue && previousValueRef.current !== newValue) {
-				previousValueRef.current = newValue;
-				setValue(newValue);
-			}
-		}, 300);
-
-		return () => {
-			clearTimeout(handler);
-		};
-	}, [newValue, value]);
-
-	return [value, setValue];
-};
 
 const Text = ({
 	disabled,
@@ -63,9 +32,10 @@ const Text = ({
 	onChange,
 	onFocus,
 	placeholder,
+	syncDelay,
 	value: initialValue,
 }) => {
-	const [value, setValue] = useSyncValue(initialValue);
+	const [value, setValue] = useSyncValue(initialValue, syncDelay);
 
 	return (
 		<ClayInput
@@ -75,7 +45,7 @@ const Text = ({
 			id={id}
 			name={name}
 			onBlur={onBlur}
-			onChange={event => {
+			onChange={(event) => {
 				if (fieldName === 'name') {
 					event.target.value = normalizeFieldName(event.target.value);
 				}
@@ -99,9 +69,10 @@ const Textarea = ({
 	onChange,
 	onFocus,
 	placeholder,
+	syncDelay,
 	value: initialValue,
 }) => {
-	const [value, setValue] = useSyncValue(initialValue);
+	const [value, setValue] = useSyncValue(initialValue, syncDelay);
 
 	return (
 		<textarea
@@ -110,7 +81,7 @@ const Textarea = ({
 			id={id}
 			name={name}
 			onBlur={onBlur}
-			onChange={event => {
+			onChange={(event) => {
 				setValue(event.target.value);
 				onChange(event);
 			}}
@@ -131,14 +102,15 @@ const Autocomplete = ({
 	onFocus,
 	options,
 	placeholder,
+	syncDelay,
 	value: initialValue,
 }) => {
-	const [value, setValue] = useSyncValue(initialValue);
+	const [value, setValue] = useSyncValue(initialValue, syncDelay);
 	const [visible, setVisible] = useState(false);
 	const inputRef = useRef(null);
 	const itemListRef = useRef(null);
 
-	const filteredItems = options.filter(item => item && item.match(value));
+	const filteredItems = options.filter((item) => item && item.match(value));
 
 	useEffect(() => {
 		if (filteredItems.length === 1 && filteredItems.includes(value)) {
@@ -155,7 +127,7 @@ const Autocomplete = ({
 			'button'
 		);
 		const targetIndex = [...focusabledElements].findIndex(
-			current => current === target
+			(current) => current === target
 		);
 
 		let nextElement;
@@ -186,12 +158,12 @@ const Autocomplete = ({
 				id={id}
 				name={name}
 				onBlur={onBlur}
-				onChange={event => {
+				onChange={(event) => {
 					setValue(event.target.value);
 					onChange(event);
 				}}
 				onFocus={onFocus}
-				onKeyDown={event => {
+				onKeyDown={(event) => {
 					if (
 						(event.key === 'Tab' || event.key === 'ArrowDown') &&
 						!event.shiftKey &&
@@ -218,7 +190,7 @@ const Autocomplete = ({
 			>
 				<ul
 					className="list-unstyled"
-					onKeyDown={event => {
+					onKeyDown={(event) => {
 						switch (event.key) {
 							case 'ArrowDown':
 								handleFocus(event, false);
@@ -240,7 +212,7 @@ const Autocomplete = ({
 							{Liferay.Language.get('no-results-were-found')}
 						</ClayDropDown.Item>
 					)}
-					{filteredItems.map(label => (
+					{filteredItems.map((label) => (
 						<ClayAutocomplete.Item
 							key={label}
 							match={value}
@@ -263,7 +235,7 @@ const DISPLAY_STYLE = {
 	singleline: Text,
 };
 
-const TextWithFieldBase = ({
+const Main = ({
 	autocomplete,
 	autocompleteEnabled,
 	displayStyle = 'singleline',
@@ -277,10 +249,11 @@ const TextWithFieldBase = ({
 	placeholder,
 	predefinedValue = '',
 	readOnly,
+	syncDelay = true,
 	value,
 	...otherProps
 }) => {
-	const optionsMemo = useMemo(() => options.map(option => option.label), [
+	const optionsMemo = useMemo(() => options.map((option) => option.label), [
 		options,
 	]);
 	const Component =
@@ -300,25 +273,25 @@ const TextWithFieldBase = ({
 				onFocus={onFocus}
 				options={optionsMemo}
 				placeholder={placeholder}
+				syncDelay={syncDelay}
 				value={value ? value : predefinedValue}
 			/>
 		</FieldBaseProxy>
 	);
 };
 
+Main.displayName = 'Text';
+
 const TextProxy = connectStore(({emit, ...otherProps}) => (
-	<TextWithFieldBase
+	<Main
 		{...otherProps}
-		onBlur={event => emit('fieldBlurred', event, event.target.value)}
-		onChange={event => emit('fieldEdited', event, event.target.value)}
-		onFocus={event => emit('fieldFocused', event, event.target.value)}
+		onBlur={(event) => emit('fieldBlurred', event, event.target.value)}
+		onChange={(event) => emit('fieldEdited', event, event.target.value)}
+		onFocus={(event) => emit('fieldFocused', event, event.target.value)}
 	/>
 ));
 
-const ReactTextAdapter = getConnectedReactComponentAdapter(
-	TextProxy,
-	templates
-);
+const ReactTextAdapter = getConnectedReactComponentAdapter(TextProxy, 'text');
 
-export {ReactTextAdapter, useSyncValue, TextWithFieldBase};
+export {ReactTextAdapter, useSyncValue, Main};
 export default ReactTextAdapter;

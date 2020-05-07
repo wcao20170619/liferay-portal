@@ -12,9 +12,11 @@
  * details.
  */
 
+import {toggleDisabled} from 'frontend-js-web';
+
 import {previewSeoFireChange} from './PreviewSeoEvents.es';
 
-export default function({namespace}) {
+export default function ({namespace}) {
 	var canonicalURLEnabledCheck = document.getElementById(
 		`${namespace}canonicalURLEnabled`
 	);
@@ -26,14 +28,14 @@ export default function({namespace}) {
 		`${namespace}canonicalURLAlert`
 	);
 
-	canonicalURLEnabledCheck.addEventListener('click', event => {
+	canonicalURLEnabledCheck.addEventListener('click', (event) => {
 		var disabled = !event.target.checked;
 
 		canonicalURLAlert.classList.toggle('hide');
 
-		Liferay.Util.toggleDisabled(canonicalURLField, disabled);
+		toggleDisabled(canonicalURLField, disabled);
 
-		Liferay.Util.toggleDisabled(canonicalURLFieldDefaultLocale, disabled);
+		toggleDisabled(canonicalURLFieldDefaultLocale, disabled);
 
 		previewSeoFireChange(namespace, {
 			disabled,

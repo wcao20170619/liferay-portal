@@ -12,15 +12,12 @@
  * details.
  */
 
-import './ColorPickerRegister.soy';
-
 import ClayColorPicker from '@clayui/color-picker';
 import React, {useEffect, useState} from 'react';
 
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './ColorPickerAdapter.soy';
 
 const DEFAULT_COLORS = [
 	'000000',
@@ -67,7 +64,7 @@ const ClayColorPickerWithState = ({
 			onBlur={onBlur}
 			onColorsChange={setCustoms}
 			onFocus={onFocus}
-			onValueChange={value => {
+			onValueChange={(value) => {
 				if (value !== color) {
 					setColor(value);
 					onValueChange(value);
@@ -105,13 +102,13 @@ const ColorPickerProxy = connectStore(
 			<ClayColorPickerWithState
 				inputValue={value ? value : predefinedValue}
 				name={name}
-				onBlur={event =>
+				onBlur={(event) =>
 					emit('fieldBlurred', event, event.target.value)
 				}
-				onFocus={event =>
+				onFocus={(event) =>
 					emit('fieldFocused', event, event.target.value)
 				}
-				onValueChange={value => emit('fieldEdited', {}, value)}
+				onValueChange={(value) => emit('fieldEdited', {}, value)}
 				readOnly={readOnly}
 				spritemap={spritemap}
 			/>
@@ -121,7 +118,7 @@ const ColorPickerProxy = connectStore(
 
 const ReactColorPickerAdapter = getConnectedReactComponentAdapter(
 	ColorPickerProxy,
-	templates
+	'color'
 );
 
 export {ClayColorPickerWithState, ReactColorPickerAdapter};

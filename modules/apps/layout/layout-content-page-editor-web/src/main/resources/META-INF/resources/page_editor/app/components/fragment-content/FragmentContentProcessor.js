@@ -16,7 +16,6 @@ import PropTypes from 'prop-types';
 import {useEffect, useMemo} from 'react';
 
 import {config} from '../../config/index';
-import selectPrefixedSegmentsExperienceId from '../../selectors/selectPrefixedSegmentsExperienceId';
 import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
 import {useDispatch, useSelector} from '../../store/index';
 import updateEditableValues from '../../thunks/updateEditableValues';
@@ -38,10 +37,7 @@ export default function FragmentContentProcessor({
 	const setEditableProcessorUniqueId = useSetEditableProcessorUniqueId();
 	const isProcessorEnabled = useIsProcessorEnabled();
 	const languageId = useSelector(
-		state => state.languageId || config.defaultLanguageId
-	);
-	const prefixedSegmentsExperienceId = useSelector(
-		selectPrefixedSegmentsExperienceId
+		(state) => state.languageId || config.defaultLanguageId
 	);
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
@@ -55,7 +51,7 @@ export default function FragmentContentProcessor({
 
 		if (editables) {
 			enabledEditable =
-				editables.find(editable =>
+				editables.find((editable) =>
 					isProcessorEnabled(
 						getEditableUniqueId(
 							fragmentEntryLinkId,
@@ -69,7 +65,7 @@ export default function FragmentContentProcessor({
 	}, [editables, isProcessorEnabled, fragmentEntryLinkId]);
 
 	const editableValues = useSelector(
-		state =>
+		(state) =>
 			state.fragmentEntryLinks[fragmentEntryLinkId] &&
 			state.fragmentEntryLinks[fragmentEntryLinkId].editableValues
 	);
@@ -86,29 +82,28 @@ export default function FragmentContentProcessor({
 
 		editable.processor.createEditor(
 			editable.element,
-			value => {
+			(value) => {
+				const previousValue = editableValue[languageId];
+
+				if (
+					!previousValue &&
+					value === editableValue.defaultValue.trim()
+				) {
+					return;
+				}
+
+				if (previousValue === value) {
+					return;
+				}
+
 				let nextEditableValue = {
 					...editableValue,
 				};
 
-				if (prefixedSegmentsExperienceId) {
-					nextEditableValue = {
-						...nextEditableValue,
-
-						[prefixedSegmentsExperienceId]: {
-							...(nextEditableValue[
-								prefixedSegmentsExperienceId
-							] || {}),
-							[languageId]: value,
-						},
-					};
-				}
-				else {
-					nextEditableValue = {
-						...nextEditableValue,
-						[languageId]: value,
-					};
-				}
+				nextEditableValue = {
+					...nextEditableValue,
+					[languageId]: value,
+				};
 
 				dispatch(
 					updateEditableValues({
@@ -156,7 +151,6 @@ export default function FragmentContentProcessor({
 		editableValues,
 		fragmentEntryLinkId,
 		languageId,
-		prefixedSegmentsExperienceId,
 		segmentsExperienceId,
 		setEditableProcessorUniqueId,
 	]);
@@ -169,7 +163,7 @@ FragmentContentProcessor.propTypes = {
 		PropTypes.shape({
 			editableId: PropTypes.string.isRequired,
 			editableValueNamespace: PropTypes.string.isRequired,
-			element: PropTypes.instanceOf(HTMLElement).isRequired,
+			element: PropTypes.object.isRequired,
 			processor: PropTypes.object,
 		})
 	),

@@ -52,10 +52,10 @@ const RatingsLike = ({
 			: Liferay.Language.get('like-this');
 	};
 
-	const handleSendVoteRequest = score => {
+	const handleSendVoteRequest = (score) => {
 		sendVoteRequest(score).then(({totalScore} = {}) => {
 			if (isMounted() && totalScore) {
-				setTotalLikes(totalScore);
+				setTotalLikes(Math.round(totalScore));
 			}
 		});
 	};

@@ -90,6 +90,15 @@ public class RedirectEntryServiceWrapper
 	}
 
 	@Override
+	public void updateChainedRedirectEntries(
+			long groupId, String destinationURL, String sourceURL)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_redirectEntryService.updateChainedRedirectEntries(
+			groupId, destinationURL, sourceURL);
+	}
+
+	@Override
 	public com.liferay.redirect.model.RedirectEntry updateRedirectEntry(
 			long redirectEntryId, String destinationURL,
 			java.util.Date expirationDate, boolean permanent, String sourceURL)

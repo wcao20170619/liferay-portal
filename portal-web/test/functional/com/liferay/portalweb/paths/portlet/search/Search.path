@@ -9,6 +9,11 @@
 </thead>
 <tbody>
 <tr>
+	<td>CATEGORY_FACET_CLOUD_LAYOUT</td>
+	<td>//ul[contains(@class,'tag-cloud')]//button[contains(.,'${categoryName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CLASSIC_SEARCH_BAR</td>
 	<td>//input[contains(@id,'SearchPortlet') and @type='text']</td>
 	<td></td>
@@ -31,6 +36,11 @@
 <tr>
 	<td>EMBEDDED_SEARCH_BAR_SCOPE_SELECT</td>
 	<td>//header[@id='banner']//div/select[@title='Scope']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FACET_DISPLAY_FREQUENCIES</td>
+	<td>//small[contains(@class,'term-count')]/preceding-sibling::span[contains(.,'${facetValueName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -116,6 +126,21 @@
 <tr>
 	<td>SORT_PORTLET_SORT_OPTION</td>
 	<td>//div/select[contains(@id, "SortPortlet")]/option[contains(., "${sortOption}")]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TAG_FACET_CLOUD_LAYOUT</td>
+	<td>//ul[contains(@class,'tag-cloud')]//button[contains(.,'${tagName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TYPE_FACET_AVAILABLE_ASSET_TYPE</td>
+	<td>//select[contains(@id, "availableAssetTypes")]/option[contains(., "${assetType}")]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TYPE_FACET_CURRENT_ASSET_TYPE</td>
+	<td>//select[contains(@id, "currentAssetTypes")]/option[contains(., "${assetType}")]</td>
 	<td></td>
 </tr>
 </tbody>

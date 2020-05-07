@@ -39,7 +39,7 @@ const createFileEntryPreviewURL = (groupId, fileEntryId) => {
 	return portletURL.toString();
 };
 
-const getDocumentIcon = fileName => {
+const getDocumentIcon = (fileName) => {
 	const extension = fileName.split('.').pop();
 
 	if (extension === 'pdf') {
@@ -81,8 +81,9 @@ const DocumentRenderer = ({displayType, value = {}}) => {
 	};
 
 	const onClickDownload = () => {
-		location.href = `${themeDisplay.getPathContext()}/documents/${groupId}/${folderId ||
-			'0'}/${encodeURIComponent(title)}?download=true`;
+		location.href = `${themeDisplay.getPathContext()}/documents/${groupId}/${
+			folderId || '0'
+		}/${encodeURIComponent(title)}?download=true`;
 	};
 
 	return (
@@ -123,7 +124,7 @@ const DocumentRenderer = ({displayType, value = {}}) => {
 };
 
 const OptionsRenderer = ({displayType, options, values = []}) => {
-	const labels = values.map(value =>
+	const labels = values.map((value) =>
 		DataDefinitionUtils.getOptionLabel(options, value)
 	);
 
@@ -140,7 +141,9 @@ const OptionsRenderer = ({displayType, options, values = []}) => {
 	);
 };
 
-const StringRenderer = ({value}) => <div>{value || ' - '}</div>;
+const StringRenderer = ({value = ' - '}) => (
+	<div>{Array.isArray(value) ? value.join(', ') : value}</div>
+);
 
 const getFieldValueRenderer = (dataDefinitionField, displayType) => {
 	const {customProperties, fieldType} = dataDefinitionField;

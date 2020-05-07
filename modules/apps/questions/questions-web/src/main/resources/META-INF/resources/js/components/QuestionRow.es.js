@@ -12,9 +12,14 @@
  * details.
  */
 
-import React from 'react';
+import React, {useContext} from 'react';
 
-import {dateToInternationalHuman, normalizeRating} from '../utils/utils.es';
+import {AppContext} from '../AppContext.es';
+import {
+	dateToInternationalHuman,
+	normalizeRating,
+	stripHTML,
+} from '../utils/utils.es';
 import ArticleBodyRenderer from './ArticleBodyRenderer.es';
 import Link from './Link.es';
 import QuestionBadge from './QuestionsBadge.es';
@@ -23,12 +28,9 @@ import TagList from './TagList.es';
 import UserIcon from './UserIcon.es';
 
 export default ({question}) => {
-	const hasValidAnswer = question =>
-		question.messageBoardMessages.items.filter(
-			message => message.showAsAnswer
-		).length > 0;
+	const context = useContext(AppContext);
 
-	const sectionTitle = question.messageBoardSection.title;
+	const sectionTitle = context.section;
 
 	return (
 		<div className="c-mt-4 c-p-3 position-relative question-row text-secondary">
@@ -57,16 +59,16 @@ export default ({question}) => {
 					<li>
 						<QuestionBadge
 							className={
-								hasValidAnswer(question)
+								question.hasValidAnswer
 									? 'alert-success border-0'
 									: ''
 							}
 							symbol={
-								hasValidAnswer(question)
+								question.hasValidAnswer
 									? 'check-circle-full'
 									: 'message'
 							}
-							value={question.messageBoardMessages.items.length}
+							value={question.numberOfMessageBoardMessages}
 						/>
 					</li>
 				</ul>
@@ -82,7 +84,10 @@ export default ({question}) => {
 			</Link>
 
 			<div className="c-mb-0 c-mt-3 question-row-article-body stretched-link-layer text-truncate">
-				<ArticleBodyRenderer {...question} />
+				<ArticleBodyRenderer
+					{...question}
+					articleBody={stripHTML(question.articleBody)}
+				/>
 			</div>
 
 			<div className="align-items-sm-center align-items-start d-flex flex-column-reverse flex-sm-row justify-content-between">

@@ -16,7 +16,6 @@ import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {useDebounceCallback} from '../../../core/hooks/useDebounceCallback';
 import {getEditableItemPropTypes} from '../../../prop-types/index';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../config/constants/editableFragmentEntryProcessor';
 import {EDITABLE_TYPES} from '../../config/constants/editableTypes';
@@ -66,8 +65,8 @@ export default function LinkPanel({item}) {
 	const {editableId, editableType, fragmentEntryLinkId} = item;
 
 	const dispatch = useDispatch();
-	const fragmentEntryLinks = useSelector(state => state.fragmentEntryLinks);
-	const languageId = useSelector(state => state.languageId);
+	const fragmentEntryLinks = useSelector((state) => state.fragmentEntryLinks);
+	const languageId = useSelector((state) => state.languageId);
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 
 	const editableValue =
@@ -83,9 +82,21 @@ export default function LinkPanel({item}) {
 			: SOURCE_TYPES.manual
 	);
 
-	const [href, setHref] = useState(editableConfig.href);
+	const [href, setHref] = useState(editableConfig.href || '');
 
 	const getFieldValue = useGetFieldValue();
+
+	useEffect(() => {
+		const editableConfig = editableValue ? editableValue.config : {};
+
+		setHref((href) => {
+			if (href !== editableConfig.href) {
+				return editableConfig.href || '';
+			}
+
+			return href;
+		});
+	}, [editableValue]);
 
 	useEffect(() => {
 		updateMappedHrefValue({
@@ -103,7 +114,7 @@ export default function LinkPanel({item}) {
 	]);
 
 	const updateRowConfig = useCallback(
-		newConfig => {
+		(newConfig) => {
 			const editableValues =
 				fragmentEntryLinks[fragmentEntryLinkId].editableValues;
 			const editableProcessorValues =
@@ -148,8 +159,6 @@ export default function LinkPanel({item}) {
 		]
 	);
 
-	const [debounceUpdateRowConfig] = useDebounceCallback(updateRowConfig, 500);
-
 	const updateMappedHrefValue = useCallback(
 		({classNameId, classPK, fieldId, languageId}) => {
 			if (!classNameId || !classPK || !fieldId) {
@@ -162,7 +171,7 @@ export default function LinkPanel({item}) {
 				fieldId,
 				languageId,
 				onNetworkStatus: () => {},
-			}).then(fieldValue => {
+			}).then((fieldValue) => {
 				setHref(fieldValue);
 			});
 		},
@@ -177,7 +186,7 @@ export default function LinkPanel({item}) {
 				</label>
 				<ClaySelectWithOption
 					id="floatingToolbarLinkSourceOption"
-					onChange={event => {
+					onChange={(event) => {
 						updateRowConfig({});
 						setHref('');
 						setSourceType(event.target.value);
@@ -192,7 +201,7 @@ export default function LinkPanel({item}) {
 				<MappingSelector
 					fieldType={EDITABLE_TYPES.text}
 					mappedItem={editableConfig}
-					onMappingSelect={mappedItem => {
+					onMappingSelect={(mappedItem) => {
 						updateRowConfig({
 							...mappedItem,
 							target: editableConfig.target,
@@ -214,15 +223,20 @@ export default function LinkPanel({item}) {
 					</label>
 					<ClayInput
 						id="floatingToolbarLinkHrefOption"
-						onChange={event => {
-							setHref(event.target.value);
+						onBlur={() => {
+							const previousValue = editableConfig.href || '';
 
-							debounceUpdateRowConfig({href: event.target.value});
+							if (previousValue !== href) {
+								updateRowConfig({href});
+							}
+						}}
+						onChange={(event) => {
+							setHref(event.target.value);
 						}}
 						readOnly={sourceType !== SOURCE_TYPES.manual}
 						sizing="sm"
 						type="text"
-						value={href || ''}
+						value={href}
 					/>
 				</ClayForm.Group>
 			)}
@@ -233,7 +247,7 @@ export default function LinkPanel({item}) {
 				</label>
 				<ClaySelectWithOption
 					id="floatingToolbarLinkTargetOption"
-					onChange={event => {
+					onChange={(event) => {
 						updateRowConfig({
 							...editableConfig,
 							target: event.target.value,

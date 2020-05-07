@@ -12,7 +12,7 @@
  * details.
  */
 
-import {PortletBase} from 'frontend-js-web';
+import {PortletBase, normalizeFriendlyURL} from 'frontend-js-web';
 import core from 'metal';
 import dom from 'metal-dom';
 
@@ -24,6 +24,7 @@ import dom from 'metal-dom';
  */
 
 class EditAdaptiveMediaConfig extends PortletBase {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -54,7 +55,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		const idOptions = this.one('#idOptions');
 
 		if (idOptions) {
-			dom.delegate(idOptions, 'change', 'input[type="radio"]', event =>
+			dom.delegate(idOptions, 'change', 'input[type="radio"]', (event) =>
 				this.onChangeUuidOptions_(event.delegateTarget)
 			);
 		}
@@ -71,7 +72,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		const maxWidthInput = this.one('#maxWidth');
 
 		if (maxWidthInput) {
-			maxWidthInput.addEventListener('keydown', event => {
+			maxWidthInput.addEventListener('keydown', (event) => {
 				this.handleKeyDown_(event);
 			});
 
@@ -81,7 +82,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 		}
 
 		if (maxHeightInput) {
-			maxHeightInput.addEventListener('keydown', event =>
+			maxHeightInput.addEventListener('keydown', (event) =>
 				this.handleKeyDown_(event)
 			);
 
@@ -98,7 +99,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 
 		const saveButton = this.one('button[type=submit]');
 
-		saveButton.addEventListener('click', event =>
+		saveButton.addEventListener('click', (event) =>
 			this.onSubmitForm_(event)
 		);
 	}
@@ -116,9 +117,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
 			this.isAutomaticUuid_() &&
 			(uuidEmpty || this._originalUuidChanged)
 		) {
-			newUuidInput.value = Liferay.Util.normalizeFriendlyURL(
-				this.nameInput.value
-			);
+			newUuidInput.value = normalizeFriendlyURL(this.nameInput.value);
 		}
 
 		this._originalUuidChanged = true;
@@ -231,6 +230,7 @@ class EditAdaptiveMediaConfig extends PortletBase {
  * @type {!Object}
  */
 EditAdaptiveMediaConfig.STATE = {
+
 	/**
 	 * Node where errors will be rendered.
 	 * @instance

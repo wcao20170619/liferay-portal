@@ -39,6 +39,11 @@ import ${serviceBuilder.getCompatJavaClassName("StringBundler")};
 
 import ${apiPackagePath}.exception.${noSuchEntity}Exception;
 import ${apiPackagePath}.model.${entity.name};
+
+<#if serviceBuilder.isDSLEnabled()>
+	import ${apiPackagePath}.model.${entity.name}Table;
+</#if>
+
 import ${packagePath}.model.impl.${entity.name}Impl;
 import ${packagePath}.model.impl.${entity.name}ModelImpl;
 import ${apiPackagePath}.service.persistence.${entity.name}Persistence;
@@ -219,16 +224,6 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 	</#list>
 
 	public ${entity.name}PersistenceImpl() {
-		setModelClass(${entity.name}.class);
-
-		<#if !serviceBuilder.isVersionLTE_7_1_0()>
-			setModelImplClass(${entity.name}Impl.class);
-			setModelPKClass(${entity.PKClassName}.class);
-			<#if !dependencyInjectorDS>
-				setEntityCacheEnabled(${entityCacheEnabled});
-			</#if>
-		</#if>
-
 		<#if entity.badEntityColumns?size != 0>
 			Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -252,6 +247,20 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 			<#else>
 				setDBColumnNames(dbColumnNames);
 			</#if>
+		</#if>
+
+		setModelClass(${entity.name}.class);
+
+		<#if !serviceBuilder.isVersionLTE_7_1_0()>
+			setModelImplClass(${entity.name}Impl.class);
+			setModelPKClass(${entity.PKClassName}.class);
+			<#if !dependencyInjectorDS>
+				setEntityCacheEnabled(${entityCacheEnabled});
+			</#if>
+		</#if>
+
+		<#if serviceBuilder.isDSLEnabled()>
+			setTable(${entity.name}Table.INSTANCE);
 		</#if>
 	}
 

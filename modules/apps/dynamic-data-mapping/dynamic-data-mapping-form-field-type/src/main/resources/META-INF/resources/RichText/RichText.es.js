@@ -12,170 +12,132 @@
  * details.
  */
 
-import '../FieldBase/FieldBase.es';
+import {Editor} from 'frontend-editor-ckeditor-web';
+import React from 'react';
 
-import './RichTextAdapter.soy';
+import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
+import {useSyncValue} from '../hooks/useSyncValue.es';
+import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
+import {connectStore} from '../util/connectStore.es';
 
-import './RichTextRegister.soy';
-
-import './ReactRichTextAdapter.es';
-
-import Component from 'metal-component';
-import Soy from 'metal-soy';
-import {Config} from 'metal-state';
-
-import templates from './RichText.soy';
-
-class RichText extends Component {
-	dispatchEvent(event, name, value) {
-		this.emit(name, {
-			fieldInstance: this,
-			originalEvent: event,
-			value,
-		});
-	}
-
-	_handleOnDispatch(event) {
-		switch (event.type) {
-			case 'value':
-				this.dispatchEvent(event, 'fieldEdited', event.payload);
-				break;
-			default:
-				console.error(new TypeError(`There is no type ${event.type}`));
-				break;
-		}
-	}
-}
-
-RichText.STATE = {
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	errorMessage: Config.string(),
-
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof RichText
-	 * @type {?bool}
-	 */
-
-	evaluable: Config.bool().value(false),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	fieldName: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	label: Config.string(),
-
-	/**
-	 * @default {}
-	 * @instance
-	 * @memberof RichText
-	 * @type {?(object|undefined)}
-	 */
-
-	localizedValue: Config.object().value({}),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	name: Config.string().required(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	predefinedValue: Config.string(),
-
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof Text
-	 * @type {?bool}
-	 */
-
-	readOnly: Config.bool().value(false),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldBase
-	 * @type {?(bool|undefined)}
-	 */
-
-	repeatable: Config.bool().value(false),
-
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof Text
-	 * @type {?(bool|undefined)}
-	 */
-
-	required: Config.bool().value(false),
-
-	/**
-	 * @default true
-	 * @instance
-	 * @memberof Text
-	 * @type {?(bool|undefined)}
-	 */
-
-	showLabel: Config.bool().value(true),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	spritemap: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	tip: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof Text
-	 * @type {?(string|undefined)}
-	 */
-
-	value: Config.string(),
+const CKEDITOR_CONFIG = {
+	toolbar: [
+		{items: ['Undo', 'Redo'], name: 'clipboard'},
+		'/',
+		{
+			items: [
+				'Bold',
+				'Italic',
+				'Underline',
+				'Strike',
+				'-',
+				'CopyFormatting',
+				'RemoveFormat',
+			],
+			name: 'basicstyles',
+		},
+		{
+			items: [
+				'NumberedList',
+				'BulletedList',
+				'-',
+				'Outdent',
+				'Indent',
+				'-',
+				'Blockquote',
+				'-',
+				'JustifyLeft',
+				'JustifyCenter',
+				'JustifyRight',
+				'JustifyBlock',
+			],
+			name: 'paragraph',
+		},
+		{items: ['Link', 'Unlink', 'Anchor'], name: 'links'},
+		{
+			items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'],
+			name: 'insert',
+		},
+		'/',
+		{items: ['Styles', 'Format', 'Font', 'FontSize'], name: 'styles'},
+		{items: ['TextColor', 'BGColor'], name: 'colors'},
+		{items: ['Maximize'], name: 'tools'},
+		{
+			items: ['Source'],
+			name: 'document',
+		},
+	],
 };
 
-Soy.register(RichText, templates);
+const RichText = ({data, id, name, onChange, readOnly}) => {
+	const [currentValue, setCurrentValue] = useSyncValue(data);
 
-export {RichText};
-export default RichText;
+	const editorProps = {
+		config: CKEDITOR_CONFIG,
+		data: currentValue,
+	};
+
+	if (readOnly) {
+		editorProps.readOnly = true;
+		editorProps.style = {pointerEvents: 'none'};
+	}
+	else {
+		editorProps.onChange = (event) => {
+			const newValue = event.editor.getData();
+
+			setCurrentValue(newValue);
+
+			onChange({data: newValue, event});
+		};
+	}
+
+	return (
+		<>
+			<Editor {...editorProps} />
+
+			<input
+				defaultValue={currentValue}
+				id={id || name}
+				name={name}
+				type="hidden"
+			/>
+		</>
+	);
+};
+
+const Main = ({
+	id,
+	name,
+	onChange,
+	predefinedValue,
+	readOnly,
+	value,
+	...otherProps
+}) => {
+	return (
+		<FieldBaseProxy {...otherProps} id={id} name={name} readOnly={readOnly}>
+			<RichText
+				data={value || predefinedValue}
+				id={id}
+				name={name}
+				onChange={onChange}
+				readOnly={readOnly}
+			/>
+		</FieldBaseProxy>
+	);
+};
+
+const RichTextProxy = connectStore(({emit, ...otherProps}) => (
+	<Main
+		{...otherProps}
+		onChange={({data, event}) => emit('fieldEdited', event, data)}
+	/>
+));
+
+const ReactRichTextAdapter = getConnectedReactComponentAdapter(
+	RichTextProxy,
+	'rich_text'
+);
+
+export {ReactRichTextAdapter};
+export default ReactRichTextAdapter;

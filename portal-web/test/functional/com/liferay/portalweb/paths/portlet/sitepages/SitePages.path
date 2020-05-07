@@ -40,6 +40,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LIST_GROUP_ITEM_CHECKBOX</td>
+	<td>//li[contains(.,'${key_pageName}')]//input[@type='checkbox']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LIST_GROUP_ITEM_CHILD_INDICATOR</td>
 	<td>//li[contains(.,'${key_pageName}')]//*[contains(@class,'child-indicator')]</td>
 	<td></td>
@@ -47,6 +52,11 @@
 <tr>
 	<td>LIST_GROUP_ITEM_PAGE_INFO</td>
 	<td>//li[contains(@class,'list-group-item') and contains(.,'${key_itemName}')]//*[contains(@class,'list-group-subtitle')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LIST_GROUP_ITEM_PAGE_STATUS</td>
+	<td>//li[contains(@class,'list-group-item') and contains(.,'${key_itemName}')]//*[contains(@class,'label-secondary')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -62,6 +72,11 @@
 <tr>
 	<td>LIST_GROUP_ITEM_ROW_ENTRY</td>
 	<td>xpath=(//li[contains(@class,'list-group-item')])[${key_index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LIST_GROUP_ITEM_ROW_ENTRY_TITLE_LINK</td>
+	<td>//li[contains(.,'${key_pageName}')]//h4/a</td>
 	<td></td>
 </tr>
 <tr>

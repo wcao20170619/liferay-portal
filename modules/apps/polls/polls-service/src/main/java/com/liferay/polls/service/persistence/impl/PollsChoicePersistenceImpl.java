@@ -17,6 +17,7 @@ package com.liferay.polls.service.persistence.impl;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.polls.exception.NoSuchChoiceException;
 import com.liferay.polls.model.PollsChoice;
+import com.liferay.polls.model.PollsChoiceTable;
 import com.liferay.polls.model.impl.PollsChoiceImpl;
 import com.liferay.polls.model.impl.PollsChoiceModelImpl;
 import com.liferay.polls.service.persistence.PollsChoicePersistence;
@@ -2225,16 +2226,18 @@ public class PollsChoicePersistenceImpl
 		"(pollsChoice.name IS NULL OR pollsChoice.name = '')";
 
 	public PollsChoicePersistenceImpl() {
-		setModelClass(PollsChoice.class);
-
-		setModelImplClass(PollsChoiceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(PollsChoice.class);
+
+		setModelImplClass(PollsChoiceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(PollsChoiceTable.INSTANCE);
 	}
 
 	/**

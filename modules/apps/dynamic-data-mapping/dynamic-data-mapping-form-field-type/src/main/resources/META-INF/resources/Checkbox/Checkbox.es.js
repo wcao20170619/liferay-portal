@@ -12,8 +12,6 @@
  * details.
  */
 
-import './CheckboxRegister.soy';
-
 import {ClayCheckbox} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import React, {useState} from 'react';
@@ -21,7 +19,6 @@ import React, {useState} from 'react';
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './CheckboxAdapter.soy';
 
 const Switcher = ({
 	checked: initialChecked,
@@ -42,7 +39,7 @@ const Switcher = ({
 				className="toggle-switch-check"
 				disabled={disabled}
 				name={name}
-				onChange={event => {
+				onChange={(event) => {
 					setChecked(event.target.checked);
 					onChange(event, event.target.checked);
 				}}
@@ -89,7 +86,7 @@ const Checkbox = ({
 			disabled={disabled}
 			label={showLabel && label}
 			name={name}
-			onChange={event => {
+			onChange={(event) => {
 				setChecked(event.target.checked);
 				onChange(event, event.target.checked);
 			}}
@@ -105,53 +102,58 @@ const Checkbox = ({
 	);
 };
 
-const CheckboxProxy = connectStore(
-	({
-		disabled,
-		dispatch,
-		emit,
-		label,
-		name,
-		required,
-		showAsSwitcher = true,
-		showLabel = true,
-		spritemap,
-		value = true,
-		...otherProps
-	}) => {
-		const Toggle = showAsSwitcher ? Switcher : Checkbox;
+const Main = ({
+	disabled,
+	dispatch,
+	label,
+	name,
+	onChange,
+	required,
+	showAsSwitcher = true,
+	showLabel = true,
+	spritemap,
+	value = true,
+	...otherProps
+}) => {
+	const Toggle = showAsSwitcher ? Switcher : Checkbox;
 
-		return (
-			<FieldBaseProxy
-				dispatch={dispatch}
+	return (
+		<FieldBaseProxy
+			dispatch={dispatch}
+			label={label}
+			name={name}
+			required={required}
+			showLabel={false}
+			spritemap={spritemap}
+			{...otherProps}
+		>
+			<Toggle
+				checked={value}
+				disabled={disabled}
 				label={label}
 				name={name}
+				onChange={onChange}
 				required={required}
-				showLabel={false}
+				showLabel={showLabel}
 				spritemap={spritemap}
-				{...otherProps}
-			>
-				<Toggle
-					checked={value}
-					disabled={disabled}
-					label={label}
-					name={name}
-					onChange={(event, value) =>
-						emit('fieldEdited', event, value)
-					}
-					required={required}
-					showLabel={showLabel}
-					spritemap={spritemap}
-				/>
-			</FieldBaseProxy>
-		);
-	}
-);
+			/>
+		</FieldBaseProxy>
+	);
+};
+
+Main.displayName = 'Checkbox';
+
+const CheckboxProxy = connectStore(({emit, ...otherProps}) => (
+	<Main
+		{...otherProps}
+		onChange={(event, value) => emit('fieldEdited', event, value)}
+	/>
+));
 
 const ReactCheckboxAdapter = getConnectedReactComponentAdapter(
 	CheckboxProxy,
-	templates
+	'checkbox'
 );
 
-export {ReactCheckboxAdapter};
+export {ReactCheckboxAdapter, Main};
 export default ReactCheckboxAdapter;

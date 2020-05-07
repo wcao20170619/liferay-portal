@@ -23,6 +23,7 @@ import React, {
 } from 'react';
 
 import useThunk from '../../core/hooks/useThunk';
+import useUndo from '../components/undo/useUndo';
 
 const StoreContext = React.createContext(null);
 
@@ -42,13 +43,13 @@ export const StoreAPIContextProvider = ({
 }) => {
 	const subscribers = useRef([]);
 
-	const subscribe = useCallback(subscriber => {
+	const subscribe = useCallback((subscriber) => {
 		subscribers.current = [...subscribers.current, subscriber];
 	}, []);
 
-	const unsubscribe = useCallback(subscriber => {
+	const unsubscribe = useCallback((subscriber) => {
 		subscribers.current = subscribers.current.filter(
-			_subscriber => _subscriber !== subscriber
+			(_subscriber) => _subscriber !== subscriber
 		);
 	}, []);
 
@@ -58,7 +59,7 @@ export const StoreAPIContextProvider = ({
 
 	useEffect(() => {
 		storeRef.current.getState = getState;
-		subscribers.current.forEach(subscriber => subscriber());
+		subscribers.current.forEach((subscriber) => subscriber());
 	}, [getState]);
 
 	const storeRef = useRef({
@@ -84,7 +85,9 @@ export const StoreAPIContextProvider = ({
  * of the raw React context.
  */
 export const StoreContextProvider = ({children, initialState, reducer}) => {
-	const [state, dispatch] = useThunk(useReducer(reducer, initialState));
+	const [state, dispatch] = useThunk(
+		useUndo(useReducer(reducer, initialState))
+	);
 
 	const getState = useCallback(() => state, [state]);
 
@@ -120,6 +123,7 @@ export const useSelector = (selector, compareEqual = (a, b) => a === b) => {
 
 	const initialState = useMemo(
 		() => selector(storeRef.current.getState()),
+
 		// We really want to call selector here just on component mount.
 		// This provides an initial value that will be recalculated when
 		// store suscription has been called.

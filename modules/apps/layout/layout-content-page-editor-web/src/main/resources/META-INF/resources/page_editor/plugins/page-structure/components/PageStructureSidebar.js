@@ -30,9 +30,9 @@ import StructureTreeNode from './StructureTreeNode';
 
 export default function PageStructureSidebar() {
 	const activeItemId = useActiveItemId();
-	const layoutData = useSelector(state => state.layoutData);
-	const masterLayoutData = useSelector(state => state.masterLayoutData);
-	const state = useSelector(state => state);
+	const layoutData = useSelector((state) => state.layoutData);
+	const masterLayoutData = useSelector((state) => state.masterLayoutData);
+	const state = useSelector((state) => state);
 
 	const isMasterPage = config.pageType === PAGE_TYPES.master;
 
@@ -124,12 +124,15 @@ function visit(item, items, {activeItemId, isMasterPage, state}) {
 		Object.keys(masterLayoutData.items).includes(item.itemId);
 
 	if (item.type === LAYOUT_DATA_ITEM_TYPES.fragment) {
-		const fragmentChildren =
-			fragmentEntryLinks[item.config.fragmentEntryLinkId].editableValues[
+		const fragmentEntryLink =
+			fragmentEntryLinks[item.config.fragmentEntryLinkId];
+
+		const editables =
+			fragmentEntryLink.editableValues[
 				EDITABLE_FRAGMENT_ENTRY_PROCESSOR
 			] || {};
 
-		Object.keys(fragmentChildren).forEach(editableId => {
+		Object.keys(editables).forEach((editableId) => {
 			const childId = `${item.config.fragmentEntryLinkId}-${editableId}`;
 
 			children.push({
@@ -143,9 +146,22 @@ function visit(item, items, {activeItemId, isMasterPage, state}) {
 				type: ITEM_TYPES.editable,
 			});
 		});
+
+		children.push(
+			...item.children.map((childItemId) => ({
+				...visit(items[childItemId], items, {
+					activeItemId,
+					isMasterPage,
+					state,
+				}),
+
+				name: Liferay.Language.get('drop-zone'),
+				removable: false,
+			}))
+		);
 	}
 	else {
-		item.children.forEach(childId => {
+		item.children.forEach((childId) => {
 			const childItem = items[childId];
 
 			if (

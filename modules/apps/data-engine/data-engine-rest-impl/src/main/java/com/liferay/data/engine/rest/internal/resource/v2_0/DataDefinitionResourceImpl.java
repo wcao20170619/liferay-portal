@@ -17,7 +17,11 @@ package com.liferay.data.engine.rest.internal.resource.v2_0;
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
 import com.liferay.data.engine.field.type.util.LocalizedValueUtil;
 import com.liferay.data.engine.model.DEDataListView;
+import com.liferay.data.engine.nativeobject.DataEngineNativeObject;
+import com.liferay.data.engine.nativeobject.DataEngineNativeObjectField;
+import com.liferay.data.engine.nativeobject.tracker.DataEngineNativeObjectTracker;
 import com.liferay.data.engine.rest.dto.v2_0.DataDefinition;
+import com.liferay.data.engine.rest.dto.v2_0.DataDefinitionField;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayout;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayoutColumn;
 import com.liferay.data.engine.rest.dto.v2_0.DataLayoutPage;
@@ -29,12 +33,14 @@ import com.liferay.data.engine.rest.internal.dto.v2_0.util.DataDefinitionUtil;
 import com.liferay.data.engine.rest.internal.dto.v2_0.util.DataLayoutUtil;
 import com.liferay.data.engine.rest.internal.odata.entity.v2_0.DataDefinitionEntityModel;
 import com.liferay.data.engine.rest.internal.security.permission.resource.DataDefinitionModelResourcePermission;
+import com.liferay.data.engine.rest.resource.exception.DataDefinitionValidationException;
 import com.liferay.data.engine.rest.resource.v2_0.DataDefinitionResource;
 import com.liferay.data.engine.rest.resource.v2_0.DataLayoutResource;
 import com.liferay.data.engine.rest.resource.v2_0.DataRecordCollectionResource;
 import com.liferay.data.engine.service.DEDataDefinitionFieldLinkLocalService;
 import com.liferay.data.engine.service.DEDataListViewLocalService;
 import com.liferay.dynamic.data.lists.service.DDLRecordSetLocalService;
+import com.liferay.dynamic.data.mapping.exception.NoSuchStructureException;
 import com.liferay.dynamic.data.mapping.form.builder.rule.DDMFormRuleDeserializer;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
@@ -63,7 +69,10 @@ import com.liferay.dynamic.data.mapping.util.DDMFormLayoutFactory;
 import com.liferay.dynamic.data.mapping.util.comparator.StructureCreateDateComparator;
 import com.liferay.dynamic.data.mapping.util.comparator.StructureModifiedDateComparator;
 import com.liferay.dynamic.data.mapping.util.comparator.StructureNameComparator;
+import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
+import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -85,7 +94,9 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
@@ -101,12 +112,16 @@ import com.liferay.portal.vulcan.permission.PermissionUtil;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
+import java.sql.Types;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -294,6 +309,53 @@ public class DataDefinitionResourceImpl
 					"page-size-is-greater-than-x", 250));
 		}
 
+		if (Objects.equals(contentType, "native-object") &&
+			Validator.isNull(keywords)) {
+
+			for (DataEngineNativeObject dataEngineNativeObject :
+					_dataEngineNativeObjectTracker.
+						getDataEngineNativeObjects()) {
+
+				DataDefinition dataDefinition = null;
+
+				try {
+					getSiteDataDefinitionByContentTypeByDataDefinitionKey(
+						siteId, "native-object",
+						dataEngineNativeObject.getClassName());
+				}
+				catch (Exception exception) {
+					if (!(exception instanceof NoSuchStructureException) &&
+						!(exception.getCause() instanceof
+							NoSuchStructureException)) {
+
+						throw exception;
+					}
+
+					dataDefinition = new DataDefinition() {
+						{
+							availableLanguageIds = new String[] {
+								contextAcceptLanguage.getPreferredLanguageId()
+							};
+							dataDefinitionFields = _toDataDefinitionFields(
+								dataEngineNativeObject);
+							dataDefinitionKey =
+								dataEngineNativeObject.getClassName();
+							name = HashMapBuilder.<String, Object>put(
+								contextAcceptLanguage.getPreferredLanguageId(),
+								dataEngineNativeObject.getName()
+							).build();
+							storageType = "json";
+						}
+					};
+				}
+
+				if (dataDefinition != null) {
+					postDataDefinitionByContentType(
+						"native-object", dataDefinition);
+				}
+			}
+		}
+
 		if (ArrayUtil.isEmpty(sorts)) {
 			sorts = new Sort[] {
 				new Sort(
@@ -365,10 +427,13 @@ public class DataDefinitionResourceImpl
 			PermissionThreadLocal.getPermissionChecker(), contentType, siteId,
 			DataActionKeys.ADD_DATA_DEFINITION);
 
+		DDMForm ddmForm = DataDefinitionUtil.toDDMForm(
+			dataDefinition, _ddmFormFieldTypeServicesTracker);
+
+		_validate(dataDefinition, ddmForm);
+
 		DDMFormSerializerSerializeRequest.Builder builder =
-			DDMFormSerializerSerializeRequest.Builder.newBuilder(
-				DataDefinitionUtil.toDDMForm(
-					dataDefinition, _ddmFormFieldTypeServicesTracker));
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
 
 		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
 			_ddmFormSerializer.serialize(builder.build());
@@ -464,10 +529,13 @@ public class DataDefinitionResourceImpl
 
 		_updateFieldNames(dataDefinitionId, dataDefinition);
 
+		DDMForm ddmForm = DataDefinitionUtil.toDDMForm(
+			dataDefinition, _ddmFormFieldTypeServicesTracker);
+
+		_validate(dataDefinition, ddmForm);
+
 		DDMFormSerializerSerializeRequest.Builder builder =
-			DDMFormSerializerSerializeRequest.Builder.newBuilder(
-				DataDefinitionUtil.toDDMForm(
-					dataDefinition, _ddmFormFieldTypeServicesTracker));
+			DDMFormSerializerSerializeRequest.Builder.newBuilder(ddmForm);
 
 		DDMFormSerializerSerializeResponse ddmFormSerializerSerializeResponse =
 			_ddmFormSerializer.serialize(builder.build());
@@ -629,6 +697,18 @@ public class DataDefinitionResourceImpl
 		return dataLayout.getId();
 	}
 
+	private String _getFieldType(int sqlType) {
+		if ((sqlType == Types.BIGINT) || (sqlType == Types.DECIMAL) ||
+			(sqlType == Types.DOUBLE) || (sqlType == Types.FLOAT) ||
+			(sqlType == Types.INTEGER) || (sqlType == Types.NUMERIC) ||
+			(sqlType == Types.TINYINT)) {
+
+			return "number";
+		}
+
+		return "text";
+	}
+
 	private JSONObject _getFieldTypeMetadataJSONObject(
 		String ddmFormFieldName, ResourceBundle resourceBundle) {
 
@@ -761,6 +841,222 @@ public class DataDefinitionResourceImpl
 		return DataDefinitionUtil.toDataDefinition(
 			_ddmFormFieldTypeServicesTracker, ddmStructure,
 			_spiDDMFormRuleConverter);
+	}
+
+	private DataDefinitionField[] _toDataDefinitionFields(
+		DataEngineNativeObject dataEngineNativeObject) {
+
+		List<DataDefinitionField> dataDefinitionFields = new ArrayList<>();
+
+		for (DataEngineNativeObjectField dataEngineNativeObjectField :
+				dataEngineNativeObject.getDataEngineNativeObjectFields()) {
+
+			Column column = dataEngineNativeObjectField.getColumn();
+
+			dataDefinitionFields.add(
+				new DataDefinitionField() {
+					{
+						customProperties = HashMapBuilder.<String, Object>put(
+							"native-field", "native-field"
+						).build();
+						fieldType = GetterUtil.getString(
+							dataEngineNativeObjectField.getCustomType(),
+							_getFieldType(column.getSQLType()));
+						name = column.getName();
+						required = !column.isNullAllowed();
+					}
+				});
+		}
+
+		return dataDefinitionFields.toArray(new DataDefinitionField[0]);
+	}
+
+	private DataDefinitionValidationException
+		_toDataDefinitionValidationException(
+			DDMFormValidationException ddmFormValidationException) {
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustNotDuplicateFieldName) {
+
+			DDMFormValidationException.MustNotDuplicateFieldName
+				mustNotDuplicateFieldName =
+					(DDMFormValidationException.MustNotDuplicateFieldName)
+						ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustNotDuplicateFieldName(
+					mustNotDuplicateFieldName.getDuplicatedFieldNames());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetAvailableLocales) {
+
+			return new DataDefinitionValidationException.
+				MustSetAvailableLocales();
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetDefaultLocale) {
+
+			return new DataDefinitionValidationException.MustSetDefaultLocale();
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.
+					MustSetDefaultLocaleAsAvailableLocale) {
+
+			DDMFormValidationException.MustSetDefaultLocaleAsAvailableLocale
+				mustSetDefaultLocaleAsAvailableLocale =
+					(DDMFormValidationException.
+						MustSetDefaultLocaleAsAvailableLocale)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetDefaultLocaleAsAvailableLocale(
+					mustSetDefaultLocaleAsAvailableLocale.getDefaultLocale());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetFieldType) {
+
+			DDMFormValidationException.MustSetFieldType mustSetFieldType =
+				(DDMFormValidationException.MustSetFieldType)
+					ddmFormValidationException;
+
+			return new DataDefinitionValidationException.MustSetFieldType(
+				mustSetFieldType.getFieldName());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetOptionsForField) {
+
+			DDMFormValidationException.MustSetOptionsForField
+				mustSetOptionsForField =
+					(DDMFormValidationException.MustSetOptionsForField)
+						ddmFormValidationException;
+
+			return new DataDefinitionValidationException.MustSetOptionsForField(
+				mustSetOptionsForField.getFieldName());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.
+					MustSetValidAvailableLocalesForProperty) {
+
+			DDMFormValidationException.MustSetValidAvailableLocalesForProperty
+				mustSetValidAvailableLocalesForProperty =
+					(DDMFormValidationException.
+						MustSetValidAvailableLocalesForProperty)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidAvailableLocalesForProperty(
+					mustSetValidAvailableLocalesForProperty.getFieldName(),
+					mustSetValidAvailableLocalesForProperty.getProperty());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidCharactersForFieldName) {
+
+			DDMFormValidationException.MustSetValidCharactersForFieldName
+				mustSetValidCharactersForFieldName =
+					(DDMFormValidationException.
+						MustSetValidCharactersForFieldName)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidCharactersForFieldName(
+					mustSetValidCharactersForFieldName.getFieldName());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidCharactersForFieldType) {
+
+			DDMFormValidationException.MustSetValidCharactersForFieldType
+				mustSetValidCharactersForFieldType =
+					(DDMFormValidationException.
+						MustSetValidCharactersForFieldType)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidCharactersForFieldType(
+					mustSetValidCharactersForFieldType.getFieldType());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.
+					MustSetValidDefaultLocaleForProperty) {
+
+			DDMFormValidationException.MustSetValidDefaultLocaleForProperty
+				mustSetValidDefaultLocaleForProperty =
+					(DDMFormValidationException.
+						MustSetValidDefaultLocaleForProperty)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidDefaultLocaleForProperty(
+					mustSetValidDefaultLocaleForProperty.getFieldName(),
+					mustSetValidDefaultLocaleForProperty.getProperty());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidFormRuleExpression) {
+
+			DDMFormValidationException.MustSetValidFormRuleExpression
+				mustSetValidFormRuleExpression =
+					(DDMFormValidationException.MustSetValidFormRuleExpression)
+						ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidRuleExpression(
+					mustSetValidFormRuleExpression.getExpression(),
+					mustSetValidFormRuleExpression.getMessage());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidIndexType) {
+
+			DDMFormValidationException.MustSetValidIndexType
+				mustSetValidIndexType =
+					(DDMFormValidationException.MustSetValidIndexType)
+						ddmFormValidationException;
+
+			return new DataDefinitionValidationException.MustSetValidIndexType(
+				mustSetValidIndexType.getFieldName());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidValidationExpression) {
+
+			DDMFormValidationException.MustSetValidValidationExpression
+				mustSetValidValidationExpression =
+					(DDMFormValidationException.
+						MustSetValidValidationExpression)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidValidationExpression(
+					mustSetValidValidationExpression.getFieldName(),
+					mustSetValidValidationExpression.getExpression());
+		}
+
+		if (ddmFormValidationException instanceof
+				DDMFormValidationException.MustSetValidVisibilityExpression) {
+
+			DDMFormValidationException.MustSetValidVisibilityExpression
+				mustSetValidVisibilityExpression =
+					(DDMFormValidationException.
+						MustSetValidVisibilityExpression)
+							ddmFormValidationException;
+
+			return new DataDefinitionValidationException.
+				MustSetValidVisibilityExpression(
+					mustSetValidVisibilityExpression.getFieldName(),
+					mustSetValidVisibilityExpression.getExpression());
+		}
+
+		return new DataDefinitionValidationException(
+			ddmFormValidationException.getCause());
 	}
 
 	private OrderByComparator<DDMStructure> _toOrderByComparator(Sort sort) {
@@ -928,6 +1224,42 @@ public class DataDefinitionResourceImpl
 		_updateDataListViews(deDataListViewIds, removedFieldNames);
 	}
 
+	private void _validate(DataDefinition dataDefinition, DDMForm ddmForm) {
+		try {
+			_ddmFormValidator.validate(ddmForm);
+
+			Map<String, Object> name = dataDefinition.getName();
+
+			Locale defaultLocale = ddmForm.getDefaultLocale();
+
+			if ((name == null) ||
+				!name.containsKey(LocaleUtil.toLanguageId(defaultLocale))) {
+
+				throw new DataDefinitionValidationException.MustSetValidName(
+					"Name is null for locale " +
+						defaultLocale.getDisplayName());
+			}
+		}
+		catch (DDMFormValidationException ddmFormValidationException) {
+			if (ddmFormValidationException instanceof
+					DDMFormValidationException.MustSetFieldsForForm) {
+
+				return;
+			}
+
+			throw _toDataDefinitionValidationException(
+				ddmFormValidationException);
+		}
+		catch (DataDefinitionValidationException
+					dataDefinitionValidationException) {
+
+			throw dataDefinitionValidationException;
+		}
+		catch (Exception exception) {
+			throw new DataDefinitionValidationException(exception);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		DataDefinitionResourceImpl.class);
 
@@ -940,6 +1272,9 @@ public class DataDefinitionResourceImpl
 	@Reference
 	private DataDefinitionModelResourcePermission
 		_dataDefinitionModelResourcePermission;
+
+	@Reference
+	private DataEngineNativeObjectTracker _dataEngineNativeObjectTracker;
 
 	@Reference
 	private DDLRecordSetLocalService _ddlRecordSetLocalService;
@@ -958,6 +1293,9 @@ public class DataDefinitionResourceImpl
 
 	@Reference
 	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;
+
+	@Reference
+	private DDMFormValidator _ddmFormValidator;
 
 	@Reference
 	private DDMFormValuesFactory _ddmFormValuesFactory;

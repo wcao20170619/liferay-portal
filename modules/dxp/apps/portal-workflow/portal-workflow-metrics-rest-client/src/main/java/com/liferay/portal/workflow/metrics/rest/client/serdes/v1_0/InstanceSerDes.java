@@ -298,20 +298,6 @@ public class InstanceSerDes {
 			sb.append("\"");
 		}
 
-		if (instance.getStatus() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"status\": ");
-
-			sb.append("\"");
-
-			sb.append(instance.getStatus());
-
-			sb.append("\"");
-		}
-
 		if (instance.getTaskNames() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -443,17 +429,32 @@ public class InstanceSerDes {
 			map.put("creator", String.valueOf(instance.getCreator()));
 		}
 
-		map.put(
-			"dateCompletion",
-			liferayToJSONDateFormat.format(instance.getDateCompletion()));
+		if (instance.getDateCompletion() == null) {
+			map.put("dateCompletion", null);
+		}
+		else {
+			map.put(
+				"dateCompletion",
+				liferayToJSONDateFormat.format(instance.getDateCompletion()));
+		}
 
-		map.put(
-			"dateCreated",
-			liferayToJSONDateFormat.format(instance.getDateCreated()));
+		if (instance.getDateCreated() == null) {
+			map.put("dateCreated", null);
+		}
+		else {
+			map.put(
+				"dateCreated",
+				liferayToJSONDateFormat.format(instance.getDateCreated()));
+		}
 
-		map.put(
-			"dateModified",
-			liferayToJSONDateFormat.format(instance.getDateModified()));
+		if (instance.getDateModified() == null) {
+			map.put("dateModified", null);
+		}
+		else {
+			map.put(
+				"dateModified",
+				liferayToJSONDateFormat.format(instance.getDateModified()));
+		}
 
 		if (instance.getDuration() == null) {
 			map.put("duration", null);
@@ -496,13 +497,6 @@ public class InstanceSerDes {
 		}
 		else {
 			map.put("slaStatus", String.valueOf(instance.getSLAStatus()));
-		}
-
-		if (instance.getStatus() == null) {
-			map.put("status", null);
-		}
-		else {
-			map.put("status", String.valueOf(instance.getStatus()));
 		}
 
 		if (instance.getTaskNames() == null) {
@@ -654,12 +648,6 @@ public class InstanceSerDes {
 					instance.setSLAStatus(
 						Instance.SLAStatus.create(
 							(String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "status")) {
-				if (jsonParserFieldValue != null) {
-					instance.setStatus(
-						Instance.Status.create((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "taskNames")) {

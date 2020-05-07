@@ -24,8 +24,10 @@ user2 = user2.toEscapedModel();
 request.setAttribute("view_user.jsp-user", user2);
 %>
 
-<aui:row>
-	<aui:col cssClass="contacts-container" width="<%= 100 %>">
+<clay:row>
+	<clay:col
+		className="contacts-container"
+	>
 		<div class="lfr-contact-thumb">
 			<img alt="<%= HtmlUtil.escapeAttribute(user2.getFullName()) %>" src="<%= user2.getPortraitURL(themeDisplay) %>" />
 		</div>
@@ -43,5 +45,5 @@ request.setAttribute("view_user.jsp-user", user2);
 		</div>
 
 		<liferay-util:include page="/user/view_user_information.jsp" servletContext="<%= application %>" />
-	</aui:col>
-</aui:row>
+	</clay:col>
+</clay:row>

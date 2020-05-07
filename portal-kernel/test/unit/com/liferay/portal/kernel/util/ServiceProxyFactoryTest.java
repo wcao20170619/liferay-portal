@@ -108,7 +108,7 @@ public class ServiceProxyFactoryTest {
 
 		ServiceProxyFactory.newServiceTrackedInstance(
 			TestService.class, TestServiceUtil.class, testServiceUtil,
-			"nonStaticField", null, false);
+			"nonstaticField", null, false);
 
 		FinalizeAction finalizeAction = null;
 
@@ -241,7 +241,7 @@ public class ServiceProxyFactoryTest {
 
 		try {
 			ServiceProxyFactory.newServiceTrackedInstance(
-				TestService.class, TestServiceUtil.class, "nonStaticField",
+				TestService.class, TestServiceUtil.class, "nonstaticField",
 				false);
 
 			Assert.fail();
@@ -251,7 +251,7 @@ public class ServiceProxyFactoryTest {
 				IllegalArgumentException.class, throwable.getClass());
 
 			Field testServiceField = ReflectionUtil.getDeclaredField(
-				TestServiceUtil.class, "nonStaticField");
+				TestServiceUtil.class, "nonstaticField");
 
 			Assert.assertEquals(
 				testServiceField + " is not static", throwable.getMessage());
@@ -263,13 +263,13 @@ public class ServiceProxyFactoryTest {
 
 		TestService testService = new TestServiceImpl();
 
-		testServiceUtil.nonStaticField = testService;
+		testServiceUtil.nonstaticField = testService;
 
 		ServiceProxyFactory.newServiceTrackedInstance(
 			TestService.class, TestServiceUtil.class, testServiceUtil,
-			"nonStaticField", null, false);
+			"nonstaticField", null, false);
 
-		Assert.assertSame(testService, testServiceUtil.nonStaticField);
+		Assert.assertSame(testService, testServiceUtil.nonstaticField);
 
 		// Test 5, test constructor
 
@@ -292,7 +292,7 @@ public class ServiceProxyFactoryTest {
 
 		TestService testService = ServiceProxyFactory.newServiceTrackedInstance(
 			TestService.class, TestServiceUtil.class, testServiceUtil,
-			"nonStaticField", null, false);
+			"nonstaticField", null, false);
 
 		_testNonblockingProxy(false, testService, testServiceUtil);
 	}
@@ -564,7 +564,7 @@ public class ServiceProxyFactoryTest {
 			newTestService = TestServiceUtil.testService;
 		}
 		else {
-			newTestService = testServiceUtil.nonStaticField;
+			newTestService = testServiceUtil.nonstaticField;
 		}
 
 		Assert.assertEquals(
@@ -630,7 +630,7 @@ public class ServiceProxyFactoryTest {
 
 		public static volatile TestService testService;
 
-		public volatile TestService nonStaticField;
+		public volatile TestService nonstaticField;
 
 	}
 

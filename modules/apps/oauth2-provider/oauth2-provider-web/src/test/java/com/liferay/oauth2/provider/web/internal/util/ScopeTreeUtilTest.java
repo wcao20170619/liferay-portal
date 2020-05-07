@@ -39,7 +39,7 @@ public class ScopeTreeUtilTest {
 			"everything.read", "everything.write", "everything",
 			"everything.read.user", "everything.read.user.documents");
 
-		Tree.Node<String> node = ScopeTreeUtil.getScopeTreeNode(
+		Tree.Node<String> node = ScopeTreeUtil.getScopeAliasTreeNode(
 			scopeAliasesList, _scopeMatcherFactory);
 
 		Assert.assertEquals(StringPool.BLANK, node.getValue());
@@ -79,7 +79,7 @@ public class ScopeTreeUtilTest {
 			"everything.read", "everything.write", "everything",
 			"everything.read.user", "analytics.read", "analytics");
 
-		Tree.Node<String> node = ScopeTreeUtil.getScopeTreeNode(
+		Tree.Node<String> node = ScopeTreeUtil.getScopeAliasTreeNode(
 			scopeAliasesList, _scopeMatcherFactory);
 
 		Assert.assertEquals(StringPool.BLANK, node.getValue());
@@ -110,7 +110,7 @@ public class ScopeTreeUtilTest {
 		List<String> scopeAliasesList = Arrays.asList(
 			"everything.read", "everything.write", "everything");
 
-		Tree.Node<String> node = ScopeTreeUtil.getScopeTreeNode(
+		Tree.Node<String> node = ScopeTreeUtil.getScopeAliasTreeNode(
 			scopeAliasesList, _scopeMatcherFactory);
 
 		Assert.assertEquals(StringPool.BLANK, node.getValue());

@@ -12,18 +12,15 @@
  * details.
  */
 
-import './NumericRegister.soy';
-
 import {ClayInput} from '@clayui/form';
 import React, {useEffect, useRef} from 'react';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import vanillaTextMask from 'vanilla-text-mask';
 
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
-import {useSyncValue} from '../Text/Text.es';
+import {useSyncValue} from '../hooks/useSyncValue.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './NumericAdapter.soy';
 
 const getMaskConfig = (dataType, symbols) => {
 	let config = {
@@ -96,7 +93,7 @@ const Numeric = ({
 			{...otherProps}
 			aria-label="numeric"
 			disabled={disabled}
-			onChange={event => {
+			onChange={(event) => {
 				const {value: newValue} = event.target;
 
 				if (newValue.substr(-1) === symbols.decimalSymbol) {
@@ -113,46 +110,51 @@ const Numeric = ({
 	);
 };
 
-const NumericProxy = connectStore(
-	({
-		dataType,
-		emit,
-		id,
-		name,
-		placeholder,
-		predefinedValue = '',
-		readOnly,
-		symbols,
-		value,
-		...otherProps
-	}) => (
-		<FieldBaseProxy {...otherProps} id={id} name={name} readOnly={readOnly}>
-			<Numeric
-				dataType={dataType}
-				disabled={readOnly}
-				id={id}
-				name={name}
-				onBlur={event =>
-					emit('fieldBlurred', event, event.target.value)
-				}
-				onChange={event =>
-					emit('fieldEdited', event, event.target.value)
-				}
-				onFocus={event =>
-					emit('fieldFocused', event, event.target.value)
-				}
-				placeholder={placeholder}
-				symbols={symbols}
-				value={value ? value : predefinedValue}
-			/>
-		</FieldBaseProxy>
-	)
+const Main = ({
+	dataType,
+	id,
+	name,
+	onBlur,
+	onChange,
+	onFocus,
+	placeholder,
+	predefinedValue = '',
+	readOnly,
+	symbols,
+	value,
+	...otherProps
+}) => (
+	<FieldBaseProxy {...otherProps} id={id} name={name} readOnly={readOnly}>
+		<Numeric
+			dataType={dataType}
+			disabled={readOnly}
+			id={id}
+			name={name}
+			onBlur={onBlur}
+			onChange={onChange}
+			onFocus={onFocus}
+			placeholder={placeholder}
+			symbols={symbols}
+			value={value ? value : predefinedValue}
+		/>
+	</FieldBaseProxy>
 );
+
+Main.displayName = 'Numeric';
+
+const NumericProxy = connectStore(({emit, ...otherProps}) => (
+	<Main
+		{...otherProps}
+		onBlur={(event) => emit('fieldBlurred', event, event.target.value)}
+		onChange={(event) => emit('fieldEdited', event, event.target.value)}
+		onFocus={(event) => emit('fieldFocused', event, event.target.value)}
+	/>
+));
 
 const ReactNumericAdapter = getConnectedReactComponentAdapter(
 	NumericProxy,
-	templates
+	'numeric'
 );
 
-export {ReactNumericAdapter};
+export {Main};
 export default ReactNumericAdapter;

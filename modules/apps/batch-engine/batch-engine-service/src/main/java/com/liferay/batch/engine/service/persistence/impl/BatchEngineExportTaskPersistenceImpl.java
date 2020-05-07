@@ -16,6 +16,7 @@ package com.liferay.batch.engine.service.persistence.impl;
 
 import com.liferay.batch.engine.exception.NoSuchExportTaskException;
 import com.liferay.batch.engine.model.BatchEngineExportTask;
+import com.liferay.batch.engine.model.BatchEngineExportTaskTable;
 import com.liferay.batch.engine.model.impl.BatchEngineExportTaskImpl;
 import com.liferay.batch.engine.model.impl.BatchEngineExportTaskModelImpl;
 import com.liferay.batch.engine.service.persistence.BatchEngineExportTaskPersistence;
@@ -1793,16 +1794,18 @@ public class BatchEngineExportTaskPersistenceImpl
 		"(batchEngineExportTask.executeStatus IS NULL OR batchEngineExportTask.executeStatus = '')";
 
 	public BatchEngineExportTaskPersistenceImpl() {
-		setModelClass(BatchEngineExportTask.class);
-
-		setModelImplClass(BatchEngineExportTaskImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(BatchEngineExportTask.class);
+
+		setModelImplClass(BatchEngineExportTaskImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(BatchEngineExportTaskTable.INSTANCE);
 	}
 
 	/**

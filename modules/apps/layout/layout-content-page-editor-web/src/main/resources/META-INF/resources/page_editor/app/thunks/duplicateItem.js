@@ -12,13 +12,15 @@
  * details.
  */
 
-import {updateLayoutData} from '../actions/index';
+import duplicateItemAction from '../actions/duplicateItem';
 import FragmentService from '../services/FragmentService';
 
-export default function duplicateItem({itemId, store, selectItem = () => {}}) {
-	const {segmentsExperienceId} = store;
-
-	return dispatch => {
+export default function duplicateItem({
+	itemId,
+	segmentsExperienceId,
+	selectItem = () => {},
+}) {
+	return (dispatch) => {
 		FragmentService.duplicateItem({
 			itemId,
 			onNetworkStatus: dispatch,
@@ -26,8 +28,9 @@ export default function duplicateItem({itemId, store, selectItem = () => {}}) {
 		}).then(
 			({duplicatedFragmentEntryLinks, duplicatedItemId, layoutData}) => {
 				dispatch(
-					updateLayoutData({
+					duplicateItemAction({
 						addedFragmentEntryLinks: duplicatedFragmentEntryLinks,
+						duplicatedItemId,
 						layoutData,
 					})
 				);

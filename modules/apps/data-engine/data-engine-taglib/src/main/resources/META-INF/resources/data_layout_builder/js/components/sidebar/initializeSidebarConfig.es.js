@@ -28,6 +28,7 @@ export default function initializeSidebarConfig(backendInfo) {
 	const toolbarId = `${backendInfo.portletNamespace}${DEFAULT_CONFIG.toolbarId}`;
 
 	// Special items requiring augmentation, creation, or transformation.
+
 	const augmentedPanels = augmentPanelData(
 		Object.values(backendInfo.sidebarPanels)
 	);
@@ -54,7 +55,7 @@ const SIDEBAR_PANEL_IDS_TO_PLUGINS = {
 };
 
 function augmentPanelData(sidebarPanels) {
-	return sidebarPanels.map(panel => {
+	return sidebarPanels.map((panel) => {
 		if (isSeparator(panel) || panel.isLink) {
 			return panel;
 		}

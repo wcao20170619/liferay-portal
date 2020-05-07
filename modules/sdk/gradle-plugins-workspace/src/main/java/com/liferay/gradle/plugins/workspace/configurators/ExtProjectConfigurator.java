@@ -16,7 +16,6 @@ package com.liferay.gradle.plugins.workspace.configurators;
 
 import com.liferay.gradle.plugins.LiferayExtPlugin;
 import com.liferay.gradle.plugins.LiferayOSGiExtPlugin;
-import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.workspace.WorkspaceExtension;
 import com.liferay.gradle.plugins.workspace.WorkspacePlugin;
 import com.liferay.gradle.plugins.workspace.internal.util.GradleUtil;
@@ -74,8 +73,9 @@ public class ExtProjectConfigurator extends BaseProjectConfigurator {
 			GradleUtil.addDefaultRepositories(project);
 		}
 
-		_configureLiferay(project, workspaceExtension);
 		_configureRootTaskDistBundle(project, extPlugin);
+
+		configureLiferay(project, workspaceExtension);
 	}
 
 	@Override
@@ -123,15 +123,6 @@ public class ExtProjectConfigurator extends BaseProjectConfigurator {
 		else {
 			GradleUtil.applyPlugin(project, LiferayOSGiExtPlugin.class);
 		}
-	}
-
-	private void _configureLiferay(
-		Project project, WorkspaceExtension workspaceExtension) {
-
-		LiferayExtension liferayExtension = GradleUtil.getExtension(
-			project, LiferayExtension.class);
-
-		liferayExtension.setAppServerParentDir(workspaceExtension.getHomeDir());
 	}
 
 	@SuppressWarnings("serial")

@@ -49,6 +49,10 @@ public interface AppResource {
 		return FactoryHolder.factory.create();
 	}
 
+	public Page<App> getAppsPage(
+			String keywords, Pagination pagination, Sort[] sorts)
+		throws Exception;
+
 	public void deleteApp(Long appId) throws Exception;
 
 	public Response deleteAppBatch(String callbackURL, Object object)

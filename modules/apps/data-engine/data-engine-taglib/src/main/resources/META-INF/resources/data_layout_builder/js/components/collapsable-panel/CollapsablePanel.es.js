@@ -83,9 +83,9 @@ const CollapsablePanel = ({actions, children, title}) => {
 					</>
 				</ClayButton>
 
-				<span className="collapse-icon-options">
+				<div className="collapse-icon-options">
 					<DropDown actions={actions} />
-				</span>
+				</div>
 
 				<div
 					className={classNames('panel-collapse', {

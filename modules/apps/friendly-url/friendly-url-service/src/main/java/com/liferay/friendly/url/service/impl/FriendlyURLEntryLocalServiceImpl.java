@@ -205,10 +205,22 @@ public class FriendlyURLEntryLocalServiceImpl
 
 	@Override
 	public void deleteFriendlyURLEntry(
-			long groupId, Class<?> clazz, long classPK)
-		throws PortalException {
+		long groupId, Class<?> clazz, long classPK) {
 
-		long classNameId = classNameLocalService.getClassNameId(clazz);
+		deleteFriendlyURLEntry(
+			groupId, classNameLocalService.getClassNameId(clazz), classPK);
+	}
+
+	@Override
+	public void deleteFriendlyURLEntry(
+		long groupId, long classNameId, long classPK) {
+
+		FriendlyURLEntryMapping friendlyURLEntryMapping =
+			friendlyURLEntryMappingPersistence.fetchByC_C(classNameId, classPK);
+
+		if (friendlyURLEntryMapping == null) {
+			return;
+		}
 
 		List<FriendlyURLEntry> friendlyURLEntries =
 			friendlyURLEntryPersistence.findByG_C_C(
@@ -221,7 +233,7 @@ public class FriendlyURLEntryLocalServiceImpl
 			friendlyURLEntryPersistence.remove(friendlyURLEntry);
 		}
 
-		friendlyURLEntryMappingPersistence.removeByC_C(classNameId, classPK);
+		friendlyURLEntryMappingPersistence.remove(friendlyURLEntryMapping);
 	}
 
 	@Override

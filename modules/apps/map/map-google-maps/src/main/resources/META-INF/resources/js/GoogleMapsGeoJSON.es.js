@@ -19,6 +19,7 @@ import GeoJSONBase from 'map-common/js/GeoJSONBase.es';
  * @review
  */
 class GoogleMapsGeoJSON extends GeoJSONBase {
+
 	/**
 	 * Creates a new geojson parser using Google Map's API
 	 * @param  {Array} args List of arguments to be passed to State
@@ -42,7 +43,7 @@ class GoogleMapsGeoJSON extends GeoJSONBase {
 	 * @review
 	 */
 	destructor() {
-		this._eventHandlers.forEach(item => {
+		this._eventHandlers.forEach((item) => {
 			google.maps.event.removeListener(item);
 		});
 	}

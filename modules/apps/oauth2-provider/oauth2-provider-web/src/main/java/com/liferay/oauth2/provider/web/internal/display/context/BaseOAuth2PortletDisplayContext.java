@@ -143,6 +143,17 @@ public abstract class BaseOAuth2PortletDisplayContext {
 		}
 	}
 
+	protected BaseOAuth2PortletDisplayContext(
+		DLURLHelper dlURLHelper,
+		OAuth2ApplicationService oAuth2ApplicationService,
+		PortletRequest portletRequest, ThemeDisplay themeDisplay) {
+
+		this.dlURLHelper = dlURLHelper;
+		this.oAuth2ApplicationService = oAuth2ApplicationService;
+		this.portletRequest = portletRequest;
+		this.themeDisplay = themeDisplay;
+	}
+
 	protected DLURLHelper dlURLHelper;
 	protected OAuth2Application oAuth2Application;
 	protected OAuth2ApplicationService oAuth2ApplicationService;

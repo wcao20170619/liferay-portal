@@ -22,15 +22,19 @@
 	<p>A dropdown is a list of options related to the element that triggers it.</p>
 </blockquote>
 
-<div class="row">
-	<div class="col-md-2">
+<clay:row>
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-menu
 			dropdownItems="<%= dropdownsDisplayContext.getDefaultDropdownItems() %>"
 			label="Default"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<liferay-util:buffer
 			var="userSticker"
 		>
@@ -45,43 +49,53 @@
 			label="<%= userSticker %>"
 			showToggleIcon="<%= false %>"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-menu
 			dropdownItems="<%= dropdownsDisplayContext.getGroupDropdownItems() %>"
 			label="Dividers"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-menu
 			buttonLabel="Done"
 			dropdownItems="<%= dropdownsDisplayContext.getInputDropdownItems() %>"
 			label="Inputs"
 			searchable="<%= true %>"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-menu
 			dropdownItems="<%= dropdownsDisplayContext.getDefaultDropdownItems() %>"
 			icon="share"
 			label="Icon"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-menu
 			dropdownItems="<%= dropdownsDisplayContext.getIconDropdownItems() %>"
 			itemsIconAlignment="left"
 			label="Icons"
 		/>
-	</div>
-</div>
+	</clay:col>
+</clay:row>
 
-<div class="row">
-	<div class="col-md-4">
+<clay:row>
+	<clay:col
+		md="4"
+	>
 		<clay:dropdown-menu
 			dropdownItems="<%= dropdownsDisplayContext.getDefaultDropdownItems() %>"
 			itemsIconAlignment="left"
@@ -89,15 +103,19 @@
 			style="secondary"
 			triggerCssClasses="btn-outline-borderless"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-actions
 			dropdownItems="<%= dropdownsDisplayContext.getDefaultDropdownItems() %>"
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-actions
 			buttonLabel="More"
 			buttonStyle="secondary"
@@ -105,9 +123,11 @@
 			dropdownItems="<%= dropdownsDisplayContext.getDefaultDropdownItems() %>"
 			helpText="You can customize this menu or see all you have by pressing \"more\"."
 		/>
-	</div>
+	</clay:col>
 
-	<div class="col-md-2">
+	<clay:col
+		md="2"
+	>
 		<clay:dropdown-actions
 			buttonLabel="More"
 			buttonStyle="secondary"
@@ -116,5 +136,5 @@
 			helpText="You can customize this menu or see all you have by pressing \"more\"."
 			triggerCssClasses="btn-outline-borderless"
 		/>
-	</div>
-</div>
+	</clay:col>
+</clay:row>

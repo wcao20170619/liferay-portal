@@ -13,23 +13,19 @@
  */
 
 import ClayForm, {ClayInput} from '@clayui/form';
-import {useIsMounted} from 'frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
 
-import {useDebounceCallback} from '../../../core/hooks/useDebounceCallback';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 
 export const TextField = ({field, onValueSelect, value}) => {
-	const [currentValue, setCurrentValue] = useState(
-		value || field.defaultValue || ''
-	);
+	const initialValue = value || field.defaultValue || '';
+
+	const [currentValue, setCurrentValue] = useState(initialValue);
 	const [errorMessage, setErrorMessage] = useState('');
 
-	const isMounted = useIsMounted();
-
 	useEffect(() => {
-		setCurrentValue(currentValue => {
+		setCurrentValue((currentValue) => {
 			if (!currentValue || !value) {
 				return value || field.defaultValue || '';
 			}
@@ -42,26 +38,22 @@ export const TextField = ({field, onValueSelect, value}) => {
 		field.typeOptions
 	);
 
-	const selectValue = (target, name, isMounted, onValueSelect) => {
-		if (isMounted() && target.validity.valid) {
-			onValueSelect(name, target.value);
-		}
-	};
-
-	const [debouncedOnValueSelect] = useDebounceCallback(selectValue, 500);
-
 	return (
 		<ClayForm.Group className={errorMessage ? 'has-error' : ''}>
 			<label htmlFor={field.name}>{field.label}</label>
 
 			<ClayInput
 				id={field.name}
-				onBlur={event => {
+				onBlur={(event) => {
 					if (event.target.checkValidity()) {
 						setErrorMessage('');
+
+						if (currentValue !== initialValue) {
+							onValueSelect(field.name, currentValue);
+						}
 					}
 				}}
-				onChange={event => {
+				onChange={(event) => {
 					if (event.target.validity.valid) {
 						setErrorMessage('');
 					}
@@ -76,13 +68,6 @@ export const TextField = ({field, onValueSelect, value}) => {
 
 						setErrorMessage(validationErrorMessage);
 					}
-
-					debouncedOnValueSelect(
-						event.target,
-						field.name,
-						isMounted,
-						onValueSelect
-					);
 
 					setCurrentValue(event.target.value);
 				}}

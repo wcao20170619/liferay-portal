@@ -1,16 +1,16 @@
 {
 	"dependencies": {
-		"@clayui/button": "3.3.0",
-		"@clayui/form": "3.7.0",
-		"@clayui/modal": "3.4.0",
-		"@clayui/table": "4.0.0",
+		"@clayui/button": "3.3.1",
+		"@clayui/form": "3.7.1",
+		"@clayui/modal": "3.5.0",
+		"@clayui/table": "3.0.7",
 		"classnames": "2.2.6",
-		"clay-button": "2.21.0",
-		"clay-checkbox": "2.21.0",
-		"clay-dropdown": "2.21.0",
-		"clay-icon": "2.21.0",
-		"clay-label": "2.21.0",
-		"clay-radio": "2.21.0",
+		"clay-button": "2.21.2",
+		"clay-checkbox": "2.21.2",
+		"clay-dropdown": "2.21.2",
+		"clay-icon": "2.21.2",
+		"clay-label": "2.21.2",
+		"clay-radio": "2.21.2",
 		"frontend-editor-ckeditor-web": "*",
 		"frontend-js-web": "*",
 		"leaflet": "1.2.0",
@@ -23,6 +23,7 @@
 		"metal-soy": "2.16.8",
 		"moment": "^2.22.2",
 		"text-mask-addons": "^3.7.1",
+		"text-mask-core": "^5.1.2",
 		"vanilla-text-mask": "^5.0.1"
 	},
 	"jest": {
@@ -36,9 +37,7 @@
 			"Checkbox",
 			"DatePicker",
 			"FieldBase",
-			"Select",
 			"Tooltip",
-			"Validation",
 			"withContextMock"
 		]
 	},

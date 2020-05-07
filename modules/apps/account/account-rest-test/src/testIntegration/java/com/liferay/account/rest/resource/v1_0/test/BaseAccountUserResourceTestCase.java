@@ -29,8 +29,8 @@ import com.liferay.account.rest.client.pagination.Pagination;
 import com.liferay.account.rest.client.resource.v1_0.AccountUserResource;
 import com.liferay.account.rest.client.serdes.v1_0.AccountUserSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
+import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -47,10 +47,12 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -492,56 +494,39 @@ public abstract class BaseAccountUserResourceTestCase {
 	public void testGraphQLGetAccountUsersPage() throws Exception {
 		Long accountId = testGetAccountUsersPage_getAccountId();
 
-		List<GraphQLField> graphQLFields = new ArrayList<>();
-
-		List<GraphQLField> itemsGraphQLFields = getGraphQLFields();
-
-		graphQLFields.add(
-			new GraphQLField(
-				"items", itemsGraphQLFields.toArray(new GraphQLField[0])));
-
-		graphQLFields.add(new GraphQLField("page"));
-		graphQLFields.add(new GraphQLField("totalCount"));
-
 		GraphQLField graphQLField = new GraphQLField(
-			"query",
-			new GraphQLField(
-				"accountUsers",
-				new HashMap<String, Object>() {
-					{
-						put("page", 1);
-						put("pageSize", 2);
+			"accountUsers",
+			new HashMap<String, Object>() {
+				{
+					put("page", 1);
+					put("pageSize", 2);
 
-						put("accountId", accountId);
-					}
-				},
-				graphQLFields.toArray(new GraphQLField[0])));
+					put("accountId", accountId);
+				}
+			},
+			new GraphQLField("items", getGraphQLFields()),
+			new GraphQLField("page"), new GraphQLField("totalCount"));
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		JSONObject dataJSONObject = jsonObject.getJSONObject("data");
-
-		JSONObject accountUsersJSONObject = dataJSONObject.getJSONObject(
-			"accountUsers");
+		JSONObject accountUsersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/accountUsers");
 
 		Assert.assertEquals(0, accountUsersJSONObject.get("totalCount"));
 
 		AccountUser accountUser1 = testGraphQLAccountUser_addAccountUser();
 		AccountUser accountUser2 = testGraphQLAccountUser_addAccountUser();
 
-		jsonObject = JSONFactoryUtil.createJSONObject(
-			invoke(graphQLField.toString()));
-
-		dataJSONObject = jsonObject.getJSONObject("data");
-
-		accountUsersJSONObject = dataJSONObject.getJSONObject("accountUsers");
+		accountUsersJSONObject = JSONUtil.getValueAsJSONObject(
+			invokeGraphQLQuery(graphQLField), "JSONObject/data",
+			"JSONObject/accountUsers");
 
 		Assert.assertEquals(2, accountUsersJSONObject.get("totalCount"));
 
-		assertEqualsJSONArray(
+		assertEqualsIgnoringOrder(
 			Arrays.asList(accountUser1, accountUser2),
-			accountUsersJSONObject.getJSONArray("items"));
+			Arrays.asList(
+				AccountUserSerDes.toDTOs(
+					accountUsersJSONObject.getString("items"))));
 	}
 
 	@Test
@@ -562,6 +547,9 @@ public abstract class BaseAccountUserResourceTestCase {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
+
+	@Rule
+	public SearchTestRule searchTestRule = new SearchTestRule();
 
 	protected AccountUser testGraphQLAccountUser_addAccountUser()
 		throws Exception {
@@ -617,25 +605,6 @@ public abstract class BaseAccountUserResourceTestCase {
 
 			Assert.assertTrue(
 				accountUsers2 + " does not contain " + accountUser1, contains);
-		}
-	}
-
-	protected void assertEqualsJSONArray(
-		List<AccountUser> accountUsers, JSONArray jsonArray) {
-
-		for (AccountUser accountUser : accountUsers) {
-			boolean contains = false;
-
-			for (Object object : jsonArray) {
-				if (equalsJSONObject(accountUser, (JSONObject)object)) {
-					contains = true;
-
-					break;
-				}
-			}
-
-			Assert.assertTrue(
-				jsonArray + " does not contain " + accountUser, contains);
 		}
 	}
 
@@ -734,13 +703,49 @@ public abstract class BaseAccountUserResourceTestCase {
 		return new String[0];
 	}
 
-	protected List<GraphQLField> getGraphQLFields() {
+	protected List<GraphQLField> getGraphQLFields() throws Exception {
 		List<GraphQLField> graphQLFields = new ArrayList<>();
 
-		for (String additionalAssertFieldName :
-				getAdditionalAssertFieldNames()) {
+		for (Field field :
+				ReflectionUtil.getDeclaredFields(
+					com.liferay.account.rest.dto.v1_0.AccountUser.class)) {
 
-			graphQLFields.add(new GraphQLField(additionalAssertFieldName));
+			if (!ArrayUtil.contains(
+					getAdditionalAssertFieldNames(), field.getName())) {
+
+				continue;
+			}
+
+			graphQLFields.addAll(getGraphQLFields(field));
+		}
+
+		return graphQLFields;
+	}
+
+	protected List<GraphQLField> getGraphQLFields(Field... fields)
+		throws Exception {
+
+		List<GraphQLField> graphQLFields = new ArrayList<>();
+
+		for (Field field : fields) {
+			com.liferay.portal.vulcan.graphql.annotation.GraphQLField
+				vulcanGraphQLField = field.getAnnotation(
+					com.liferay.portal.vulcan.graphql.annotation.GraphQLField.
+						class);
+
+			if (vulcanGraphQLField != null) {
+				Class<?> clazz = field.getType();
+
+				if (clazz.isArray()) {
+					clazz = clazz.getComponentType();
+				}
+
+				List<GraphQLField> childrenGraphQLFields = getGraphQLFields(
+					ReflectionUtil.getDeclaredFields(clazz));
+
+				graphQLFields.add(
+					new GraphQLField(field.getName(), childrenGraphQLFields));
+			}
 		}
 
 		return graphQLFields;
@@ -872,104 +877,6 @@ public abstract class BaseAccountUserResourceTestCase {
 					return false;
 				}
 			}
-		}
-
-		return true;
-	}
-
-	protected boolean equalsJSONObject(
-		AccountUser accountUser, JSONObject jsonObject) {
-
-		for (String fieldName : getAdditionalAssertFieldNames()) {
-			if (Objects.equals("emailAddress", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getEmailAddress(),
-						jsonObject.getString("emailAddress"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("firstName", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getFirstName(),
-						jsonObject.getString("firstName"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("id", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getId(), jsonObject.getLong("id"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("lastName", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getLastName(),
-						jsonObject.getString("lastName"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("middleName", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getMiddleName(),
-						jsonObject.getString("middleName"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("prefix", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getPrefix(),
-						jsonObject.getString("prefix"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("screenName", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getScreenName(),
-						jsonObject.getString("screenName"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("suffix", fieldName)) {
-				if (!Objects.deepEquals(
-						accountUser.getSuffix(),
-						jsonObject.getString("suffix"))) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			throw new IllegalArgumentException(
-				"Invalid field name " + fieldName);
 		}
 
 		return true;
@@ -1107,6 +1014,26 @@ public abstract class BaseAccountUserResourceTestCase {
 		return httpResponse.getContent();
 	}
 
+	protected JSONObject invokeGraphQLMutation(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField mutationGraphQLField = new GraphQLField(
+			"mutation", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(mutationGraphQLField.toString()));
+	}
+
+	protected JSONObject invokeGraphQLQuery(GraphQLField graphQLField)
+		throws Exception {
+
+		GraphQLField queryGraphQLField = new GraphQLField(
+			"query", graphQLField);
+
+		return JSONFactoryUtil.createJSONObject(
+			invoke(queryGraphQLField.toString()));
+	}
+
 	protected AccountUser randomAccountUser() throws Exception {
 		return new AccountUser() {
 			{
@@ -1149,9 +1076,22 @@ public abstract class BaseAccountUserResourceTestCase {
 			this(key, new HashMap<>(), graphQLFields);
 		}
 
+		public GraphQLField(String key, List<GraphQLField> graphQLFields) {
+			this(key, new HashMap<>(), graphQLFields);
+		}
+
 		public GraphQLField(
 			String key, Map<String, Object> parameterMap,
 			GraphQLField... graphQLFields) {
+
+			_key = key;
+			_parameterMap = parameterMap;
+			_graphQLFields = Arrays.asList(graphQLFields);
+		}
+
+		public GraphQLField(
+			String key, Map<String, Object> parameterMap,
+			List<GraphQLField> graphQLFields) {
 
 			_key = key;
 			_parameterMap = parameterMap;
@@ -1179,7 +1119,7 @@ public abstract class BaseAccountUserResourceTestCase {
 				sb.append(")");
 			}
 
-			if (_graphQLFields.length > 0) {
+			if (!_graphQLFields.isEmpty()) {
 				sb.append("{");
 
 				for (GraphQLField graphQLField : _graphQLFields) {
@@ -1195,7 +1135,7 @@ public abstract class BaseAccountUserResourceTestCase {
 			return sb.toString();
 		}
 
-		private final GraphQLField[] _graphQLFields;
+		private final List<GraphQLField> _graphQLFields;
 		private final String _key;
 		private final Map<String, Object> _parameterMap;
 

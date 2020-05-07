@@ -19,6 +19,8 @@ import com.liferay.dynamic.data.mapping.demo.data.creator.DDMFormInstanceRecordD
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
+import com.liferay.portal.background.task.constants.BackgroundTaskContextMapConstants;
+import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener;
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -27,10 +29,11 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.security.RandomUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
@@ -39,8 +42,11 @@ import com.liferay.portal.workflow.kaleo.demo.data.creator.WorkflowDefinitionLin
 import com.liferay.portal.workflow.kaleo.demo.data.creator.WorkflowInstanceDemoDataCreator;
 import com.liferay.portal.workflow.kaleo.demo.data.creator.WorkflowTaskDemoDataCreator;
 import com.liferay.portal.workflow.metrics.demo.data.creator.WorkflowMetricsSLADefinitionDemoDataCreator;
+import com.liferay.portal.workflow.metrics.search.background.task.WorkflowMetricsBackgroundTaskExecutorNames;
 import com.liferay.users.admin.demo.data.creator.OmniAdminUserDemoDataCreator;
 import com.liferay.users.admin.demo.data.creator.SiteMemberUserDemoDataCreator;
+
+import java.io.Serializable;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -232,8 +238,18 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 				_toDate(completionLocalDateTime));
 		}
 
-		_slaWorkflowMetricsIndexer.reindex(
-			new String[] {String.valueOf(company.getCompanyId())});
+		_backgroundTaskLocalService.addBackgroundTask(
+			omniAdminUser.getUserId(), group.getGroupId(),
+			WorkflowMetricsDemo.class.getSimpleName(),
+			WorkflowMetricsBackgroundTaskExecutorNames.
+				WORKFLOW_METRICS_REINDEX_BACKGROUND_TASK_EXECUTOR,
+			HashMapBuilder.<String, Serializable>put(
+				BackgroundTaskContextMapConstants.DELETE_ON_SUCCESS, true
+			).put(
+				"workflow.metrics.index.entity.names",
+				new String[] {"sla-instance-result", "sla-task-result"}
+			).build(),
+			new ServiceContext());
 	}
 
 	@Deactivate
@@ -250,7 +266,7 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 		_omniAdminUserDemoDataCreator.delete();
 	}
 
-	@Reference(target = ModuleServiceLifecycle.PORTAL_INITIALIZED, unbind = "-")
+	@Reference(target = ModuleServiceLifecycle.SYSTEM_CHECK, unbind = "-")
 	protected void setModuleServiceLifecycle(
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
@@ -354,6 +370,9 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 	}
 
 	@Reference
+	private BackgroundTaskLocalService _backgroundTaskLocalService;
+
+	@Reference
 	private DDMFormInstanceDemoDataCreator _ddmFormInstanceDemoDataCreator;
 
 	@Reference
@@ -371,11 +390,6 @@ public class WorkflowMetricsDemo extends BasePortalInstanceLifecycleListener {
 
 	@Reference
 	private SiteMemberUserDemoDataCreator _siteMemberUserDemoDataCreator;
-
-	@Reference(
-		target = "(&(objectClass=com.liferay.portal.workflow.metrics.internal.search.SLAWorkflowMetricsIndexer))"
-	)
-	private Indexer<Object> _slaWorkflowMetricsIndexer;
 
 	@Reference
 	private WorkflowDefinitionDemoDataCreator

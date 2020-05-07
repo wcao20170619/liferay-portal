@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-notice',
-	A => {
+	(A) => {
 		var ADOM = A.DOM;
 		var ANode = A.Node;
 		var Do = A.Do;
@@ -33,7 +33,7 @@ AUI.add(
 		var STR_SHOW = 'show';
 
 		/**
-		 * @deprecated
+		 * @deprecated As of Wilberforce (7.0.x)
 		 *
 		 * OPTIONS
 		 *
@@ -53,7 +53,7 @@ AUI.add(
 		 * onClose {function}: Called when the toolbar is closed.
 		 */
 
-		var Notice = function(options) {
+		var Notice = function (options) {
 			var instance = this;
 
 			options = options || {};
@@ -284,7 +284,7 @@ AUI.add(
 					notice.html(content);
 				}
 
-				instance._noticeClass.split(' ').forEach(item => {
+				instance._noticeClass.split(' ').forEach((item) => {
 					notice.addClass(item);
 				});
 

@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchFormInstanceReportException;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceReport;
+import com.liferay.dynamic.data.mapping.model.DDMFormInstanceReportTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceReportImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceReportModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMFormInstanceReportPersistence;
@@ -316,16 +317,18 @@ public class DDMFormInstanceReportPersistenceImpl
 		"ddmFormInstanceReport.formInstanceId = ?";
 
 	public DDMFormInstanceReportPersistenceImpl() {
-		setModelClass(DDMFormInstanceReport.class);
-
-		setModelImplClass(DDMFormInstanceReportImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("data", "data_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMFormInstanceReport.class);
+
+		setModelImplClass(DDMFormInstanceReportImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMFormInstanceReportTable.INSTANCE);
 	}
 
 	/**

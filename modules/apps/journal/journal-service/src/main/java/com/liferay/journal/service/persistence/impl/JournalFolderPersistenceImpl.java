@@ -16,6 +16,7 @@ package com.liferay.journal.service.persistence.impl;
 
 import com.liferay.journal.exception.NoSuchFolderException;
 import com.liferay.journal.model.JournalFolder;
+import com.liferay.journal.model.JournalFolderTable;
 import com.liferay.journal.model.impl.JournalFolderImpl;
 import com.liferay.journal.model.impl.JournalFolderModelImpl;
 import com.liferay.journal.service.persistence.JournalFolderPersistence;
@@ -7560,16 +7561,18 @@ public class JournalFolderPersistenceImpl
 		"journalFolder.status != ?";
 
 	public JournalFolderPersistenceImpl() {
-		setModelClass(JournalFolder.class);
-
-		setModelImplClass(JournalFolderImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(JournalFolder.class);
+
+		setModelImplClass(JournalFolderImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(JournalFolderTable.INSTANCE);
 	}
 
 	/**

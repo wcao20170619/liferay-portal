@@ -17,7 +17,6 @@ package com.liferay.gradle.plugins.workspace.configurators;
 import com.liferay.ant.bnd.metatype.MetatypePlugin;
 import com.liferay.gradle.plugins.JspCDefaultsPlugin;
 import com.liferay.gradle.plugins.LiferayOSGiPlugin;
-import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.LiferayOSGiExtension;
 import com.liferay.gradle.plugins.service.builder.ServiceBuilderPlugin;
 import com.liferay.gradle.plugins.test.integration.TestIntegrationBasePlugin;
@@ -182,7 +181,7 @@ public class ModulesProjectConfigurator extends BaseProjectConfigurator {
 		final WorkspaceExtension workspaceExtension = _getWorkspaceExtension(
 			project);
 
-		_configureLiferay(project, workspaceExtension);
+		configureLiferay(project, workspaceExtension);
 
 		project.afterEvaluate(
 			new Action<Project>() {
@@ -288,15 +287,6 @@ public class ModulesProjectConfigurator extends BaseProjectConfigurator {
 		SourceSetOutput sourceSetOutput = sourceSet.getOutput();
 
 		return sourceSetOutput.getResourcesDir();
-	}
-
-	private void _configureLiferay(
-		Project project, WorkspaceExtension workspaceExtension) {
-
-		LiferayExtension liferayExtension = GradleUtil.getExtension(
-			project, LiferayExtension.class);
-
-		liferayExtension.setAppServerParentDir(workspaceExtension.getHomeDir());
 	}
 
 	private void _configureLiferayOSGi(Project project) {

@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchCategoryException;
 import com.liferay.message.boards.model.MBCategory;
+import com.liferay.message.boards.model.MBCategoryTable;
 import com.liferay.message.boards.model.impl.MBCategoryImpl;
 import com.liferay.message.boards.model.impl.MBCategoryModelImpl;
 import com.liferay.message.boards.service.persistence.MBCategoryPersistence;
@@ -11433,16 +11434,18 @@ public class MBCategoryPersistenceImpl
 		"mbCategory.status = ?";
 
 	public MBCategoryPersistenceImpl() {
-		setModelClass(MBCategory.class);
-
-		setModelImplClass(MBCategoryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBCategory.class);
+
+		setModelImplClass(MBCategoryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBCategoryTable.INSTANCE);
 	}
 
 	/**

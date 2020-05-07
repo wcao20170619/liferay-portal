@@ -34,6 +34,7 @@ import com.liferay.portlet.social.model.impl.SocialActivityCounterImpl;
 import com.liferay.portlet.social.model.impl.SocialActivityCounterModelImpl;
 import com.liferay.social.kernel.exception.NoSuchActivityCounterException;
 import com.liferay.social.kernel.model.SocialActivityCounter;
+import com.liferay.social.kernel.model.SocialActivityCounterTable;
 import com.liferay.social.kernel.service.persistence.SocialActivityCounterPersistence;
 
 import java.io.Serializable;
@@ -2484,6 +2485,12 @@ public class SocialActivityCounterPersistenceImpl
 		"socialActivityCounter.endPeriod = ?";
 
 	public SocialActivityCounterPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("active", "active_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(SocialActivityCounter.class);
 
 		setModelImplClass(SocialActivityCounterImpl.class);
@@ -2491,11 +2498,7 @@ public class SocialActivityCounterPersistenceImpl
 		setEntityCacheEnabled(
 			SocialActivityCounterModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("active", "active_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(SocialActivityCounterTable.INSTANCE);
 	}
 
 	/**

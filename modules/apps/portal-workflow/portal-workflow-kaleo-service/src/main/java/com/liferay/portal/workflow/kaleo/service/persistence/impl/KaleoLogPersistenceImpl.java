@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchLogException;
 import com.liferay.portal.workflow.kaleo.model.KaleoLog;
+import com.liferay.portal.workflow.kaleo.model.KaleoLogTable;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoLogImpl;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoLogModelImpl;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoLogPersistence;
@@ -3451,17 +3452,19 @@ public class KaleoLogPersistenceImpl
 		"(kaleoLog.type IS NULL OR kaleoLog.type = '')";
 
 	public KaleoLogPersistenceImpl() {
-		setModelClass(KaleoLog.class);
-
-		setModelImplClass(KaleoLogImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 		dbColumnNames.put("comment", "comment_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(KaleoLog.class);
+
+		setModelImplClass(KaleoLogImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(KaleoLogTable.INSTANCE);
 	}
 
 	/**

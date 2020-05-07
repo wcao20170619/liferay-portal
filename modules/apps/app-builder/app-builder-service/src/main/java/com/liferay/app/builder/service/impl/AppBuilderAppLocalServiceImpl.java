@@ -146,6 +146,20 @@ public class AppBuilderAppLocalServiceImpl
 			groupId, companyId, ddmStructureId);
 	}
 
+	@Override
+	public List<AppBuilderApp> getCompanyAppBuilderApps(
+		long companyId, int start, int end,
+		OrderByComparator<AppBuilderApp> orderByComparator) {
+
+		return appBuilderAppPersistence.findByCompanyId(
+			companyId, start, end, orderByComparator);
+	}
+
+	@Override
+	public int getCompanyAppBuilderAppsCount(long companyId) {
+		return appBuilderAppPersistence.countByCompanyId(companyId);
+	}
+
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public AppBuilderApp updateAppBuilderApp(

@@ -18,6 +18,7 @@ import com.liferay.asset.auto.tagger.model.AssetAutoTaggerEntry;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.petra.function.UnsafeFunction;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -80,6 +81,10 @@ public interface AssetAutoTaggerEntryLocalService
 	public AssetAutoTaggerEntry addAssetAutoTaggerEntry(
 		AssetEntry assetEntry, AssetTag assetTag);
 
+	public AssetAutoTaggerEntry addAssetAutoTaggerEntry(
+			AssetEntry assetEntry, String assetTagName)
+		throws PortalException;
+
 	/**
 	 * Creates a new asset auto tagger entry with the primary key. Does not add the asset auto tagger entry to the database.
 	 *
@@ -124,6 +129,8 @@ public interface AssetAutoTaggerEntryLocalService
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
+
+	public <T> T dslQuery(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();

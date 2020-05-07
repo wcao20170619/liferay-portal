@@ -15,6 +15,7 @@
 package com.liferay.redirect.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -89,6 +90,8 @@ public interface RedirectEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public RedirectEntry addRedirectEntry(RedirectEntry redirectEntry);
 
+	public boolean checkRedirectionChain(long groupId, String destinationURL);
+
 	/**
 	 * @throws PortalException
 	 */
@@ -130,6 +133,8 @@ public interface RedirectEntryLocalService
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	public RedirectEntry deleteRedirectEntry(RedirectEntry redirectEntry);
+
+	public <T> T dslQuery(DSLQuery dslQuery);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
@@ -260,6 +265,10 @@ public interface RedirectEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<RedirectEntry> getRedirectEntries(
 		long groupId, int start, int end, OrderByComparator<RedirectEntry> obc);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<RedirectEntry> getRedirectEntriesByGroupIdAndDestinationURL(
+		long groupId, String destinationURL);
 
 	/**
 	 * Returns all the redirect entries matching the UUID and company.

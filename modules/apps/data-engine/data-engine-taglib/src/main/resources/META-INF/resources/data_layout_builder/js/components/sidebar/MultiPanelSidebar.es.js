@@ -32,9 +32,13 @@ const {Suspense, useCallback, useContext, useEffect} = React;
  * Failure to preload is a non-critical failure, so we'll use this to swallow
  * rejected promises silently.
  */
-const swallow = [value => value, _error => undefined];
+const swallow = [(value) => value, (_error) => undefined];
 
-export default function MultiPanelSidebar({panels, sidebarPanels}) {
+export default function MultiPanelSidebar({
+	panels,
+	sidebarPanels,
+	variant = 'dark',
+}) {
 	const [{sidebarOpen, sidebarPanelId}, dispatch] = useContext(AppContext);
 	const [hasError, setHasError] = useStateSafe(false);
 	const isMounted = useIsMounted();
@@ -117,7 +121,7 @@ export default function MultiPanelSidebar({panels, sidebarPanels}) {
 		}, [])
 	);
 
-	const handleClick = panel => {
+	const handleClick = (panel) => {
 		const open =
 			panel.sidebarPanelId === sidebarPanelId ? !sidebarOpen : true;
 		const productMenuToggle = document.querySelector(
@@ -143,7 +147,7 @@ export default function MultiPanelSidebar({panels, sidebarPanels}) {
 		}
 
 		if (registerPanel) {
-			registerPanel.then(plugin => {
+			registerPanel.then((plugin) => {
 				if (
 					plugin &&
 					typeof plugin.activate === 'function' &&
@@ -160,11 +164,16 @@ export default function MultiPanelSidebar({panels, sidebarPanels}) {
 
 	return (
 		<ClayTooltipProvider>
-			<div className="multi-panel-sidebar">
-				<nav className="multi-panel-sidebar__buttons tbar tbar-light tbar-stacked">
+			<div
+				className={classNames(
+					'multi-panel-sidebar',
+					`multi-panel-sidebar-${variant}`
+				)}
+			>
+				<nav className="multi-panel-sidebar-buttons tbar tbar-stacked">
 					<ul className="tbar-nav">
 						{panels.reduce((elements, group, groupIndex) => {
-							const buttons = group.map(panelId => {
+							const buttons = group.map((panelId) => {
 								const panel = sidebarPanels[panelId];
 
 								const active =
@@ -233,9 +242,8 @@ export default function MultiPanelSidebar({panels, sidebarPanels}) {
 					</ul>
 				</nav>
 				<div
-					className={classNames({
-						'multi-panel-sidebar__content': true,
-						'multi-panel-sidebar__content--open': sidebarOpen,
+					className={classNames('multi-panel-sidebar-content', {
+						'multi-panel-sidebar-content-open': sidebarOpen,
 					})}
 				>
 					{hasError ? (

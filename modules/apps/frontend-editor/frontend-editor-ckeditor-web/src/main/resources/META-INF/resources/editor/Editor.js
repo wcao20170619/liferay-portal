@@ -17,9 +17,9 @@ import React from 'react';
 
 const BASEPATH = '/o/frontend-editor-ckeditor-web/ckeditor/';
 
-const Editor = props => {
-	return <CKEditor {...props} />;
-};
+const Editor = React.forwardRef((props, ref) => {
+	return <CKEditor ref={ref} {...props} />;
+});
 
 CKEditor.editorUrl = `${BASEPATH}ckeditor.js`;
 window.CKEDITOR_BASEPATH = BASEPATH;

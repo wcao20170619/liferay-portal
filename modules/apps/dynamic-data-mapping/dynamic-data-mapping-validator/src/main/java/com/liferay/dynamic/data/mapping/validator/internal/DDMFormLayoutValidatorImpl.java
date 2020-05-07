@@ -28,9 +28,12 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormLayoutValidationExcepti
 import com.liferay.dynamic.data.mapping.validator.DDMFormLayoutValidator;
 import com.liferay.portal.kernel.util.SetUtil;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -62,33 +65,66 @@ public class DDMFormLayoutValidatorImpl implements DDMFormLayoutValidator {
 		}
 	}
 
+	private Stream<String> _getDDMFormFieldNamesStream(
+		DDMFormLayoutColumn ddmFormLayoutColumn) {
+
+		List<String> ddmFormFieldNames =
+			ddmFormLayoutColumn.getDDMFormFieldNames();
+
+		return ddmFormFieldNames.stream();
+	}
+
+	private Stream<DDMFormLayoutColumn> _getDDMFormLayoutColumnStream(
+		DDMFormLayoutRow ddmFormLayoutRow) {
+
+		List<DDMFormLayoutColumn> ddmFormLayoutColumns =
+			ddmFormLayoutRow.getDDMFormLayoutColumns();
+
+		return ddmFormLayoutColumns.stream();
+	}
+
+	private Stream<DDMFormLayoutRow> _getDDMFormLayoutRowStream(
+		DDMFormLayoutPage ddmFormLayoutPage) {
+
+		List<DDMFormLayoutRow> ddmFormLayoutRows =
+			ddmFormLayoutPage.getDDMFormLayoutRows();
+
+		return ddmFormLayoutRows.stream();
+	}
+
 	private void _validateDDMFormFieldNames(DDMFormLayout ddmFormLayout)
 		throws DDMFormLayoutValidationException {
 
-		Set<String> ddmFormFieldNames = new HashSet<>();
+		List<DDMFormLayoutPage> ddmFormLayoutPages =
+			ddmFormLayout.getDDMFormLayoutPages();
 
-		for (DDMFormLayoutPage ddmFormLayoutPage :
-				ddmFormLayout.getDDMFormLayoutPages()) {
+		Stream<DDMFormLayoutPage> stream = ddmFormLayoutPages.stream();
 
-			for (DDMFormLayoutRow ddmFormLayoutRow :
-					ddmFormLayoutPage.getDDMFormLayoutRows()) {
+		Map<String, Long> ddmFormFieldNamesCount = stream.flatMap(
+			this::_getDDMFormLayoutRowStream
+		).flatMap(
+			this::_getDDMFormLayoutColumnStream
+		).flatMap(
+			this::_getDDMFormFieldNamesStream
+		).collect(
+			Collectors.groupingBy(String::valueOf, Collectors.counting())
+		);
 
-				for (DDMFormLayoutColumn ddmFormLayoutColumn :
-						ddmFormLayoutRow.getDDMFormLayoutColumns()) {
+		Set<Map.Entry<String, Long>> entrySet =
+			ddmFormFieldNamesCount.entrySet();
 
-					Set<String> intersectDDMFormFieldNames = SetUtil.intersect(
-						ddmFormFieldNames,
-						ddmFormLayoutColumn.getDDMFormFieldNames());
+		Stream<Map.Entry<String, Long>> entrySetStream = entrySet.stream();
 
-					if (!intersectDDMFormFieldNames.isEmpty()) {
-						throw new MustNotDuplicateFieldName(
-							intersectDDMFormFieldNames);
-					}
+		Set<String> duplicatedFieldNames = entrySetStream.filter(
+			entry -> entry.getValue() > 1
+		).map(
+			Map.Entry::getKey
+		).collect(
+			Collectors.toSet()
+		);
 
-					ddmFormFieldNames.addAll(
-						ddmFormLayoutColumn.getDDMFormFieldNames());
-				}
-			}
+		if (SetUtil.isNotEmpty(duplicatedFieldNames)) {
+			throw new MustNotDuplicateFieldName(duplicatedFieldNames);
 		}
 	}
 

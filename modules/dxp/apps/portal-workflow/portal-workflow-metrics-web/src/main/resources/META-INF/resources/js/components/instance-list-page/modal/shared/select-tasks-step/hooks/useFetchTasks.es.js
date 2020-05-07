@@ -31,7 +31,7 @@ const useFetchTasks = (options = {}) => {
 		filterState,
 		filterValues: {
 			bulkAssigneeIds: userIds = [],
-			bulkTaskKeys: workflowTaskNames,
+			bulkTaskNames: workflowTaskNames,
 		},
 	} = useFilter({withoutRouteParams: true});
 	const {selectAll, selectedItems} = useContext(InstanceListContext);
@@ -41,7 +41,7 @@ const useFetchTasks = (options = {}) => {
 		dispatch({
 			...filterState,
 			bulkAssigneeIds: [],
-			bulkTaskKeys: [],
+			bulkTaskNames: [],
 		});
 	}, [dispatch, filterState]);
 
@@ -52,7 +52,7 @@ const useFetchTasks = (options = {}) => {
 
 		const assignees = !unassigned ? [userId] : [];
 		const assigneeIds = userIds.length
-			? userIds.filter(id => id !== '-1')
+			? userIds.filter((id) => id !== '-1')
 			: assignees;
 
 		const body = {

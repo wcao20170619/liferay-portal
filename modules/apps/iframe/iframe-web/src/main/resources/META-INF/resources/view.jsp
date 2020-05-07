@@ -36,7 +36,7 @@
 		Liferay.provide(
 			window,
 			'<portlet:namespace />init',
-			function() {
+			function () {
 				var A = AUI();
 
 				var hash = document.location.hash.replace('#', '');
@@ -73,7 +73,7 @@
 		Liferay.provide(
 			window,
 			'<portlet:namespace />monitorIframe',
-			function() {
+			function () {
 				var A = AUI();
 
 				var url = null;
@@ -116,7 +116,7 @@
 		Liferay.provide(
 			window,
 			'<portlet:namespace />updateHash',
-			function(url) {
+			function (url) {
 				var A = AUI();
 
 				var hash = document.location.hash.replace('#', '');
@@ -164,14 +164,14 @@
 	if (iframe) {
 		iframe.set(
 			'src',
-			'<%= HtmlUtil.escapeHREF(iFrameDisplayContext.getIframeSrc()) %>'
+			'<%= HtmlUtil.escapeJS(iFrameDisplayContext.getIframeSrc()) %>'
 		);
 
 		iframe.plug(A.Plugin.AutosizeIframe, {
 			monitorHeight: <%= iFramePortletInstanceConfiguration.resizeAutomatically() %>,
 		});
 
-		iframe.on('load', function() {
+		iframe.on('load', function () {
 			var height = A.Plugin.AutosizeIframe.getContentHeight(iframe);
 
 			if (height == null) {
@@ -204,7 +204,7 @@
 		);
 
 		Liferay.Util.fetch(
-			'<%= HtmlUtil.escapeHREF(iFrameDisplayContext.getIframeSrc()) %>',
+			'<%= HtmlUtil.escapeJS(iFrameDisplayContext.getIframeSrc()) %>',
 			{
 				headers: headers,
 				mode: 'no-cors',

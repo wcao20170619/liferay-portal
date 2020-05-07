@@ -14,7 +14,7 @@
 
 AUI.add(
 	'liferay-logo-selector',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var DELETE_LOGO = 'DELETE_LOGO';
@@ -35,7 +35,7 @@ AUI.add(
 
 				editLogoFn: {
 					setter(value) {
-						var fn = function() {};
+						var fn = function () {};
 
 						if (Lang.isFunction(window[value])) {
 							fn = window[value] || fn;
@@ -75,6 +75,8 @@ AUI.add(
 			prototype: {
 				_changeLogo(url, fileEntryId) {
 					var instance = this;
+
+					url = Liferay.Util.addParams('t=' + Date.now(), url);
 
 					instance.set('logoURL', url);
 

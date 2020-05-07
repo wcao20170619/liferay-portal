@@ -16,6 +16,7 @@ package com.liferay.fragment.collection.contributor.navigation.bars;
 
 import com.liferay.fragment.contributor.BaseFragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
+import com.liferay.fragment.contributor.PortletAliasRegistration;
 
 import javax.servlet.ServletContext;
 
@@ -43,9 +44,9 @@ public class NavigationBarsFragmentCollectionContributor
 	}
 
 	@Reference(
-		target = "(osgi.web.symbolicname=com.liferay.site.navigation.menu.web)"
+		target = "(com.liferay.fragment.entry.processor.portlet.alias=nav)"
 	)
-	private ServletContext _portletServletContext;
+	private PortletAliasRegistration _portletAliasRegistration;
 
 	@Reference(
 		target = "(osgi.web.symbolicname=com.liferay.fragment.collection.contributor.navigation.bars)"

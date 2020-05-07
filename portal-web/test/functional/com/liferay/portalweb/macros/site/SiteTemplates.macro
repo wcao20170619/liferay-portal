@@ -30,6 +30,8 @@ definition {
 	}
 
 	macro addCP {
+		SiteTemplatesNavigator.openSiteTemplatesAdmin();
+
 		LexiconEntry.gotoAdd();
 
 		PortletEntry.inputName(name = "${siteTemplateName}");
@@ -51,6 +53,8 @@ definition {
 	}
 
 	macro addSitePageViaSiteTemplateCP {
+		SiteTemplatesNavigator.openSiteTemplatesAdmin();
+
 		LexiconEntry.gotoEntryMenuItem(
 			menuItem = "Manage",
 			rowEntry = "${siteTemplateName}");

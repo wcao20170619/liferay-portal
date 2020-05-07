@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchContentException;
 import com.liferay.dynamic.data.mapping.model.DDMContent;
+import com.liferay.dynamic.data.mapping.model.DDMContentTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMContentImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMContentModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMContentPersistence;
@@ -2465,17 +2466,19 @@ public class DDMContentPersistenceImpl
 		"ddmContent.companyId = ?";
 
 	public DDMContentPersistenceImpl() {
-		setModelClass(DDMContent.class);
-
-		setModelImplClass(DDMContentImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("data", "data_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMContent.class);
+
+		setModelImplClass(DDMContentImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMContentTable.INSTANCE);
 	}
 
 	/**

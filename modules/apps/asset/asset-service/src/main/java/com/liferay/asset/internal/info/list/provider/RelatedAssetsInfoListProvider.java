@@ -15,22 +15,21 @@
 package com.liferay.asset.internal.info.list.provider;
 
 import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.model.AssetLink;
-import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
-import com.liferay.asset.kernel.service.AssetLinkLocalService;
+import com.liferay.asset.kernel.service.AssetEntryService;
+import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.info.list.provider.InfoListProvider;
 import com.liferay.info.list.provider.InfoListProviderContext;
 import com.liferay.info.pagination.Pagination;
 import com.liferay.info.sort.Sort;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,24 +43,13 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = InfoListProvider.class)
 public class RelatedAssetsInfoListProvider
-	implements InfoListProvider<AssetEntry> {
+	extends BaseAssetsInfoListProvider implements InfoListProvider<AssetEntry> {
 
 	@Override
 	public List<AssetEntry> getInfoList(
 		InfoListProviderContext infoListProviderContext) {
 
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		long assetEntryId = _getLayoutAssetEntryId(serviceContext.getRequest());
-
-		Company company = infoListProviderContext.getCompany();
-
-		List<AssetLink> directAssetLinks =
-			_assetLinkLocalService.getDirectLinks(assetEntryId, true);
-
-		return _toAssetEntry(
-			assetEntryId, company.getCompanyId(), directAssetLinks);
+		return getInfoList(infoListProviderContext, null, null);
 	}
 
 	@Override
@@ -69,19 +57,50 @@ public class RelatedAssetsInfoListProvider
 		InfoListProviderContext infoListProviderContext, Pagination pagination,
 		Sort sort) {
 
-		List<AssetEntry> assetEntries = getInfoList(infoListProviderContext);
+		long assetEntryId = _getLayoutAssetEntryId();
 
-		return ListUtil.subList(
-			assetEntries, pagination.getStart(), pagination.getEnd());
+		if (assetEntryId == 0) {
+			return Collections.emptyList();
+		}
+
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			infoListProviderContext, Field.MODIFIED_DATE, "DESC", pagination);
+
+		assetEntryQuery.setLinkedAssetEntryId(assetEntryId);
+
+		try {
+			return _assetEntryService.getEntries(assetEntryQuery);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to get asset entries", exception);
+		}
+
+		return Collections.emptyList();
 	}
 
 	@Override
 	public int getInfoListCount(
 		InfoListProviderContext infoListProviderContext) {
 
-		List<AssetEntry> assetEntries = getInfoList(infoListProviderContext);
+		long assetEntryId = _getLayoutAssetEntryId();
 
-		return assetEntries.size();
+		if (assetEntryId == 0) {
+			return 0;
+		}
+
+		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
+			infoListProviderContext, Field.MODIFIED_DATE, "DESC", null);
+
+		assetEntryQuery.setLinkedAssetEntryId(assetEntryId);
+
+		try {
+			return _assetEntryService.getEntriesCount(assetEntryQuery);
+		}
+		catch (Exception exception) {
+			_log.error("Unable to get asset entries count", exception);
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -89,15 +108,12 @@ public class RelatedAssetsInfoListProvider
 		return LanguageUtil.get(locale, "related-assets");
 	}
 
-	private AssetEntry _getAssetEntry(long assetEntryId, AssetLink assetLink) {
-		if ((assetEntryId > 0) || (assetLink.getEntryId1() == assetEntryId)) {
-			return _assetEntryLocalService.fetchEntry(assetLink.getEntryId2());
-		}
+	private long _getLayoutAssetEntryId() {
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
 
-		return _assetEntryLocalService.fetchEntry(assetLink.getEntryId1());
-	}
+		HttpServletRequest httpServletRequest = serviceContext.getRequest();
 
-	private long _getLayoutAssetEntryId(HttpServletRequest httpServletRequest) {
 		AssetEntry layoutAssetEntry =
 			(AssetEntry)httpServletRequest.getAttribute(
 				WebKeys.LAYOUT_ASSET_ENTRY);
@@ -109,29 +125,10 @@ public class RelatedAssetsInfoListProvider
 		return 0;
 	}
 
-	private List<AssetEntry> _toAssetEntry(
-		long assetEntryId, long companyId, List<AssetLink> directAssetLinks) {
-
-		List<AssetEntry> assetEntries = new ArrayList<>();
-
-		for (AssetLink assetLink : directAssetLinks) {
-			AssetEntry assetEntry = _getAssetEntry(assetEntryId, assetLink);
-
-			AssetRendererFactory<?> assetRendererFactory =
-				assetEntry.getAssetRendererFactory();
-
-			if (assetRendererFactory.isActive(companyId)) {
-				assetEntries.add(assetEntry);
-			}
-		}
-
-		return assetEntries;
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		RelatedAssetsInfoListProvider.class);
 
 	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
-
-	@Reference
-	private AssetLinkLocalService _assetLinkLocalService;
+	private AssetEntryService _assetEntryService;
 
 }

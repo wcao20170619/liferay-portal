@@ -100,11 +100,12 @@ class EventQueue {
 	 * @returns {AnalyticsMessage}
 	 */
 	_createMessage({context, events, userId}) {
-		const {channelId, dataSourceId} = this.analyticsInstance.config;
+		const {channelId, ...updatedContext} = context;
+		const {dataSourceId} = this.analyticsInstance.config;
 
 		return {
 			channelId,
-			context,
+			context: updatedContext,
 			dataSourceId,
 			events,
 			id: uuidv4(),
@@ -159,7 +160,7 @@ class EventQueue {
 
 		const lock = new ProcessLock();
 
-		lock.acquireLock(this.keys.eventQueue).then(success => {
+		lock.acquireLock(this.keys.eventQueue).then((success) => {
 			if (success) {
 				const storedContexts = getItem(this.keys.contexts) || [];
 				const eventsByContextHash = this._groupEventsByContextHash(
@@ -168,7 +169,7 @@ class EventQueue {
 
 				analyticsInstance
 					._getUserId()
-					.then(userId =>
+					.then((userId) =>
 						this._pushEventBatchesToMessageQueue(
 							eventsByContextHash,
 							storedContexts,
@@ -292,7 +293,7 @@ class EventQueue {
 		userId
 	) {
 		return Promise.all(
-			storedContexts.map(context => {
+			storedContexts.map((context) => {
 				const events = contextHashEventMap[hash(context)];
 
 				if (!events) {

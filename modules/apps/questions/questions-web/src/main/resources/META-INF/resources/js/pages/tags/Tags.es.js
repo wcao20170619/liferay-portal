@@ -35,7 +35,7 @@ export default withRouter(
 		const [tags, setTags] = useState({});
 
 		useEffect(() => {
-			getTags(page, context.siteKey).then(data => setTags(data || []));
+			getTags(page, context.siteKey).then((data) => setTags(data || []));
 		}, [page, context.siteKey]);
 
 		return (
@@ -43,14 +43,13 @@ export default withRouter(
 				<div className="container">
 					<div className="row">
 						{tags.items &&
-							tags.items.map(tag => (
+							tags.items.map((tag) => (
 								<div
 									className="col-md-3 question-tags"
 									key={tag.id}
 								>
 									<Link
-										className="questions-disabled-link"
-										to={`/questions/${sectionTitle}/tag/${tag.taxonomyCategoryId}`}
+										to={`/questions/${sectionTitle}/tag/${tag.name}`}
 									>
 										<ClayCardWithNavigation>
 											<ClayCard.Body>
@@ -62,9 +61,7 @@ export default withRouter(
 														Liferay.Language.get(
 															'used-x-times'
 														),
-														[
-															tag.taxonomyCategoryUsageCount,
-														]
+														[tag.keywordUsageCount]
 													)}
 												</ClayCard.Description>
 												<ClayCard.Description displayType="text">

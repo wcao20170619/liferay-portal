@@ -12,222 +12,244 @@
  * details.
  */
 
-import '../FieldBase/FieldBase.es';
+import './FieldSet.scss';
 
-import './FieldSetRegister.soy';
+import {getRepeatedIndex} from 'dynamic-data-mapping-form-renderer';
+import React, {useEffect, useMemo, useRef} from 'react';
 
-import 'dynamic-data-mapping-form-renderer/js/components/PageRenderer/PageRenderer.es';
-import Component from 'metal-component';
-import Soy from 'metal-soy';
-import {Config} from 'metal-state';
+import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
+import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
+import {connectStore} from '../util/connectStore.es';
+import PageRendererRows from './PageRendererRows.es';
+import Panel from './Panel.es';
 
-import templates from './FieldSet.soy';
-
-class FieldSet extends Component {
-	prepareNestedRows({nestedFields, rows}) {
-		return rows.map(row => ({
-			...row,
-			columns: row.columns.map(column => ({
-				...column,
-				fields: column.fields.map(fieldName => {
-					return nestedFields.find(
-						nestedField => nestedField.fieldName === fieldName
-					);
-				}),
-			})),
-		}));
+class NoRender extends React.Component {
+	shouldComponentUpdate() {
+		return false;
 	}
 
-	prepareStateForRender(state) {
-		return {
-			...state,
-			nestedRows: this.prepareNestedRows(state),
-		};
-	}
+	render() {
+		const {forwardRef, ...otherProps} = this.props;
 
-	willReceiveState(changes) {
-		if (changes.nestedFields || changes.rows) {
-			this.forceUpdate();
-		}
-	}
-
-	_handleFieldBlurred(event) {
-		this.emit('fieldBlurred', event);
-	}
-
-	_handleFieldEdited(event) {
-		this.emit('fieldEdited', event);
-	}
-
-	_handleFieldFocused(event) {
-		this.emit('fieldFocused', event);
-	}
-
-	_setRows(rows) {
-		if (typeof rows === 'string') {
-			try {
-				return JSON.parse(rows);
-			}
-			catch (e) {
-				return [];
-			}
-		}
-
-		return rows;
+		return <div ref={forwardRef} {...otherProps} />;
 	}
 }
 
-FieldSet.STATE = {
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
+// This is a adapter to maintain compatibility with the previous FieldSet,
+// being able to call page renderer rows. This should probably be removed
+// by a more friendly implementation when we remove the implementation of
+// calling the fields dynamically through soy.
 
-	errorMessage: Config.string(),
+const PageRendererAdapter = ({
+	activePage,
+	context,
+	editable,
+	onBlur,
+	onChange,
+	onFocus,
+	pageIndex,
+	rows = [],
+	spritemap,
+}) => {
+	const component = useRef(null);
+	const container = useRef(null);
 
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?bool}
-	 */
+	useEffect(() => {
+		if (!component.current && container.current) {
+			component.current = new PageRendererRows(
+				{
+					activePage,
+					editable,
+					events: {
+						fieldBlurred: onBlur,
+						fieldEdited: onChange,
+						fieldFocused: onFocus,
+					},
+					pageIndex,
+					parentContext: context,
+					rows,
+					spritemap,
+				},
+				container.current
+			);
+		}
 
-	evaluable: Config.bool().value(false),
+		return () => {
+			if (component.current) {
+				component.current.dispose();
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
+	useEffect(() => {
+		if (component.current) {
+			component.current.setState({rows});
+		}
+	}, [rows]);
 
-	fieldName: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	label: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	name: Config.string().required(),
-
-	/**
-	 * @default []
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(Array)}
-	 */
-
-	nestedFields: Config.array().value([]),
-
-	/**
-	 * @default []
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(Array)}
-	 */
-
-	nestedRows: Config.array()
-		.internal()
-		.value([]),
-
-	/**
-	 * @default '000000'
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	predefinedValue: Config.string().value('000000'),
-
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?bool}
-	 */
-
-	readOnly: Config.bool().value(false),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(bool|undefined)}
-	 */
-
-	repeatable: Config.bool().value(false),
-
-	/**
-	 * @default false
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(bool|undefined)}
-	 */
-
-	required: Config.bool().value(false),
-
-	/**
-	 * @default []
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(Array|string)}
-	 */
-
-	rows: Config.oneOfType([Config.array(), Config.string()])
-		.setter('_setRows')
-		.value([]),
-
-	/**
-	 * @default true
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(bool|undefined)}
-	 */
-
-	showLabel: Config.bool().value(true),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	spritemap: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	tip: Config.string(),
-
-	/**
-	 * @default undefined
-	 * @instance
-	 * @memberof FieldSet
-	 * @type {?(string|undefined)}
-	 */
-
-	value: Config.string(),
+	return <NoRender forwardRef={container} />;
 };
 
-Soy.register(FieldSet, templates);
+const FieldSet = ({
+	activePage,
+	collapsible,
+	context,
+	editable,
+	label,
+	onBlur,
+	onChange,
+	onFocus,
+	onRemoveButton,
+	onRepeatButton,
+	pageIndex,
+	readOnly,
+	repeatable,
+	rows,
+	showLabel,
+	showRepeatableRemoveButton,
+	spritemap,
+}) => (
+	<>
+		{showLabel && !collapsible && (
+			<>
+				<label className="text-uppercase">{label}</label>
+				<div className="ddm-field-types-fieldset__nested-separator">
+					<div className="mt-1 separator" />
+				</div>
+			</>
+		)}
 
-export {FieldSet};
-export default FieldSet;
+		{collapsible ? (
+			<Panel
+				onRemoveButton={onRemoveButton}
+				onRepeatButton={onRepeatButton}
+				readOnly={readOnly}
+				repeatable={repeatable}
+				showRepeatableRemoveButton={showRepeatableRemoveButton}
+				spritemap={spritemap}
+				title={label}
+			>
+				<PageRendererAdapter
+					activePage={activePage}
+					context={context}
+					editable={editable}
+					onBlur={onBlur}
+					onChange={onChange}
+					onFocus={onFocus}
+					pageIndex={pageIndex}
+					rows={rows}
+					spritemap={spritemap}
+				/>
+			</Panel>
+		) : (
+			<PageRendererAdapter
+				activePage={activePage}
+				context={context}
+				editable={editable}
+				onBlur={onBlur}
+				onChange={onChange}
+				onFocus={onFocus}
+				pageIndex={pageIndex}
+				rows={rows}
+				spritemap={spritemap}
+			/>
+		)}
+	</>
+);
+
+const getRowsArray = (rows) => {
+	if (typeof rows === 'string') {
+		try {
+			return JSON.parse(rows);
+		}
+		catch (e) {
+			return [];
+		}
+	}
+
+	return rows;
+};
+
+const getRows = (rows, nestedFields) => {
+	const normalizedRows = getRowsArray(rows);
+
+	return normalizedRows.map((row) => ({
+		...row,
+		columns: row.columns.map((column) => ({
+			...column,
+			fields: column.fields.map((fieldName) => {
+				return nestedFields.find(
+					(nestedField) => nestedField.fieldName === fieldName
+				);
+			}),
+		})),
+	}));
+};
+
+const FieldSetProxy = connectStore(
+	({
+		activePage,
+		collapsible,
+		context,
+		dispatch,
+		editable,
+		label,
+		name,
+		nestedFields = [],
+		pageIndex,
+		propagate,
+		readOnly,
+		repeatable,
+		rows,
+		showLabel,
+		spritemap,
+		...otherProps
+	}) => {
+		const repeatedIndex = useMemo(() => getRepeatedIndex(name), [name]);
+
+		return (
+			<FieldBaseProxy
+				{...otherProps}
+				dispatch={dispatch}
+				name={name}
+				readOnly={readOnly}
+				repeatable={repeatable}
+				showLabel={false}
+				spritemap={spritemap}
+			>
+				<div className="ddm-field-types-fieldset__nested">
+					<FieldSet
+						activePage={activePage}
+						collapsible={collapsible}
+						context={context}
+						editable={editable}
+						label={label}
+						onBlur={(event) => propagate('fieldBlurred', event)}
+						onChange={(event) => propagate('fieldEdited', event)}
+						onFocus={(event) => propagate('fieldFocused', event)}
+						onRemoveButton={() => dispatch('fieldRemoved', name)}
+						onRepeatButton={() => dispatch('fieldRepeated', name)}
+						pageIndex={pageIndex}
+						readOnly={readOnly}
+						repeatable={repeatable}
+						rows={getRows(rows, nestedFields)}
+						showLabel={showLabel}
+						showRepeatableRemoveButton={
+							repeatable && repeatedIndex > 0
+						}
+						spritemap={spritemap}
+					/>
+				</div>
+			</FieldBaseProxy>
+		);
+	}
+);
+
+const ReactFieldSetAdapter = getConnectedReactComponentAdapter(
+	FieldSetProxy,
+	'fieldset'
+);
+
+export {ReactFieldSetAdapter};
+export default ReactFieldSetAdapter;

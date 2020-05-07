@@ -12,7 +12,11 @@
  * details.
  */
 
-import {FormSupport, PagesVisitor} from 'dynamic-data-mapping-form-renderer';
+import {
+	FormSupport,
+	PagesVisitor,
+	generateInstanceId,
+} from 'dynamic-data-mapping-form-renderer';
 
 import {sub} from '../../../util/strings.es';
 import {getFieldLocalizedValue} from '../util/fields.es';
@@ -25,7 +29,6 @@ export const createDuplicatedField = (originalField, props) => {
 	const {editingLanguageId, fieldNameGenerator} = props;
 	const label = getLabel(originalField, editingLanguageId);
 	const newFieldName = fieldNameGenerator(label);
-	const oldFieldName = originalField.fieldName;
 
 	let duplicatedField = updateField(
 		props,
@@ -34,13 +37,15 @@ export const createDuplicatedField = (originalField, props) => {
 		newFieldName
 	);
 
+	duplicatedField.instanceId = generateInstanceId(8);
+
 	duplicatedField = updateField(props, duplicatedField, 'label', label);
 
 	return updateField(
 		props,
 		duplicatedField,
 		'validation',
-		getValidation(duplicatedField, oldFieldName, newFieldName)
+		getValidation(duplicatedField)
 	);
 };
 
@@ -54,23 +59,11 @@ export const getLabel = (originalField, editingLanguageId) => {
 	]);
 };
 
-export const getValidation = (originalField, oldFieldName, newFieldName) => {
+export const getValidation = (originalField) => {
 	const validation = getSettingsContextProperty(
 		originalField.settingsContext,
 		'validation'
 	);
-
-	const expression = validation.expression;
-
-	if (expression && expression.value) {
-		return {
-			...validation,
-			expression: {
-				...validation.expression,
-				value: expression.value.replace(oldFieldName, newFieldName),
-			},
-		};
-	}
 
 	return validation;
 };
@@ -90,7 +83,7 @@ export const duplicateField = (
 
 	if (parentField) {
 		return visitor.mapFields(
-			field => {
+			(field) => {
 				if (field.fieldName === parentField.fieldName) {
 					const nestedFields = field.nestedFields
 						? [...field.nestedFields, duplicatedField]
@@ -140,7 +133,9 @@ const handleFieldDuplicated = (props, state, event) => {
 	const {fieldName} = event;
 	const {pages} = state;
 
-	const originalField = FormSupport.findFieldByFieldName(pages, fieldName);
+	const originalField = JSON.parse(
+		JSON.stringify(FormSupport.findFieldByFieldName(pages, fieldName))
+	);
 
 	const duplicatedField = createDuplicatedField(originalField, props);
 

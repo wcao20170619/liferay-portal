@@ -14,6 +14,7 @@
 
 package com.liferay.source.formatter.checkstyle.checks;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
@@ -37,49 +38,75 @@ public class CamelCaseNameCheck extends BaseCheck {
 
 	@Override
 	protected void doVisitToken(DetailAST detailAST) {
-		_checkName(detailAST, "re", "reCaptcha");
-		_checkName(detailAST, "sub");
-	}
+		if ((detailAST.getType() == TokenTypes.METHOD_DEF) &&
+			AnnotationUtil.containsAnnotation(detailAST, "Override")) {
 
-	private void _checkName(
-		DetailAST detailAST, String s, String... allowedNames) {
+			return;
+		}
 
 		DetailAST nameDetailAST = detailAST.findFirstToken(TokenTypes.IDENT);
 
 		String name = nameDetailAST.getText();
 
-		String lowerCaseName = StringUtil.toLowerCase(name);
+		_checkName(
+			detailAST, name, "non", "nonProxyHost",
+			"nonSerializableObjectHandler", "nonSpringServlet");
+		_checkName(detailAST, name, "re", "reCaptcha");
+		_checkName(detailAST, name, "sub", "subSelect");
+	}
+
+	private void _checkName(
+		DetailAST detailAST, String name, String s, String... allowedNames) {
 
 		for (String allowedName : allowedNames) {
-			if (lowerCaseName.contains(StringUtil.toLowerCase(allowedName))) {
+			if (name.startsWith(allowedName) ||
+				name.startsWith("_" + allowedName) ||
+				name.contains(
+					TextFormatter.format(allowedName, TextFormatter.G))) {
+
+				return;
+			}
+
+			String allowedNameConstantStyle = StringUtil.toUpperCase(
+				StringUtil.replace(
+					TextFormatter.format(allowedName, TextFormatter.K),
+					CharPool.DASH, CharPool.UNDERLINE));
+
+			if (name.startsWith(allowedNameConstantStyle) ||
+				name.contains("_" + allowedNameConstantStyle)) {
+
 				return;
 			}
 		}
 
-		if (detailAST.getType() == TokenTypes.METHOD_DEF) {
-			if (!AnnotationUtil.containsAnnotation(detailAST, "Override")) {
-				String regex = StringBundler.concat(
-					"(^_", s, "|.*", TextFormatter.format(s, TextFormatter.G),
-					")[A-Z].*");
+		if (name.matches(
+				StringBundler.concat(
+					"(^_?", s, "|.*", TextFormatter.format(s, TextFormatter.G),
+					")[A-Z].*"))) {
 
-				if (name.matches(regex)) {
-					log(detailAST, _MSG_METHOD_INVALID_NAME, s, name);
-				}
+			if (detailAST.getType() == TokenTypes.METHOD_DEF) {
+				log(detailAST, _MSG_METHOD_INVALID_NAME, s, name);
+			}
+			else if (detailAST.getType() == TokenTypes.PARAMETER_DEF) {
+				log(detailAST, _MSG_PARAMETER_INVALID_NAME, s, name);
+			}
+			else {
+				log(detailAST, _MSG_VARIABLE_INVALID_NAME, s, name);
 			}
 		}
-		else {
-			String regex = StringBundler.concat("^_?", s, "[A-Z].*");
+		else if ((detailAST.getType() == TokenTypes.VARIABLE_DEF) &&
+				 name.matches(
+					 StringBundler.concat(
+						 "(.*_)?", StringUtil.toUpperCase(s), "_[A-Z].*"))) {
 
-			if (name.matches(regex)) {
-				if (detailAST.getType() == TokenTypes.PARAMETER_DEF) {
-					log(detailAST, _MSG_PARAMETER_INVALID_NAME, s, name);
-				}
-				else {
-					log(detailAST, _MSG_VARIABLE_INVALID_NAME, s, name);
-				}
-			}
+			log(
+				detailAST, _MSG_CONSTANT_INVALID_NAME,
+				StringUtil.toUpperCase(s), name);
 		}
 	}
+
+	private static final String _MSG_CONSTANT_INVALID_NAME =
+		"constant.invalidName";
 
 	private static final String _MSG_METHOD_INVALID_NAME = "method.invalidName";
 

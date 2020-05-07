@@ -215,8 +215,8 @@ public class ProcessMetricResourceImpl
 		return booleanQuery.addShouldQueryClauses(
 			_queries.rangeTerm(
 				"completionDate", true, true,
-				_resourceHelper.formatDate(dateStart),
-				_resourceHelper.formatDate(dateEnd)),
+				_resourceHelper.getDate(dateStart),
+				_resourceHelper.getDate(dateEnd)),
 			_queries.term("slaDefinitionId", 0));
 	}
 
@@ -229,8 +229,8 @@ public class ProcessMetricResourceImpl
 			booleanQuery.addMustQueryClauses(
 				_queries.rangeTerm(
 					"completionDate", true, true,
-					_resourceHelper.formatDate(dateStart),
-					_resourceHelper.formatDate(dateEnd)));
+					_resourceHelper.getDate(dateStart),
+					_resourceHelper.getDate(dateEnd)));
 		}
 
 		return booleanQuery.addMustQueryClauses(
@@ -398,9 +398,8 @@ public class ProcessMetricResourceImpl
 		termsAggregation.addChildrenAggregations(
 			onTimeFilterAggregation, overdueFilterAggregation,
 			_resourceHelper.creatInstanceCountScriptedMetricAggregation(
-				Collections.emptyList(), dateEnd, dateStart,
-				Collections.emptyList(), Collections.emptyList(),
-				Collections.emptyList()));
+				Collections.emptyList(), null, dateEnd, dateStart,
+				Collections.emptyList(), Collections.emptyList()));
 
 		termsAggregation.addPipelineAggregations(
 			_createBucketSelectorPipelineAggregation());

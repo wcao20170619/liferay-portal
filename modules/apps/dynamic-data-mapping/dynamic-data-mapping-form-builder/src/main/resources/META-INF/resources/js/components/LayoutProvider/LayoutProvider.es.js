@@ -147,7 +147,7 @@ class LayoutProvider extends Component {
 		const {defaultLanguageId, editingLanguageId} = this.props;
 		const settingsVisitor = new PagesVisitor(pages);
 
-		return settingsVisitor.mapFields(field =>
+		return settingsVisitor.mapFields((field) =>
 			localizeField(field, defaultLanguageId, editingLanguageId)
 		);
 	}
@@ -161,7 +161,7 @@ class LayoutProvider extends Component {
 		const visitor = new PagesVisitor(pages);
 
 		pages = visitor.mapFields(
-			field => {
+			(field) => {
 				const {options, settingsContext} = field;
 
 				return {
@@ -190,7 +190,7 @@ class LayoutProvider extends Component {
 
 		visitor.setPages(pages);
 
-		return visitor.mapPages(page => {
+		return visitor.mapPages((page) => {
 			let {description, title} = page;
 
 			if (page.localizedDescription[editingLanguageId]) {
@@ -232,7 +232,7 @@ class LayoutProvider extends Component {
 		if (rules) {
 			const visitor = new RulesVisitor(rules);
 
-			rules = visitor.mapConditions(condition => {
+			rules = visitor.mapConditions((condition) => {
 				if (condition.operands[0].type == 'list') {
 					condition = {
 						...condition,
@@ -271,7 +271,7 @@ class LayoutProvider extends Component {
 
 		return (
 			<span>
-				{(children || []).map(child => ({
+				{(children || []).map((child) => ({
 					...child,
 					props: {
 						...child.props,
@@ -296,12 +296,13 @@ class LayoutProvider extends Component {
 	_fieldActionsValueFn() {
 		return [
 			{
-				action: fieldName =>
+				action: (fieldName) =>
 					this.dispatch('fieldDuplicated', {fieldName}),
 				label: Liferay.Language.get('duplicate'),
 			},
 			{
-				action: fieldName => this.dispatch('fieldDeleted', {fieldName}),
+				action: (fieldName) =>
+					this.dispatch('fieldDeleted', {fieldName}),
 				label: Liferay.Language.get('delete'),
 			},
 		];
@@ -365,7 +366,7 @@ class LayoutProvider extends Component {
 
 		this.setState({
 			focusedField: previousFocusedField,
-			pages: visitor.mapFields(field => {
+			pages: visitor.mapFields((field) => {
 				if (field.fieldName === focusedField.fieldName) {
 					return {
 						...field,
@@ -402,11 +403,12 @@ class LayoutProvider extends Component {
 		this.setState(handleFieldSetAdded(this.props, this.state, event));
 	}
 
-	_handleFocusedFieldEvaluationEnded({settingsContext}) {
+	_handleFocusedFieldEvaluationEnded({instanceId, settingsContext}) {
 		this.setState(
 			handleFocusedFieldEvaluationEnded(
 				this.props,
 				this.state,
+				instanceId,
 				settingsContext
 			)
 		);
@@ -557,7 +559,7 @@ class LayoutProvider extends Component {
 	_setInitialPages(initialPages) {
 		const visitor = new PagesVisitor(initialPages);
 
-		return visitor.mapFields(field => {
+		return visitor.mapFields((field) => {
 			const {settingsContext} = field;
 
 			return {
@@ -578,10 +580,10 @@ class LayoutProvider extends Component {
 
 		return {
 			...settingsContext,
-			pages: visitor.mapFields(field => {
+			pages: visitor.mapFields((field) => {
 				if (field.type === 'options') {
 					const getOptions = (languageId, field) => {
-						return field.value[languageId].map(option => {
+						return field.value[languageId].map((option) => {
 							return {
 								...option,
 								edited: true,
@@ -589,7 +591,7 @@ class LayoutProvider extends Component {
 						});
 					};
 
-					Object.keys(field.value).forEach(languageId => {
+					Object.keys(field.value).forEach((languageId) => {
 						field = {
 							...field,
 							value: {
@@ -621,6 +623,7 @@ class LayoutProvider extends Component {
 }
 
 LayoutProvider.PROPS = {
+
 	/**
 	 * @instance
 	 * @memberof LayoutProvider
@@ -772,6 +775,7 @@ LayoutProvider.PROPS = {
 };
 
 LayoutProvider.STATE = {
+
 	/**
 	 * @instance
 	 * @memberof FormPage

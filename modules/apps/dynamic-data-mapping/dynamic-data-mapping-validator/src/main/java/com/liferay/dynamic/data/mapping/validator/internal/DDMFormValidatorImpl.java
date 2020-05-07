@@ -48,6 +48,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -55,10 +56,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -81,6 +85,8 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 		if (ddmFormFields.isEmpty()) {
 			throw new MustSetFieldsForForm();
 		}
+
+		_validateDDMFormFieldNames(ddmFormFields);
 
 		validateDDMFormFields(
 			ddmFormFields, new HashSet<String>(), ddmForm.getAvailableLocales(),
@@ -393,13 +399,44 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 			(LocalizedValue)BeanPropertiesUtil.getObject(
 				ddmFormField, propertyName);
 
-		if (MapUtil.isEmpty(propertyValue.getValues())) {
+		if ((propertyValue == null) ||
+			MapUtil.isEmpty(propertyValue.getValues())) {
+
 			return;
 		}
 
 		validateDDMFormFieldPropertyValue(
 			ddmFormField.getName(), propertyName, propertyValue,
 			ddmFormAvailableLocales, ddmFormDefaultLocale);
+	}
+
+	private void _validateDDMFormFieldNames(List<DDMFormField> ddmFormFields)
+		throws DDMFormValidationException {
+
+		Stream<DDMFormField> stream = ddmFormFields.stream();
+
+		Map<String, Long> ddmFormFieldNamesCount = stream.map(
+			DDMFormField::getName
+		).collect(
+			Collectors.groupingBy(String::valueOf, Collectors.counting())
+		);
+
+		Set<Map.Entry<String, Long>> entrySet =
+			ddmFormFieldNamesCount.entrySet();
+
+		Stream<Map.Entry<String, Long>> entrySetStream = entrySet.stream();
+
+		Set<String> duplicatedFieldNames = entrySetStream.filter(
+			entry -> entry.getValue() > 1
+		).map(
+			Map.Entry::getKey
+		).collect(
+			Collectors.toSet()
+		);
+
+		if (SetUtil.isNotEmpty(duplicatedFieldNames)) {
+			throw new MustNotDuplicateFieldName(duplicatedFieldNames);
+		}
 	}
 
 	private static final String[] _DDM_FORM_FIELD_INDEX_TYPES = {

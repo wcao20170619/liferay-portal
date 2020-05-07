@@ -22,11 +22,12 @@ import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.workflow.metrics.search.index.TaskWorkflowMetricsIndexer;
-import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
 
 import java.time.Duration;
 
 import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
@@ -35,20 +36,19 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(
-	immediate = true, property = "workflow.metrics.index.entity.name=task",
-	service = {TaskWorkflowMetricsIndexer.class, WorkflowMetricsIndex.class}
-)
+@Component(immediate = true, service = TaskWorkflowMetricsIndexer.class)
 public class TaskWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer implements TaskWorkflowMetricsIndexer {
 
 	@Override
 	public Document addTask(
+		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		Long[] assigneeIds, String assigneeType, String className, long classPK,
 		long companyId, boolean completed, Date completionDate,
 		Long completionUserId, Date createDate, boolean instanceCompleted,
-		long instanceId, Date modifiedDate, String name, long nodeId,
-		long processId, String processVersion, long taskId, long userId) {
+		Date instanceCompletionDate, long instanceId, Date modifiedDate,
+		String name, long nodeId, long processId, String processVersion,
+		long taskId, long userId) {
 
 		DocumentBuilder documentBuilder = documentBuilderFactory.builder();
 
@@ -69,14 +69,14 @@ public class TaskWorkflowMetricsIndexerImpl
 
 		if (completed) {
 			documentBuilder.setDate(
-				"completionDate", formatDate(completionDate)
+				"completionDate", getDate(completionDate)
 			).setLong(
 				"completionUserId", completionUserId
 			);
 		}
 
 		documentBuilder.setDate(
-			"createDate", formatDate(createDate)
+			"createDate", getDate(createDate)
 		).setValue(
 			Field.getSortableFieldName(
 				StringBundler.concat(
@@ -93,10 +93,12 @@ public class TaskWorkflowMetricsIndexerImpl
 
 		documentBuilder.setValue(
 			"instanceCompleted", instanceCompleted
+		).setDate(
+			"instanceCompletionDate", getDate(instanceCompletionDate)
 		).setLong(
 			"instanceId", instanceId
 		).setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setString(
 			"name", name
 		).setLong(
@@ -112,6 +114,9 @@ public class TaskWorkflowMetricsIndexerImpl
 		).setString(
 			"version", processVersion
 		);
+
+		setLocalizedField(documentBuilder, "assetTitle", assetTitleMap);
+		setLocalizedField(documentBuilder, "assetType", assetTypeMap);
 
 		Document document = documentBuilder.build();
 
@@ -132,13 +137,13 @@ public class TaskWorkflowMetricsIndexerImpl
 		).setValue(
 			"completed", true
 		).setDate(
-			"completionDate", formatDate(completionDate)
+			"completionDate", getDate(completionDate)
 		).setLong(
 			"completionUserId", completionUserId
 		).setLong(
 			"duration", duration
 		).setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setLong(
 			"taskId", taskId
 		).setString(
@@ -190,16 +195,17 @@ public class TaskWorkflowMetricsIndexerImpl
 
 	@Override
 	public String getIndexName(long companyId) {
-		return _taskWorkflowMetricsIndexNameBuilder.getIndexName(companyId);
+		return _taskWorkflowMetricsIndex.getIndexName(companyId);
 	}
 
 	@Override
 	public String getIndexType() {
-		return "WorkflowMetricsTaskType";
+		return _taskWorkflowMetricsIndex.getIndexType();
 	}
 
 	@Override
 	public Document updateTask(
+		Map<Locale, String> assetTitleMap, Map<Locale, String> assetTypeMap,
 		Long[] assigneeIds, String assigneeType, long companyId,
 		Date modifiedDate, long taskId, long userId) {
 
@@ -213,7 +219,7 @@ public class TaskWorkflowMetricsIndexerImpl
 		documentBuilder.setLong(
 			"companyId", companyId
 		).setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setLong(
 			"taskId", taskId
 		).setString(
@@ -221,6 +227,9 @@ public class TaskWorkflowMetricsIndexerImpl
 		).setLong(
 			"userId", userId
 		);
+
+		setLocalizedField(documentBuilder, "assetTitle", assetTitleMap);
+		setLocalizedField(documentBuilder, "assetType", assetTypeMap);
 
 		Document document = documentBuilder.build();
 
@@ -263,7 +272,6 @@ public class TaskWorkflowMetricsIndexerImpl
 		_slaTaskResultWorkflowMetricsIndexer;
 
 	@Reference(target = "(workflow.metrics.index.entity.name=task)")
-	private WorkflowMetricsIndexNameBuilder
-		_taskWorkflowMetricsIndexNameBuilder;
+	private WorkflowMetricsIndex _taskWorkflowMetricsIndex;
 
 }

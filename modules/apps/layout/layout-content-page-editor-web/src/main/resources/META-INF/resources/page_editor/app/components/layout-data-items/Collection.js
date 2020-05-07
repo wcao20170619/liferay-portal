@@ -29,7 +29,7 @@ function getCollectionPrefix(collectionId, index) {
 }
 
 function getToControlsId(collectionId, index) {
-	return itemId => {
+	return (itemId) => {
 		if (!itemId) {
 			return null;
 		}
@@ -98,6 +98,8 @@ const Grid = ({
 									collectionFields,
 									collectionItem:
 										collection[i * numberOfColumns + j],
+									collectionItemIndex:
+										i * numberOfColumns + j,
 									fromControlsId:
 										itemCount === 0 ? null : fromControlsId,
 									toControlsId:
@@ -136,7 +138,7 @@ const Collection = React.forwardRef(({children, item}, ref) => {
 	const dispatch = useDispatch();
 
 	const segmentsExperienceId = useSelector(
-		state => state.segmentsExperienceId
+		(state) => state.segmentsExperienceId
 	);
 
 	const [collection, setCollection] = useState({
@@ -152,10 +154,10 @@ const Collection = React.forwardRef(({children, item}, ref) => {
 				segmentsExperienceId,
 				size: collectionConfig.numberOfItems,
 			})
-				.then(response => {
+				.then((response) => {
 					setCollection(response);
 				})
-				.catch(error => {
+				.catch((error) => {
 					if (process.env.NODE_ENV === 'development') {
 						console.error(error);
 					}
@@ -177,10 +179,10 @@ const Collection = React.forwardRef(({children, item}, ref) => {
 				itemType: collectionConfig.collection.itemType,
 				onNetworkStatus: dispatch,
 			})
-				.then(response => {
+				.then((response) => {
 					setCollectionFields(response);
 				})
-				.catch(error => {
+				.catch((error) => {
 					if (process.env.NODE_ENV === 'development') {
 						console.error(error);
 					}

@@ -16,14 +16,14 @@ package com.liferay.portal.workflow.metrics.rest.internal.dto.v1_0.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
-
-import java.text.DateFormat;
 
 import java.util.Collection;
 import java.util.Date;
@@ -47,9 +47,22 @@ public class ProcessUtil {
 				dateModified = _parseDate(document.getDate("modifiedDate"));
 				description = document.getString("description");
 				id = document.getLong("processId");
-				title = titleMap.get(locale.toLanguageTag());
 				title_i18n = titleMap;
 				version = document.getString("version");
+
+				setTitle(
+					() -> {
+						String title = titleMap.get(locale.toLanguageTag());
+
+						if (Validator.isNull(title)) {
+							Locale defaultLocale =
+								LocaleThreadLocal.getDefaultLocale();
+
+							title = titleMap.get(defaultLocale.toLanguageTag());
+						}
+
+						return title;
+					});
 			}
 		};
 	}
@@ -78,11 +91,9 @@ public class ProcessUtil {
 	}
 
 	private static Date _parseDate(String dateString) {
-		DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
-			"yyyyMMddHHmmss");
-
 		try {
-			return dateFormat.parse(dateString);
+			return DateUtil.parseDate(
+				"yyyyMMddHHmmss", dateString, LocaleUtil.getDefault());
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {

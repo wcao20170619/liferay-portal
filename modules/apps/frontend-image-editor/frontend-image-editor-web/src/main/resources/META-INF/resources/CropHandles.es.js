@@ -25,6 +25,7 @@ import handlesTemplates from './CropHandles.soy';
  * Creates a Crop Handles Component.
  */
 class CropHandles extends Component {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -71,7 +72,7 @@ class CropHandles extends Component {
 	 * @protected
 	 */
 	bindDrags_() {
-		this.resizer.addEventListener('mousedown', event =>
+		this.resizer.addEventListener('mousedown', (event) =>
 			event.stopPropagation()
 		);
 
@@ -87,7 +88,7 @@ class CropHandles extends Component {
 	bindSelectionDrag_() {
 		const canvas = this.getImageEditorCanvas();
 
-		this.selectionDrag_.on(Drag.Events.DRAG, data => {
+		this.selectionDrag_.on(Drag.Events.DRAG, (data) => {
 			const left =
 				data.relativeX - canvas.offsetLeft + this.selectionBorderWidth_;
 			const top =
@@ -118,7 +119,7 @@ class CropHandles extends Component {
 	bindSizeDrag_() {
 		const canvas = this.getImageEditorCanvas();
 
-		this.sizeDrag_.on(Drag.Events.DRAG, data => {
+		this.sizeDrag_.on(Drag.Events.DRAG, (data) => {
 			const width = data.relativeX + this.resizer.offsetWidth / 2;
 			const height = data.relativeY + this.resizer.offsetHeight / 2;
 
@@ -260,6 +261,7 @@ class CropHandles extends Component {
  * @type {!Object}
  */
 CropHandles.STATE = {
+
 	/**
 	 * Injected helper that retrieves the editor canvas element.
 	 *

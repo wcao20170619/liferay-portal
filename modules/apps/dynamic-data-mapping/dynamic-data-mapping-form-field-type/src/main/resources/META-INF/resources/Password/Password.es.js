@@ -12,14 +12,11 @@
  * details.
  */
 
-import './PasswordRegister.soy';
-
 import React, {useState} from 'react';
 
 import {FieldBaseProxy} from '../FieldBase/ReactFieldBase.es';
 import getConnectedReactComponentAdapter from '../util/ReactComponentAdapter.es';
 import {connectStore} from '../util/connectStore.es';
-import templates from './PasswordAdapter.soy';
 
 const Password = ({
 	disabled,
@@ -40,7 +37,7 @@ const Password = ({
 			name={name}
 			onBlur={onBlur}
 			onFocus={onFocus}
-			onInput={event => {
+			onInput={(event) => {
 				onInput(event);
 				setValue(event.target.value);
 			}}
@@ -65,13 +62,13 @@ const PasswordProxy = connectStore(
 			<Password
 				disabled={readOnly}
 				name={name}
-				onBlur={event =>
+				onBlur={(event) =>
 					emit('fieldBlurred', event, event.target.value)
 				}
-				onFocus={event =>
+				onFocus={(event) =>
 					emit('fieldFocused', event, event.target.value)
 				}
-				onInput={event =>
+				onInput={(event) =>
 					emit('fieldEdited', event, event.target.value)
 				}
 				placeholder={placeholder}
@@ -83,7 +80,7 @@ const PasswordProxy = connectStore(
 
 const ReactPasswordAdapter = getConnectedReactComponentAdapter(
 	PasswordProxy,
-	templates
+	'password'
 );
 
 export {ReactPasswordAdapter};

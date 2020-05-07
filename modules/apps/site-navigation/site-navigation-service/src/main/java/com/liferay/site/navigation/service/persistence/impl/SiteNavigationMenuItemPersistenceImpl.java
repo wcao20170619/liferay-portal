@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.site.navigation.exception.NoSuchMenuItemException;
 import com.liferay.site.navigation.model.SiteNavigationMenuItem;
+import com.liferay.site.navigation.model.SiteNavigationMenuItemTable;
 import com.liferay.site.navigation.model.impl.SiteNavigationMenuItemImpl;
 import com.liferay.site.navigation.model.impl.SiteNavigationMenuItemModelImpl;
 import com.liferay.site.navigation.service.persistence.SiteNavigationMenuItemPersistence;
@@ -3725,11 +3726,6 @@ public class SiteNavigationMenuItemPersistenceImpl
 		"(siteNavigationMenuItem.name IS NULL OR siteNavigationMenuItem.name LIKE '')";
 
 	public SiteNavigationMenuItemPersistenceImpl() {
-		setModelClass(SiteNavigationMenuItem.class);
-
-		setModelImplClass(SiteNavigationMenuItemImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -3737,6 +3733,13 @@ public class SiteNavigationMenuItemPersistenceImpl
 		dbColumnNames.put("order", "order_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SiteNavigationMenuItem.class);
+
+		setModelImplClass(SiteNavigationMenuItemImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SiteNavigationMenuItemTable.INSTANCE);
 	}
 
 	/**

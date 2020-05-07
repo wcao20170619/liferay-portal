@@ -39,6 +39,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>APPLICATIONS_RATING</td>
+	<td>//select[contains(@id,'${key_applications}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>COUNTRY</td>
 	<td>//div[label[contains(.,'Country')]]/select</td>
 	<td></td>
@@ -101,6 +106,11 @@
 <tr>
 	<td>LOS_ANGELES_TIME_ZONE</td>
 	<td>//select[contains(@id,'timeZoneId')]/option[@value='America/Los_Angeles']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MINIMUM_AGE</td>
+	<td>//select[contains(@id,'maxAge')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -181,6 +191,11 @@
 <tr>
 	<td>TYPE</td>
 	<td>//div[label[contains(.,'Type')]]/select</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WARNING_TIME</td>
+	<td>//select[contains(@id,'warningTime')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -95,15 +95,14 @@ definition {
 	@description = "This test covers LPS-89884. It ensures that a DL image can be added to a wiki page via URL."
 	@priority = "5"
 	test AddPageWithDMImageViaURL {
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "CPWiki#AddPageWithDMImageViaURL";
 
-		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
-
-		DMDocument.addCP(
+		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_2.jpg",
-			dmDocumentTitle = "Document_2.jpg");
+			dmDocumentTitle = "Document_2.jpg",
+			groupName = "Guest",
+			mimeType = "image/jpeg",
+			sourceFileName = "Document_2.jpg");
 
 		WikiNavigator.openWikiAdmin(siteURLKey = "guest");
 
@@ -113,15 +112,13 @@ definition {
 
 		WikiEntry.addPageTitle(wikiPageTitle = "New Wiki Page Title");
 
-		ItemSelector.gotoItemSelectorViaAlloyEditor();
+		ItemSelector.gotoItemSelectorViaCKEditor();
 
 		ItemSelector.addFromURL(
 			imageSourceURL = "http://localhost:8080/webdav/guest/document_library/Document_2.jpg",
 			navTab = "URL");
 
-		AssertElementPresent(
-			key_contentImageName = "Document_2.jpg",
-			locator1 = "Wiki#CONTENT_IMAGE_NAME");
+		CKEditor.viewEntryContentImage(contentImageName = "Document_2.jpg");
 
 		PortletEntry.publish();
 
@@ -483,8 +480,6 @@ definition {
 	@ignore = "true"
 	@priority = "4"
 	test ViewPageRSS {
-		property portal.upstream = "quarantine";
-
 		Navigator.openURL();
 
 		ProductMenu.gotoPortlet(

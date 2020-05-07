@@ -42,11 +42,6 @@ definition {
 	@description = "This is a use case for LPS-87055."
 	@priority = "3"
 	test AddPageTemplatesWithDuplicateNameViaSiteTemplate {
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
 			siteTemplateName = "Site Template Name");
@@ -104,20 +99,10 @@ definition {
 	@description = "This is a use case for LPS-51432 and LPS-95113."
 	@priority = "4"
 	test AdminCanNotAddASubpageOfAChildPageLinkedToSiteTemplatePage {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#AdminCanNotAddASubpageOfAChildPageLinkedToSiteTemplatePage";
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Site Page Name",
@@ -186,11 +171,6 @@ definition {
 
 	@priority = "4"
 	test EditSiteTemplateGuestPermissions {
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "${siteTemplateName}");
 
 		ProductMenu.gotoPortlet(
@@ -246,26 +226,11 @@ definition {
 	test PortletPreferencesPersistWithSiteTemplateWhenSamePortletAddedOnSecondPage {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page1 Name",
 			siteTemplateName = "Site Template Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Page1 Name",
@@ -275,11 +240,6 @@ definition {
 		Portlet.addPG(
 			defaultURL = "false",
 			portletName = "Hello World");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page2 Name",
@@ -343,11 +303,6 @@ definition {
 	test PublishSiteCreatedBasedOnASiteTemplate {
 		property osgi.app.includes = "frontend-theme-porygon";
 		property portal.upstream = "quarantine";
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
@@ -524,30 +479,21 @@ definition {
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
+		SiteTemplates.addSitePageViaSiteTemplateCP(
+			pageName = "Test Page Name",
+			siteTemplateName = "Site Template Name");
 
-		SiteTemplates.gotoViewPages(
+		SiteTemplatesNavigator.gotoSiteTemplatesPage(
+			pageName = "Test Page Name",
 			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
 		Portlet.addPG(portletName = "Documents and Media");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
-		SiteTemplates.gotoViewPages(
+		SiteTemplatesNavigator.gotoSiteTemplatesPage(
+			pageName = "Test Page Name",
 			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
@@ -557,12 +503,8 @@ definition {
 			dmDocumentTitle = "Document_1.png");
 
 		if (IsElementNotPresent(locator1 = "Portlet#PORTLET_CONTENT")) {
-			ProductMenu.gotoPortlet(
-				category = "Sites",
-				panel = "Control Panel",
-				portlet = "Site Templates");
-
-			SiteTemplates.gotoViewPages(
+			SiteTemplatesNavigator.gotoSiteTemplatesPage(
+				pageName = "Test Page Name",
 				siteName = "${siteName}",
 				siteTemplateName = "Site Template Name");
 		}
@@ -597,6 +539,8 @@ definition {
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Dashboard");
 
+		Navigator._gotoPage(pageName = "Test Page Name");
+
 		DMDocument.viewPG(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentFile = "Document_1.png",
@@ -610,23 +554,13 @@ definition {
 	@description = "This is a use case for LPS-86487."
 	@priority = "4"
 	test SiteTemplatePageLinkInWebContentRedirectCorrectly {
-		property portal.acceptance = "quarantine";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SitetemplatesUsecase#SiteTemplatePageLinkInWebContentRedirectCorrectly";
 
 		var portalURL = PropsUtil.get("portal.url");
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page1 Name",
@@ -634,19 +568,9 @@ definition {
 
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page2 Name",
 			siteTemplateName = "Template Site");
-
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
 
 		SiteTemplatesNavigator.gotoSiteTemplatesPage(
 			pageName = "Page2 Name",
@@ -778,11 +702,6 @@ definition {
 
 		LAR.downloadLar();
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Template Site");
 
 		ProductMenu.gotoPortlet(
@@ -813,8 +732,6 @@ definition {
 	@description = "This is a use case for LPS-107677."
 	@priority = "3"
 	test ViewImportedSitePageWithoutInfoMessage {
-		SiteTemplatesNavigator.openSiteTemplatesAdmin();
-
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
 			siteTemplateName = "Site Template Name");
@@ -874,19 +791,14 @@ definition {
 	test ViewInlineGuestPermissionsInSiteTemplatesViaWCD {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
+		SiteTemplates.addSitePageViaSiteTemplateCP(
+			pageName = "Test Page Name",
+			siteTemplateName = "Site Template Name");
 
-		SiteTemplates.gotoViewPages(
+		SiteTemplatesNavigator.gotoSiteTemplatesPage(
+			pageName = "Test Page Name",
 			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
@@ -894,12 +806,8 @@ definition {
 			defaultURL = "false",
 			portletName = "Web Content Display");
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
-
-		SiteTemplates.gotoViewPages(
+		SiteTemplatesNavigator.gotoSiteTemplatesPage(
+			pageName = "Test Page Name",
 			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
@@ -918,21 +826,15 @@ definition {
 	test ViewNavigationMenuCopyFromSitesTemplate {
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		SiteTemplatesNavigator.openSiteTemplatesAdmin();
-
 		SiteTemplates.addCP(
 			siteTemplateActive = "Yes",
 			siteTemplateName = "Site Template Name");
 
 		var siteTemplateID = SiteTemplates.getSiteTemplateID(siteTemplateName = "Site Template Name");
 
-		SiteTemplatesNavigator.openSiteTemplatesAdmin();
-
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page1 Name",
 			siteTemplateName = "Site Template Name");
-
-		SiteTemplatesNavigator.openSiteTemplatesAdmin();
 
 		SiteTemplates.addSitePageViaSiteTemplateCP(
 			pageName = "Page2 Name",

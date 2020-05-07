@@ -50,6 +50,7 @@ const SELECTOR_TRIGGER = `
 	.preview-toolbar-container [title]:not(.lfr-portal-tooltip),
 	.preview-tooltbar-containter [data-restore-title],
 	.progress-container[data-title],
+	.redirect-entries span[data-title],
 	.source-editor__fixed-text__help[data-title],
 	.taglib-discussion [data-title]:not(.lfr-portal-tooltip),
 	.taglib-discussion [title]:not(.lfr-portal-tooltip):not([title=""]),
@@ -111,7 +112,7 @@ const TooltipProvider = () => {
 		return dispose;
 	}, [delay, state]);
 
-	const saveTitle = element => {
+	const saveTitle = (element) => {
 		if (element) {
 			const title = element.getAttribute('title');
 
@@ -134,7 +135,7 @@ const TooltipProvider = () => {
 		}
 	};
 
-	const restoreTitle = element => {
+	const restoreTitle = (element) => {
 		if (element) {
 			const title = element.getAttribute('data-restore-title');
 
@@ -156,16 +157,17 @@ const TooltipProvider = () => {
 	};
 
 	useEffect(() => {
-		const TRIGGER_SHOW_HANDLES = TRIGGER_SHOW_EVENTS.map(eventName => {
+		const TRIGGER_SHOW_HANDLES = TRIGGER_SHOW_EVENTS.map((eventName) => {
 			return dom.delegate(
 				document.body,
 				eventName,
 				SELECTOR_TRIGGER,
-				event => dispatch({target: event.delegateTarget, type: 'show'})
+				(event) =>
+					dispatch({target: event.delegateTarget, type: 'show'})
 			);
 		});
 
-		const TRIGGER_HIDE_HANDLES = TRIGGER_HIDE_EVENTS.map(eventName => {
+		const TRIGGER_HIDE_HANDLES = TRIGGER_HIDE_EVENTS.map((eventName) => {
 			return dom.delegate(
 				document.body,
 				eventName,
@@ -198,7 +200,7 @@ const TooltipProvider = () => {
 				TOOLTIP_LEAVE,
 				...TRIGGER_HIDE_HANDLES,
 				...TRIGGER_SHOW_HANDLES,
-			].forEach(handle => handle.dispose());
+			].forEach((handle) => handle.dispose());
 		};
 	}, [state]);
 

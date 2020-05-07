@@ -129,6 +129,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EXPORT</td>
+	<td>//*[*[name()='svg'][contains(@class,'icon-download')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>EXPORT_DISABLED</td>
+	<td>//button[*[name()='svg'][contains(@class,'icon-download')] and contains(@disabled,'disabled')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EYE_PREVIEW</td>
 	<td>//*[*[name()='svg'][contains(@class,'lexicon-icon-view')]]</td>
 	<td></td>
@@ -145,7 +155,7 @@
 </tr>
 <tr>
 	<td>INFO_IE</td>
-	<td>//button[contains(@aria-label,'info-circle') and @title='Info'] | //*[@data-qa-id='infoButton']</td>
+	<td>//button[contains(@aria-label,'info-circle-open')] | //*[@data-qa-id='infoButton']</td>
 	<td></td>
 </tr>
 <tr>
@@ -170,7 +180,7 @@
 </tr>
 <tr>
 	<td>MOVE_TO_RECYCLE_BIN</td>
-	<td>//a[contains(@data-qa-id,'recycle-binButton')]/span[contains(@class,'icon-monospaced')] | //*[*[name()='svg'][contains(@class,'icon-trash')] | //a[@data-title='Deactivate']]  | //a[@title='Deactivate'] | //a[@title='Delete']</td>
+	<td>//*[*[name()='svg'][contains(@class,'icon-trash')]]</td>
 	<td></td>
 </tr>
 <tr>
@@ -209,6 +219,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>RESTORE</td>
+	<td>//*[*[name()='svg'][contains(@class,'icon-restore')]]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SHARE</td>
 	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-share')]]</td>
 	<td></td>
@@ -231,11 +246,6 @@
 <tr>
 	<td>TOOLTIP</td>
 	<td>//span[*[name()='svg'][contains(@class,'icon-question')]]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>TRASH</td>
-	<td>//*[*[name()='svg'][contains(@class,'icon-trash')]]</td>
 	<td></td>
 </tr>
 <tr>

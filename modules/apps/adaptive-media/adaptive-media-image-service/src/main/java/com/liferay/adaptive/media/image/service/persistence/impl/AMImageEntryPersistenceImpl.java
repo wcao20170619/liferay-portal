@@ -16,6 +16,7 @@ package com.liferay.adaptive.media.image.service.persistence.impl;
 
 import com.liferay.adaptive.media.image.exception.NoSuchAMImageEntryException;
 import com.liferay.adaptive.media.image.model.AMImageEntry;
+import com.liferay.adaptive.media.image.model.AMImageEntryTable;
 import com.liferay.adaptive.media.image.model.impl.AMImageEntryImpl;
 import com.liferay.adaptive.media.image.model.impl.AMImageEntryModelImpl;
 import com.liferay.adaptive.media.image.service.persistence.AMImageEntryPersistence;
@@ -4382,17 +4383,19 @@ public class AMImageEntryPersistenceImpl
 		"amImageEntry.fileVersionId = ?";
 
 	public AMImageEntryPersistenceImpl() {
-		setModelClass(AMImageEntry.class);
-
-		setModelImplClass(AMImageEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("size", "size_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(AMImageEntry.class);
+
+		setModelImplClass(AMImageEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(AMImageEntryTable.INSTANCE);
 	}
 
 	/**

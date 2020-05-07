@@ -217,20 +217,20 @@ public class AssigneeMetricBulkSelection {
 	protected Long[] roleIds;
 
 	@Schema
-	public String[] getTaskKeys() {
-		return taskKeys;
+	public String[] getTaskNames() {
+		return taskNames;
 	}
 
-	public void setTaskKeys(String[] taskKeys) {
-		this.taskKeys = taskKeys;
+	public void setTaskNames(String[] taskNames) {
+		this.taskNames = taskNames;
 	}
 
 	@JsonIgnore
-	public void setTaskKeys(
-		UnsafeSupplier<String[], Exception> taskKeysUnsafeSupplier) {
+	public void setTaskNames(
+		UnsafeSupplier<String[], Exception> taskNamesUnsafeSupplier) {
 
 		try {
-			taskKeys = taskKeysUnsafeSupplier.get();
+			taskNames = taskNamesUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -242,7 +242,7 @@ public class AssigneeMetricBulkSelection {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected String[] taskKeys;
+	protected String[] taskNames;
 
 	@Override
 	public boolean equals(Object object) {
@@ -368,23 +368,23 @@ public class AssigneeMetricBulkSelection {
 			sb.append("]");
 		}
 
-		if (taskKeys != null) {
+		if (taskNames != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"taskKeys\": ");
+			sb.append("\"taskNames\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < taskKeys.length; i++) {
+			for (int i = 0; i < taskNames.length; i++) {
 				sb.append("\"");
 
-				sb.append(_escape(taskKeys[i]));
+				sb.append(_escape(taskNames[i]));
 
 				sb.append("\"");
 
-				if ((i + 1) < taskKeys.length) {
+				if ((i + 1) < taskNames.length) {
 					sb.append(", ");
 				}
 			}
@@ -424,9 +424,44 @@ public class AssigneeMetricBulkSelection {
 			sb.append("\"");
 			sb.append(entry.getKey());
 			sb.append("\":");
-			sb.append("\"");
-			sb.append(entry.getValue());
-			sb.append("\"");
+
+			Object value = entry.getValue();
+
+			Class<?> clazz = value.getClass();
+
+			if (clazz.isArray()) {
+				sb.append("[");
+
+				Object[] valueArray = (Object[])value;
+
+				for (int i = 0; i < valueArray.length; i++) {
+					if (valueArray[i] instanceof String) {
+						sb.append("\"");
+						sb.append(valueArray[i]);
+						sb.append("\"");
+					}
+					else {
+						sb.append(valueArray[i]);
+					}
+
+					if ((i + 1) < valueArray.length) {
+						sb.append(", ");
+					}
+				}
+
+				sb.append("]");
+			}
+			else if (value instanceof Map) {
+				sb.append(_toJSON((Map<String, ?>)value));
+			}
+			else if (value instanceof String) {
+				sb.append("\"");
+				sb.append(value);
+				sb.append("\"");
+			}
+			else {
+				sb.append(value);
+			}
 
 			if (iterator.hasNext()) {
 				sb.append(",");

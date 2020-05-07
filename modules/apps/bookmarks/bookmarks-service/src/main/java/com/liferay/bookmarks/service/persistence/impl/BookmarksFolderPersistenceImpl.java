@@ -16,6 +16,7 @@ package com.liferay.bookmarks.service.persistence.impl;
 
 import com.liferay.bookmarks.exception.NoSuchFolderException;
 import com.liferay.bookmarks.model.BookmarksFolder;
+import com.liferay.bookmarks.model.BookmarksFolderTable;
 import com.liferay.bookmarks.model.impl.BookmarksFolderImpl;
 import com.liferay.bookmarks.model.impl.BookmarksFolderModelImpl;
 import com.liferay.bookmarks.service.persistence.BookmarksFolderPersistence;
@@ -6817,16 +6818,18 @@ public class BookmarksFolderPersistenceImpl
 		"bookmarksFolder.status != ?";
 
 	public BookmarksFolderPersistenceImpl() {
-		setModelClass(BookmarksFolder.class);
-
-		setModelImplClass(BookmarksFolderImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(BookmarksFolder.class);
+
+		setModelImplClass(BookmarksFolderImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(BookmarksFolderTable.INSTANCE);
 	}
 
 	/**

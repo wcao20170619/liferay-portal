@@ -1,0 +1,23 @@
+{
+	"com.liferay.fragment.entry.processor.editable.EditableFragmentEntryProcessor": {
+		"editable_text1": {
+			"defaultValue": "test 1",
+			"en_US": "test"
+		},
+		"editable_text2": {
+			"defaultValue": "test 2",
+			"en_US": "test"
+		},
+		"editable_text3": {
+			"defaultValue": "test 3",
+			"en_US": "test"
+		},
+		"editable_text4": {
+			"defaultValue": "test 4",
+			"en_US": "test"
+		},
+		"editable_text5": {
+			"defaultValue": "test 5"
+		}
+	}
+}

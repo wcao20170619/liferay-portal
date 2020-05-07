@@ -149,11 +149,13 @@ public class DDMFormInstanceRecordSearchTest {
 
 		ddmForm.addDDMFormField(nameDDMFormField);
 
-		DDMFormField notIndexableDDMFormField =
+		DDMFormField descriptionDDMFormField =
 			DDMFormTestUtil.createTextDDMFormField(
-				"notIndexable", true, false, false);
+				"description", true, false, false);
 
-		notIndexableDDMFormField.setIndexType("");
+		descriptionDDMFormField.setIndexType("");
+
+		ddmForm.addDDMFormField(descriptionDDMFormField);
 
 		DDMFormInstanceTestHelper ddmFormInstanceTestHelper =
 			new DDMFormInstanceTestHelper(_group);

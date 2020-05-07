@@ -16,6 +16,7 @@ package com.liferay.blogs.service.persistence.impl;
 
 import com.liferay.blogs.exception.NoSuchEntryException;
 import com.liferay.blogs.model.BlogsEntry;
+import com.liferay.blogs.model.BlogsEntryTable;
 import com.liferay.blogs.model.impl.BlogsEntryImpl;
 import com.liferay.blogs.model.impl.BlogsEntryModelImpl;
 import com.liferay.blogs.service.persistence.BlogsEntryPersistence;
@@ -21139,16 +21140,18 @@ public class BlogsEntryPersistenceImpl
 		"blogsEntry.status != ?";
 
 	public BlogsEntryPersistenceImpl() {
-		setModelClass(BlogsEntry.class);
-
-		setModelImplClass(BlogsEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(BlogsEntry.class);
+
+		setModelImplClass(BlogsEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(BlogsEntryTable.INSTANCE);
 	}
 
 	/**

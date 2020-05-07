@@ -23,20 +23,25 @@ import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
-import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.layout.util.structure.FragmentLayoutStructureItem;
+import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.layout.util.structure.LayoutStructureItem;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.PortletIdException;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionRequest;
 import com.liferay.portal.kernel.test.portlet.MockLiferayPortletActionResponse;
@@ -50,13 +55,10 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-
-import java.io.InputStream;
 
 import java.util.List;
 import java.util.Locale;
@@ -65,7 +67,6 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,9 +74,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * @author Jürgen Kappler
@@ -97,14 +95,18 @@ public class AddPortletMVCActionCommandTest {
 
 		_company = _companyLocalService.getCompany(_group.getCompanyId());
 
-		_layout = LayoutTestUtil.addLayout(_group);
+		_layout = _addLayout();
+
+		_layoutStructure = new LayoutStructure();
+
+		_layoutStructure.addRootLayoutStructureItem();
 
 		_layoutPageTemplateStructure =
 			_layoutPageTemplateStructureLocalService.
 				addLayoutPageTemplateStructure(
 					TestPropsValues.getUserId(), _group.getGroupId(),
 					_portal.getClassNameId(Layout.class.getName()),
-					_layout.getPlid(), _read("layout_data.json"),
+					_layout.getPlid(), _layoutStructure.toString(),
 					ServiceContextTestUtil.getServiceContext(
 						_group, TestPropsValues.getUserId()));
 	}
@@ -124,7 +126,7 @@ public class AddPortletMVCActionCommandTest {
 		ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		List<FragmentEntryLink> actualFragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
@@ -147,7 +149,7 @@ public class AddPortletMVCActionCommandTest {
 		ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 	}
 
 	@Test(expected = PortletIdException.class)
@@ -159,12 +161,12 @@ public class AddPortletMVCActionCommandTest {
 		ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		Assert.assertTrue(jsonObject.has("error"));
 	}
@@ -178,7 +180,7 @@ public class AddPortletMVCActionCommandTest {
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		JSONObject fragmentEntryLinkJSONObject = jsonObject.getJSONObject(
 			"fragmentEntryLink");
@@ -215,54 +217,68 @@ public class AddPortletMVCActionCommandTest {
 		MockLiferayPortletActionRequest actionRequest = _getMockActionRequest();
 
 		actionRequest.addParameter("itemType", RandomTestUtil.randomString());
-		actionRequest.addParameter("parentItemId", "root");
+		actionRequest.addParameter(
+			"parentItemId", _layoutStructure.getMainItemId());
 		actionRequest.addParameter("portletId", JournalPortletKeys.JOURNAL);
 		actionRequest.addParameter("position", "0");
 
 		JSONObject jsonObject = ReflectionTestUtil.invoke(
 			_mvcActionCommand, "processAddPortlet",
 			new Class<?>[] {ActionRequest.class, ActionResponse.class},
-			actionRequest, new MockActionResponse());
+			actionRequest, new MockLiferayPortletActionResponse());
 
 		JSONObject layoutDataJSONObject = jsonObject.getJSONObject(
 			"layoutData");
 
+		LayoutStructure layoutStructure = LayoutStructure.of(
+			layoutDataJSONObject.toString());
+
 		JSONObject fragmentEntryLinkJSONObject = jsonObject.getJSONObject(
 			"fragmentEntryLink");
 
-		String fragmentEntryLinkId = fragmentEntryLinkJSONObject.getString(
+		long fragmentEntryLinkId = fragmentEntryLinkJSONObject.getLong(
 			"fragmentEntryLinkId");
 
-		JSONObject itemsJSONObject = layoutDataJSONObject.getJSONObject(
-			"items");
+		LayoutStructureItem layoutStructureItem =
+			layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
+				fragmentEntryLinkId);
 
-		for (String key : itemsJSONObject.keySet()) {
-			if (key.equals("root")) {
-				continue;
-			}
+		Assert.assertNotNull(layoutStructureItem);
+		Assert.assertTrue(
+			layoutStructureItem instanceof FragmentLayoutStructureItem);
 
-			JSONObject newItemJSONObject = itemsJSONObject.getJSONObject(key);
+		FragmentLayoutStructureItem fragmentLayoutStructureItem =
+			(FragmentLayoutStructureItem)layoutStructureItem;
 
-			JSONObject configJSONObject = newItemJSONObject.getJSONObject(
-				"config");
+		Assert.assertEquals(
+			fragmentEntryLinkId,
+			fragmentLayoutStructureItem.getFragmentEntryLinkId());
 
-			Assert.assertEquals(
-				fragmentEntryLinkId,
-				configJSONObject.getString("fragmentEntryLinkId"));
+		Assert.assertEquals(
+			_layoutStructure.getMainItemId(),
+			fragmentLayoutStructureItem.getParentItemId());
 
-			Assert.assertEquals(
-				"root", newItemJSONObject.getString("parentId"));
+		LayoutStructureItem rootLayoutStructureItem =
+			layoutStructure.getMainLayoutStructureItem();
 
-			JSONObject rootItemJSONObject = itemsJSONObject.getJSONObject(
-				"root");
+		List<String> childrenItemIds =
+			rootLayoutStructureItem.getChildrenItemIds();
 
-			JSONArray childrenJSONArray = rootItemJSONObject.getJSONArray(
-				"children");
+		Assert.assertEquals(
+			fragmentLayoutStructureItem.getItemId(), childrenItemIds.get(0));
+	}
 
-			Assert.assertEquals(
-				newItemJSONObject.getString("itemId"),
-				childrenJSONArray.getString(0));
-		}
+	private Layout _addLayout() throws PortalException {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
+
+		return _layoutLocalService.addLayout(
+			TestPropsValues.getUserId(), _group.getGroupId(), false,
+			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			StringPool.BLANK, LayoutConstants.TYPE_CONTENT, false,
+			StringPool.BLANK, serviceContext);
 	}
 
 	private MockActionRequest _getMockActionRequest() throws PortalException {
@@ -308,15 +324,6 @@ public class AddPortletMVCActionCommandTest {
 		return themeDisplay;
 	}
 
-	private String _read(String fileName) throws Exception {
-		Class<?> clazz = getClass();
-
-		InputStream inputStream = clazz.getResourceAsStream(
-			"dependencies/" + fileName);
-
-		return StringUtil.read(inputStream);
-	}
-
 	private Company _company;
 
 	@Inject
@@ -336,12 +343,17 @@ public class AddPortletMVCActionCommandTest {
 
 	private Layout _layout;
 
+	@Inject
+	private LayoutLocalService _layoutLocalService;
+
 	@DeleteAfterTestRun
 	private LayoutPageTemplateStructure _layoutPageTemplateStructure;
 
 	@Inject
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
+
+	private LayoutStructure _layoutStructure;
 
 	@Inject(filter = "mvc.command.name=/content_layout/add_portlet")
 	private MVCActionCommand _mvcActionCommand;
@@ -355,34 +367,19 @@ public class AddPortletMVCActionCommandTest {
 		public MockActionRequest(Layout layout, ThemeDisplay themeDisplay) {
 			_layout = layout;
 			_themeDisplay = themeDisplay;
-		}
 
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			MockHttpServletRequest httpServletRequest =
-				new MockHttpServletRequest();
+			HttpServletRequest httpServletRequest = getHttpServletRequest();
 
 			httpServletRequest.setAttribute(
-				JavaConstants.JAVAX_PORTLET_RESPONSE, new MockActionResponse());
+				JavaConstants.JAVAX_PORTLET_RESPONSE,
+				new MockLiferayPortletActionResponse());
 			httpServletRequest.setAttribute(WebKeys.LAYOUT, _layout);
 			httpServletRequest.setAttribute(
 				WebKeys.THEME_DISPLAY, _themeDisplay);
-
-			return httpServletRequest;
 		}
 
 		private final Layout _layout;
 		private final ThemeDisplay _themeDisplay;
-
-	}
-
-	private static class MockActionResponse
-		extends MockLiferayPortletActionResponse {
-
-		@Override
-		public HttpServletResponse getHttpServletResponse() {
-			return new MockHttpServletResponse();
-		}
 
 	}
 

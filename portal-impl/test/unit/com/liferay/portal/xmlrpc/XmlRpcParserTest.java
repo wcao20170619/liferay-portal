@@ -109,18 +109,18 @@ public class XmlRpcParserTest {
 		Assert.assertEquals("hello", parameterizedMethodArguments[1]);
 		Assert.assertEquals("world", parameterizedMethodArguments[2]);
 
-		for (String xml : _NON_PARAMETERIZED_METHODS) {
-			Tuple nonParameterizedMethodTuple = XmlRpcParser.parseMethod(xml);
+		for (String xml : _NONPARAMETERIZED_METHODS) {
+			Tuple nonparameterizedMethodTuple = XmlRpcParser.parseMethod(xml);
 
 			Assert.assertEquals(
-				"noParams", nonParameterizedMethodTuple.getObject(0));
+				"noParams", nonparameterizedMethodTuple.getObject(0));
 
-			Object[] nonParameterizedMethodArguments =
-				(Object[])nonParameterizedMethodTuple.getObject(1);
+			Object[] nonparameterizedMethodArguments =
+				(Object[])nonparameterizedMethodTuple.getObject(1);
 
 			Assert.assertEquals(
-				Arrays.toString(nonParameterizedMethodArguments), 0,
-				nonParameterizedMethodArguments.length);
+				Arrays.toString(nonparameterizedMethodArguments), 0,
+				nonparameterizedMethodArguments.length);
 		}
 	}
 
@@ -190,7 +190,7 @@ public class XmlRpcParserTest {
 
 	// Skip JavaParser
 
-	private static final String[] _NON_PARAMETERIZED_METHODS = {
+	private static final String[] _NONPARAMETERIZED_METHODS = {
 		StringBundler.concat(
 			"<?xml version=\"1.0\"?>",
 			"<methodCall>",

@@ -15,18 +15,18 @@
 /**
  * The Autocomplete Input Caretoffset Sel Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-autocomplete-input-caretoffset-sel
  */
 
 AUI.add(
 	'liferay-autocomplete-input-caretoffset-sel',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var DOC = A.config.doc;
 
-		var AutcompleteInputCaretOffset = function() {};
+		var AutcompleteInputCaretOffset = function () {};
 
 		AutcompleteInputCaretOffset.prototype = {
 			_getCaretOffset(node) {

@@ -398,6 +398,19 @@ mariadb.executable=${mariadb.executable}]]></echo>
 						</else>
 					</if>
 
+					<if>
+						<and>
+							<equals arg1="${operating.system.type}" arg2="centos" />
+							<equals arg1="${operating.system.centos.version}" arg2="8" />
+							<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+						</and>
+						<then>
+							<stop-docker-os />
+
+							<start-docker-os />
+						</then>
+					</if>
+
 					<antcall inheritall="false" target="copy-optional-jars">
 						<param name="database.type" value="@{database.type}" />
 						<param name="todir" value="lib/development" />
@@ -424,6 +437,17 @@ mariadb.executable=${mariadb.executable}]]></echo>
 							<antcall target="stop-app-server" />
 
 							<delete failonerror="false" file=".testable.portal.started" />
+						</then>
+					</if>
+
+					<if>
+						<and>
+							<equals arg1="${operating.system.type}" arg2="centos" />
+							<equals arg1="${operating.system.centos.version}" arg2="8" />
+							<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+						</and>
+						<then>
+							<stop-docker-os />
 						</then>
 					</if>
 
@@ -1476,13 +1500,18 @@ app.server.type=@{app.server.type}]]></echo>
 				<matches pattern="[A-z]+" string="${axis.variable}" />
 			</condition>
 
+			<if>
+				<matches pattern="[0-9]+_[0-9]+" string="${test.class}" />
+				<then>
+					<get-test-class />
+				</then>
+			</if>
+
 			<property name="functional.test.type" value="@{functional.test.type}" />
 
 			<condition else="0" property="functional.batch.retry.count" value="1">
 				<and>
-					<not>
-						<contains string="${test.class}" substring="," />
-					</not>
+					<matches pattern="^[\w\.]+#[\w]+$" string="${test.class}" />
 					<or>
 						<contains string="${env.TOP_LEVEL_JOB_NAME}" substring="test-portal-acceptance" />
 						<contains string="${env.TOP_LEVEL_JOB_NAME}" substring="test-portal-testsuite-upstream" />
@@ -2687,7 +2716,7 @@ log.sanitizer.enabled=false</echo>
 
 							<setup-test-batch-testable-tomcat test.portal.bundle.version="@{test.portal.bundle.version}" />
 
-							<antcall target="start-app-server-preserve-liferay-home" />
+							<antcall inheritAll="false" target="start-app-server-preserve-liferay-home" />
 
 							<gradle-execute dir="modules" refreshdependencies="@{refreshdependencies}" task="testIntegration">
 								<arg value="--continue" />
@@ -2695,7 +2724,7 @@ log.sanitizer.enabled=false</echo>
 								<arg value="-Dtest.class.group.index=${axis.variable}" />
 							</gradle-execute>
 
-							<antcall target="stop-app-server" />
+							<antcall inheritAll="false" target="stop-app-server" />
 
 							<if>
 								<and>
@@ -3600,7 +3629,7 @@ log.sanitizer.enabled=false</echo>
 
 				<trycatch property="junit.failure.message">
 					<try>
-						<for keepgoing="true" list="check-upgrade-client-gogoshell,check-upgrade-client-gogoshell-failed-upgrade,check-upgrade-client-help,check-upgrade-client-java-version,check-upgrade-client-custom-log,check-upgrade-client-additional-settings,check-upgrade-client-sh-disconnect,check-upgrade-client-second-process,check-upgrade-client-upgrade-core-only,check-upgrade-client-zip-content,check-upgrade-properties-app-db-set,check-upgrade-properties-app-ext-set,check-upgrade-properties-db-ext-set,check-upgrade-properties-none-set" param="upgrade.test.target">
+						<for keepgoing="true" list="check-upgrade-client-additional-settings,check-upgrade-client-custom-log,check-upgrade-client-gogoshell,check-upgrade-client-gogoshell-command-output,check-upgrade-client-gogoshell-failed-upgrade,check-upgrade-client-gogoshell-help-output,check-upgrade-client-help,check-upgrade-client-java-version,check-upgrade-client-second-process,check-upgrade-client-sh-disconnect,check-upgrade-client-upgrade-core-only,check-upgrade-client-zip-content,check-upgrade-properties-app-db-set,check-upgrade-properties-app-ext-set,check-upgrade-properties-db-ext-set,check-upgrade-properties-none-set" param="upgrade.test.target">
 							<sequential>
 								<ant antfile="modules/util/portal-tools-db-upgrade-client/src/testFunctional/ant/build-test-db-upgrade-client.xml" target="@{upgrade.test.target}" />
 							</sequential>
@@ -4065,6 +4094,10 @@ log.sanitizer.enabled=false</echo>
 			test.portal.lpkg.name="${test.portal.lpkg.name}"
 			test.sql.zip.url="${test.sql.zip.url}"
 		/>
+	</target>
+
+	<target name="functional-centos8-tomcat90-mysql57-jdk8">
+		<run-functional-test app.server.type="tomcat" database.type="mysql" database.version="5.7" test.portal.log.assert="true" />
 	</target>
 
 	<target name="functional-smoke-bundle-tomcat-mysql56-jdk8">
@@ -5146,6 +5179,13 @@ log.sanitizer.enabled=false</echo>
 		<run-modules-integration-test database.type="postgresql" database.version="12.1" />
 	</target>
 
+	<target name="modules-integration-project-templates-jdk8">
+		<antcall target="modules-unit-jdk8">
+			<param name="project.templates.test" value="true" />
+			<param name="project.templates.test.builds" value="true" />
+		</antcall>
+	</target>
+
 	<target name="modules-integration-sqlserver2017-jdk8">
 		<run-modules-integration-test database.type="sqlserver" database.version="2017" />
 	</target>
@@ -5292,11 +5332,23 @@ log.sanitizer.enabled=false</echo>
 	<target name="modules-unit-jdk8">
 		<run-batch-test>
 			<test-action>
+				<if>
+					<equals arg1="${project.templates.test}" arg2="true" />
+					<then>
+						<gradle-execute dir="modules/sdk/project-templates" task="install">
+							<arg value="--continue" />
+							<arg value="-Dbuild.exclude.ant.plugin=true" />
+							<arg if:set="project.templates.test.builds" value="-Dproject.templates.test.builds=${project.templates.test.builds}" />
+						</gradle-execute>
+					</then>
+				</if>
+
 				<gradle-execute dir="modules" task="test">
 					<arg value="--continue" />
 					<arg value="-Dbuild.exclude.ant.plugin=true" />
 					<arg if:set="com.liferay.portal.search.solr7.test.unit.started" value="-Dcom.liferay.portal.search.solr7.test.unit.started=${com.liferay.portal.search.solr7.test.unit.started}" />
 					<arg value="-Djunit.code.coverage=${test.batch.code.coverage}" />
+					<arg if:set="project.templates.test.builds" value="-Dproject.templates.test.builds=${project.templates.test.builds}" />
 					<arg value="-Dtest.class.group.index=${axis.variable}" />
 				</gradle-execute>
 			</test-action>
@@ -5327,7 +5379,10 @@ log.sanitizer.enabled=false</echo>
 	</target>
 
 	<target name="modules-unit-project-templates-jdk8">
-		<antcall target="modules-unit-jdk8" />
+		<antcall target="modules-unit-jdk8">
+			<param name="project.templates.test" value="true" />
+			<param name="project.templates.test.builds" value="false" />
+		</antcall>
 	</target>
 
 	<target name="oracle-service-start">
@@ -6332,6 +6387,13 @@ information. Make sure to commit in all build services results.
 					tofile="${module.base.dir}/settings.gradle.temp"
 					verbose="true"
 				/>
+
+				<if>
+					<contains string="${module.base.dir}" substring="dxp" />
+					<then>
+						<antcall inheritAll="false" target="setup-profile-dxp" />
+					</then>
+				</if>
 
 				<gradle-execute checktask="true" dir="${module.base.dir}" forcedcacheenabled="false" refreshdependencies="true" task="test" />
 

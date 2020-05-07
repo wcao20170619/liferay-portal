@@ -21,6 +21,9 @@ public class OAuth2ProviderWebKeys {
 
 	public static final String ASSIGN_SCOPES_MODEL = "ASSIGN_SCOPES_MODEL";
 
+	public static final String ASSIGN_SCOPES_TREE_DISPLAY_CONTEXT =
+		"ASSIGN_SCOPES_TREE_DISPLAY_CONTEXT";
+
 	public static final String OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT =
 		"OAUTH2_ADMIN_PORTLET_DISPLAY_CONTEXT";
 

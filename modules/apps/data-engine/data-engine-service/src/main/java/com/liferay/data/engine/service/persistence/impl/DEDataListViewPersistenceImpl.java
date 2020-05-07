@@ -16,6 +16,7 @@ package com.liferay.data.engine.service.persistence.impl;
 
 import com.liferay.data.engine.exception.NoSuchDataListViewException;
 import com.liferay.data.engine.model.DEDataListView;
+import com.liferay.data.engine.model.DEDataListViewTable;
 import com.liferay.data.engine.model.impl.DEDataListViewImpl;
 import com.liferay.data.engine.model.impl.DEDataListViewModelImpl;
 import com.liferay.data.engine.service.persistence.DEDataListViewPersistence;
@@ -2578,16 +2579,18 @@ public class DEDataListViewPersistenceImpl
 		"deDataListView.ddmStructureId = ?";
 
 	public DEDataListViewPersistenceImpl() {
-		setModelClass(DEDataListView.class);
-
-		setModelImplClass(DEDataListViewImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DEDataListView.class);
+
+		setModelImplClass(DEDataListViewImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DEDataListViewTable.INSTANCE);
 	}
 
 	/**

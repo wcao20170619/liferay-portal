@@ -21,6 +21,7 @@ const MAX_TIMEOUT = Math.pow(2, 31) - 1;
  */
 
 class Utils {
+
 	/**
 	 * Returns the maximum number allowed by the `setTimeout` function
 	 * @return {!Number} The number
@@ -47,7 +48,7 @@ class Utils {
 	 */
 
 	static getPortletBoundaryIds(portletIds) {
-		return portletIds.map(portletId => {
+		return portletIds.map((portletId) => {
 			return Utils.getPortletBoundaryId(portletId);
 		});
 	}
@@ -57,7 +58,7 @@ class Utils {
 	 */
 
 	static resetAllPortlets() {
-		Utils.getPortletBoundaryIds(Liferay.Portlet.list).forEach(value => {
+		Utils.getPortletBoundaryIds(Liferay.Portlet.list).forEach((value) => {
 			const portlet = document.querySelector('#' + value);
 
 			if (portlet) {

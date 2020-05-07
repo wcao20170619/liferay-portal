@@ -26,22 +26,27 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Calendar;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.HistogramMetric;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Index;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.NodeMetric;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ProcessMetric;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.ReindexStatus;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Role;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLA;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Task;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TaskBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TimeRange;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.CalendarResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.HistogramMetricResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.InstanceResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeMetricResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessMetricResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ReindexStatusResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.RoleResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.SLAResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.TaskResource;
@@ -83,6 +88,14 @@ public class Query {
 			histogramMetricResourceComponentServiceObjects;
 	}
 
+	public static void setIndexResourceComponentServiceObjects(
+		ComponentServiceObjects<IndexResource>
+			indexResourceComponentServiceObjects) {
+
+		_indexResourceComponentServiceObjects =
+			indexResourceComponentServiceObjects;
+	}
+
 	public static void setInstanceResourceComponentServiceObjects(
 		ComponentServiceObjects<InstanceResource>
 			instanceResourceComponentServiceObjects) {
@@ -121,6 +134,14 @@ public class Query {
 
 		_processMetricResourceComponentServiceObjects =
 			processMetricResourceComponentServiceObjects;
+	}
+
+	public static void setReindexStatusResourceComponentServiceObjects(
+		ComponentServiceObjects<ReindexStatusResource>
+			reindexStatusResourceComponentServiceObjects) {
+
+		_reindexStatusResourceComponentServiceObjects =
+			reindexStatusResourceComponentServiceObjects;
 	}
 
 	public static void setRoleResourceComponentServiceObjects(
@@ -193,17 +214,30 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processInstances(assigneeIds: ___, dateEnd: ___, dateStart: ___, page: ___, pageSize: ___, processId: ___, slaStatuses: ___, statuses: ___, taskKeys: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {indexes{items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public IndexPage indexes() throws Exception {
+		return _applyComponentServiceObjects(
+			_indexResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			indexResource -> new IndexPage(indexResource.getIndexesPage()));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processInstances(assigneeIds: ___, completed: ___, dateEnd: ___, dateStart: ___, page: ___, pageSize: ___, processId: ___, slaStatuses: ___, taskNames: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public InstancePage processInstances(
 			@GraphQLName("processId") Long processId,
 			@GraphQLName("assigneeIds") Long[] assigneeIds,
+			@GraphQLName("completed") Boolean completed,
 			@GraphQLName("dateEnd") Date dateEnd,
 			@GraphQLName("dateStart") Date dateStart,
 			@GraphQLName("slaStatuses") String[] slaStatuses,
-			@GraphQLName("statuses") String[] statuses,
-			@GraphQLName("taskKeys") String[] taskKeys,
+			@GraphQLName("taskNames") String[] taskNames,
 			@GraphQLName("pageSize") int pageSize,
 			@GraphQLName("page") int page)
 		throws Exception {
@@ -213,14 +247,14 @@ public class Query {
 			this::_populateResourceContext,
 			instanceResource -> new InstancePage(
 				instanceResource.getProcessInstancesPage(
-					processId, assigneeIds, dateEnd, dateStart, slaStatuses,
-					statuses, taskKeys, Pagination.of(page, pageSize))));
+					processId, assigneeIds, completed, dateEnd, dateStart,
+					slaStatuses, taskNames, Pagination.of(page, pageSize))));
 	}
 
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processInstance(instanceId: ___, processId: ___){assetTitle, assetTitle_i18n, assetType, assetType_i18n, assignees, className, classPK, completed, creator, dateCompletion, dateCreated, dateModified, duration, id, processId, processVersion, slaResults, slaStatus, status, taskNames, transitions}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processInstance(instanceId: ___, processId: ___){assetTitle, assetTitle_i18n, assetType, assetType_i18n, assignees, className, classPK, completed, creator, dateCompletion, dateCreated, dateModified, duration, id, processId, processVersion, slaResults, slaStatus, taskNames, transitions}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Instance processInstance(
@@ -354,6 +388,20 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {reindexStatus{items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public ReindexStatusPage reindexStatus() throws Exception {
+		return _applyComponentServiceObjects(
+			_reindexStatusResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			reindexStatusResource -> new ReindexStatusPage(
+				reindexStatusResource.getReindexStatusPage()));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processRoles(completed: ___, processId: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
@@ -420,7 +468,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processTask(processId: ___, taskId: ___){assigneeId, className, classPK, completed, completionUserId, dateCompletion, dateCreated, dateModified, duration, id, instanceId, label, name, nodeId, processId, processVersion}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {processTask(processId: ___, taskId: ___){assetTitle, assetTitle_i18n, assetType, assetType_i18n, assignee, className, classPK, completed, completionUserId, dateCompletion, dateCreated, dateModified, duration, id, instanceId, label, name, nodeId, processId, processVersion}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public Task processTask(
@@ -470,11 +518,11 @@ public class Query {
 
 	}
 
-	@GraphQLTypeExtension(Task.class)
+	@GraphQLTypeExtension(TaskBulkSelection.class)
 	public class GetProcessTypeExtension {
 
-		public GetProcessTypeExtension(Task task) {
-			_task = task;
+		public GetProcessTypeExtension(TaskBulkSelection taskBulkSelection) {
+			_taskBulkSelection = taskBulkSelection;
 		}
 
 		@GraphQLField
@@ -483,10 +531,10 @@ public class Query {
 				_processResourceComponentServiceObjects,
 				Query.this::_populateResourceContext,
 				processResource -> processResource.getProcess(
-					_task.getProcessId()));
+					_taskBulkSelection.getProcessId()));
 		}
 
-		private Task _task;
+		private TaskBulkSelection _taskBulkSelection;
 
 	}
 
@@ -694,11 +742,11 @@ public class Query {
 		@GraphQLField
 		public InstancePage instances(
 				@GraphQLName("assigneeIds") Long[] assigneeIds,
+				@GraphQLName("completed") Boolean completed,
 				@GraphQLName("dateEnd") Date dateEnd,
 				@GraphQLName("dateStart") Date dateStart,
 				@GraphQLName("slaStatuses") String[] slaStatuses,
-				@GraphQLName("statuses") String[] statuses,
-				@GraphQLName("taskKeys") String[] taskKeys,
+				@GraphQLName("taskNames") String[] taskNames,
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
 			throws Exception {
@@ -708,8 +756,8 @@ public class Query {
 				Query.this::_populateResourceContext,
 				instanceResource -> new InstancePage(
 					instanceResource.getProcessInstancesPage(
-						_process.getId(), assigneeIds, dateEnd, dateStart,
-						slaStatuses, statuses, taskKeys,
+						_process.getId(), assigneeIds, completed, dateEnd,
+						dateStart, slaStatuses, taskNames,
 						Pagination.of(page, pageSize))));
 		}
 
@@ -766,6 +814,38 @@ public class Query {
 
 		@GraphQLField
 		protected java.util.Collection<HistogramMetric> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
+	@GraphQLName("IndexPage")
+	public class IndexPage {
+
+		public IndexPage(Page indexPage) {
+			actions = indexPage.getActions();
+			items = indexPage.getItems();
+			lastPage = indexPage.getLastPage();
+			page = indexPage.getPage();
+			pageSize = indexPage.getPageSize();
+			totalCount = indexPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map> actions;
+
+		@GraphQLField
+		protected java.util.Collection<Index> items;
 
 		@GraphQLField
 		protected long lastPage;
@@ -926,6 +1006,38 @@ public class Query {
 
 		@GraphQLField
 		protected java.util.Collection<ProcessMetric> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
+	@GraphQLName("ReindexStatusPage")
+	public class ReindexStatusPage {
+
+		public ReindexStatusPage(Page reindexStatusPage) {
+			actions = reindexStatusPage.getActions();
+			items = reindexStatusPage.getItems();
+			lastPage = reindexStatusPage.getLastPage();
+			page = reindexStatusPage.getPage();
+			pageSize = reindexStatusPage.getPageSize();
+			totalCount = reindexStatusPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map> actions;
+
+		@GraphQLField
+		protected java.util.Collection<ReindexStatus> items;
 
 		@GraphQLField
 		protected long lastPage;
@@ -1113,6 +1225,17 @@ public class Query {
 		histogramMetricResource.setContextUser(_user);
 	}
 
+	private void _populateResourceContext(IndexResource indexResource)
+		throws Exception {
+
+		indexResource.setContextAcceptLanguage(_acceptLanguage);
+		indexResource.setContextCompany(_company);
+		indexResource.setContextHttpServletRequest(_httpServletRequest);
+		indexResource.setContextHttpServletResponse(_httpServletResponse);
+		indexResource.setContextUriInfo(_uriInfo);
+		indexResource.setContextUser(_user);
+	}
+
 	private void _populateResourceContext(InstanceResource instanceResource)
 		throws Exception {
 
@@ -1170,6 +1293,19 @@ public class Query {
 		processMetricResource.setContextUser(_user);
 	}
 
+	private void _populateResourceContext(
+			ReindexStatusResource reindexStatusResource)
+		throws Exception {
+
+		reindexStatusResource.setContextAcceptLanguage(_acceptLanguage);
+		reindexStatusResource.setContextCompany(_company);
+		reindexStatusResource.setContextHttpServletRequest(_httpServletRequest);
+		reindexStatusResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		reindexStatusResource.setContextUriInfo(_uriInfo);
+		reindexStatusResource.setContextUser(_user);
+	}
+
 	private void _populateResourceContext(RoleResource roleResource)
 		throws Exception {
 
@@ -1218,6 +1354,8 @@ public class Query {
 		_calendarResourceComponentServiceObjects;
 	private static ComponentServiceObjects<HistogramMetricResource>
 		_histogramMetricResourceComponentServiceObjects;
+	private static ComponentServiceObjects<IndexResource>
+		_indexResourceComponentServiceObjects;
 	private static ComponentServiceObjects<InstanceResource>
 		_instanceResourceComponentServiceObjects;
 	private static ComponentServiceObjects<NodeResource>
@@ -1228,6 +1366,8 @@ public class Query {
 		_processResourceComponentServiceObjects;
 	private static ComponentServiceObjects<ProcessMetricResource>
 		_processMetricResourceComponentServiceObjects;
+	private static ComponentServiceObjects<ReindexStatusResource>
+		_reindexStatusResourceComponentServiceObjects;
 	private static ComponentServiceObjects<RoleResource>
 		_roleResourceComponentServiceObjects;
 	private static ComponentServiceObjects<SLAResource>

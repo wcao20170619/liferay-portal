@@ -73,8 +73,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-
 /**
  * @author Cristina González
  */
@@ -121,7 +119,7 @@ public class DLAdminDisplayContextTest {
 		}
 
 		SearchContainer searchContainer = _getSearchContainer(
-			_getMockHttpServletRequest());
+			_getMockLiferayPortletActionRequest());
 
 		Assert.assertEquals(25, searchContainer.getTotal());
 	}
@@ -133,7 +131,7 @@ public class DLAdminDisplayContextTest {
 		}
 
 		SearchContainer searchContainer = _getSearchContainer(
-			_getMockHttpServletRequestWithSearch("alpha"));
+			_getMockLiferayPortletActionRequestWithSearch("alpha"));
 
 		Assert.assertEquals(25, searchContainer.getTotal());
 	}
@@ -152,49 +150,42 @@ public class DLAdminDisplayContextTest {
 			serviceContext);
 	}
 
-	private HttpServletRequest _getHttpServletRequest(
-		HttpServletRequest httpServletRequest) {
-
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
-
-		mockHttpServletRequest.setAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST,
-			new MockActionRequest(httpServletRequest));
-		mockHttpServletRequest.setAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE, new MockActionResponse());
-
-		return mockHttpServletRequest;
-	}
-
-	private MockHttpServletRequest _getMockHttpServletRequest()
+	private MockLiferayPortletActionRequest
+			_getMockLiferayPortletActionRequest()
 		throws PortalException {
 
-		MockHttpServletRequest mockHttpServletRequest =
-			new MockHttpServletRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			new MockLiferayPortletActionRequest();
 
-		mockHttpServletRequest.setAttribute(
+		mockLiferayPortletActionRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_CONFIG, null);
+		mockLiferayPortletActionRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST,
+			mockLiferayPortletActionRequest);
+		mockLiferayPortletActionRequest.setAttribute(
+			JavaConstants.JAVAX_PORTLET_RESPONSE, new MockActionResponse());
+		mockLiferayPortletActionRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());
 
-		return mockHttpServletRequest;
+		return mockLiferayPortletActionRequest;
 	}
 
-	private MockHttpServletRequest _getMockHttpServletRequestWithSearch(
-			String keywords)
+	private MockLiferayPortletActionRequest
+			_getMockLiferayPortletActionRequestWithSearch(String keywords)
 		throws PortalException {
 
-		MockHttpServletRequest mockHttpServletRequest =
-			_getMockHttpServletRequest();
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest =
+			_getMockLiferayPortletActionRequest();
 
-		mockHttpServletRequest.setParameter(
+		mockLiferayPortletActionRequest.setParameter(
 			"mvcRenderCommandName", "/document_library/search");
-		mockHttpServletRequest.setParameter("keywords", keywords);
+		mockLiferayPortletActionRequest.setParameter("keywords", keywords);
 
-		return mockHttpServletRequest;
+		return mockLiferayPortletActionRequest;
 	}
 
 	private SearchContainer _getSearchContainer(
-		MockHttpServletRequest mockHttpServletRequest) {
+		MockLiferayPortletActionRequest mockLiferayPortletActionRequest) {
 
 		Object dlAdminDisplayContextProvider = _serviceTracker.getService();
 
@@ -203,7 +194,7 @@ public class DLAdminDisplayContextTest {
 			new Class<?>[] {
 				HttpServletRequest.class, HttpServletResponse.class
 			},
-			_getHttpServletRequest(mockHttpServletRequest), null);
+			mockLiferayPortletActionRequest.getHttpServletRequest(), null);
 
 		return ReflectionTestUtil.invoke(
 			dlAdminDisplayContext, "getSearchContainer", new Class<?>[0], null);
@@ -236,22 +227,6 @@ public class DLAdminDisplayContextTest {
 	private Group _group;
 
 	private Layout _layout;
-
-	private static class MockActionRequest
-		extends MockLiferayPortletActionRequest {
-
-		public MockActionRequest(HttpServletRequest httpServletRequest) {
-			_httpServletRequest = httpServletRequest;
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return _httpServletRequest;
-		}
-
-		private final HttpServletRequest _httpServletRequest;
-
-	}
 
 	private static class MockActionResponse
 		extends MockLiferayPortletActionResponse {

@@ -97,7 +97,7 @@ const deleteDataDefinitionField = (dataDefinition, fieldName) => {
 	return {
 		...dataDefinition,
 		dataDefinitionFields: dataDefinition.dataDefinitionFields.filter(
-			field => field.name !== fieldName
+			(field) => field.name !== fieldName
 		),
 	};
 };
@@ -122,7 +122,7 @@ const editFocusedCustomObjectField = ({
 	const visitor = new PagesVisitor(settingsContext.pages);
 	const newSettingsContext = {
 		...settingsContext,
-		pages: visitor.mapFields(field => {
+		pages: visitor.mapFields((field) => {
 			const {fieldName, localizable} = field;
 
 			if (fieldName === propertyName) {
@@ -168,7 +168,7 @@ const setDataDefinitionFields = (
 
 	const newFields = [];
 
-	visitor.mapFields(field => {
+	visitor.mapFields((field) => {
 		const definitionField = dataLayoutBuilder.getDataDefinitionField(field);
 
 		newFields.push(definitionField);
@@ -176,21 +176,21 @@ const setDataDefinitionFields = (
 
 	return newFields.concat(
 		dataDefinitionFields.filter(
-			field =>
+			(field) =>
 				!DataLayoutVisitor.containsField(dataLayoutPages, field.name) &&
 				!newFields.some(({name}) => name === field.name)
 		)
 	);
 };
 
-const setDataLayout = dataLayoutBuilder => {
+const setDataLayout = (dataLayoutBuilder) => {
 	const {pages} = dataLayoutBuilder.getStore();
 	const {layout} = dataLayoutBuilder.getDataDefinitionAndDataLayout(pages);
 
 	return layout;
 };
 
-const createReducer = dataLayoutBuilder => {
+const createReducer = (dataLayoutBuilder) => {
 	return (state = initialState, action) => {
 		switch (action.type) {
 			case ADD_CUSTOM_OBJECT_FIELD: {
@@ -226,7 +226,7 @@ const createReducer = dataLayoutBuilder => {
 					dataLayout: {dataRules},
 				} = state;
 
-				dataRule = DataLayoutVisitor.normalizeLogicalOperator(dataRule);
+				dataRule = DataLayoutVisitor.normalizeRule(dataRule);
 
 				return {
 					...state,
@@ -269,7 +269,7 @@ const createReducer = dataLayoutBuilder => {
 					dataLayout: {
 						...state.dataLayout,
 						dataRules: dataRules.filter(
-							rule => rule.ruleEditedIndex !== ruleEditedIndex
+							(_rule, index) => index !== ruleEditedIndex
 						),
 					},
 				};
@@ -289,7 +289,7 @@ const createReducer = dataLayoutBuilder => {
 					dataDefinition: {
 						...dataDefinition,
 						dataDefinitionFields: dataDefinition.dataDefinitionFields.map(
-							dataDefinitionField => {
+							(dataDefinitionField) => {
 								if (
 									dataDefinitionField.name ===
 									focusedCustomObjectField.name
@@ -357,17 +357,14 @@ const createReducer = dataLayoutBuilder => {
 					dataLayout: {dataRules},
 				} = state;
 
-				dataRule = DataLayoutVisitor.normalizeLogicalOperator(dataRule);
+				dataRule = DataLayoutVisitor.normalizeRule(dataRule);
 
 				return {
 					...state,
 					dataLayout: {
 						...state.dataLayout,
-						dataRules: dataRules.map(rule => {
-							if (
-								rule.ruleEditedIndex ===
-								dataRule.ruleEditedIndex
-							) {
+						dataRules: dataRules.map((rule, index) => {
+							if (index === dataRule.ruleEditedIndex) {
 								return dataRule;
 							}
 

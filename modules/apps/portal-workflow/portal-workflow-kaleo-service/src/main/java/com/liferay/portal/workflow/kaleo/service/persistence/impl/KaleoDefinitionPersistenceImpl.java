@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchDefinitionException;
 import com.liferay.portal.workflow.kaleo.model.KaleoDefinition;
+import com.liferay.portal.workflow.kaleo.model.KaleoDefinitionTable;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoDefinitionImpl;
 import com.liferay.portal.workflow.kaleo.model.impl.KaleoDefinitionModelImpl;
 import com.liferay.portal.workflow.kaleo.service.persistence.KaleoDefinitionPersistence;
@@ -2007,16 +2008,18 @@ public class KaleoDefinitionPersistenceImpl
 		"kaleoDefinition.active = ?";
 
 	public KaleoDefinitionPersistenceImpl() {
-		setModelClass(KaleoDefinition.class);
-
-		setModelImplClass(KaleoDefinitionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("active", "active_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(KaleoDefinition.class);
+
+		setModelImplClass(KaleoDefinitionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(KaleoDefinitionTable.INSTANCE);
 	}
 
 	/**

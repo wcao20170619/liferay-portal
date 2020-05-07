@@ -28,6 +28,7 @@ import './BrightnessControls.soy';
  * Creates a Brightness component.
  */
 class BrightnessComponent extends Component {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -98,10 +99,10 @@ class BrightnessComponent extends Component {
 	 * finishes processing the image.
 	 */
 	spawnWorker_(message) {
-		return new Promise(resolve => {
+		return new Promise((resolve) => {
 			const workerURI = this.modulePath + '/BrightnessWorker.js';
 			const processWorker = new Worker(workerURI);
-			processWorker.onmessage = event => resolve(event.data);
+			processWorker.onmessage = (event) => resolve(event.data);
 			processWorker.postMessage(message);
 		});
 	}
@@ -114,6 +115,7 @@ class BrightnessComponent extends Component {
  * @type {!Object}
  */
 BrightnessComponent.STATE = {
+
 	/**
 	 * Path of this module.
 	 *

@@ -39,21 +39,23 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 					<liferay-ui:message key="add-this-page-to-the-following-menus" />
 
 					<div class="auto-site-navigation-menus container my-3">
-						<div class="row">
+						<clay:row>
 
 							<%
 							for (SiteNavigationMenu autoSiteNavigationMenu : autoSiteNavigationMenus) {
 							%>
 
-								<div class="col-6">
+								<clay:col
+									size="6"
+								>
 									<aui:input id='<%= "menu_" + autoSiteNavigationMenu.getSiteNavigationMenuId() %>' label="<%= HtmlUtil.escape(autoSiteNavigationMenu.getName()) %>" name="TypeSettingsProperties--siteNavigationMenuId--" type="checkbox" value="<%= autoSiteNavigationMenu.getSiteNavigationMenuId() %>" />
-								</div>
+								</clay:col>
 
 							<%
 							}
 							%>
 
-						</div>
+						</clay:row>
 					</div>
 				</c:when>
 				<c:when test="<%= autoSiteNavigationMenus.size() == 1 %>">
@@ -63,9 +65,9 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 					%>
 
 					<div class="auto-site-navigation-menus container mt-3">
-						<div class="row">
+						<clay:row>
 							<aui:input id='<%= "menu_" + autoSiteNavigationMenu.getSiteNavigationMenuId() %>' label='<%= LanguageUtil.format(request, "add-this-page-to-x", HtmlUtil.escape(autoSiteNavigationMenu.getName())) %>' name="TypeSettingsProperties--siteNavigationMenuId--" type="checkbox" value="<%= autoSiteNavigationMenu.getSiteNavigationMenuId() %>" />
-						</div>
+						</clay:row>
 					</div>
 				</c:when>
 			</c:choose>
@@ -109,14 +111,14 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 <aui:script use="liferay-alert">
 	var form = document.<portlet:namespace />fm;
 
-	form.addEventListener('submit', function(event) {
+	form.addEventListener('submit', function (event) {
 		event.stopPropagation();
 
 		var formData = new FormData();
 
 		Array.prototype.slice
 			.call(form.querySelectorAll('input'))
-			.forEach(function(input) {
+			.forEach(function (input) {
 				if (input.type == 'checkbox' && !input.checked) {
 					return;
 				}
@@ -130,10 +132,10 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 			body: formData,
 			method: 'POST',
 		})
-			.then(function(response) {
+			.then(function (response) {
 				return response.json();
 			})
-			.then(function(response) {
+			.then(function (response) {
 				if (response.redirectURL) {
 					var redirectURL = new URL(
 						response.redirectURL,

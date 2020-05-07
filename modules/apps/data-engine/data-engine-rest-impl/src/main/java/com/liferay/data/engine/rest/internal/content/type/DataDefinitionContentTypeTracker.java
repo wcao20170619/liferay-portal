@@ -15,10 +15,12 @@
 package com.liferay.data.engine.rest.internal.content.type;
 
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
+import com.liferay.data.engine.rest.resource.exception.DataDefinitionValidationException;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.osgi.service.component.annotations.Component;
@@ -35,7 +37,12 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 public class DataDefinitionContentTypeTracker {
 
 	public Long getClassNameId(String contentType) {
-		return _classNameIds.get(contentType);
+		return Optional.ofNullable(
+			_classNameIds.get(contentType)
+		).orElseThrow(
+			() -> new DataDefinitionValidationException.MustSetValidContentType(
+				contentType)
+		);
 	}
 
 	public DataDefinitionContentType getDataDefinitionContentType(
@@ -47,7 +54,12 @@ public class DataDefinitionContentTypeTracker {
 	public DataDefinitionContentType getDataDefinitionContentType(
 		String contentType) {
 
-		return _dataDefinitionContentTypesByContentType.get(contentType);
+		return Optional.ofNullable(
+			_dataDefinitionContentTypesByContentType.get(contentType)
+		).orElseThrow(
+			() -> new DataDefinitionValidationException.MustSetValidContentType(
+				contentType)
+		);
 	}
 
 	@Reference(

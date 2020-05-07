@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.wedeploy.auth.exception.NoSuchTokenException;
 import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthToken;
+import com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthTokenTable;
 import com.liferay.portal.security.wedeploy.auth.model.impl.WeDeployAuthTokenImpl;
 import com.liferay.portal.security.wedeploy.auth.model.impl.WeDeployAuthTokenModelImpl;
 import com.liferay.portal.security.wedeploy.auth.service.persistence.WeDeployAuthTokenPersistence;
@@ -688,16 +689,18 @@ public class WeDeployAuthTokenPersistenceImpl
 		"weDeployAuthToken.type = ?";
 
 	public WeDeployAuthTokenPersistenceImpl() {
-		setModelClass(WeDeployAuthToken.class);
-
-		setModelImplClass(WeDeployAuthTokenImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(WeDeployAuthToken.class);
+
+		setModelImplClass(WeDeployAuthTokenImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(WeDeployAuthTokenTable.INSTANCE);
 	}
 
 	/**

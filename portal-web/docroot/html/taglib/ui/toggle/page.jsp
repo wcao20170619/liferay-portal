@@ -62,7 +62,7 @@ String defaultMessage = (String)request.getAttribute("liferay-ui:toggle:defaultM
 			</c:choose>
 
 			if ((saveState == null) || saveState) {
-				Liferay.Store('<%= id %>', 'none');
+				Liferay.Util.Session.set('<%= id %>', 'none');
 			}
 
 			Liferay.fire(
@@ -88,7 +88,7 @@ String defaultMessage = (String)request.getAttribute("liferay-ui:toggle:defaultM
 			</c:choose>
 
 			if ((saveState == null) || saveState) {
-				Liferay.Store('<%= id %>', 'block');
+				Liferay.Util.Session.set('<%= id %>', 'block');
 			}
 
 			Liferay.fire(

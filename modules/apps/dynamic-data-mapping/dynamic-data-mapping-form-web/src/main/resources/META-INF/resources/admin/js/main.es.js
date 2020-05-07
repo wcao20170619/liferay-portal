@@ -70,7 +70,7 @@ class Form extends Component {
 		this._eventHandler = new EventHandler();
 
 		const dependencies = [
-			this._createEditor('nameEditor').then(editor => {
+			this._createEditor('nameEditor').then((editor) => {
 				this._eventHandler.add(
 					dom.on(
 						editor.element.$,
@@ -297,7 +297,9 @@ class Form extends Component {
 		this._eventHandler.removeAllListeners();
 
 		if (this._translationManagerHandles) {
-			this._translationManagerHandles.forEach(handle => handle.detach());
+			this._translationManagerHandles.forEach((handle) =>
+				handle.detach()
+			);
 		}
 	}
 
@@ -629,8 +631,8 @@ class Form extends Component {
 			promise = Promise.resolve(CKEDITOR.instances[editorName]);
 		}
 		else {
-			promise = new Promise(resolve => {
-				Liferay.on('editorAPIReady', event => {
+			promise = new Promise((resolve) => {
+				Liferay.on('editorAPIReady', (event) => {
 					if (event.editorName === editorName) {
 						event.editor.create();
 
@@ -667,7 +669,7 @@ class Form extends Component {
 		if (settingsDDMForm) {
 			const settingsPageVisitor = new PagesVisitor(settingsDDMForm.pages);
 
-			settingsPageVisitor.mapFields(field => {
+			settingsPageVisitor.mapFields((field) => {
 				if (field.fieldName === 'requireAuthentication') {
 					requireAuthentication = field.value;
 				}
@@ -739,24 +741,18 @@ class Form extends Component {
 
 	_handleFormNavClicked(event) {
 		const {delegateTarget} = event;
-		const {published, saved} = this.props;
 		const navItem = dom.closest(delegateTarget, '.nav-item');
 		const navItemIndex = Number(navItem.dataset.navItemIndex);
 		const navLink = navItem.querySelector('.nav-link');
 
-		if (
-			(navItemIndex === 2 && (published || saved)) ||
-			navItemIndex !== 2
-		) {
-			document
-				.querySelector('.forms-management-bar li > a.active')
-				.classList.remove('active');
-			navLink.classList.add('active');
+		document
+			.querySelector('.forms-management-bar li > a.active')
+			.classList.remove('active');
+		navLink.classList.add('active');
 
-			this.setState({
-				activeNavItem: navItemIndex,
-			});
-		}
+		this.setState({
+			activeNavItem: navItemIndex,
+		});
 
 		this.syncActiveNavItem(this.state.activeNavItem);
 	}
@@ -881,7 +877,7 @@ class Form extends Component {
 
 		return {
 			...context,
-			pages: context.pages.map(page => {
+			pages: context.pages.map((page) => {
 				let {
 					description,
 					localizedDescription,
@@ -1080,6 +1076,7 @@ class Form extends Component {
 }
 
 Form.PROPS = {
+
 	/**
 	 * The context for rendering a layout that represents a form.
 	 * @default undefined
@@ -1303,6 +1300,7 @@ Form.PROPS = {
 };
 
 Form.STATE = {
+
 	/**
 	 * Current active tab index.
 	 * @default

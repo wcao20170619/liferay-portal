@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.sync.exception.NoSuchDeviceException;
 import com.liferay.sync.model.SyncDevice;
+import com.liferay.sync.model.SyncDeviceTable;
 import com.liferay.sync.model.impl.SyncDeviceImpl;
 import com.liferay.sync.model.impl.SyncDeviceModelImpl;
 import com.liferay.sync.service.persistence.SyncDevicePersistence;
@@ -2284,17 +2285,19 @@ public class SyncDevicePersistenceImpl
 		"(syncDevice.userName IS NULL OR syncDevice.userName LIKE '')";
 
 	public SyncDevicePersistenceImpl() {
-		setModelClass(SyncDevice.class);
-
-		setModelImplClass(SyncDeviceImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SyncDevice.class);
+
+		setModelImplClass(SyncDeviceImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(SyncDeviceTable.INSTANCE);
 	}
 
 	/**

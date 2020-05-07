@@ -1,7 +1,7 @@
 .ddm-form-report {
 	.ddm-form-report-header {
 		background-color: #fff;
-		height: 173px;
+		height: 124px;
 		padding-top: 24px;
 
 		.ddm-form-report-header-subtitle {
@@ -13,6 +13,14 @@
 		.ddm-form-report-header-title {
 			font-size: 32px;
 			font-weight: 600;
+		}
+	}
+
+	.ddm-form-report-tabs {
+		.nav-item {
+			.nav-link {
+				cursor: pointer;
+			}
 		}
 	}
 }

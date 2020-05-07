@@ -118,7 +118,8 @@ public class ViewAuthorizationRequestMVCRenderCommand
 			OAuth2AuthorizePortletDisplayContext
 				oAuth2AuthorizePortletDisplayContext =
 					new OAuth2AuthorizePortletDisplayContext(
-						themeDisplay, _dlURLHelper);
+						_dlURLHelper, _oAuth2ApplicationService, renderRequest,
+						themeDisplay);
 
 			oAuth2AuthorizePortletDisplayContext.setOAuth2Application(
 				oAuth2Application);

@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.InactiveRequestHandler;
 import com.liferay.portal.kernel.servlet.PortalMessages;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
@@ -93,7 +94,8 @@ import org.osgi.service.component.annotations.Reference;
 public class FriendlyURLServlet extends HttpServlet {
 
 	public Redirect getRedirect(
-			HttpServletRequest httpServletRequest, String path)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String path)
 		throws PortalException {
 
 		if (path.length() <= 1) {
@@ -300,7 +302,19 @@ public class FriendlyURLServlet extends HttpServlet {
 			redirectNotFoundEntryLocalService.addOrUpdateRedirectNotFoundEntry(
 				group, _normalizeFriendlyURL(friendlyURL));
 
-			throw noSuchLayoutException;
+			if (Validator.isNotNull(
+					PropsValues.LAYOUT_FRIENDLY_URL_PAGE_NOT_FOUND)) {
+
+				throw noSuchLayoutException;
+			}
+
+			httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+			SessionErrors.add(
+				httpServletRequest, noSuchLayoutException.getClass(),
+				noSuchLayoutException);
+
+			friendlyURL = null;
 		}
 
 		String actualURL = portal.getActualURL(
@@ -381,7 +395,8 @@ public class FriendlyURLServlet extends HttpServlet {
 		Redirect redirect = null;
 
 		try {
-			redirect = getRedirect(httpServletRequest, pathInfo);
+			redirect = getRedirect(
+				httpServletRequest, httpServletResponse, pathInfo);
 
 			if (httpServletRequest.getAttribute(WebKeys.LAST_PATH) == null) {
 				httpServletRequest.setAttribute(

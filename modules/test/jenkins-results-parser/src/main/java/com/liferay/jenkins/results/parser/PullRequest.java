@@ -187,6 +187,10 @@ public class PullRequest {
 		return comments;
 	}
 
+	public String getCommonParentSHA() {
+		return _commonParentSHA;
+	}
+
 	public GitHubRemoteGitCommit getGitHubRemoteGitCommit() {
 		return GitCommitFactory.newGitHubRemoteGitCommit(
 			getOwnerUsername(), getGitHubRemoteGitRepositoryName(),
@@ -371,6 +375,20 @@ public class PullRequest {
 		try {
 			_jsonObject = JenkinsResultsParserUtil.toJSONObject(
 				getURL(), false);
+
+			JSONArray commitsJSONArray = JenkinsResultsParserUtil.toJSONArray(
+				_jsonObject.getString("commits_url"));
+
+			JSONObject firstCommitJSONObject = commitsJSONArray.getJSONObject(
+				0);
+
+			JSONArray parentsJSONArray = firstCommitJSONObject.getJSONArray(
+				"parents");
+
+			JSONObject firstParentJSONObject = parentsJSONArray.getJSONObject(
+				0);
+
+			_commonParentSHA = firstParentJSONObject.getString("sha");
 
 			_labels.clear();
 
@@ -617,7 +635,7 @@ public class PullRequest {
 
 		static {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm'Z'");
+				"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 			simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -692,6 +710,7 @@ public class PullRequest {
 			"(?<gitHubRemoteGitRepositoryName>[^/]+)/pull/(?<number>\\d+)"));
 
 	private Boolean _autoCloseCommentAvailable;
+	private String _commonParentSHA;
 	private GitHubRemoteGitRepository _gitHubRemoteGitRepository;
 	private String _gitHubRemoteGitRepositoryName;
 	private JSONObject _jsonObject;

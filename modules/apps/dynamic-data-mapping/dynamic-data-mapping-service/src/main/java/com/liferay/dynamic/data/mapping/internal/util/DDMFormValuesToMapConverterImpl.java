@@ -27,8 +27,8 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -78,10 +78,12 @@ public class DDMFormValuesToMapConverterImpl
 			return;
 		}
 
+		String name = ddmFormField.getName();
+
 		Value value = ddmFormFieldValue.getValue();
 
 		if (value == null) {
-			values.put(ddmFormField.getName(), null);
+			values.put(name, null);
 
 			return;
 		}
@@ -90,7 +92,7 @@ public class DDMFormValuesToMapConverterImpl
 			if (ddmFormField.isLocalizable()) {
 				Map<String, Object> localizedValues =
 					(Map<String, Object>)values.getOrDefault(
-						ddmFormField.getName(), new HashMap<>());
+						name, new HashMap<>());
 
 				LocalizedValue localizedValue = (LocalizedValue)value;
 
@@ -100,38 +102,33 @@ public class DDMFormValuesToMapConverterImpl
 				for (Locale locale : availableLocales) {
 					String languageId = LanguageUtil.getLanguageId(locale);
 
-					Object[] instancesValue =
-						(Object[])localizedValues.getOrDefault(
-							languageId, new Object[0]);
+					List<Object> list =
+						(List<Object>)localizedValues.getOrDefault(
+							languageId, new ArrayList<>());
 
-					localizedValues.put(
-						languageId,
-						ArrayUtil.append(
-							instancesValue, localizedValue.getString(locale)));
+					list.add(localizedValue.getString(locale));
+
+					localizedValues.put(languageId, list);
 				}
 
-				values.put(ddmFormField.getName(), localizedValues);
+				values.put(name, localizedValues);
 			}
 			else {
-				Object[] instancesValue = (Object[])values.getOrDefault(
-					ddmFormField.getName(), new Object[0]);
+				List<Object> list = (List<Object>)values.getOrDefault(
+					name, new ArrayList<>());
 
-				values.put(
-					ddmFormField.getName(),
-					ArrayUtil.append(
-						instancesValue,
-						value.getString(value.getDefaultLocale())));
+				list.add(value.getString(value.getDefaultLocale()));
+
+				values.put(name, list);
 			}
 		}
 		else if (ddmFormField.isLocalizable()) {
 			values.put(
-				ddmFormField.getName(),
+				name,
 				_toLocalizedMap(ddmFormField.getType(), (LocalizedValue)value));
 		}
 		else {
-			values.put(
-				ddmFormField.getName(),
-				value.getString(value.getDefaultLocale()));
+			values.put(name, value.getString(value.getDefaultLocale()));
 		}
 	}
 

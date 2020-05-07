@@ -24,8 +24,11 @@
 	}
 
 	.sidebar {
+		border-left: 1px solid $gray-300;
+		box-shadow: none;
+
 		.sidebar-body {
-			height: calc(100vh - 168px);
+			height: calc(100vh - 224px);
 
 			.component-tbar {
 				height: auto;

@@ -38,8 +38,6 @@ import com.liferay.portal.util.PropsImpl;
 
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +109,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
@@ -131,7 +129,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
@@ -150,7 +148,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
@@ -167,7 +165,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
@@ -185,7 +183,7 @@ public class DLEditFileEntryTypeDisplayContextTest {
 			new DLEditFileEntryTypeDisplayContext(
 				_ddm, _ddmStorageLinkLocalService, _ddmStructureLocalService,
 				_language,
-				new MockPortletRenderRequest(
+				new MockLiferayPortletRenderRequest(
 					new MockHttpServletRequestBuilder().withAttribute(
 						WebKeys.DOCUMENT_LIBRARY_DYNAMIC_DATA_MAPPING_STRUCTURE,
 						_getRandomDDMStructure()
@@ -241,31 +239,5 @@ public class DLEditFileEntryTypeDisplayContextTest {
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private Language _language;
-
-	private class MockPortletRenderRequest
-		extends MockLiferayPortletRenderRequest {
-
-		public MockPortletRenderRequest(HttpServletRequest httpServletRequest) {
-			_httpServletRequest = httpServletRequest;
-		}
-
-		@Override
-		public Object getAttribute(String name) {
-			return _httpServletRequest.getAttribute(name);
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return _httpServletRequest;
-		}
-
-		@Override
-		public String getParameter(String name) {
-			return _httpServletRequest.getParameter(name);
-		}
-
-		private final HttpServletRequest _httpServletRequest;
-
-	}
 
 }

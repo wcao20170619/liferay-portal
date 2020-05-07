@@ -26,13 +26,16 @@ import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Assignee;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.AssigneeBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.AssigneeMetric;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.AssigneeMetricBulkSelection;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Index;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Instance;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Node;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Process;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.SLA;
 import com.liferay.portal.workflow.metrics.rest.dto.v1_0.Task;
+import com.liferay.portal.workflow.metrics.rest.dto.v1_0.TaskBulkSelection;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.AssigneeMetricResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.AssigneeResource;
+import com.liferay.portal.workflow.metrics.rest.resource.v1_0.IndexResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.InstanceResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.NodeResource;
 import com.liferay.portal.workflow.metrics.rest.resource.v1_0.ProcessResource;
@@ -72,6 +75,14 @@ public class Mutation {
 
 		_assigneeMetricResourceComponentServiceObjects =
 			assigneeMetricResourceComponentServiceObjects;
+	}
+
+	public static void setIndexResourceComponentServiceObjects(
+		ComponentServiceObjects<IndexResource>
+			indexResourceComponentServiceObjects) {
+
+		_indexResourceComponentServiceObjects =
+			indexResourceComponentServiceObjects;
 	}
 
 	public static void setInstanceResourceComponentServiceObjects(
@@ -156,6 +167,18 @@ public class Mutation {
 
 				return paginationPage.getItems();
 			});
+	}
+
+	@GraphQLField
+	public boolean patchIndexesReindex(@GraphQLName("index") Index index)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_indexResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			indexResource -> indexResource.patchIndexesReindex(index));
+
+		return true;
 	}
 
 	@GraphQLField
@@ -489,6 +512,25 @@ public class Mutation {
 		return true;
 	}
 
+	@GraphQLField
+	public java.util.Collection<Task> createProcessTasksPage(
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page,
+			@GraphQLName("taskBulkSelection") TaskBulkSelection
+				taskBulkSelection)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_taskResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			taskResource -> {
+				Page paginationPage = taskResource.postProcessTasksPage(
+					Pagination.of(page, pageSize), taskBulkSelection);
+
+				return paginationPage.getItems();
+			});
+	}
+
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R
 			_applyComponentServiceObjects(
 				ComponentServiceObjects<T> componentServiceObjects,
@@ -552,6 +594,17 @@ public class Mutation {
 		assigneeMetricResource.setContextUser(_user);
 	}
 
+	private void _populateResourceContext(IndexResource indexResource)
+		throws Exception {
+
+		indexResource.setContextAcceptLanguage(_acceptLanguage);
+		indexResource.setContextCompany(_company);
+		indexResource.setContextHttpServletRequest(_httpServletRequest);
+		indexResource.setContextHttpServletResponse(_httpServletResponse);
+		indexResource.setContextUriInfo(_uriInfo);
+		indexResource.setContextUser(_user);
+	}
+
 	private void _populateResourceContext(InstanceResource instanceResource)
 		throws Exception {
 
@@ -611,6 +664,8 @@ public class Mutation {
 		_assigneeResourceComponentServiceObjects;
 	private static ComponentServiceObjects<AssigneeMetricResource>
 		_assigneeMetricResourceComponentServiceObjects;
+	private static ComponentServiceObjects<IndexResource>
+		_indexResourceComponentServiceObjects;
 	private static ComponentServiceObjects<InstanceResource>
 		_instanceResourceComponentServiceObjects;
 	private static ComponentServiceObjects<NodeResource>

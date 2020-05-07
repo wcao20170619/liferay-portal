@@ -14,10 +14,9 @@
 
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
 import React from 'react';
-import {HashRouter} from 'react-router-dom';
 
-import {AppContextProvider} from '../../../../src/main/resources/META-INF/resources/js/AppContext.es';
 import ViewCustomObject from '../../../../src/main/resources/META-INF/resources/js/pages/custom-object/ViewCustomObject.es';
+import AppContextProviderWrapper from '../../AppContextProviderWrapper.es';
 
 import '@testing-library/jest-dom/extend-expect';
 
@@ -27,25 +26,6 @@ describe('ViewCustomObject', () => {
 			en_US: 'Custom Object',
 		},
 	};
-
-	const ViewCustomObjectWithRouter = () => (
-		<>
-			<div className="tools-control-group">
-				<div className="control-menu-level-1-heading" />
-			</div>
-			<HashRouter>
-				<AppContextProvider value={{}}>
-					<ViewCustomObject
-						match={{
-							params: {
-								dataDefinitionId: 1,
-							},
-						}}
-					></ViewCustomObject>
-				</AppContextProvider>
-			</HashRouter>
-		</>
-	);
 
 	beforeEach(() => {
 		jest.useFakeTimers();
@@ -64,7 +44,16 @@ describe('ViewCustomObject', () => {
 	it('renders', async () => {
 		fetch.mockResponseOnce(JSON.stringify(RESPONSE));
 
-		const {asFragment} = render(<ViewCustomObjectWithRouter />);
+		const {asFragment} = render(
+			<ViewCustomObject
+				match={{
+					params: {
+						dataDefinitionId: 1,
+					},
+				}}
+			></ViewCustomObject>,
+			{wrapper: AppContextProviderWrapper}
+		);
 
 		await act(async () => {
 			jest.runAllTimers();
@@ -76,7 +65,16 @@ describe('ViewCustomObject', () => {
 	it('clicks on tabs and checks if they are active', async () => {
 		fetch.mockResponse(JSON.stringify(RESPONSE));
 
-		const {queryByText} = render(<ViewCustomObjectWithRouter />);
+		const {queryByText} = render(
+			<ViewCustomObject
+				match={{
+					params: {
+						dataDefinitionId: 1,
+					},
+				}}
+			></ViewCustomObject>,
+			{wrapper: AppContextProviderWrapper}
+		);
 
 		await act(async () => {
 			jest.runAllTimers();

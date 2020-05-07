@@ -28,7 +28,14 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
  */
 @DDMForm(
 	rules = {
-		@DDMFormRule(actions = "setVisible('name', FALSE)", condition = "TRUE")
+		@DDMFormRule(
+			actions = {
+				"setVisible('ddmStructureId', FALSE)",
+				"setVisible('ddmStructureLayoutId', FALSE)",
+				"setVisible('name', FALSE)", "setVisible('rows', FALSE)"
+			},
+			condition = "TRUE"
+		)
 	}
 )
 @DDMFormLayout(
@@ -42,8 +49,8 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 						@DDMFormLayoutColumn(
 							size = 12,
 							value = {
-								"dataDefinitionId", "label", "name",
-								"repeatable", "rows", "type"
+								"label", "name", "collapsible", "repeatable",
+								"rows", "type"
 							}
 						)
 					}
@@ -55,12 +62,22 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 public interface FieldSetDDMFormFieldTypeSettings
 	extends DefaultDDMFormFieldTypeSettings {
 
+	@DDMFormField(
+		label = "%collapsible", properties = "showAsSwitcher=true",
+		type = "checkbox"
+	)
+	public boolean collapsible();
+
 	@DDMFormField(type = "numeric", visibilityExpression = "FALSE")
 	public String dataDefinitionId();
 
-	@DDMFormField(
-		dataType = "json", type = "text", visibilityExpression = "FALSE"
-	)
+	@DDMFormField(dataType = "numeric")
+	public long ddmStructureId();
+
+	@DDMFormField(dataType = "numeric")
+	public long ddmStructureLayoutId();
+
+	@DDMFormField(dataType = "json", type = "text")
 	public String rows();
 
 }

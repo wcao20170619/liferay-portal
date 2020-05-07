@@ -56,6 +56,7 @@ import com.liferay.portlet.asset.util.AssetVocabularySettingsHelper;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -199,19 +200,21 @@ public class TaxonomyVocabularyResourceImpl
 			Long siteId, TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
-		_validateI18n(true, taxonomyVocabulary);
+		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyVocabulary.getName(), taxonomyVocabulary.getName_i18n());
+		Map<Locale, String> descriptionMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyVocabulary.getDescription(),
+			taxonomyVocabulary.getDescription_i18n());
+
+		LocalizedMapUtil.validateI18n(
+			true, LocaleUtil.getSiteDefault(), "Taxonomy vocabulary", titleMap,
+			new HashSet<>(descriptionMap.keySet()));
 
 		return _toTaxonomyVocabulary(
 			_assetVocabularyService.addVocabulary(
-				siteId, null,
-				LocalizedMapUtil.getLocalizedMap(
-					contextAcceptLanguage.getPreferredLocale(),
-					taxonomyVocabulary.getName(),
-					taxonomyVocabulary.getName_i18n()),
-				LocalizedMapUtil.getLocalizedMap(
-					contextAcceptLanguage.getPreferredLocale(),
-					taxonomyVocabulary.getDescription(),
-					taxonomyVocabulary.getDescription_i18n()),
+				siteId, null, titleMap, descriptionMap,
 				_getSettings(taxonomyVocabulary.getAssetTypes(), siteId),
 				ServiceContextUtil.createServiceContext(
 					siteId, taxonomyVocabulary.getViewableByAsString())));
@@ -222,24 +225,27 @@ public class TaxonomyVocabularyResourceImpl
 			Long taxonomyVocabularyId, TaxonomyVocabulary taxonomyVocabulary)
 		throws Exception {
 
-		_validateI18n(false, taxonomyVocabulary);
-
 		AssetVocabulary assetVocabulary = _assetVocabularyService.getVocabulary(
 			taxonomyVocabularyId);
 
+		Map<Locale, String> titleMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyVocabulary.getName(), taxonomyVocabulary.getName_i18n(),
+			assetVocabulary.getTitleMap());
+		Map<Locale, String> descriptionMap = LocalizedMapUtil.getLocalizedMap(
+			contextAcceptLanguage.getPreferredLocale(),
+			taxonomyVocabulary.getDescription(),
+			taxonomyVocabulary.getDescription_i18n(),
+			assetVocabulary.getDescriptionMap());
+
+		LocalizedMapUtil.validateI18n(
+			false, LocaleUtil.getSiteDefault(), "Taxonomy vocabulary", titleMap,
+			new HashSet<>(descriptionMap.keySet()));
+
 		return _toTaxonomyVocabulary(
 			_assetVocabularyService.updateVocabulary(
-				assetVocabulary.getVocabularyId(), null,
-				LocalizedMapUtil.getLocalizedMap(
-					contextAcceptLanguage.getPreferredLocale(),
-					taxonomyVocabulary.getName(),
-					taxonomyVocabulary.getName_i18n(),
-					assetVocabulary.getTitleMap()),
-				LocalizedMapUtil.getLocalizedMap(
-					contextAcceptLanguage.getPreferredLocale(),
-					taxonomyVocabulary.getDescription(),
-					taxonomyVocabulary.getDescription_i18n(),
-					assetVocabulary.getDescriptionMap()),
+				assetVocabulary.getVocabularyId(), null, titleMap,
+				descriptionMap,
 				_getSettings(
 					taxonomyVocabulary.getAssetTypes(),
 					assetVocabulary.getGroupId()),
@@ -531,32 +537,6 @@ public class TaxonomyVocabularyResourceImpl
 				siteId = assetVocabulary.getGroupId();
 			}
 		};
-	}
-
-	private void _validateI18n(
-		boolean add, TaxonomyVocabulary taxonomyVocabulary) {
-
-		Locale defaultLocale = LocaleUtil.getSiteDefault();
-
-		if (LocaleUtil.equals(
-				defaultLocale, contextAcceptLanguage.getPreferredLocale())) {
-
-			return;
-		}
-
-		Map<String, String> localizedNames = taxonomyVocabulary.getName_i18n();
-
-		if ((add && (localizedNames == null)) ||
-			((localizedNames != null) &&
-			 !localizedNames.containsKey(
-				 LocaleUtil.toBCP47LanguageId(defaultLocale)))) {
-
-			String w3cLanguageId = LocaleUtil.toW3cLanguageId(defaultLocale);
-
-			throw new BadRequestException(
-				"Taxonomy vocabularies must include the default language " +
-					w3cLanguageId);
-		}
 	}
 
 	private static final Map<String, String> _assetTypeTypeToClassNames =

@@ -12,7 +12,11 @@
  * details.
  */
 
-import {DefaultEventHandler, ItemSelectorDialog} from 'frontend-js-web';
+import {
+	DefaultEventHandler,
+	ItemSelectorDialog,
+	addParams,
+} from 'frontend-js-web';
 import dom from 'metal-dom';
 
 class UsersManagementToolbarDefaultEventHandler extends DefaultEventHandler {
@@ -44,8 +48,8 @@ class UsersManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 				title: Liferay.Language.get('select-role'),
 				uri: itemData.selectRolesURL,
 			},
-			event => {
-				location.href = Liferay.Util.addParams(
+			(event) => {
+				location.href = addParams(
 					`${this.ns('roleId')}=${event.id}`,
 					itemData.viewRoleURL
 				);
@@ -61,13 +65,13 @@ class UsersManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 			url: itemData.selectRoleURL,
 		});
 
-		itemSelectorDialog.on('selectedItemChange', event => {
+		itemSelectorDialog.on('selectedItemChange', (event) => {
 			const selectedItem = event.selectedItem;
 
 			if (selectedItem) {
 				const fm = this.one('#fm');
 
-				selectedItem.forEach(item => {
+				selectedItem.forEach((item) => {
 					dom.append(fm, item);
 				});
 
@@ -89,13 +93,13 @@ class UsersManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 			url: itemData.selectUsersURL,
 		});
 
-		itemSelectorDialog.on('selectedItemChange', event => {
+		itemSelectorDialog.on('selectedItemChange', (event) => {
 			const selectedItem = event.selectedItem;
 
 			if (selectedItem) {
 				const addGroupUsersFm = this.one('#addGroupUsersFm');
 
-				selectedItem.forEach(item => {
+				selectedItem.forEach((item) => {
 					dom.append(addGroupUsersFm, item);
 				});
 

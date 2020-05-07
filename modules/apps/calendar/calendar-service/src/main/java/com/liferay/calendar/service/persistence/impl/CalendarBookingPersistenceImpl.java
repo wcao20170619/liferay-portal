@@ -16,6 +16,7 @@ package com.liferay.calendar.service.persistence.impl;
 
 import com.liferay.calendar.exception.NoSuchBookingException;
 import com.liferay.calendar.model.CalendarBooking;
+import com.liferay.calendar.model.CalendarBookingTable;
 import com.liferay.calendar.model.impl.CalendarBookingImpl;
 import com.liferay.calendar.model.impl.CalendarBookingModelImpl;
 import com.liferay.calendar.service.persistence.CalendarBookingPersistence;
@@ -5431,16 +5432,18 @@ public class CalendarBookingPersistenceImpl
 		"calendarBooking.status = ?";
 
 	public CalendarBookingPersistenceImpl() {
-		setModelClass(CalendarBooking.class);
-
-		setModelImplClass(CalendarBookingImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(CalendarBooking.class);
+
+		setModelImplClass(CalendarBookingImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(CalendarBookingTable.INSTANCE);
 	}
 
 	/**

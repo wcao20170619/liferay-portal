@@ -47,6 +47,7 @@ const EditTagsModal = ({
 
 	// Flag that indicates whether new selected items must be added to old ones
 	// or replace them.
+
 	const [append, setAppend] = useState(true);
 	const [description, setDescription] = useState('');
 	const [loading, setLoading] = useState(true);
@@ -54,10 +55,12 @@ const EditTagsModal = ({
 
 	// Selected items received from the server and saved to compare with new
 	// ones.
+
 	const [initialSelectedItems, setInitialSelectedItems] = useState([]);
 	const [inputValue, setInputValue] = useState();
 
 	// Current selected items.
+
 	const [selectedItems, setSelectedItems] = useState([]);
 	const [selectedRadioGroupValue, setSelectedRadioGroupValue] = useState(
 		'add'
@@ -67,6 +70,7 @@ const EditTagsModal = ({
 
 	// This makes the component fetch selected items only after mounting it
 	// (a.k.a. first render).
+
 	useEffect(() => {
 		const selection = {
 			documentIds: fileEntries,
@@ -117,7 +121,7 @@ const EditTagsModal = ({
 			};
 
 			return fetch(`${pathModule}${url}`, init)
-				.then(response => response.json())
+				.then((response) => response.json())
 				.catch(() => {
 					onModalClose();
 				});
@@ -125,7 +129,7 @@ const EditTagsModal = ({
 		[onModalClose, pathModule]
 	);
 
-	const getDescription = size => {
+	const getDescription = (size) => {
 		if (size === 1) {
 			return Liferay.Language.get(
 				'you-are-editing-the-tags-for-the-selected-item'
@@ -140,28 +144,28 @@ const EditTagsModal = ({
 		);
 	};
 
-	const handleMultipleSelectedOptionChange = value => {
+	const handleMultipleSelectedOptionChange = (value) => {
 		setAppend(value === 'add');
 		setSelectedRadioGroupValue(value);
 	};
 
-	const handleSubmit = event => {
+	const handleSubmit = (event) => {
 		event.preventDefault();
 
 		const addedLabels = !append
 			? selectedItems
 			: selectedItems.filter(
-					selectedItem =>
+					(selectedItem) =>
 						!initialSelectedItems.find(
-							initialSelectedItem =>
+							(initialSelectedItem) =>
 								initialSelectedItem.value === selectedItem.value
 						)
 			  );
 
 		const removedLabels = initialSelectedItems.filter(
-			initialSelectedItem =>
+			(initialSelectedItem) =>
 				!selectedItems.find(
-					selectedItem =>
+					(selectedItem) =>
 						selectedItem.value === initialSelectedItem.value
 				)
 		);
@@ -175,9 +179,9 @@ const EditTagsModal = ({
 					selectAll,
 				},
 			},
-			keywordsToAdd: addedLabels.map(addedLabel => addedLabel.value),
+			keywordsToAdd: addedLabels.map((addedLabel) => addedLabel.value),
 			keywordsToRemove: removedLabels.map(
-				removedLabel => removedLabel.value
+				(removedLabel) => removedLabel.value
 			),
 		}).then(() => {
 			const bulkStatusComponent = Liferay.component(

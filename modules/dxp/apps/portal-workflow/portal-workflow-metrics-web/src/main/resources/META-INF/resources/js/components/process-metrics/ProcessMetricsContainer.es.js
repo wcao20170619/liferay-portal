@@ -31,7 +31,7 @@ import PendingItemsCard from './process-items/PendingItemsCard.es';
 import WorkloadByAssigneeCard from './workload-by-assignee-card/WorkloadByAssigneeCard.es';
 import WorkloadByStepCard from './workload-by-step-card/WorkloadByStepCard.es';
 
-const DashboardTab = props => {
+const DashboardTab = (props) => {
 	return (
 		<div className="container-fluid-1280">
 			<div className="row">
@@ -49,7 +49,7 @@ const DashboardTab = props => {
 	);
 };
 
-const PerformanceTab = props => {
+const PerformanceTab = (props) => {
 	useTimeRangeFetch();
 
 	return (
@@ -98,7 +98,7 @@ const ProcessMetricsContainer = ({history, processId, query}) => {
 
 		const search = stringify({
 			...parse(query),
-			filters: {taskKeys: ['allSteps']},
+			filters: {taskNames: ['allSteps']},
 		});
 
 		history.replace({pathname, search});

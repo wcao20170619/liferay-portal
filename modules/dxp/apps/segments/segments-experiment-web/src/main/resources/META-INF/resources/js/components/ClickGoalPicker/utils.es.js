@@ -26,7 +26,9 @@ export const GeometryType = PropTypes.shape({
  */
 export function stopImmediatePropagation(event) {
 	if (event.nativeEvent) {
+
 		// This is a React synthetic event; must access nativeEvent instead.
+
 		event.nativeEvent.stopImmediatePropagation();
 	}
 	else {
@@ -44,7 +46,8 @@ export function getTargetableElements(element) {
 	const elements = element.querySelectorAll('a, button');
 
 	// As first cut, only deal with items that have an id.
-	return Array.from(elements).filter(element => {
+
+	return Array.from(elements).filter((element) => {
 		return element.id && _isVisible(element);
 	});
 }

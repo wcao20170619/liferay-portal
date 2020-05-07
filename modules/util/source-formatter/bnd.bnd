@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Source Formatter
 Bundle-SymbolicName: com.liferay.source.formatter
-Bundle-Version: 1.0.984
+Bundle-Version: 1.0.991
 Import-Package:\
 	!javax.portlet,\
 	\
@@ -60,6 +60,7 @@ Main-Class: com.liferay.source.formatter.SourceFormatter
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/json/JSONException.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/json/JSONObject.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/json/JSONSerializable.class,\
+	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/json/JSONUtil.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/language/Language.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/language/LanguageUtil.class,\
 	@com.liferay.portal.kernel-*.jar!/com/liferay/portal/kernel/log/*,\

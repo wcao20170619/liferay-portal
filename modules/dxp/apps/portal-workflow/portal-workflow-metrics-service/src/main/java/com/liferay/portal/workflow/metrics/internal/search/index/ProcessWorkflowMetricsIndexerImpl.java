@@ -21,7 +21,6 @@ import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.engine.adapter.document.BulkDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.workflow.metrics.search.index.ProcessWorkflowMetricsIndexer;
-import com.liferay.portal.workflow.metrics.search.index.name.WorkflowMetricsIndexNameBuilder;
 
 import java.util.Date;
 import java.util.Locale;
@@ -33,10 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Inácio Nery
  */
-@Component(
-	immediate = true, property = "workflow.metrics.index.entity.name=process",
-	service = {ProcessWorkflowMetricsIndexer.class, WorkflowMetricsIndex.class}
-)
+@Component(immediate = true, service = ProcessWorkflowMetricsIndexer.class)
 public class ProcessWorkflowMetricsIndexerImpl
 	extends BaseWorkflowMetricsIndexer
 	implements ProcessWorkflowMetricsIndexer {
@@ -61,6 +57,7 @@ public class ProcessWorkflowMetricsIndexerImpl
 					setType(_instanceWorkflowMetricsIndex.getIndexType());
 				}
 			});
+
 		bulkDocumentRequest.addBulkableDocumentRequest(
 			new IndexDocumentRequest(
 				_slaInstanceResultWorkflowMetricsIndexer.getIndexName(
@@ -75,12 +72,15 @@ public class ProcessWorkflowMetricsIndexerImpl
 							getIndexType());
 				}
 			});
+
 		bulkDocumentRequest.addBulkableDocumentRequest(
 			new IndexDocumentRequest(
-				getIndexName(document.getLong("companyId")), document) {
+				_processWorkflowMetricsIndex.getIndexName(
+					document.getLong("companyId")),
+				document) {
 
 				{
-					setType(getIndexType());
+					setType(_processWorkflowMetricsIndex.getIndexType());
 				}
 			});
 
@@ -104,13 +104,13 @@ public class ProcessWorkflowMetricsIndexerImpl
 		).setLong(
 			"companyId", companyId
 		).setDate(
-			"createDate", formatDate(createDate)
+			"createDate", getDate(createDate)
 		).setValue(
 			"deleted", false
 		).setString(
 			"description", description
 		).setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setString(
 			"name", name
 		).setLong(
@@ -150,12 +150,12 @@ public class ProcessWorkflowMetricsIndexerImpl
 
 	@Override
 	public String getIndexName(long companyId) {
-		return _processWorkflowMetricsIndexNameBuilder.getIndexName(companyId);
+		return _processWorkflowMetricsIndex.getIndexName(companyId);
 	}
 
 	@Override
 	public String getIndexType() {
-		return "WorkflowMetricsProcessType";
+		return _processWorkflowMetricsIndex.getIndexType();
 	}
 
 	@Override
@@ -177,7 +177,7 @@ public class ProcessWorkflowMetricsIndexerImpl
 		}
 
 		documentBuilder.setDate(
-			"modifiedDate", formatDate(modifiedDate)
+			"modifiedDate", getDate(modifiedDate)
 		).setLong(
 			"processId", processId
 		);
@@ -229,8 +229,7 @@ public class ProcessWorkflowMetricsIndexerImpl
 	private WorkflowMetricsIndex _instanceWorkflowMetricsIndex;
 
 	@Reference(target = "(workflow.metrics.index.entity.name=process)")
-	private WorkflowMetricsIndexNameBuilder
-		_processWorkflowMetricsIndexNameBuilder;
+	private WorkflowMetricsIndex _processWorkflowMetricsIndex;
 
 	@Reference
 	private SLAInstanceResultWorkflowMetricsIndexer

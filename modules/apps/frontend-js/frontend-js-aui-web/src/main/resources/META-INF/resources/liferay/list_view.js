@@ -15,13 +15,13 @@
 /**
  * The List View Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-list-view
  */
 
 AUI.add(
 	'liferay-list-view',
-	A => {
+	(A) => {
 		var Lang = A.Lang;
 
 		var isString = Lang.isString;

@@ -87,12 +87,13 @@ const AppContent = ({
 	);
 };
 
-const App = props => {
+const App = (props) => {
 	const {
 		config,
 		contentType,
 		dataDefinitionId,
 		dataLayoutId,
+		fieldSetContentType,
 		fieldTypesModules,
 		groupId,
 	} = parseProps(props);
@@ -118,6 +119,7 @@ const App = props => {
 						dataDefinitionId={dataDefinitionId}
 						dataLayoutBuilder={dataLayoutBuilder}
 						dataLayoutId={dataLayoutId}
+						fieldSetContentType={fieldSetContentType}
 						groupId={groupId}
 					>
 						<AppContent

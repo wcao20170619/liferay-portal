@@ -16,6 +16,7 @@ package com.liferay.message.boards.service.persistence.impl;
 
 import com.liferay.message.boards.exception.NoSuchBanException;
 import com.liferay.message.boards.model.MBBan;
+import com.liferay.message.boards.model.MBBanTable;
 import com.liferay.message.boards.model.impl.MBBanImpl;
 import com.liferay.message.boards.model.impl.MBBanModelImpl;
 import com.liferay.message.boards.service.persistence.MBBanPersistence;
@@ -3168,16 +3169,18 @@ public class MBBanPersistenceImpl
 		"mbBan.banUserId = ?";
 
 	public MBBanPersistenceImpl() {
-		setModelClass(MBBan.class);
-
-		setModelImplClass(MBBanImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(MBBan.class);
+
+		setModelImplClass(MBBanImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(MBBanTable.INSTANCE);
 	}
 
 	/**

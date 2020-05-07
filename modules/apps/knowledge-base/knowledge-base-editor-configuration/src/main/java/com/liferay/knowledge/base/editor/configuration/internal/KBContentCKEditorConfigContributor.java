@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Map;
 
@@ -51,7 +52,18 @@ public class KBContentCKEditorConfigContributor
 		ThemeDisplay themeDisplay,
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory) {
 
+		String extraPlugins = jsonObject.getString("extraPlugins");
+
+		if (Validator.isNotNull(extraPlugins)) {
+			extraPlugins = extraPlugins + ",videoembed";
+		}
+		else {
+			extraPlugins = "videoembed";
+		}
+
 		jsonObject.put(
+			"extraPlugins", extraPlugins
+		).put(
 			"toolbar", "kb"
 		).put(
 			"toolbar_kb", getToolbarKBJSONArray(inputEditorTaglibAttributes)
@@ -66,11 +78,14 @@ public class KBContentCKEditorConfigContributor
 			super.toJSONArray("['NumberedList', 'BulletedList']"),
 			super.toJSONArray("['Styles']"),
 			super.toJSONArray("['Link', 'Unlink']"),
-			super.toJSONArray("['Table','ImageSelector','HorizontalRule']"));
+			super.toJSONArray(
+				"['Table','ImageSelector','VideoEmbed', 'HorizontalRule']"));
 
 		if (_isShowSource(inputEditorTaglibAttributes)) {
 			jsonArray.put(toJSONArray("['Source']"));
 		}
+
+		jsonArray.put(toJSONArray("['A11YBtn']"));
 
 		return jsonArray;
 	}

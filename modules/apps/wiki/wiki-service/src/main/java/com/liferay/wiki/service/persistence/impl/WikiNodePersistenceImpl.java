@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.wiki.exception.NoSuchNodeException;
 import com.liferay.wiki.model.WikiNode;
+import com.liferay.wiki.model.WikiNodeTable;
 import com.liferay.wiki.model.impl.WikiNodeImpl;
 import com.liferay.wiki.model.impl.WikiNodeModelImpl;
 import com.liferay.wiki.service.persistence.WikiNodePersistence;
@@ -4553,16 +4554,18 @@ public class WikiNodePersistenceImpl
 		"wikiNode.status = ?";
 
 	public WikiNodePersistenceImpl() {
-		setModelClass(WikiNode.class);
-
-		setModelImplClass(WikiNodeImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(WikiNode.class);
+
+		setModelImplClass(WikiNodeImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(WikiNodeTable.INSTANCE);
 	}
 
 	/**

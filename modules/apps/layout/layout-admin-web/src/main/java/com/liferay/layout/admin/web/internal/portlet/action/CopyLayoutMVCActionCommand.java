@@ -133,6 +133,11 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 			targetLayout.setNameMap(nameMap);
 
+			UnicodeProperties unicodeProperties =
+				targetLayout.getTypeSettingsProperties();
+
+			unicodeProperties.put("published", Boolean.FALSE.toString());
+
 			_layoutLocalService.updateLayout(targetLayout);
 
 			LiferayPortletResponse liferayPortletResponse =

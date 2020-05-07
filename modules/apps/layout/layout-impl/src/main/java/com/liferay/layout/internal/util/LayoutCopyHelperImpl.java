@@ -56,18 +56,17 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.model.SegmentsExperience;
-import com.liferay.segments.model.SegmentsExperienceModel;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.sites.kernel.util.Sites;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -201,14 +200,14 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					classNameId, targetLayout.getPlid(), null, serviceContext);
 		}
 
-		for (Long segmentsExperienceId :
-				_getSegmentsExperienceIds(
-					sourceLayout.getGroupId(), classNameId,
-					sourceLayout.getPlid())) {
+		Map<Long, Long> segmentsExperienceIds = _getSegmentsExperienceIds(
+			classNameId, sourceLayout, targetLayout, serviceContext);
 
+		for (Map.Entry<Long, Long> entry : segmentsExperienceIds.entrySet()) {
 			_copyLayoutPageTemplateStructureExperience(
-				layoutPageTemplateStructure, segmentsExperienceId, classNameId,
-				targetLayout, fragmentEntryLinkMap, serviceContext);
+				layoutPageTemplateStructure, entry.getKey(), classNameId,
+				targetLayout, fragmentEntryLinkMap, entry.getValue(),
+				serviceContext);
 		}
 
 		_layoutClassedModelUsageLocalService.
@@ -235,7 +234,7 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			LayoutPageTemplateStructure layoutPageTemplateStructure,
 			long segmentsExperienceId, long classNameId, Layout targetLayout,
 			Map<Long, FragmentEntryLink> fragmentEntryLinkMap,
-			ServiceContext serviceContext)
+			long targetSegmentsExperienceId, ServiceContext serviceContext)
 		throws Exception {
 
 		String data = layoutPageTemplateStructure.getData(segmentsExperienceId);
@@ -246,12 +245,12 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 
 		JSONObject dataJSONObject = _processDataJSONObject(
 			data, classNameId, targetLayout, fragmentEntryLinkMap,
-			serviceContext);
+			targetSegmentsExperienceId, serviceContext);
 
 		_layoutPageTemplateStructureLocalService.
 			updateLayoutPageTemplateStructure(
 				targetLayout.getGroupId(), classNameId, targetLayout.getPlid(),
-				segmentsExperienceId, dataJSONObject.toString());
+				targetSegmentsExperienceId, dataJSONObject.toString());
 	}
 
 	private void _copyPortletPermissions(
@@ -402,20 +401,63 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 		}
 	}
 
-	private long[] _getSegmentsExperienceIds(
-		long groupId, long classNameId, long classPK) {
+	private Map<Long, Long> _getSegmentsExperienceIds(
+		long classNameId, Layout sourceLayout, Layout targetLayout,
+		ServiceContext serviceContext) {
+
+		Map<Long, Long> segmentsExperienceIds = new HashMap<>();
 
 		List<SegmentsExperience> segmentsExperiences =
 			_segmentsExperienceLocalService.getSegmentsExperiences(
-				groupId, classNameId, classPK);
+				sourceLayout.getGroupId(), classNameId, sourceLayout.getPlid());
 
-		Stream<SegmentsExperience> stream = segmentsExperiences.stream();
+		for (SegmentsExperience segmentsExperience : segmentsExperiences) {
+			if (_isDraft(sourceLayout) &&
+				(sourceLayout.getClassPK() == targetLayout.getPlid())) {
 
-		return ArrayUtil.append(
-			stream.mapToLong(
-				SegmentsExperienceModel::getSegmentsExperienceId
-			).toArray(),
-			new long[] {SegmentsExperienceConstants.ID_DEFAULT});
+				segmentsExperienceIds.put(
+					segmentsExperience.getSegmentsExperienceId(),
+					segmentsExperience.getSegmentsExperienceId());
+
+				continue;
+			}
+
+			SegmentsExperience newSegmentsExperience =
+				(SegmentsExperience)segmentsExperience.clone();
+
+			newSegmentsExperience.setUuid(serviceContext.getUuid());
+			newSegmentsExperience.setSegmentsExperienceId(
+				_counterLocalService.increment());
+			newSegmentsExperience.setUserId(targetLayout.getUserId());
+			newSegmentsExperience.setUserName(targetLayout.getUserName());
+			newSegmentsExperience.setCreateDate(
+				serviceContext.getCreateDate(new Date()));
+			newSegmentsExperience.setModifiedDate(
+				serviceContext.getModifiedDate(new Date()));
+			newSegmentsExperience.setSegmentsExperienceKey(
+				String.valueOf(_counterLocalService.increment()));
+			newSegmentsExperience.setClassNameId(classNameId);
+
+			if (_isDraft(targetLayout)) {
+				newSegmentsExperience.setClassPK(targetLayout.getClassPK());
+			}
+			else {
+				newSegmentsExperience.setClassPK(targetLayout.getPlid());
+			}
+
+			_segmentsExperienceLocalService.addSegmentsExperience(
+				newSegmentsExperience);
+
+			segmentsExperienceIds.put(
+				segmentsExperience.getSegmentsExperienceId(),
+				newSegmentsExperience.getSegmentsExperienceId());
+		}
+
+		segmentsExperienceIds.put(
+			SegmentsExperienceConstants.ID_DEFAULT,
+			SegmentsExperienceConstants.ID_DEFAULT);
+
+		return segmentsExperienceIds;
 	}
 
 	private boolean _isDraft(Layout layout) {
@@ -435,7 +477,7 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	private JSONObject _processDataJSONObject(
 			String data, long classNameId, Layout targetLayout,
 			Map<Long, FragmentEntryLink> fragmentEntryLinkMap,
-			ServiceContext serviceContext)
+			long targetSegmentsExperienceId, ServiceContext serviceContext)
 		throws PortalException {
 
 		LayoutStructure layoutStructure = LayoutStructure.of(data);
@@ -470,6 +512,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			newFragmentEntryLink.setModifiedDate(
 				serviceContext.getModifiedDate(new Date()));
 			newFragmentEntryLink.setOriginalFragmentEntryLinkId(0);
+			newFragmentEntryLink.setSegmentsExperienceId(
+				targetSegmentsExperienceId);
 			newFragmentEntryLink.setClassNameId(classNameId);
 			newFragmentEntryLink.setClassPK(targetLayout.getPlid());
 			newFragmentEntryLink.setLastPropagationDate(

@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.exception.NoSuchCompanyInfoException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyInfo;
+import com.liferay.portal.kernel.model.CompanyInfoTable;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.CompanyInfoPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
@@ -282,17 +283,19 @@ public class CompanyInfoPersistenceImpl
 		"companyInfo.companyId = ?";
 
 	public CompanyInfoPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("key", "key_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(CompanyInfo.class);
 
 		setModelImplClass(CompanyInfoImpl.class);
 		setModelPKClass(long.class);
 		setEntityCacheEnabled(CompanyInfoModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("key", "key_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(CompanyInfoTable.INSTANCE);
 	}
 
 	/**

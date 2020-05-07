@@ -15,13 +15,13 @@
 /**
  * The Resize RTL Component.
  *
- * @deprecated since 7.2, unused
+ * @deprecated As of Mueller (7.2.x), with no direct replacement
  * @module liferay-resize-rtl
  */
 
 AUI.add(
 	'liferay-resize-rtl',
-	A => {
+	(A) => {
 		var RULES = A.Resize.RULES;
 
 		var tmpL = RULES.l;

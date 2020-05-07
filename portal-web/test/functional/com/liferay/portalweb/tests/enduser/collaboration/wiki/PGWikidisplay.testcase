@@ -117,16 +117,16 @@ definition {
 			locator1 = "Link#ADD_CHILD_PAGE",
 			value1 = "Add Child Page");
 
+		WikiEntry.addPageTitle(wikiPageTitle = "Wiki FrontPage Child Page Title");
+
 		WikiEntry.selectPageFormat(pageFormat = "HTML");
 
 		WikiEntry.confirmHTML();
 
-		WikiEntry.addPageTitle(wikiPageTitle = "Wiki FrontPage Child Page Title");
-
 		Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON");
 
 		Type(
-			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_2",
+			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON_3",
 			value1 = "${welcomeToLiferay}");
 
 		SelectFrame(value1 = "relative=top");

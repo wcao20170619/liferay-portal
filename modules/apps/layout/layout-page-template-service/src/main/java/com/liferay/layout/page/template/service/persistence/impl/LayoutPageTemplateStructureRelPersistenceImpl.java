@@ -16,6 +16,7 @@ package com.liferay.layout.page.template.service.persistence.impl;
 
 import com.liferay.layout.page.template.exception.NoSuchPageTemplateStructureRelException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRelTable;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelImpl;
 import com.liferay.layout.page.template.model.impl.LayoutPageTemplateStructureRelModelImpl;
 import com.liferay.layout.page.template.service.persistence.LayoutPageTemplateStructureRelPersistence;
@@ -2855,11 +2856,6 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		"layoutPageTemplateStructureRel.segmentsExperienceId = ?";
 
 	public LayoutPageTemplateStructureRelPersistenceImpl() {
-		setModelClass(LayoutPageTemplateStructureRel.class);
-
-		setModelImplClass(LayoutPageTemplateStructureRelImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
@@ -2868,6 +2864,13 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 		dbColumnNames.put("data", "data_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(LayoutPageTemplateStructureRel.class);
+
+		setModelImplClass(LayoutPageTemplateStructureRelImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(LayoutPageTemplateStructureRelTable.INSTANCE);
 	}
 
 	/**

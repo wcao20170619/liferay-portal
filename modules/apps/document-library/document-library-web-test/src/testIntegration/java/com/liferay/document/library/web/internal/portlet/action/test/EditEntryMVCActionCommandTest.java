@@ -53,8 +53,6 @@ import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -302,11 +300,6 @@ public class EditEntryMVCActionCommandTest {
 			}
 
 			return super.getAttribute(name);
-		}
-
-		@Override
-		public HttpServletRequest getHttpServletRequest() {
-			return new MockHttpServletRequest();
 		}
 
 		@Override

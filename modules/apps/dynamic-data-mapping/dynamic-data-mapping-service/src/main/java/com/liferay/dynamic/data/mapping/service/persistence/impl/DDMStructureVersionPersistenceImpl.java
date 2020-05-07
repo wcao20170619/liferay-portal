@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service.persistence.impl;
 
 import com.liferay.dynamic.data.mapping.exception.NoSuchStructureVersionException;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
+import com.liferay.dynamic.data.mapping.model.DDMStructureVersionTable;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureVersionImpl;
 import com.liferay.dynamic.data.mapping.model.impl.DDMStructureVersionModelImpl;
 import com.liferay.dynamic.data.mapping.service.persistence.DDMStructureVersionPersistence;
@@ -1465,16 +1466,18 @@ public class DDMStructureVersionPersistenceImpl
 		"ddmStructureVersion.status = ?";
 
 	public DDMStructureVersionPersistenceImpl() {
-		setModelClass(DDMStructureVersion.class);
-
-		setModelImplClass(DDMStructureVersionImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DDMStructureVersion.class);
+
+		setModelImplClass(DDMStructureVersionImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DDMStructureVersionTable.INSTANCE);
 	}
 
 	/**

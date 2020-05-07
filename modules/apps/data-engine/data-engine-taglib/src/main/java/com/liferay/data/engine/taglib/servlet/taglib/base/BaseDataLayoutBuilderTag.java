@@ -54,6 +54,10 @@ public abstract class BaseDataLayoutBuilderTag extends com.liferay.taglib.util.I
 		return _dataLayoutId;
 	}
 
+	public java.lang.String getFieldSetContentType() {
+		return _fieldSetContentType;
+	}
+
 	public java.lang.Long getGroupId() {
 		return _groupId;
 	}
@@ -90,6 +94,10 @@ public abstract class BaseDataLayoutBuilderTag extends com.liferay.taglib.util.I
 		_dataLayoutId = dataLayoutId;
 	}
 
+	public void setFieldSetContentType(java.lang.String fieldSetContentType) {
+		_fieldSetContentType = fieldSetContentType;
+	}
+
 	public void setGroupId(java.lang.Long groupId) {
 		_groupId = groupId;
 	}
@@ -122,6 +130,7 @@ public abstract class BaseDataLayoutBuilderTag extends com.liferay.taglib.util.I
 		_contentType = null;
 		_dataDefinitionId = null;
 		_dataLayoutId = null;
+		_fieldSetContentType = null;
 		_groupId = null;
 		_localizable = false;
 		_namespace = null;
@@ -145,6 +154,7 @@ public abstract class BaseDataLayoutBuilderTag extends com.liferay.taglib.util.I
 		setNamespacedAttribute(request, "contentType", _contentType);
 		setNamespacedAttribute(request, "dataDefinitionId", _dataDefinitionId);
 		setNamespacedAttribute(request, "dataLayoutId", _dataLayoutId);
+		setNamespacedAttribute(request, "fieldSetContentType", _fieldSetContentType);
 		setNamespacedAttribute(request, "groupId", _groupId);
 		setNamespacedAttribute(request, "localizable", _localizable);
 		setNamespacedAttribute(request, "namespace", _namespace);
@@ -164,6 +174,7 @@ public abstract class BaseDataLayoutBuilderTag extends com.liferay.taglib.util.I
 	private java.lang.String _contentType = null;
 	private java.lang.Long _dataDefinitionId = null;
 	private java.lang.Long _dataLayoutId = null;
+	private java.lang.String _fieldSetContentType = null;
 	private java.lang.Long _groupId = null;
 	private boolean _localizable = false;
 	private java.lang.String _namespace = null;

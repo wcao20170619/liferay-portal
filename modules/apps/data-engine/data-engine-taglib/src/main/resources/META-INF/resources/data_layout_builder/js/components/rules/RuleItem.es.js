@@ -43,7 +43,12 @@ const OPERATOR_LABELS = {
 };
 
 export default function RuleItem({rule, toggleRulesEditorVisibility}) {
-	const {actions, conditions, logicalOperator, name} = rule;
+	const {
+		actions,
+		conditions,
+		logicalOperator,
+		name: {en_US: name},
+	} = rule;
 	const [, dispatch] = useContext(AppContext);
 
 	const dropDownActions = [
@@ -84,7 +89,7 @@ export default function RuleItem({rule, toggleRulesEditorVisibility}) {
 								{Liferay.Language.get('field')}
 							</Text>
 							<ClayLabel displayType="success">
-								{first.label}
+								{first.value}
 							</ClayLabel>
 							<ClayLabel displayType="secondary">
 								{OPERATOR_LABELS[operator] || operator}
@@ -107,10 +112,10 @@ export default function RuleItem({rule, toggleRulesEditorVisibility}) {
 
 				<Text>{Liferay.Language.get('then')}</Text>
 
-				{actions.map(({action, label}, index) => (
+				{actions.map(({action, target}, index) => (
 					<>
 						<Text lowercase>{action}</Text>
-						<ClayLabel displayType="success">{label}</ClayLabel>
+						<ClayLabel displayType="success">{target}</ClayLabel>
 
 						{index + 1 !== actions.length && (
 							<ClayLabel displayType="warning">

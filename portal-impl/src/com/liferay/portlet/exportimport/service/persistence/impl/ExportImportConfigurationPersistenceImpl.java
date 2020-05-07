@@ -16,6 +16,7 @@ package com.liferay.portlet.exportimport.service.persistence.impl;
 
 import com.liferay.exportimport.kernel.exception.NoSuchConfigurationException;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.model.ExportImportConfigurationTable;
 import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationPersistence;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
@@ -2800,6 +2801,13 @@ public class ExportImportConfigurationPersistenceImpl
 		"exportImportConfiguration.status = ?";
 
 	public ExportImportConfigurationPersistenceImpl() {
+		Map<String, String> dbColumnNames = new HashMap<String, String>();
+
+		dbColumnNames.put("type", "type_");
+		dbColumnNames.put("settings", "settings_");
+
+		setDBColumnNames(dbColumnNames);
+
 		setModelClass(ExportImportConfiguration.class);
 
 		setModelImplClass(ExportImportConfigurationImpl.class);
@@ -2807,12 +2815,7 @@ public class ExportImportConfigurationPersistenceImpl
 		setEntityCacheEnabled(
 			ExportImportConfigurationModelImpl.ENTITY_CACHE_ENABLED);
 
-		Map<String, String> dbColumnNames = new HashMap<String, String>();
-
-		dbColumnNames.put("type", "type_");
-		dbColumnNames.put("settings", "settings_");
-
-		setDBColumnNames(dbColumnNames);
+		setTable(ExportImportConfigurationTable.INSTANCE);
 	}
 
 	/**

@@ -13,14 +13,14 @@ const fs = require('fs');
 const path = require('path');
 
 describe('liferay-kaleo-designer-xml-definition', () => {
-	beforeEach(done => {
+	beforeEach((done) => {
 		const add = AUI.add;
 
-		AUI.add = function(name, callback, version, metadata) {
+		AUI.add = function (name, callback, version, metadata) {
 			add.call(AUI, name, callback, version, {
 				...metadata,
 				requires: metadata.requires.filter(
-					name => name !== 'aui-component'
+					(name) => name !== 'aui-component'
 				),
 			});
 		};
@@ -31,11 +31,13 @@ describe('liferay-kaleo-designer-xml-definition', () => {
 
 		require('../../../src/main/resources/META-INF/resources/designer/js/utils');
 
-		AUI().use(['liferay-kaleo-designer-utils'], A => {
+		AUI().use(['liferay-kaleo-designer-utils'], (A) => {
+
 			// Stub for "aui-component", which refuses to load in test env.
+
 			A.Component = {
 				create({ATTRS, prototype, ...properties}) {
-					const constructor = function(config) {
+					const constructor = function (config) {
 						this.initializer(config);
 					};
 
@@ -103,6 +105,7 @@ describe('liferay-kaleo-designer-xml-definition', () => {
 			//
 			//      https://github.com/yui/yui3/blob/25264e3629/src/dataschema/js/dataschema-xml.js#L182
 			//
+
 			xmlDefinition.definitionDoc.evaluate = undefined;
 
 			xmlDefinition.forEachField((_tagName, fieldData) => {

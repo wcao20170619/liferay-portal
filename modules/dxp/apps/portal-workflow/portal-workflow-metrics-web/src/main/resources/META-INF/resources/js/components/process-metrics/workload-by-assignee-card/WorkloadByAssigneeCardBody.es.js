@@ -20,7 +20,7 @@ import {AppContext} from '../../AppContext.es';
 import {Table} from './WorkloadByAssigneeCardTable.es';
 
 const Body = ({currentTab, items, processId, processStepKey, totalCount}) => {
-	const getEmptyMessage = tab => {
+	const getEmptyMessage = (tab) => {
 		switch (tab) {
 			case 'onTime':
 				return Liferay.Language.get(
@@ -89,7 +89,7 @@ const Footer = ({processId, processStepKey, totalCount}) => {
 	const filters = {};
 
 	if (processStepKey && processStepKey !== 'allSteps') {
-		filters.taskKeys = [processStepKey];
+		filters.taskNames = [processStepKey];
 	}
 
 	const viewAllAssigneesQuery = {filters};

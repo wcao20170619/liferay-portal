@@ -334,6 +334,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>IGNORE_REDIRECT_URLS</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-hidden')]]</td>
+	<td></td>
+</tr>s
+<tr>
 	<td>IMPORT</td>
 	<td>//div[contains(@class,'footer')]//button[contains(.,'Import')]</td>
 	<td></td>
@@ -460,7 +465,7 @@
 </tr>
 <tr>
 	<td>PLUS_IE</td>
-	<td>//a[contains(@class,'nav-btn-monospaced')] | //button[@data-title='New' or @title='New' or @title='Add']</td>
+	<td>//a[contains(@class,'nav-btn-monospaced')] | //button[contains(@class,'nav-btn-monospaced')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -714,6 +719,16 @@
 	<td></td>
 </tr>
 <tr>
+	<td>TRY_REDIRECTION</td>
+	<td>//button[@type='button' and @title='Try Redirection']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TRY_REDIRECTION_DISABLED</td>
+	<td>//button[@type='button' and @title='Try Redirection'][@disabled='']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>SUBMIT_FOR_PUBLICATION</td>
 	<td>//button[contains(.,'Submit for Publication')]</td>
 	<td></td>
@@ -731,6 +746,11 @@
 <tr>
 	<td>UNDO</td>
 	<td>//button[contains(.,'Undo')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UNIGNORE_REDIRECT_URLS</td>
+	<td>//button[*[name()='svg'][contains(@class,'lexicon-icon-view')]]</td>
 	<td></td>
 </tr>
 <tr>

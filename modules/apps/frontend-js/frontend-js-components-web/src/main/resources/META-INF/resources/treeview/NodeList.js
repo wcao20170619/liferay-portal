@@ -28,7 +28,9 @@ export default function NodeList({
 	const rootNodeId = nodes[0] && nodes[0].id;
 
 	if (!rootNodeId) {
+
 		// All nodes have been filtered.
+
 		return null;
 	}
 
@@ -40,7 +42,7 @@ export default function NodeList({
 					onBlur();
 				}
 			}}
-			onFocus={event => {
+			onFocus={(event) => {
 				if (onFocus) {
 					onFocus(event);
 				}
@@ -48,7 +50,7 @@ export default function NodeList({
 			role={role}
 			tabIndex={tabIndex}
 		>
-			{nodes.map(node => (
+			{nodes.map((node) => (
 				<NodeListItem
 					key={node.id}
 					node={node}

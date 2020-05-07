@@ -1665,17 +1665,17 @@ public class PowwowParticipantPersistenceImpl
 		"powwowParticipant.type = ?";
 
 	public PowwowParticipantPersistenceImpl() {
-		setModelClass(PowwowParticipant.class);
-
-		setModelImplClass(PowwowParticipantImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(PowwowParticipantModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(PowwowParticipant.class);
+
+		setModelImplClass(PowwowParticipantImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(PowwowParticipantModelImpl.ENTITY_CACHE_ENABLED);
 	}
 
 	/**

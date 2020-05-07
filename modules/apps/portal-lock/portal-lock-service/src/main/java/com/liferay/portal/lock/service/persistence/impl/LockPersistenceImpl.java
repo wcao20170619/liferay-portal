@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.lock.exception.NoSuchLockException;
 import com.liferay.portal.lock.model.Lock;
+import com.liferay.portal.lock.model.LockTable;
 import com.liferay.portal.lock.model.impl.LockImpl;
 import com.liferay.portal.lock.model.impl.LockModelImpl;
 import com.liferay.portal.lock.service.persistence.LockPersistence;
@@ -2556,17 +2557,19 @@ public class LockPersistenceImpl
 		"(lock_.key IS NULL OR lock_.key = '')";
 
 	public LockPersistenceImpl() {
-		setModelClass(Lock.class);
-
-		setModelImplClass(LockImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("key", "key_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(Lock.class);
+
+		setModelImplClass(LockImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(LockTable.INSTANCE);
 	}
 
 	/**

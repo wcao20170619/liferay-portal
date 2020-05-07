@@ -90,7 +90,9 @@ public class DTOOpenAPIParser {
 
 		Map<String, Schema> schemas = OpenAPIUtil.getAllSchemas(openAPIYAML);
 
-		return getProperties(configYAML, openAPIYAML, schemas.get(schemaName));
+		Schema schema = schemas.get(schemaName);
+
+		return getProperties(configYAML, openAPIYAML, schema);
 	}
 
 	public static Schema getPropertySchema(String propertyName, Schema schema) {
@@ -222,11 +224,8 @@ public class DTOOpenAPIParser {
 		if (StringUtil.equals(type, "array") && (items != null) &&
 			StringUtil.equalsIgnoreCase(items.getType(), "object")) {
 
-			String name = StringUtil.upperCaseFirstLetter(propertySchemaName);
-
-			if (items != null) {
-				name = OpenAPIUtil.formatSingular(name);
-			}
+			String name = OpenAPIUtil.formatSingular(
+				StringUtil.upperCaseFirstLetter(propertySchemaName));
 
 			if (javaDataTypeMap.containsKey(name)) {
 				return name + "[]";

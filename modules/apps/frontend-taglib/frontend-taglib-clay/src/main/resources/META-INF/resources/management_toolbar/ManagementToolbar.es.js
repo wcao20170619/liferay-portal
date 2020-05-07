@@ -29,6 +29,7 @@ import templates from './ManagementToolbar.soy';
  * Creates a Metal Management Toolbar component.
  */
 class ManagementToolbar extends ClayComponent {
+
 	/**
 	 * @inheritDoc
 	 */
@@ -37,38 +38,40 @@ class ManagementToolbar extends ClayComponent {
 
 		new EventEmitterProxy(this.refs.managementToolbar, this);
 
-		Liferay.componentReady(this.searchContainerId).then(searchContainer => {
-			this._eventHandler = [
-				searchContainer.on(
-					'rowToggled',
-					this._handleSearchContainerRowToggled,
-					this
-				),
-			];
+		Liferay.componentReady(this.searchContainerId).then(
+			(searchContainer) => {
+				this._eventHandler = [
+					searchContainer.on(
+						'rowToggled',
+						this._handleSearchContainerRowToggled,
+						this
+					),
+				];
 
-			this._searchContainer = searchContainer;
+				this._searchContainer = searchContainer;
 
-			const select = searchContainer.select;
+				const select = searchContainer.select;
 
-			if (
-				select &&
-				select.getAllSelectedElements &&
-				select.getCurrentPageElements &&
-				select.getCurrentPageSelectedElements
-			) {
-				const bulkSelection =
-					this.supportsBulkActions && select.get('bulkSelection');
+				if (
+					select &&
+					select.getAllSelectedElements &&
+					select.getCurrentPageElements &&
+					select.getCurrentPageSelectedElements
+				) {
+					const bulkSelection =
+						this.supportsBulkActions && select.get('bulkSelection');
 
-				this._setActiveStatus(
-					{
-						allSelectedElements: select.getAllSelectedElements(),
-						currentPageElements: select.getCurrentPageElements(),
-						currentPageSelectedElements: select.getCurrentPageSelectedElements(),
-					},
-					bulkSelection
-				);
+					this._setActiveStatus(
+						{
+							allSelectedElements: select.getAllSelectedElements(),
+							currentPageElements: select.getCurrentPageElements(),
+							currentPageSelectedElements: select.getCurrentPageSelectedElements(),
+						},
+						bulkSelection
+					);
+				}
 			}
-		});
+		);
 
 		if (this.infoPanelId) {
 			const sidenavToggle = this.refs.managementToolbar.refs.infoButton;
@@ -100,7 +103,7 @@ class ManagementToolbar extends ClayComponent {
 		}
 
 		if (this._eventHandler) {
-			this._eventHandler.forEach(eventHandler => {
+			this._eventHandler.forEach((eventHandler) => {
 				eventHandler.detach();
 			});
 		}
@@ -218,7 +221,7 @@ class ManagementToolbar extends ClayComponent {
 		this._setActiveStatus(event.elements, bulkSelection);
 
 		if (this.actionItems) {
-			this.actionItems = this.actionItems.map(actionItem => {
+			this.actionItems = this.actionItems.map((actionItem) => {
 				return Object.assign(actionItem, {
 					disabled:
 						actions &&
@@ -273,6 +276,7 @@ class ManagementToolbar extends ClayComponent {
  * @type {!Object}
  */
 ManagementToolbar.STATE = {
+
 	/**
 	 * List of items to display in the actions menu on active state.
 	 *

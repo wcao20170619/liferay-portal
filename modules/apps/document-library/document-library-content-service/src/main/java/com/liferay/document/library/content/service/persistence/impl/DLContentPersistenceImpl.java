@@ -16,6 +16,7 @@ package com.liferay.document.library.content.service.persistence.impl;
 
 import com.liferay.document.library.content.exception.NoSuchContentException;
 import com.liferay.document.library.content.model.DLContent;
+import com.liferay.document.library.content.model.DLContentTable;
 import com.liferay.document.library.content.model.impl.DLContentImpl;
 import com.liferay.document.library.content.model.impl.DLContentModelImpl;
 import com.liferay.document.library.content.service.persistence.DLContentPersistence;
@@ -2280,11 +2281,6 @@ public class DLContentPersistenceImpl
 		"(dlContent.version IS NULL OR dlContent.version = '')";
 
 	public DLContentPersistenceImpl() {
-		setModelClass(DLContent.class);
-
-		setModelImplClass(DLContentImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("path", "path_");
@@ -2292,6 +2288,13 @@ public class DLContentPersistenceImpl
 		dbColumnNames.put("size", "size_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(DLContent.class);
+
+		setModelImplClass(DLContentImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(DLContentTable.INSTANCE);
 	}
 
 	/**

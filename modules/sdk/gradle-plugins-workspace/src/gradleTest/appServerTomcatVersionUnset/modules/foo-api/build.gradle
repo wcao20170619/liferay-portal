@@ -1,0 +1,14 @@
+task testLiferayTomcatVersion
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: "org.osgi", name: "org.osgi.annotation.versioning"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
+}
+
+testLiferayTomcatVersion {
+	doLast {
+		assert project.liferay.appServers.tomcat.version == "9.0.17"
+	}
+}

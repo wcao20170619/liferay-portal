@@ -14,56 +14,83 @@
 
 import IncrementalDomRenderer from 'metal-incremental-dom';
 import JSXComponent from 'metal-jsx';
-import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 
 import Observer from './Observer.es';
+import {SoyRegisterAdapter} from './SoyRegisterAdapter.es';
 
 const CONFIG_BLACKLIST = ['children', 'events', 'ref', 'visible'];
 const CONFIG_DEFAULT = ['displayErrors'];
 
 /**
- * The Adapter needs the React component instance to render and the soy template
- * is only used to bridge when a Metal+soy component calls the Metal+jsx component
- * inside Soy Templates, the rest ReactComponentAdapter will take care of render.
+ * The Adapter creates a communication bridge between the Metal and React components.
+ * The Adapter when it is rendered for the first time uses `ReactDOM.render` to assemble
+ * the component and subsequent renderings are done by React. We created a tunnel with
+ * an Observer that updates the internal state of the component in React that makes a
+ * wrapper over the main component to force React to render at the best time, we also
+ * ignore the rendering of Metal.
+ *
  * @example
  * // import getConnectedReactComponentAdapter from '/path/ReactComponentAdapter.es';
- * // import templates from './ComponentNameAdapter.soy';
  * //
- * // const DatePickerWithState = ({dispatch}) => (
- * // 	<ClayDatePicker {...} />
+ * // const ReactComponent = ({children, className}) => <div className={className}>{children}</div>;
+ * // const ReactComponentAdapter = getConnectedReactComponentAdapter(
+ * //   ReactComponent
  * // );
  * //
- * // const ReactDatePickerAdapter = getConnectedReactComponentAdapter(
- * // 	DatePickerWithState,
- * // 	templates
- * // );
- * `ReactComponentAdapter` will pass the `events` and `store` properties to the
- * React component.
+ * // In the rendering of Metal
+ * // render() {
+ * //	return (
+ * //		<ReactComponentAdapter className="h1-title">
+ * //			<h1>{'Title'}</h1>
+ * //		</ReactComponentAdapter>
+ * //	);
+ * // }
+ *
+ * Some considerations that must be made, this works very well in the context of DDM fields,
+ * where the dynamic rendering mechanism of the components is used using Soy with the use of
+ * `deltemplates`, so you just need to pass the name of the `variant` of your field so that
+ * it can be called dynamically, this registers a variant in `PageRenderer.RegisterFieldType`.
+ * This is optional; this adapter can work very well in the context of Metal+JSX.
+ *
  * @example
- * // {call ReactDatePickerAdapter.render}
- * // 	{param events: ['dispatch': $_handleOnDispatch] /}
- * //	{param store: ['value': $value, 'name': $name] /}
+ * // import getConnectedReactComponentAdapter from '/path/ReactComponentAdapter.es';
+ * //
+ * // const ReactComponent = ({className}) => <div className={className} />;
+ * // const ReactComponentAdapter = getConnectedReactComponentAdapter(
+ * //   ReactComponent,
+ * //	'separetor'
+ * // );
+ *
+ * To call the React component in the context of Metal + soy, where varient is not an option,
+ * you can use Metal's `Soy.register` to create a fake component so that you can call the React
+ * component in Soy. The use of children from Soy components for React does not work.
+ *
+ * @example
+ * // import Soy from 'metal-soy';
+ * // import getConnectedReactComponentAdapter from '/path/ReactComponentAdapter.es';
+ * // import templates from './FakeAdapter.soy';
+ * //
+ * // const ReactComponent = ({className}) => <div className={className} />;
+ * // const ReactComponentAdapter = getConnectedReactComponentAdapter(
+ * //   ReactComponent
+ * // );
+ * // Soy.register(ReactComponentAdapter, templates);
+ * //
+ * // In soy
+ * // {call FakeAdapter.render}
+ * //	{param className: 'test' /}
  * // {/call}
- * @example
- * // const DatePickerWithState = ({
- * // 	dispatch,
- * // 	value,
- * // 	name,
- * // }) => (
- * // 	<ClayDatePicker
- * //		value={value}
- * //		onValueChange={newValue => dispatch({type: 'value', payload: newValue})}
- * // 	/>
- * // );
+ *
  * @param {React.createElement} ReactComponent
- * @param {Soy} templates
+ * @param {String} variant
  */
 
-function getConnectedReactComponentAdapter(ReactComponent, templates) {
+function getConnectedReactComponentAdapter(ReactComponent, variant) {
 	class ReactComponentAdapter extends JSXComponent {
+
 		/**
 		 * For Metal to track config changes, we need to declare the
 		 * configs in the static property so that willReceiveProps is
@@ -74,7 +101,7 @@ function getConnectedReactComponentAdapter(ReactComponent, templates) {
 			const props = {};
 			Object.keys(config)
 				.concat(CONFIG_DEFAULT)
-				.forEach(key => {
+				.forEach((key) => {
 					if (!CONFIG_BLACKLIST.includes(key)) {
 						props[key] = Config.any();
 					}
@@ -97,10 +124,12 @@ function getConnectedReactComponentAdapter(ReactComponent, templates) {
 		}
 
 		willReceiveProps(changes) {
+
 			// Delete the events and children properties to make it easier to
 			// check which values have been changed, events and children are
 			// properties that are changing all the time when new renderings
 			// happen, a new reference is created all the time.
+
 			delete changes.events;
 			delete changes.children;
 
@@ -108,7 +137,7 @@ function getConnectedReactComponentAdapter(ReactComponent, templates) {
 				const newValues = {};
 				const keys = Object.keys(changes);
 
-				keys.forEach(key => {
+				keys.forEach((key) => {
 					if (!CONFIG_BLACKLIST.includes(key)) {
 						newValues[key] = changes[key].newVal;
 					}
@@ -163,7 +192,9 @@ function getConnectedReactComponentAdapter(ReactComponent, templates) {
 		}
 	}
 
-	Soy.register(ReactComponentAdapter, templates);
+	if (variant) {
+		SoyRegisterAdapter(ReactComponentAdapter, variant);
+	}
 
 	ReactComponentAdapter.RENDERER = IncrementalDomRenderer;
 
@@ -178,7 +209,7 @@ const ObserverSubscribe = ({children, observer}) => {
 	const [state, setState] = useState({});
 
 	useEffect(() => {
-		const change = value => setState({...state, ...value});
+		const change = (value) => setState({...state, ...value});
 
 		observer.subscribe(change);
 

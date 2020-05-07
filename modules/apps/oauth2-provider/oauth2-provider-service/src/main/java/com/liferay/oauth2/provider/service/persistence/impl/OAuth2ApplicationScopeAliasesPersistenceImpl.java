@@ -16,6 +16,7 @@ package com.liferay.oauth2.provider.service.persistence.impl;
 
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationScopeAliasesException;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
+import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliasesTable;
 import com.liferay.oauth2.provider.model.impl.OAuth2ApplicationScopeAliasesImpl;
 import com.liferay.oauth2.provider.model.impl.OAuth2ApplicationScopeAliasesModelImpl;
 import com.liferay.oauth2.provider.service.persistence.OAuth2ApplicationScopeAliasesPersistence;
@@ -1135,17 +1136,19 @@ public class OAuth2ApplicationScopeAliasesPersistenceImpl
 			"oAuth2ApplicationScopeAliases.oAuth2ApplicationId = ?";
 
 	public OAuth2ApplicationScopeAliasesPersistenceImpl() {
-		setModelClass(OAuth2ApplicationScopeAliases.class);
-
-		setModelImplClass(OAuth2ApplicationScopeAliasesImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put(
 			"oAuth2ApplicationScopeAliasesId", "oA2AScopeAliasesId");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(OAuth2ApplicationScopeAliases.class);
+
+		setModelImplClass(OAuth2ApplicationScopeAliasesImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(OAuth2ApplicationScopeAliasesTable.INSTANCE);
 	}
 
 	/**

@@ -13,7 +13,8 @@ import {useIsMounted} from 'frontend-js-react-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useEffect, useState} from 'react';
 
-import ConnectionContext from '../state/context';
+import ConnectionContext from '../context/ConnectionContext';
+import {StoreContext, useWarning} from '../context/store';
 import Hint from './Hint';
 
 function TotalCount({
@@ -29,12 +30,17 @@ function TotalCount({
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const [value, setValue] = useState('-');
+
 	const isMounted = useIsMounted();
+
+	const [, addWarning] = useWarning();
+
+	const [{publishedToday}] = useContext(StoreContext);
 
 	useEffect(() => {
 		if (validAnalyticsConnection) {
 			dataProvider()
-				.then(value => {
+				.then((value) => {
 					if (isMounted()) {
 						setValue(value);
 					}
@@ -42,6 +48,7 @@ function TotalCount({
 				.catch(() => {
 					if (isMounted()) {
 						setValue('-');
+						addWarning();
 					}
 				});
 		}
@@ -50,7 +57,7 @@ function TotalCount({
 
 	let displayValue = '-';
 
-	if (validAnalyticsConnection) {
+	if (validAnalyticsConnection && !publishedToday) {
 		displayValue =
 			percentage && value !== '-' ? <span>{`${value}%`}</span> : value;
 	}

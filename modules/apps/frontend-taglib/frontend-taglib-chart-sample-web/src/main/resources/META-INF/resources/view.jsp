@@ -28,148 +28,155 @@
 </style>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col">
+	<clay:row>
+		<clay:col>
 			<chart:area-spline
 				config="<%= chartSampleDisplayContext.getAreaSplineChartConfig() %>"
 				id="area-spline"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:area-step
 				config="<%= chartSampleDisplayContext.getAreaStepChartConfig() %>"
 				id="area-step"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col">
+	<clay:row>
+		<clay:col>
 			<chart:line
 				config="<%= chartSampleDisplayContext.getLineChartConfig() %>"
 				id="line"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:scatter
 				config="<%= chartSampleDisplayContext.getScatterChartConfig() %>"
 				id="scatter"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:spline
 				config="<%= chartSampleDisplayContext.getSplineChartConfig() %>"
 				id="spline"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:step
 				config="<%= chartSampleDisplayContext.getStepChartConfig() %>"
 				id="step"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col">
+	<clay:row>
+		<clay:col>
 			<chart:bar
 				config="<%= chartSampleDisplayContext.getBarChartConfig() %>"
 				id="bar"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:combination
 				config="<%= chartSampleDisplayContext.getCombinationChartConfig() %>"
 				id="combination"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col">
+	<clay:row>
+		<clay:col>
 			<chart:donut
 				config="<%= chartSampleDisplayContext.getDonutChartConfig() %>"
 				id="donut"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col">
+		<clay:col>
 			<chart:pie
 				config="<%= chartSampleDisplayContext.getPieChartConfig() %>"
 				id="pie"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-		<div class="row">
-			<div class="col">
-				<chart:gauge
-					config="<%= chartSampleDisplayContext.getGaugeChartConfig() %>"
-					id="gauge"
-				/>
-			</div>
-		</div>
-	</div>
+	<clay:row>
+		<clay:col>
+			<chart:gauge
+				config="<%= chartSampleDisplayContext.getGaugeChartConfig() %>"
+				id="gauge"
+			/>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col geomap">
+	<clay:row>
+		<clay:col
+			className="geomap"
+		>
 			<chart:geomap
 				config="<%= chartSampleDisplayContext.getGeomapConfig1() %>"
 				id="geomap-default-colors"
 			/>
-		</div>
+		</clay:col>
 
-		<div class="col geomap">
+		<clay:col
+			className="geomap"
+		>
 			<chart:geomap
 				config="<%= chartSampleDisplayContext.getGeomapConfig2() %>"
 				id="gemomap-custom-colors"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col polling-interval">
+	<clay:row>
+		<clay:col
+			className="polling-interval"
+		>
 			<chart:line
 				componentId="polling-interval-line-chart"
 				config="<%= chartSampleDisplayContext.getPollingIntervalLineChartConfig() %>"
 				id="polling-interval-line-chart"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <div class="container-fluid">
-	<div class="row">
-		<div class="col predictive">
+	<clay:row>
+		<clay:col
+			className="predictive"
+		>
 			<chart:predictive
 				componentId="predictive-chart"
 				config="<%= chartSampleDisplayContext.getPredictiveChartConfig() %>"
 				id="predictive-chart"
 			/>
-		</div>
-	</div>
+		</clay:col>
+	</clay:row>
 </div>
 
 <aui:script>
-	Liferay.componentReady('polling-interval-line-chart').then(function(chart) {
-		chart.data = function() {
+	Liferay.componentReady('polling-interval-line-chart').then(function (chart) {
+		chart.data = function () {
 			return Promise.resolve([
 				{
 					data: [
@@ -191,10 +198,10 @@
 		};
 	});
 
-	Liferay.componentReady('predictive-chart').then(function(chart) {
+	Liferay.componentReady('predictive-chart').then(function (chart) {
 		var oldData = chart.data.slice();
 
-		setTimeout(function() {
+		setTimeout(function () {
 			var newData = {
 				data: [
 					[230, 230, 230],
@@ -213,7 +220,7 @@
 				id: 'data3',
 			};
 
-			chart.data = new Promise(function(resolve, reject) {
+			chart.data = new Promise(function (resolve, reject) {
 				oldData.push(newData);
 				resolve(oldData);
 			});

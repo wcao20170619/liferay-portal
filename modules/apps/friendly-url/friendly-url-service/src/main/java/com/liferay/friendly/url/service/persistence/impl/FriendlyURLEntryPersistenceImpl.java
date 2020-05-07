@@ -16,6 +16,7 @@ package com.liferay.friendly.url.service.persistence.impl;
 
 import com.liferay.friendly.url.exception.NoSuchFriendlyURLEntryException;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
+import com.liferay.friendly.url.model.FriendlyURLEntryTable;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryImpl;
 import com.liferay.friendly.url.model.impl.FriendlyURLEntryModelImpl;
 import com.liferay.friendly.url.service.persistence.FriendlyURLEntryPersistence;
@@ -2062,16 +2063,18 @@ public class FriendlyURLEntryPersistenceImpl
 		"friendlyURLEntry.classPK = ?";
 
 	public FriendlyURLEntryPersistenceImpl() {
-		setModelClass(FriendlyURLEntry.class);
-
-		setModelImplClass(FriendlyURLEntryImpl.class);
-		setModelPKClass(long.class);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(FriendlyURLEntry.class);
+
+		setModelImplClass(FriendlyURLEntryImpl.class);
+		setModelPKClass(long.class);
+
+		setTable(FriendlyURLEntryTable.INSTANCE);
 	}
 
 	/**

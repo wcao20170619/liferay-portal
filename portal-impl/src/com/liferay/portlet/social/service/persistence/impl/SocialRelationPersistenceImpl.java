@@ -36,6 +36,7 @@ import com.liferay.portlet.social.model.impl.SocialRelationImpl;
 import com.liferay.portlet.social.model.impl.SocialRelationModelImpl;
 import com.liferay.social.kernel.exception.NoSuchRelationException;
 import com.liferay.social.kernel.model.SocialRelation;
+import com.liferay.social.kernel.model.SocialRelationTable;
 import com.liferay.social.kernel.service.persistence.SocialRelationPersistence;
 
 import java.io.Serializable;
@@ -5643,18 +5644,20 @@ public class SocialRelationPersistenceImpl
 		"socialRelation.type = ?";
 
 	public SocialRelationPersistenceImpl() {
-		setModelClass(SocialRelation.class);
-
-		setModelImplClass(SocialRelationImpl.class);
-		setModelPKClass(long.class);
-		setEntityCacheEnabled(SocialRelationModelImpl.ENTITY_CACHE_ENABLED);
-
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
 		dbColumnNames.put("uuid", "uuid_");
 		dbColumnNames.put("type", "type_");
 
 		setDBColumnNames(dbColumnNames);
+
+		setModelClass(SocialRelation.class);
+
+		setModelImplClass(SocialRelationImpl.class);
+		setModelPKClass(long.class);
+		setEntityCacheEnabled(SocialRelationModelImpl.ENTITY_CACHE_ENABLED);
+
+		setTable(SocialRelationTable.INSTANCE);
 	}
 
 	/**

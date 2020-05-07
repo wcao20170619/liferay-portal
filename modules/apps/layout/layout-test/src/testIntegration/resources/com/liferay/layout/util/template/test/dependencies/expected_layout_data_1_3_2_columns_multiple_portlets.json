@@ -6,7 +6,8 @@
 				"ROOT-CONTAINER1",
 				"ROOT-CONTAINER2"
 			],
-			"config": {},
+			"config": {
+			},
 			"itemId": "ROOT",
 			"parentId": "",
 			"type": "root"
@@ -16,7 +17,8 @@
 				"ROOT-CONTAINER0-ROW0"
 			],
 			"config": {
-				"backgroundImage": {},
+				"backgroundImage": {
+				},
 				"paddingBottom": 3,
 				"paddingHorizontal": 3,
 				"paddingTop": 3,
@@ -32,7 +34,31 @@
 			],
 			"config": {
 				"gutters": true,
-				"numberOfColumns": 1
+				"landscapeMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"modulesPerRow": 3,
+				"numberOfColumns": 1,
+				"portraitMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"reverseOrder": false,
+				"tablet": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 1,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"verticalAlignment": "top"
 			},
 			"itemId": "ROOT-CONTAINER0-ROW0",
 			"parentId": "ROOT-CONTAINER0",
@@ -51,7 +77,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER0-ROW0-COLUMN0-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-1:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -60,7 +87,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER0-ROW0-COLUMN0-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-1:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -73,7 +101,8 @@
 				"ROOT-CONTAINER1-ROW0"
 			],
 			"config": {
-				"backgroundImage": {},
+				"backgroundImage": {
+				},
 				"paddingBottom": 3,
 				"paddingHorizontal": 3,
 				"paddingTop": 3,
@@ -91,7 +120,31 @@
 			],
 			"config": {
 				"gutters": true,
-				"numberOfColumns": 3
+				"landscapeMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 3,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"modulesPerRow": 3,
+				"numberOfColumns": 3,
+				"portraitMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 3,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"reverseOrder": false,
+				"tablet": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 3,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"verticalAlignment": "top"
 			},
 			"itemId": "ROOT-CONTAINER1-ROW0",
 			"parentId": "ROOT-CONTAINER1",
@@ -110,7 +163,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN0-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-2:com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
 			},
@@ -119,7 +173,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN0-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-2:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -140,7 +195,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN1-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-3:com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			},
@@ -149,7 +205,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN1-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-3:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -170,7 +227,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN2-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-4:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -179,7 +237,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER1-ROW0-COLUMN2-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-4:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -192,7 +251,8 @@
 				"ROOT-CONTAINER2-ROW0"
 			],
 			"config": {
-				"backgroundImage": {},
+				"backgroundImage": {
+				},
 				"paddingBottom": 3,
 				"paddingHorizontal": 3,
 				"paddingTop": 3,
@@ -209,7 +269,31 @@
 			],
 			"config": {
 				"gutters": true,
-				"numberOfColumns": 2
+				"landscapeMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"modulesPerRow": 3,
+				"numberOfColumns": 2,
+				"portraitMobile": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"reverseOrder": false,
+				"tablet": {
+					"gutters": true,
+					"modulesPerRow": 3,
+					"numberOfColumns": 2,
+					"reverseOrder": false,
+					"verticalAlignment": "top"
+				},
+				"verticalAlignment": "top"
 			},
 			"itemId": "ROOT-CONTAINER2-ROW0",
 			"parentId": "ROOT-CONTAINER2",
@@ -228,7 +312,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER2-ROW0-COLUMN0-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-5:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -237,7 +322,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER2-ROW0-COLUMN0-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-5:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -258,7 +344,8 @@
 			"type": "column"
 		},
 		"ROOT-CONTAINER2-ROW0-COLUMN1-FRAGMENT0": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-6:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},
@@ -267,7 +354,8 @@
 			"type": "fragment"
 		},
 		"ROOT-CONTAINER2-ROW0-COLUMN1-FRAGMENT1": {
-			"children": [],
+			"children": [
+			],
 			"config": {
 				"fragmentEntryLinkId": "column-6:com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			},

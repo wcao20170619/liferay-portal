@@ -1,0 +1,220 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ListApp renders 1`] = `
+<DocumentFragment>
+  <div
+    class="tools-control-group"
+  >
+    <div
+      class="control-menu-level-1-heading"
+    />
+  </div>
+  <nav
+    class="management-bar navbar navbar-expand-md management-bar-light"
+  >
+    <div
+      class="container-fluid container-fluid-max-xl"
+    >
+      <div
+        class="navbar-form navbar-form-autofit navbar-overlay navbar-overlay-sm-down"
+      >
+        <div
+          class="container-fluid container-fluid-max-xl"
+        >
+          <form
+            role="search"
+          >
+            <div
+              class="input-group"
+            >
+              <div
+                class="input-group-item"
+              >
+                <input
+                  aria-label="search"
+                  class="form-control input-group-inset input-group-inset-after"
+                  placeholder="search..."
+                  type="text"
+                  value=""
+                />
+                <span
+                  class="input-group-inset-item input-group-inset-item-after"
+                >
+                  <button
+                    class="navbar-breakpoint-d-none btn btn-monospaced btn-unstyled"
+                    type="button"
+                  >
+                    <svg
+                      class="lexicon-icon lexicon-icon-times"
+                      role="presentation"
+                    >
+                      <use
+                        xlink:href="#times"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="btn btn-monospaced btn-unstyled"
+                    type="submit"
+                  >
+                    <svg
+                      class="lexicon-icon lexicon-icon-search"
+                      role="presentation"
+                    >
+                      <use
+                        xlink:href="#search"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <ul
+        class="navbar-nav"
+      >
+        <li
+          class="nav-item navbar-breakpoint-d-none"
+        >
+          <button
+            class="nav-link nav-link-monospaced btn btn-unstyled"
+            type="button"
+          >
+            <svg
+              class="lexicon-icon lexicon-icon-search"
+              role="presentation"
+            >
+              <use
+                xlink:href="#search"
+              />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div
+    class="container-fluid container-fluid-max-xl"
+  >
+    <div>
+      <div
+        class="table-responsive"
+      >
+        <table
+          class="table table-autofit table-list"
+        >
+          <thead>
+            <tr
+              class=""
+            >
+              <th
+                class="table-cell-expand text-left"
+              >
+                name
+              </th>
+              <th
+                class="table-cell-expand-smaller text-left"
+              >
+                object
+              </th>
+              <th
+                class="table-cell-expand-smaller text-left"
+              >
+                deployed-as
+              </th>
+              <th
+                class="table-cell-expand-smaller text-left"
+              >
+                create-date
+              </th>
+              <th
+                class="table-cell-expand-smaller text-left"
+              >
+                modified-date
+              </th>
+              <th
+                class="table-cell-expand-smaller text-left"
+              >
+                status
+              </th>
+              <th
+                class=""
+              />
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class=""
+            >
+              <td
+                class="table-cell-expand text-left"
+              >
+                <p
+                  class="table-list-title"
+                >
+                  Item 1
+                </p>
+              </td>
+              <td
+                class="table-cell-expand-smaller text-left"
+              >
+                Object
+              </td>
+              <td
+                class="table-cell-expand-smaller text-left"
+              >
+                standalone
+              </td>
+              <td
+                class="table-cell-expand-smaller text-left"
+              >
+                a month ago
+              </td>
+              <td
+                class="table-cell-expand-smaller text-left"
+              >
+                a month ago
+              </td>
+              <td
+                class="table-cell-expand-smaller text-left"
+              >
+                <span
+                  class="label label-secondary"
+                >
+                  <span
+                    class="label-item label-item-expand"
+                  />
+                </span>
+              </td>
+              <td
+                class=""
+              >
+                <div
+                  class="dropdown dropdown-action"
+                >
+                  <button
+                    class="dropdown-toggle page-link btn btn-unstyled"
+                    style=""
+                    type="button"
+                  >
+                    <svg
+                      class="lexicon-icon lexicon-icon-ellipsis-v"
+                      role="presentation"
+                    >
+                      <use
+                        xlink:href="#ellipsis-v"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</DocumentFragment>
+`;

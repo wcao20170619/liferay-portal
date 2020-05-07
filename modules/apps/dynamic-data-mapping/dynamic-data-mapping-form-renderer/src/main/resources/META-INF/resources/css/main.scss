@@ -35,6 +35,10 @@
 }
 
 body .ddm-user-view-content {
+	.ddm-field {
+		padding: 0 12px;
+	}
+
 	.liferay-ddm-form-renderer-wizard {
 		padding: 40px 34px 31px;
 	}
@@ -443,8 +447,9 @@ body .ddm-user-view-content {
 .lfr-ddm-form-field-repeatable-toolbar {
 	.ddm-form-field-repeatable-add-button,
 	.ddm-form-field-repeatable-delete-button {
+		border-radius: 12px !important;
+		padding: 2px !important;
 		position: absolute;
-		top: 4px;
 	}
 
 	.ddm-form-field-repeatable-delete-button {

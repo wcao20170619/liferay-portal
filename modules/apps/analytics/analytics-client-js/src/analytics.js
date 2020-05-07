@@ -43,6 +43,7 @@ let instance;
  * and flushes it to the defined endpoint at regular intervals.
  */
 class Analytics {
+
 	/**
 	 * Returns an Analytics instance and triggers the automatic flush loop
 	 * @param {Object} config object to instantiate the Analytics tool
@@ -69,7 +70,7 @@ class Analytics {
 
 		// Initializes default plugins
 
-		instance._pluginDisposers = defaultPlugins.map(plugin =>
+		instance._pluginDisposers = defaultPlugins.map((plugin) =>
 			plugin(instance)
 		);
 
@@ -85,7 +86,7 @@ class Analytics {
 		const eventQueue = new EventQueue(STORAGE_KEY_EVENTS, {
 			analyticsInstance: instance,
 			flushDelay: instance.delay,
-			onFlushSuccess: unflushedEvents => {
+			onFlushSuccess: (unflushedEvents) => {
 				if (!unflushedEvents.length) {
 					this.resetContext();
 				}
@@ -231,7 +232,7 @@ class Analytics {
 
 		this.config.identity = identity;
 
-		return this._getUserId().then(userId =>
+		return this._getUserId().then((userId) =>
 			this._sendIdentity(identity, userId)
 		);
 	}
@@ -252,8 +253,8 @@ class Analytics {
 
 		if (instance._pluginDisposers) {
 			instance._pluginDisposers
-				.filter(disposer => typeof disposer === 'function')
-				.forEach(disposer => disposer());
+				.filter((disposer) => typeof disposer === 'function')
+				.forEach((disposer) => disposer());
 		}
 	}
 
@@ -281,7 +282,7 @@ class Analytics {
 		const storedContexts = getItem(STORAGE_KEY_CONTEXTS) || [];
 
 		const hasStoredContext = storedContexts.find(
-			storedContext => hash(storedContext) === currentContextHash
+			(storedContext) => hash(storedContext) === currentContextHash
 		);
 
 		if (!hasStoredContext) {

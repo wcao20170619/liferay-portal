@@ -145,10 +145,15 @@ public class FriendlyURLEntryLocalServiceUtil {
 	}
 
 	public static void deleteFriendlyURLEntry(
-			long groupId, Class<?> clazz, long classPK)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		long groupId, Class<?> clazz, long classPK) {
 
 		getService().deleteFriendlyURLEntry(groupId, clazz, classPK);
+	}
+
+	public static void deleteFriendlyURLEntry(
+		long groupId, long classNameId, long classPK) {
+
+		getService().deleteFriendlyURLEntry(groupId, classNameId, classPK);
 	}
 
 	public static void deleteGroupFriendlyURLEntries(
@@ -166,6 +171,12 @@ public class FriendlyURLEntryLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().deletePersistedModel(persistedModel);
+	}
+
+	public static <T> T dslQuery(
+		com.liferay.petra.sql.dsl.query.DSLQuery dslQuery) {
+
+		return getService().dslQuery(dslQuery);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery

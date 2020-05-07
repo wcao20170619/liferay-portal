@@ -14,6 +14,7 @@
 
 package com.liferay.redirect.web.internal.portlet.action;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.redirect.model.RedirectEntry;
 import com.liferay.redirect.service.RedirectEntryService;
 import com.liferay.redirect.web.internal.constants.RedirectPortletKeys;
+import com.liferay.redirect.web.internal.util.RedirectUtil;
 
 import java.util.Date;
 
@@ -76,6 +78,13 @@ public class EditRedirectEntryMVCActionCommand extends BaseMVCActionCommand {
 				_redirectEntryService.updateRedirectEntry(
 					redirectEntryId, destinationURL, expirationDate, permanent,
 					sourceURL);
+			}
+
+			if (ParamUtil.getBoolean(actionRequest, "updateReferences")) {
+				_redirectEntryService.updateChainedRedirectEntries(
+					themeDisplay.getScopeGroupId(), destinationURL,
+					RedirectUtil.getGroupBaseURL(themeDisplay) +
+						StringPool.SLASH + sourceURL);
 			}
 		}
 		catch (Exception exception) {
