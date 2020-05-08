@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.ClusterableSidecar;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.SidecarPathsImpl;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -43,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration",
-	enabled = false, immediate = true, service = {}
+	enabled = true, immediate = true, service = {}
 )
 public class SidecarElasticsearchConnectionManager {
 
@@ -81,7 +82,7 @@ public class SidecarElasticsearchConnectionManager {
 				ClusterableSidecar clusterableSidecar = new ClusterableSidecar(
 					_clusterExecutor, _clusterMasterExecutor,
 					elasticsearchConfiguration, _jsonFactory, _processExecutor,
-					_props);
+					new SidecarPathsImpl(_props));
 
 				_clusterableSidecarsOSGiServiceserviceRegistration =
 					bundleContext.registerService(
@@ -97,7 +98,8 @@ public class SidecarElasticsearchConnectionManager {
 			else {
 				elasticsearchConnection = new SidecarElasticsearchConnection(
 					new Sidecar(
-						elasticsearchConfiguration, _processExecutor, _props));
+						elasticsearchConfiguration, _processExecutor,
+						new SidecarPathsImpl(_props)));
 			}
 		}
 		else {
