@@ -18,9 +18,12 @@ import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
 import com.liferay.portal.search.test.util.AssertUtils;
+
+import java.util.Arrays;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -37,24 +40,29 @@ public class ElasticsearchIndexInformationTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(
-			ElasticsearchIndexInformationTest.class.getSimpleName());
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				ElasticsearchIndexInformationTest.class.getSimpleName()
+			).build();
 
-		_elasticsearchFixture.setUp();
+		elasticsearchConnectionFixture.createNode();
+
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
 	}
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		_elasticsearchFixture.tearDown();
+		_elasticsearchConnectionFixture.destroyNode();
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		_companyIndexFactoryFixture = createCompanyIndexFactoryFixture(
-			_elasticsearchFixture);
+			_elasticsearchConnectionFixture);
 
 		_elasticsearchIndexInformation = createElasticsearchIndexInformation(
-			_elasticsearchFixture);
+			_elasticsearchConnectionFixture);
 	}
 
 	@Test
@@ -75,23 +83,18 @@ public class ElasticsearchIndexInformationTest {
 		String fieldMappings = _elasticsearchIndexInformation.getFieldMappings(
 			_companyIndexFactoryFixture.getIndexName());
 
-		JSONObject expectedJSONObject = loadJSONObject(
-			testName.getMethodName());
-		JSONObject actualJSONObject = _jsonFactory.createJSONObject(
-			fieldMappings);
-
-		AssertUtils.assertEquals("", expectedJSONObject, actualJSONObject);
+		AssertUtils.assertEquals(
+			"", loadJSONObject(testName.getMethodName()),
+			_jsonFactory.createJSONObject(fieldMappings));
 	}
 
 	@Test
 	public void testGetIndexNames() throws Exception {
 		_companyIndexFactoryFixture.createIndices();
 
-		String[] indexNames = _elasticsearchIndexInformation.getIndexNames();
-
-		Assert.assertEquals(indexNames.toString(), 1, indexNames.length);
-		Assert.assertEquals(
-			_companyIndexFactoryFixture.getIndexName(), indexNames[0]);
+		AssertUtils.assertEquals(
+			"", Arrays.asList(_companyIndexFactoryFixture.getIndexName()),
+			Arrays.asList(_elasticsearchIndexInformation.getIndexNames()));
 	}
 
 	@Rule
@@ -99,13 +102,13 @@ public class ElasticsearchIndexInformationTest {
 
 	protected static ElasticsearchIndexInformation
 		createElasticsearchIndexInformation(
-			ElasticsearchFixture elasticsearchFixture) {
+			ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		return new ElasticsearchIndexInformation() {
 			{
-				elasticsearchClientResolver = elasticsearchFixture;
-				indexNameBuilder =
-					ElasticsearchIndexInformationTest::getIndexNameBuilder;
+				setElasticsearchClientResolver(elasticsearchClientResolver);
+				setIndexNameBuilder(
+					ElasticsearchIndexInformationTest::getIndexNameBuilder);
 			}
 		};
 	}
@@ -115,10 +118,10 @@ public class ElasticsearchIndexInformationTest {
 	}
 
 	protected CompanyIndexFactoryFixture createCompanyIndexFactoryFixture(
-		ElasticsearchFixture elasticsearchFixture) {
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
 		return new CompanyIndexFactoryFixture(
-			elasticsearchFixture, testName.getMethodName());
+			elasticsearchClientResolver, testName.getMethodName());
 	}
 
 	protected JSONObject loadJSONObject(String suffix) throws Exception {
@@ -129,7 +132,8 @@ public class ElasticsearchIndexInformationTest {
 		return _jsonFactory.createJSONObject(json);
 	}
 
-	private static ElasticsearchFixture _elasticsearchFixture;
+	private static ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
 
 	private CompanyIndexFactoryFixture _companyIndexFactoryFixture;
 	private ElasticsearchIndexInformation _elasticsearchIndexInformation;

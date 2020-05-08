@@ -17,6 +17,7 @@ package com.liferay.portal.search.elasticsearch7.internal;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnection;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ import org.elasticsearch.action.admin.cluster.snapshots.delete.DeleteSnapshotReq
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsRequest;
 import org.elasticsearch.action.admin.cluster.snapshots.get.GetSnapshotsResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.SnapshotClient;
 import org.elasticsearch.snapshots.SnapshotInfo;
 
@@ -43,16 +45,32 @@ public class ElasticsearchSearchEngineTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		_elasticsearchSearchEngineFixture =
-			new ElasticsearchSearchEngineFixture(
-				ElasticsearchSearchEngineTest.class.getSimpleName());
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			createElasticsearchConnectionFixture();
 
-		_elasticsearchSearchEngineFixture.setUp();
+		ElasticsearchSearchEngineFixture elasticsearchSearchEngineFixture =
+			new ElasticsearchSearchEngineFixture(
+				elasticsearchConnectionFixture);
+
+		elasticsearchSearchEngineFixture.setUp();
+
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
+
+		_elasticsearchSearchEngineFixture = elasticsearchSearchEngineFixture;
 	}
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		_elasticsearchSearchEngineFixture.tearDown();
+		if (_elasticsearchSearchEngineFixture != null) {
+			_elasticsearchSearchEngineFixture.tearDown();
+		}
+	}
+
+	public SnapshotClient getSnapshotClient() {
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchConnectionFixture.getRestHighLevelClient();
+
+		return restHighLevelClient.snapshot();
 	}
 
 	@Test
@@ -111,6 +129,15 @@ public class ElasticsearchSearchEngineTest {
 		deleteSnapshot("liferay_backup", "restore_test");
 	}
 
+	protected static ElasticsearchConnectionFixture
+		createElasticsearchConnectionFixture() {
+
+		return ElasticsearchConnectionFixture.builder(
+		).clusterName(
+			ElasticsearchSearchEngineTest.class.getSimpleName()
+		).build();
+	}
+
 	protected void createSnapshot(
 		String repositoryName, String snapshotName, boolean waitForCompletion,
 		String... indexNames) {
@@ -121,8 +148,7 @@ public class ElasticsearchSearchEngineTest {
 		createSnapshotRequest.indices(indexNames);
 		createSnapshotRequest.waitForCompletion(waitForCompletion);
 
-		SnapshotClient snapshotClient =
-			_elasticsearchSearchEngineFixture.getSnapshotClient();
+		SnapshotClient snapshotClient = getSnapshotClient();
 
 		try {
 			snapshotClient.create(
@@ -137,8 +163,7 @@ public class ElasticsearchSearchEngineTest {
 		DeleteSnapshotRequest deleteSnapshotRequest = new DeleteSnapshotRequest(
 			repository, snapshot);
 
-		SnapshotClient snapshotClient =
-			_elasticsearchSearchEngineFixture.getSnapshotClient();
+		SnapshotClient snapshotClient = getSnapshotClient();
 
 		try {
 			snapshotClient.delete(
@@ -158,8 +183,7 @@ public class ElasticsearchSearchEngineTest {
 		getSnapshotsRequest.repository(repository);
 		getSnapshotsRequest.snapshots(snapshots);
 
-		SnapshotClient snapshotClient =
-			_elasticsearchSearchEngineFixture.getSnapshotClient();
+		SnapshotClient snapshotClient = getSnapshotClient();
 
 		try {
 			return snapshotClient.get(
@@ -181,6 +205,8 @@ public class ElasticsearchSearchEngineTest {
 		elasticsearchConnection.connect();
 	}
 
+	private static ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
 	private static ElasticsearchSearchEngineFixture
 		_elasticsearchSearchEngineFixture;
 

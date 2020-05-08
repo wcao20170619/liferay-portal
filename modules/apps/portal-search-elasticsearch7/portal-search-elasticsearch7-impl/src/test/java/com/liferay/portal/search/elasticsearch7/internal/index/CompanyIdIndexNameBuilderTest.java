@@ -18,13 +18,14 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 
 import java.util.Collections;
 
 import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexResponse;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -38,8 +39,14 @@ public class CompanyIdIndexNameBuilderTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				CompanyIdIndexNameBuilderTest.class.getSimpleName()
+			).build();
+
 		_elasticsearchFixture = new ElasticsearchFixture(
-			CompanyIdIndexNameBuilderTest.class.getSimpleName());
+			elasticsearchConnectionFixture);
 
 		_elasticsearchFixture.setUp();
 	}
@@ -117,8 +124,8 @@ public class CompanyIdIndexNameBuilderTest {
 
 		CompanyIndexFactory companyIndexFactory = new CompanyIndexFactory() {
 			{
-				indexNameBuilder = companyIdIndexNameBuilder;
-				jsonFactory = new JSONFactoryImpl();
+				setIndexNameBuilder(companyIdIndexNameBuilder);
+				setJsonFactory(new JSONFactoryImpl());
 			}
 		};
 

@@ -15,7 +15,7 @@
 package com.liferay.portal.search.elasticsearch7.internal.background.task;
 
 import com.liferay.portal.search.elasticsearch7.internal.ElasticsearchSearchEngineFixture;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.index.FieldMappingAssert;
 import com.liferay.portal.search.elasticsearch7.internal.index.LiferayTypeMappingsConstants;
 import com.liferay.portal.search.test.util.background.task.BaseReindexSingleIndexerBackgroundTaskExecutorTestCase;
@@ -28,15 +28,29 @@ import org.elasticsearch.client.RestHighLevelClient;
 public class ReindexSingleIndexerBackgroundTaskExecutorTest
 	extends BaseReindexSingleIndexerBackgroundTaskExecutorTestCase {
 
+	public ReindexSingleIndexerBackgroundTaskExecutorTest() {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				ReindexSingleIndexerBackgroundTaskExecutorTest.class.
+					getSimpleName()
+			).build();
+
+		ElasticsearchSearchEngineFixture elasticsearchSearchEngineFixture =
+			new ElasticsearchSearchEngineFixture(
+				elasticsearchConnectionFixture);
+
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
+
+		_elasticsearchSearchEngineFixture = elasticsearchSearchEngineFixture;
+	}
+
 	@Override
 	protected void assertFieldType(String fieldName, String fieldType)
 		throws Exception {
 
-		ElasticsearchFixture elasticsearchFixture =
-			_elasticsearchSearchEngineFixture.getElasticsearchFixture();
-
 		RestHighLevelClient restHighLevelClient =
-			elasticsearchFixture.getRestHighLevelClient();
+			_elasticsearchConnectionFixture.getRestHighLevelClient();
 
 		FieldMappingAssert.assertType(
 			fieldType, fieldName,
@@ -44,23 +58,14 @@ public class ReindexSingleIndexerBackgroundTaskExecutorTest
 			restHighLevelClient.indices());
 	}
 
-	protected RestHighLevelClient getRestHighLevelClient() {
-		ElasticsearchFixture elasticsearchFixture =
-			_elasticsearchSearchEngineFixture.getElasticsearchFixture();
-
-		return elasticsearchFixture.getRestHighLevelClient();
-	}
-
 	@Override
 	protected ElasticsearchSearchEngineFixture getSearchEngineFixture() {
-		_elasticsearchSearchEngineFixture =
-			new ElasticsearchSearchEngineFixture(
-				ReindexSingleIndexerBackgroundTaskExecutorTest.class.
-					getSimpleName());
-
 		return _elasticsearchSearchEngineFixture;
 	}
 
-	private ElasticsearchSearchEngineFixture _elasticsearchSearchEngineFixture;
+	private final ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
+	private final ElasticsearchSearchEngineFixture
+		_elasticsearchSearchEngineFixture;
 
 }

@@ -36,16 +36,7 @@ public class IndexCreator {
 
 		String name = indexName.getName();
 
-		DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(name);
-
-		deleteIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
-
-		try {
-			indicesClient.delete(deleteIndexRequest, RequestOptions.DEFAULT);
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+		deleteIndex(indicesClient, name);
 
 		CreateIndexRequest createIndexRequest = new CreateIndexRequest(name);
 
@@ -72,6 +63,23 @@ public class IndexCreator {
 		indexCreationHelper.whenIndexCreated(name);
 
 		return new Index(indexName);
+	}
+
+	public void deleteIndex(IndexName indexName) {
+		deleteIndex(getIndicesClient(), indexName.getName());
+	}
+
+	protected void deleteIndex(IndicesClient indicesClient, String name) {
+		DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(name);
+
+		deleteIndexRequest.indicesOptions(IndicesOptions.lenientExpandOpen());
+
+		try {
+			indicesClient.delete(deleteIndexRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	protected IndexCreationHelper getIndexCreationHelper() {

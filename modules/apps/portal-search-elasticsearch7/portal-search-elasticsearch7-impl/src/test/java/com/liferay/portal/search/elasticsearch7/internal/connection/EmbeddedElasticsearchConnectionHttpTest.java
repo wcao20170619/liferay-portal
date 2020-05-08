@@ -14,10 +14,6 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
-import com.liferay.portal.json.JSONFactoryImpl;
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -26,13 +22,12 @@ import java.io.InputStream;
 
 import java.net.URL;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.http.util.EntityUtils;
+import org.apache.http.HttpHost;
 
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
+import org.elasticsearch.client.Node;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 
@@ -52,31 +47,36 @@ import org.mockito.MockitoAnnotations;
 public class EmbeddedElasticsearchConnectionHttpTest {
 
 	@BeforeClass
-	public static void setUpClass() throws Exception {
-		setUpJSONFactoryUtil();
-
-		_clusterName = RandomTestUtil.randomString();
+	public static void setUpClass() {
+		String clusterName = RandomTestUtil.randomString();
 
 		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
-			"clusterName", _clusterName
+			"clusterName", clusterName
 		).put(
 			"networkHost", "_site_"
 		).build();
 
-		_elasticsearchFixture = new ElasticsearchFixture(
-			EmbeddedElasticsearchConnectionHttpTest.class.getSimpleName(),
-			properties);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				EmbeddedElasticsearchConnectionHttpTest.class.getSimpleName()
+			).elasticsearchConfigurationProperties(
+				properties
+			).build();
 
-		_elasticsearchFixture.setUp();
+		elasticsearchConnectionFixture.createNode();
+
+		_clusterName = clusterName;
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
 	}
 
 	@AfterClass
-	public static void tearDownClass() throws Exception {
-		_elasticsearchFixture.tearDown();
+	public static void tearDownClass() {
+		_elasticsearchConnectionFixture.destroyNode();
 	}
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 	}
 
@@ -92,46 +92,19 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 				"\"cluster_name\" : \"" + _clusterName));
 	}
 
-	protected static void setUpJSONFactoryUtil() {
-		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
-
-		jsonFactoryUtil.setJSONFactory(_jsonFactory);
-	}
-
-	protected int getHttpPort() throws Exception {
+	protected int getHttpPort() {
 		RestHighLevelClient restHighLevelClient =
-			_elasticsearchFixture.getRestHighLevelClient();
+			_elasticsearchConnectionFixture.getRestHighLevelClient();
 
 		RestClient restClient = restHighLevelClient.getLowLevelClient();
 
-		String endpoint = "/_nodes";
+		List<Node> nodes = restClient.getNodes();
 
-		Request request = new Request("GET", endpoint);
+		Node node = nodes.get(0);
 
-		Response response = restClient.performRequest(request);
+		HttpHost httpHost = node.getHost();
 
-		String responseBody = EntityUtils.toString(response.getEntity());
-
-		JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
-			responseBody);
-
-		JSONObject nodesJSONObject = responseJSONObject.getJSONObject("nodes");
-
-		Set<String> nodes = nodesJSONObject.keySet();
-
-		for (String node : nodes) {
-			JSONObject nodeJSONObject = nodesJSONObject.getJSONObject(node);
-
-			JSONObject settingsJSONObject = nodeJSONObject.getJSONObject(
-				"settings");
-
-			JSONObject httpJSONObject = settingsJSONObject.getJSONObject(
-				"http");
-
-			return httpJSONObject.getInt("port");
-		}
-
-		return 0;
+		return httpHost.getPort();
 	}
 
 	protected String toString(URL url) throws Exception {
@@ -141,7 +114,7 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 	}
 
 	private static String _clusterName;
-	private static ElasticsearchFixture _elasticsearchFixture;
-	private static final JSONFactory _jsonFactory = new JSONFactoryImpl();
+	private static ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
 
 }

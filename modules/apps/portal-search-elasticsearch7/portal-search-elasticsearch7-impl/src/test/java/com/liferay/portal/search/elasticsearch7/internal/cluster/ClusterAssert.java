@@ -14,11 +14,11 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ClusterHealthResponseUtil;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.HealthExpectations;
 import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -32,11 +32,11 @@ import org.junit.Assert;
 public class ClusterAssert {
 
 	public static void assert1PrimaryAnd1UnassignedShard(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -50,11 +50,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert1PrimaryShardAnd2Nodes(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -68,11 +68,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert1PrimaryShardOnly(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -86,11 +86,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert1ReplicaAnd1UnassignedShard(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -104,11 +104,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert1ReplicaShard(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -122,11 +122,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert2Primary2UnassignedShardsAnd1Node(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(2);
@@ -140,11 +140,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert2PrimaryShards1ReplicaAnd2Nodes(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(2);
@@ -158,11 +158,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert2PrimaryShardsAnd2Nodes(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(2);
@@ -176,11 +176,11 @@ public class ClusterAssert {
 	}
 
 	public static void assert2ReplicaShards(
-			ElasticsearchFixture elasticsearchFixture)
+			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
 
 		assertHealth(
-			elasticsearchFixture,
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
@@ -194,25 +194,24 @@ public class ClusterAssert {
 	}
 
 	public static void assertHealth(
-			final ElasticsearchFixture elasticsearchFixture,
+			final ElasticsearchClientResolver elasticsearchClientResolver,
 			final HealthExpectations healthExpectations)
 		throws Exception {
 
 		IdempotentRetryAssert.retryAssert(
 			10, TimeUnit.MINUTES,
-			new Callable<Void>() {
+			() -> {
+				_assertHealth(
+					ClusterHealthResponseUtil.getClusterHealthResponse(
+						elasticsearchClientResolver, healthExpectations),
+					healthExpectations);
 
-				@Override
-				public Void call() throws Exception {
-					_assertHealth(
-						elasticsearchFixture.getClusterHealthResponse(
-							healthExpectations),
-						healthExpectations);
-
-					return null;
-				}
-
+				return null;
 			});
+	}
+
+	public static boolean isClusterTestingEnabled() {
+		return false;
 	}
 
 	private static void _assertHealth(

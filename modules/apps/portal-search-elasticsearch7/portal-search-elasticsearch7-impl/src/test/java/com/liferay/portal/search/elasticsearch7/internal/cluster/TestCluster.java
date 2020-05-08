@@ -16,7 +16,7 @@ package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -33,35 +33,37 @@ public class TestCluster {
 	public TestCluster(int size, Object object) {
 		String prefix = getPrefix(object);
 
-		_elasticsearchConfigurationProperties =
-			createElasticsearchConfigurationProperties(prefix, size);
-
-		_elasticsearchFixtures = new ElasticsearchFixture[size];
+		_elasticsearchFixtures = new ElasticsearchConnectionFixture[size];
 
 		_prefix = prefix;
 	}
 
-	public ElasticsearchFixture createNode(int index) throws Exception {
-		ElasticsearchFixture elasticsearchFixture = new ElasticsearchFixture(
-			_prefix + "-" + index, _elasticsearchConfigurationProperties);
+	public ElasticsearchConnectionFixture createNode(int index) {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				_prefix + "-" + index
+			).clusterSettingsContext(
+				new TestClusterSettingsContext()
+			).elasticsearchConfigurationProperties(
+				createElasticsearchConfigurationProperties(
+					index, _prefix, _elasticsearchFixtures.length)
+			).build();
 
-		elasticsearchFixture.setClusterSettingsContext(
-			new TestClusterSettingsContext());
+		elasticsearchConnectionFixture.createNode();
 
-		elasticsearchFixture.createNode();
+		_elasticsearchFixtures[index] = elasticsearchConnectionFixture;
 
-		_elasticsearchFixtures[index] = elasticsearchFixture;
-
-		return elasticsearchFixture;
+		return elasticsearchConnectionFixture;
 	}
 
-	public void createNodes() throws Exception {
+	public void createNodes() {
 		for (int i = 0; i < _elasticsearchFixtures.length; i++) {
 			createNode(i);
 		}
 	}
 
-	public void destroyNode(int index) throws Exception {
+	public void destroyNode(int index) {
 		if (_elasticsearchFixtures[index] != null) {
 			_elasticsearchFixtures[index].destroyNode();
 
@@ -69,44 +71,48 @@ public class TestCluster {
 		}
 	}
 
-	public void destroyNodes() throws Exception {
+	public void destroyNodes() {
 		for (int i = 0; i < _elasticsearchFixtures.length; i++) {
 			destroyNode(i);
 		}
 	}
 
-	public ElasticsearchFixture getNode(int index) {
+	public ElasticsearchConnectionFixture getNode(int index) {
 		return _elasticsearchFixtures[index];
 	}
 
-	public void setUp() throws Exception {
+	public void setUp() {
 		createNodes();
 	}
 
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		destroyNodes();
 	}
 
 	protected HashMap<String, Object>
-		createElasticsearchConfigurationProperties(String prefix, int size) {
+		createElasticsearchConfigurationProperties(
+			int index, String prefix, int size) {
 
-		int startingPort = 9310;
-
-		String range = String.valueOf(startingPort);
-
-		if (size > 1) {
-			int endingPort = startingPort + size - 1;
-
-			range = range + StringPool.MINUS + endingPort;
-		}
+		String transportRange = getPortRange(9310, size);
 
 		return HashMapBuilder.<String, Object>put(
 			"clusterName", prefix + "-Cluster"
 		).put(
-			"discoveryZenPingUnicastHostsPort", range
+			"discoveryZenPingUnicastHostsPort", transportRange
 		).put(
-			"transportTcpPort", range
+			"embeddedHttpPort", String.valueOf(9202 + index)
+		).put(
+			"transportTcpPort", transportRange
 		).build();
+	}
+
+	protected String getPortRange(int startingPort, int size) {
+		if (size > 1) {
+			return String.valueOf(startingPort) + StringPool.MINUS +
+				String.valueOf(startingPort + size - 1);
+		}
+
+		return String.valueOf(startingPort);
 	}
 
 	protected String getPrefix(Object object) {
@@ -115,8 +121,7 @@ public class TestCluster {
 		return clazz.getSimpleName();
 	}
 
-	private final HashMap<String, Object> _elasticsearchConfigurationProperties;
-	private final ElasticsearchFixture[] _elasticsearchFixtures;
+	private final ElasticsearchConnectionFixture[] _elasticsearchFixtures;
 	private final String _prefix;
 
 	private static class TestClusterSettingsContext

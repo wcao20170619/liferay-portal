@@ -18,18 +18,17 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
-import com.liferay.portal.search.index.IndexNameBuilder;
 
 import java.util.Collections;
 
 import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -41,11 +40,12 @@ import org.mockito.MockitoAnnotations;
 /**
  * @author Artur Aquino
  */
-@Ignore
 public class ReplicasManagerImplTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(ClusterAssert.isClusterTestingEnabled());
+
 		MockitoAnnotations.initMocks(this);
 
 		_replicasClusterContext = createReplicasClusterContext();
@@ -64,7 +64,7 @@ public class ReplicasManagerImplTest {
 
 		setUpCompanyLocalService(companyId);
 
-		ElasticsearchFixture elasticsearchFixture0 = createNode(0);
+		ElasticsearchConnectionFixture elasticsearchFixture0 = createNode(0);
 
 		IndexCreator indexCreator0 = new IndexCreator() {
 			{
@@ -74,7 +74,7 @@ public class ReplicasManagerImplTest {
 
 		indexCreator0.createIndex(getTestIndexName(CompanyConstants.SYSTEM));
 
-		ElasticsearchFixture elasticsearchFixture1 = createNode(1);
+		ElasticsearchConnectionFixture elasticsearchFixture1 = createNode(1);
 
 		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture0);
 
@@ -109,7 +109,9 @@ public class ReplicasManagerImplTest {
 	@Rule
 	public TestName testName = new TestName();
 
-	protected ElasticsearchFixture createNode(int index) throws Exception {
+	protected ElasticsearchConnectionFixture createNode(int index)
+		throws Exception {
+
 		_testCluster.createNode(index);
 
 		return _testCluster.getNode(index);
@@ -120,15 +122,10 @@ public class ReplicasManagerImplTest {
 
 		elasticsearchCluster.companyLocalService = _companyLocalService;
 
-		elasticsearchCluster.indexNameBuilder = new IndexNameBuilder() {
+		elasticsearchCluster.indexNameBuilder = companyId -> {
+			IndexName indexName = getTestIndexName(companyId);
 
-			@Override
-			public String getIndexName(long companyId) {
-				IndexName indexName = getTestIndexName(companyId);
-
-				return indexName.getName();
-			}
-
+			return indexName.getName();
 		};
 
 		return elasticsearchCluster.new ReplicasClusterContextImpl();

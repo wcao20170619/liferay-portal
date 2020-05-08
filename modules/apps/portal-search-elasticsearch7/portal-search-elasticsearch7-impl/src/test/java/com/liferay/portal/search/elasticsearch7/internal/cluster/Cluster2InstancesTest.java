@@ -14,7 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.Index;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
@@ -22,8 +22,8 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -31,11 +31,12 @@ import org.junit.rules.TestName;
 /**
  * @author André de Oliveira
  */
-@Ignore
 public class Cluster2InstancesTest {
 
 	@Before
 	public void setUp() throws Exception {
+		Assume.assumeTrue(ClusterAssert.isClusterTestingEnabled());
+
 		_testCluster.setUp();
 	}
 
@@ -46,47 +47,57 @@ public class Cluster2InstancesTest {
 
 	@Test
 	public void test2Nodes1PrimaryShard() throws Exception {
-		ElasticsearchFixture elasticsearchFixture0 = _testCluster.getNode(0);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture0 =
+			_testCluster.getNode(0);
 
-		createIndex(elasticsearchFixture0);
+		createIndex(elasticsearchConnectionFixture0);
 
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture0);
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture0);
 
-		ElasticsearchFixture elasticsearchFixture1 = _testCluster.getNode(1);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture1 =
+			_testCluster.getNode(1);
 
-		createIndex(elasticsearchFixture1);
+		createIndex(elasticsearchConnectionFixture1);
 
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture1);
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture1);
 	}
 
 	@Test
 	public void testExpandAndShrink() throws Exception {
-		ElasticsearchFixture elasticsearchFixture0 = _testCluster.getNode(0);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture0 =
+			_testCluster.getNode(0);
 
-		Index index0 = createIndex(elasticsearchFixture0);
+		Index index0 = createIndex(elasticsearchConnectionFixture0);
 
-		ElasticsearchFixture elasticsearchFixture1 = _testCluster.getNode(1);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture1 =
+			_testCluster.getNode(1);
 
-		Index index1 = createIndex(elasticsearchFixture1);
+		Index index1 = createIndex(elasticsearchConnectionFixture1);
 
-		updateNumberOfReplicas(1, index1, elasticsearchFixture1);
+		updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
 
-		ClusterAssert.assert1ReplicaShard(elasticsearchFixture0);
-		ClusterAssert.assert1ReplicaShard(elasticsearchFixture1);
+		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture0);
+		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture1);
 
-		updateNumberOfReplicas(0, index0, elasticsearchFixture0);
+		updateNumberOfReplicas(0, index0, elasticsearchConnectionFixture0);
 
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture0);
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture1);
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture0);
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture1);
 	}
 
 	@Rule
 	public TestName testName = new TestName();
 
-	protected Index createIndex(ElasticsearchFixture elasticsearchFixture) {
+	protected Index createIndex(
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture) {
+
 		IndexCreator indexCreator = new IndexCreator() {
 			{
-				setElasticsearchClientResolver(elasticsearchFixture);
+				setElasticsearchClientResolver(elasticsearchConnectionFixture);
 			}
 		};
 
@@ -96,10 +107,10 @@ public class Cluster2InstancesTest {
 
 	protected void updateNumberOfReplicas(
 		int numberOfReplicas, Index index,
-		ElasticsearchFixture elasticsearchFixture) {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture) {
 
 		RestHighLevelClient restHighLevelClient =
-			elasticsearchFixture.getRestHighLevelClient();
+			elasticsearchConnectionFixture.getRestHighLevelClient();
 
 		ReplicasManager replicasManager = new ReplicasManagerImpl(
 			restHighLevelClient.indices());

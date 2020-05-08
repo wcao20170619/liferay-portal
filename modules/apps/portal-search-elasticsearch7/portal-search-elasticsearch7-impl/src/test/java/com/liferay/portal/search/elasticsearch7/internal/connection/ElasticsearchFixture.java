@@ -14,117 +14,66 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.SystemProperties;
-import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
-import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
-import com.liferay.portal.search.elasticsearch7.internal.cluster.UnicastSettingsContributor;
-import com.liferay.portal.search.elasticsearch7.internal.settings.BaseSettingsContributor;
-import com.liferay.portal.search.elasticsearch7.settings.ClientSettingsHelper;
-import com.liferay.portal.util.FileImpl;
-
-import java.io.File;
 import java.io.IOException;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.client.ClusterClient;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.common.unit.TimeValue;
-
-import org.mockito.Mockito;
-
-import org.osgi.framework.BundleContext;
 
 /**
  * @author André de Oliveira
  */
 public class ElasticsearchFixture implements ElasticsearchClientResolver {
 
-	public ElasticsearchFixture(Class<?> clazz) {
-		this(getSimpleName(clazz));
+	public ElasticsearchFixture() {
+		this(
+			_elasticsearchConnectionFixtureSingleton.
+				getElasticsearchConnectionFixture(),
+			true);
 	}
 
-	public ElasticsearchFixture(String subdirName) {
-		this(subdirName, Collections.<String, Object>emptyMap());
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public ElasticsearchFixture(Class<?> clazz) {
+		this();
 	}
 
 	public ElasticsearchFixture(
-		String subdirName,
-		Map<String, Object> elasticsearchConfigurationProperties) {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture) {
 
-		_elasticsearchConfigurationProperties =
-			createElasticsearchConfigurationProperties(
-				elasticsearchConfigurationProperties);
-
-		_tmpDirName = "tmp/" + subdirName;
+		this(elasticsearchConnectionFixture, false);
 	}
 
-	public void createNode() throws Exception {
-		deleteTmpDir();
+	public ElasticsearchFixture(
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture,
+		boolean singleton) {
 
-		_embeddedElasticsearchConnection = createElasticsearchConnection();
-
-		ReflectionTestUtil.setFieldValue(
-			_embeddedElasticsearchConnection, "_file", new FileImpl());
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
+		_singleton = singleton;
 	}
 
-	public void destroyNode() throws Exception {
-		if (_embeddedElasticsearchConnection != null) {
-			_embeddedElasticsearchConnection.close();
-		}
-
-		deleteTmpDir();
-	}
-
-	public ClusterHealthResponse getClusterHealthResponse(
-		HealthExpectations healthExpectations) {
-
-		RestHighLevelClient restHighLevelClient = getRestHighLevelClient();
-
-		ClusterClient clusterClient = restHighLevelClient.cluster();
-
-		ClusterHealthRequest clusterHealthRequest = new ClusterHealthRequest();
-
-		clusterHealthRequest.timeout(new TimeValue(10, TimeUnit.MINUTES));
-		clusterHealthRequest.waitForActiveShards(
-			healthExpectations.getActiveShards());
-		clusterHealthRequest.waitForNodes(
-			String.valueOf(healthExpectations.getNumberOfNodes()));
-		clusterHealthRequest.waitForNoRelocatingShards(true);
-		clusterHealthRequest.waitForStatus(healthExpectations.getStatus());
-
-		try {
-			return clusterClient.health(
-				clusterHealthRequest, RequestOptions.DEFAULT);
-		}
-		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
-		}
+	/**
+	 * @deprecated As of Athanasius (7.3.x)
+	 */
+	@Deprecated
+	public ElasticsearchFixture(String subdirName) {
+		this();
 	}
 
 	public Map<String, Object> getElasticsearchConfigurationProperties() {
-		return _elasticsearchConfigurationProperties;
+		return _elasticsearchConnectionFixture.
+			getElasticsearchConfigurationProperties();
 	}
 
-	public EmbeddedElasticsearchConnection
-		getEmbeddedElasticsearchConnection() {
-
-		return _embeddedElasticsearchConnection;
+	public ElasticsearchConnection getElasticsearchConnection() {
+		return _elasticsearchConnectionFixture.getElasticsearchConnection();
 	}
 
 	public GetIndexResponse getIndex(String... indices) {
@@ -132,9 +81,7 @@ public class ElasticsearchFixture implements ElasticsearchClientResolver {
 
 		IndicesClient indicesClient = restHighLevelClient.indices();
 
-		GetIndexRequest getIndexRequest = new GetIndexRequest();
-
-		getIndexRequest.indices(indices);
+		GetIndexRequest getIndexRequest = new GetIndexRequest(indices);
 
 		try {
 			return indicesClient.get(getIndexRequest, RequestOptions.DEFAULT);
@@ -146,37 +93,40 @@ public class ElasticsearchFixture implements ElasticsearchClientResolver {
 
 	@Override
 	public RestHighLevelClient getRestHighLevelClient() {
-		return _embeddedElasticsearchConnection.getRestHighLevelClient();
+		return _elasticsearchConnectionFixture.getRestHighLevelClient();
 	}
 
 	@Override
 	public RestHighLevelClient getRestHighLevelClient(String connectionId) {
-		return _embeddedElasticsearchConnection.getRestHighLevelClient();
+		return getRestHighLevelClient();
 	}
 
 	@Override
 	public RestHighLevelClient getRestHighLevelClient(
 		String connectionId, boolean preferLocalCluster) {
 
-		return _embeddedElasticsearchConnection.getRestHighLevelClient();
-	}
-
-	public void setClusterSettingsContext(
-		ClusterSettingsContext clusterSettingsContext) {
-
-		_clusterSettingsContext = clusterSettingsContext;
+		return getRestHighLevelClient();
 	}
 
 	public void setUp() throws Exception {
-		createNode();
+		if (_singleton) {
+			_elasticsearchConnectionFixtureSingleton.start();
+
+			return;
+		}
+
+		_elasticsearchConnectionFixture.createNode();
 	}
 
 	public void tearDown() throws Exception {
-		destroyNode();
+		if (!_singleton) {
+			_elasticsearchConnectionFixture.destroyNode();
+		}
 	}
 
 	public void waitForElasticsearchToStart() {
-		getClusterHealthResponse(
+		ClusterHealthResponseUtil.getClusterHealthResponse(
+			this,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(0);
@@ -189,136 +139,42 @@ public class ElasticsearchFixture implements ElasticsearchClientResolver {
 			});
 	}
 
-	protected static String getSimpleName(Class<?> clazz) {
-		while (clazz.isAnonymousClass()) {
-			clazz = clazz.getEnclosingClass();
+	private static final ElasticsearchConnectionFixtureSingleton
+		_elasticsearchConnectionFixtureSingleton =
+			new ElasticsearchConnectionFixtureSingleton();
+
+	private final ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
+	private final boolean _singleton;
+
+	private static class ElasticsearchConnectionFixtureSingleton {
+
+		public void start() {
+			if (!_connected) {
+				_elasticsearchConnectionFixture.createNode();
+
+				_connected = true;
+			}
 		}
 
-		return clazz.getSimpleName();
-	}
+		protected ElasticsearchConnectionFixture
+			getElasticsearchConnectionFixture() {
 
-	protected void addClusterLoggingThresholdContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			new BaseSettingsContributor(0) {
-
-				@Override
-				public void populate(
-					ClientSettingsHelper clientSettingsHelper) {
-
-					clientSettingsHelper.put(
-						"cluster.service.slow_task_logging_threshold", "600s");
-				}
-
-			});
-	}
-
-	protected void addDiskThresholdSettingsContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			new BaseSettingsContributor(0) {
-
-				@Override
-				public void populate(
-					ClientSettingsHelper clientSettingsHelper) {
-
-					clientSettingsHelper.put(
-						"cluster.routing.allocation.disk.threshold_enabled",
-						"false");
-				}
-
-			});
-	}
-
-	protected void addUnicastSettingsContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		if (_clusterSettingsContext == null) {
-			return;
+			return _elasticsearchConnectionFixture;
 		}
 
-		UnicastSettingsContributor unicastSettingsContributor =
-			new UnicastSettingsContributor() {
-				{
-					setClusterSettingsContext(_clusterSettingsContext);
-
-					activate(_elasticsearchConfigurationProperties);
-				}
-			};
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			unicastSettingsContributor);
-	}
-
-	protected Map<String, Object> createElasticsearchConfigurationProperties(
-		Map<String, Object> elasticsearchConfigurationProperties) {
-
-		return HashMapBuilder.<String, Object>put(
-			"configurationPid", ElasticsearchConfiguration.class.getName()
-		).put(
-			"httpCORSAllowOrigin", "*"
-		).put(
-			"logExceptionsOnly", false
-		).putAll(
-			elasticsearchConfigurationProperties
-		).build();
-	}
-
-	protected EmbeddedElasticsearchConnection createElasticsearchConnection() {
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection =
-			new EmbeddedElasticsearchConnection();
-
-		addClusterLoggingThresholdContributor(embeddedElasticsearchConnection);
-		addDiskThresholdSettingsContributor(embeddedElasticsearchConnection);
-		addUnicastSettingsContributor(embeddedElasticsearchConnection);
-
-		Props props = Mockito.mock(Props.class);
-
-		Mockito.when(
-			props.get(PropsKeys.LIFERAY_HOME)
-		).thenReturn(
-			_tmpDirName
-		);
-
-		ClusterSettingsContext clusterSettingsContext = _clusterSettingsContext;
-
-		if (clusterSettingsContext == null) {
-			clusterSettingsContext = Mockito.mock(ClusterSettingsContext.class);
+		private ElasticsearchConnectionFixtureSingleton() {
+			_elasticsearchConnectionFixture =
+				ElasticsearchConnectionFixture.builder(
+				).clusterName(
+					ElasticsearchFixture.class.getSimpleName()
+				).build();
 		}
 
-		embeddedElasticsearchConnection.clusterSettingsContext =
-			clusterSettingsContext;
+		private boolean _connected;
+		private final ElasticsearchConnectionFixture
+			_elasticsearchConnectionFixture;
 
-		embeddedElasticsearchConnection.props = props;
-
-		BundleContext bundleContext = Mockito.mock(BundleContext.class);
-
-		Mockito.when(
-			bundleContext.getDataFile(
-				EmbeddedElasticsearchConnection.JNA_TMP_DIR)
-		).thenReturn(
-			new File(
-				SystemProperties.get(SystemProperties.TMP_DIR) + "/" +
-					EmbeddedElasticsearchConnection.JNA_TMP_DIR)
-		);
-
-		embeddedElasticsearchConnection.activate(
-			bundleContext, _elasticsearchConfigurationProperties);
-
-		embeddedElasticsearchConnection.connect();
-
-		return embeddedElasticsearchConnection;
 	}
-
-	protected void deleteTmpDir() throws Exception {
-		FileUtils.deleteDirectory(new File(_tmpDirName));
-	}
-
-	private ClusterSettingsContext _clusterSettingsContext;
-	private final Map<String, Object> _elasticsearchConfigurationProperties;
-	private EmbeddedElasticsearchConnection _embeddedElasticsearchConnection;
-	private final String _tmpDirName;
 
 }

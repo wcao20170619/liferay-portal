@@ -15,7 +15,9 @@
 package com.liferay.portal.search.elasticsearch7.internal.logging;
 
 import com.liferay.portal.kernel.search.generic.MatchAllQuery;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ClusterHealthResponseUtil;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 import com.liferay.portal.search.elasticsearch7.internal.connection.HealthExpectations;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.ElasticsearchEngineAdapterFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.search.CountSearchRequestExecutorImpl;
@@ -44,30 +46,37 @@ import org.junit.Test;
 public class ElasticsearchSearchEngineAdapterLoggingTest {
 
 	@BeforeClass
-	public static void setUpClass() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(
-			ElasticsearchSearchEngineAdapterLoggingTest.class.getSimpleName());
+	public static void setUpClass() {
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				ElasticsearchSearchEngineAdapterLoggingTest.class.
+					getSimpleName()
+			).build();
 
-		_elasticsearchFixture.setUp();
+		elasticsearchConnectionFixture.createNode();
+
+		_elasticsearchConnectionFixture = elasticsearchConnectionFixture;
 	}
 
 	@AfterClass
-	public static void tearDownClass() throws Exception {
-		_elasticsearchFixture.tearDown();
+	public static void tearDownClass() {
+		_elasticsearchConnectionFixture.destroyNode();
 	}
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		ElasticsearchEngineAdapterFixture elasticsearchEngineAdapterFixture =
 			new ElasticsearchEngineAdapterFixture() {
 				{
-					setElasticsearchClientResolver(_elasticsearchFixture);
+					setElasticsearchClientResolver(
+						_elasticsearchConnectionFixture);
 				}
 			};
 
 		elasticsearchEngineAdapterFixture.setUp();
 
-		waitForElasticsearchToStart(_elasticsearchFixture);
+		waitForElasticsearchToStart(_elasticsearchConnectionFixture);
 
 		_searchEngineAdapter =
 			elasticsearchEngineAdapterFixture.getSearchEngineAdapter();
@@ -130,9 +139,10 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 	public ExpectedLogTestRule expectedLogTestRule = ExpectedLogTestRule.none();
 
 	protected void waitForElasticsearchToStart(
-		ElasticsearchFixture elasticsearchFixture) {
+		ElasticsearchClientResolver elasticsearchClientResolver) {
 
-		elasticsearchFixture.getClusterHealthResponse(
+		ClusterHealthResponseUtil.getClusterHealthResponse(
+			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(0);
@@ -145,7 +155,8 @@ public class ElasticsearchSearchEngineAdapterLoggingTest {
 			});
 	}
 
-	private static ElasticsearchFixture _elasticsearchFixture;
+	private static ElasticsearchConnectionFixture
+		_elasticsearchConnectionFixture;
 
 	private SearchEngineAdapter _searchEngineAdapter;
 

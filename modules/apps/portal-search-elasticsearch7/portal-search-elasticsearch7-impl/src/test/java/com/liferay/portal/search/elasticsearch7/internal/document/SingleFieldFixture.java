@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 
@@ -51,7 +52,7 @@ public class SingleFieldFixture {
 	}
 
 	public void indexDocument(String value) {
-		IndexRequest indexRequest = new IndexRequest(_index, _type);
+		IndexRequest indexRequest = Requests.indexRequest(_index);
 
 		indexRequest.source(_field, value);
 

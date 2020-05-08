@@ -55,7 +55,7 @@ public class ElasticsearchIndexingFixture implements IndexingFixture {
 		return _companyId;
 	}
 
-	public ElasticsearchFixture getElasticsearchFixture() {
+	public ElasticsearchClientResolver getElasticsearchClientResolver() {
 		return _elasticsearchFixture;
 	}
 
