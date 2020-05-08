@@ -37,10 +37,12 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
-import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
-import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
+import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstancePaths;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstanceSettingsBuilder;
+import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
 import java.io.IOException;
 
@@ -52,6 +54,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -68,6 +71,7 @@ import org.elasticsearch.cluster.ClusterModule;
 import org.elasticsearch.cluster.coordination.CoordinationMetaData;
 import org.elasticsearch.cluster.metadata.Manifest;
 import org.elasticsearch.cluster.metadata.MetaData;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.env.NodeEnvironment;
 import org.elasticsearch.gateway.MetaDataStateFormat;
@@ -85,14 +89,24 @@ public class ClusterableSidecar
 	public ClusterableSidecar(
 		ClusterExecutor clusterExecutor,
 		ClusterMasterExecutor clusterMasterExecutor,
+		ClusterSettingsContext clusterSettingsContext,
 		ElasticsearchConfiguration elasticsearchConfiguration,
-		JSONFactory jsonFactory, ProcessExecutor processExecutor, Props props) {
+		ElasticsearchInstancePaths elasticsearchInstancePaths,
+		JSONFactory jsonFactory, ProcessExecutor processExecutor,
+		ProcessExecutorPaths processExecutorPaths,
+		Collection<SettingsContributor> settingsContributors) {
 
-		super(elasticsearchConfiguration, processExecutor, props);
+		super(
+			clusterSettingsContext, elasticsearchConfiguration,
+			elasticsearchInstancePaths, null, processExecutor,
+			processExecutorPaths, settingsContributors);
 
 		_clusterExecutor = clusterExecutor;
 		_clusterMasterExecutor = clusterMasterExecutor;
+		_elasticsearchConfiguration = elasticsearchConfiguration;
+		_elasticsearchInstancePaths = elasticsearchInstancePaths;
 		_jsonFactory = jsonFactory;
+		_settingsContributors = settingsContributors;
 
 		ClusterNode clusterNode = _clusterExecutor.getLocalClusterNode();
 
@@ -178,6 +192,27 @@ public class ClusterableSidecar
 		_stopCountDownLatch.countDown();
 	}
 
+	protected String getClusterInitialMasterNodes() {
+		if (_initialMasterNodeTransportAddress == null) {
+			return getNodeName();
+		}
+
+		return null;
+	}
+
+	protected String getLocalClusterNodeNetworkHost() {
+		ClusterNode clusterNode = _clusterExecutor.getLocalClusterNode();
+
+		InetAddress inetAddress = clusterNode.getBindInetAddress();
+
+		if (!inetAddress.isLoopbackAddress()) {
+			return inetAddress.getHostAddress();
+		}
+
+		return null;
+	}
+
+	@Override
 	protected String getLogProperties() {
 		return StringBundler.concat(
 			"logger.cluster.name=org.elasticsearch.cluster\n",
@@ -192,24 +227,27 @@ public class ClusterableSidecar
 	}
 
 	@Override
-	protected void setClusterDiscoverySettings(
-		SettingsBuilder settingsBuilder) {
-
-		ClusterNode clusterNode = _clusterExecutor.getLocalClusterNode();
-
-		InetAddress inetAddress = clusterNode.getBindInetAddress();
-
-		if (!inetAddress.isLoopbackAddress()) {
-			settingsBuilder.put("network.host", inetAddress.getHostAddress());
-		}
-
-		if (_initialMasterNodeTransportAddress == null) {
-			super.setClusterDiscoverySettings(settingsBuilder);
-		}
-		else {
-			settingsBuilder.put(
-				"discovery.seed_hosts", _initialMasterNodeTransportAddress);
-		}
+	protected Settings getSettings() {
+		return ElasticsearchInstanceSettingsBuilder.builder(
+		).clusterInitialMasterNodes(
+			getClusterInitialMasterNodes()
+		).clusterName(
+			getClusterName()
+		).discoverySeedHosts(
+			_initialMasterNodeTransportAddress
+		).elasticsearchConfiguration(
+			_elasticsearchConfiguration
+		).elasticsearchInstancePaths(
+			_elasticsearchInstancePaths
+		).httpPort(
+			getHttpPort()
+		).networkHost(
+			getLocalClusterNodeNetworkHost()
+		).nodeName(
+			getNodeName()
+		).settingsContributors(
+			_settingsContributors
+		).build();
 	}
 
 	private static String _getMasterNodeTransportAddress(
@@ -430,10 +468,13 @@ public class ClusterableSidecar
 	private ClusterEventListener _clusterEventListener;
 	private final ClusterExecutor _clusterExecutor;
 	private final ClusterMasterExecutor _clusterMasterExecutor;
+	private final ElasticsearchConfiguration _elasticsearchConfiguration;
+	private final ElasticsearchInstancePaths _elasticsearchInstancePaths;
 	private String _initialMasterNodeTransportAddress;
 	private final JSONFactory _jsonFactory;
 	private final String _nodeName;
 	private RestClient _restClient;
+	private final Collection<SettingsContributor> _settingsContributors;
 	private final CountDownLatch _startCountDownLatch = new CountDownLatch(1);
 	private final CountDownLatch _stopCountDownLatch = new CountDownLatch(1);
 

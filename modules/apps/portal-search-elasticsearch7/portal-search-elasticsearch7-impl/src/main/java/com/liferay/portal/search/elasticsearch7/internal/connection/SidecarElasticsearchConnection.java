@@ -14,12 +14,9 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
-import com.liferay.portal.search.elasticsearch7.internal.util.ClassLoaderUtil;
 
-import org.apache.http.HttpHost;
-
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 
 /**
@@ -63,11 +60,20 @@ public class SidecarElasticsearchConnection
 
 	@Override
 	protected RestHighLevelClient createRestHighLevelClient() {
-		return ClassLoaderUtil.getWithContextClassLoader(
-			() -> new RestHighLevelClient(
-				RestClient.builder(
-					HttpHost.create(_sidecar.getNetworkHostAddress()))),
-			getClass());
+		return RestHighLevelClientFactory.builder(
+		).hostName(
+			"localhost"
+		).portRange(
+			getHttpPort(_sidecar.getNetworkHostAddress())
+		).scheme(
+			"http"
+		).build(
+		).getRestHighLevelClientOptional(
+		).get();
+	}
+
+	protected String getHttpPort(String address) {
+		return address.substring(address.indexOf(CharPool.COLON) + 1);
 	}
 
 	private final Sidecar _sidecar;

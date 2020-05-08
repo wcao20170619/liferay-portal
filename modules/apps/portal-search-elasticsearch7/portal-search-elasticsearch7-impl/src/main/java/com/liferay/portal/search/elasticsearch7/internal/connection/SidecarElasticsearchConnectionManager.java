@@ -25,11 +25,21 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
+import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.ClusterableSidecar;
+import com.liferay.portal.search.elasticsearch7.internal.sidecar.ProcessExecutorPathsImpl;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
-import com.liferay.portal.search.elasticsearch7.internal.sidecar.SidecarPathsImpl;
+import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -38,6 +48,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Tina Tian
@@ -78,11 +91,17 @@ public class SidecarElasticsearchConnectionManager {
 				_log.warn(sb.toString());
 			}
 
+			ElasticsearchInstancePaths elasticsearchInstancePaths =
+				new SidecarElasticsearchInstancePaths(
+					_props, elasticsearchConfiguration);
+
 			if (_clusterExecutor.isEnabled()) {
 				ClusterableSidecar clusterableSidecar = new ClusterableSidecar(
 					_clusterExecutor, _clusterMasterExecutor,
-					elasticsearchConfiguration, _jsonFactory, _processExecutor,
-					new SidecarPathsImpl(_props));
+					_clusterSettingsContext, elasticsearchConfiguration,
+					elasticsearchInstancePaths, _jsonFactory, _processExecutor,
+					new ProcessExecutorPathsImpl(_props),
+					_settingsContributors);
 
 				_clusterableSidecarsOSGiServiceserviceRegistration =
 					bundleContext.registerService(
@@ -98,8 +117,10 @@ public class SidecarElasticsearchConnectionManager {
 			else {
 				elasticsearchConnection = new SidecarElasticsearchConnection(
 					new Sidecar(
-						elasticsearchConfiguration, _processExecutor,
-						new SidecarPathsImpl(_props)));
+						_clusterSettingsContext, elasticsearchConfiguration,
+						elasticsearchInstancePaths, null, _processExecutor,
+						new ProcessExecutorPathsImpl(_props),
+						_settingsContributors));
 			}
 		}
 		else {
@@ -113,6 +134,18 @@ public class SidecarElasticsearchConnectionManager {
 				"operation.mode", String.valueOf(OperationMode.EMBEDDED)));
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		target = "(operation.mode=EMBEDDED)"
+	)
+	protected void addSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.add(settingsContributor);
+	}
+
 	@Deactivate
 	protected void deactivate() {
 		_serviceRegistration.unregister();
@@ -120,6 +153,12 @@ public class SidecarElasticsearchConnectionManager {
 		if (_clusterableSidecarsOSGiServiceserviceRegistration != null) {
 			_clusterableSidecarsOSGiServiceserviceRegistration.unregister();
 		}
+	}
+
+	protected void removeSettingsContributor(
+		SettingsContributor settingsContributor) {
+
+		_settingsContributors.remove(settingsContributor);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -135,6 +174,9 @@ public class SidecarElasticsearchConnectionManager {
 	private ClusterMasterExecutor _clusterMasterExecutor;
 
 	@Reference
+	private ClusterSettingsContext _clusterSettingsContext;
+
+	@Reference
 	private JSONFactory _jsonFactory;
 
 	@Reference
@@ -144,5 +186,62 @@ public class SidecarElasticsearchConnectionManager {
 	private Props _props;
 
 	private ServiceRegistration<ElasticsearchConnection> _serviceRegistration;
+	private final Set<SettingsContributor> _settingsContributors =
+		new ConcurrentSkipListSet<>();
+
+	private static class SidecarElasticsearchInstancePaths
+		implements ElasticsearchInstancePaths {
+
+		@Override
+		public String getHome() {
+			return _home;
+		}
+
+		@Override
+		public String getWork() {
+			return _work;
+		}
+
+		protected static Path resolveHomePath(
+			String work,
+			ElasticsearchConfiguration elasticsearchConfiguration) {
+
+			Path workPath = Paths.get(work);
+
+			workPath = workPath.toAbsolutePath();
+
+			Path sidecarHomePath = workPath.resolve(
+				elasticsearchConfiguration.sidecarHome());
+
+			if (!Files.isDirectory(sidecarHomePath)) {
+				sidecarHomePath = Paths.get(
+					elasticsearchConfiguration.sidecarHome());
+
+				if (!Files.isDirectory(sidecarHomePath)) {
+					throw new IllegalArgumentException(
+						"Sidecar Elasticsearch home " +
+							elasticsearchConfiguration.sidecarHome() +
+								" does not exist");
+				}
+			}
+
+			return sidecarHomePath;
+		}
+
+		private SidecarElasticsearchInstancePaths(
+			Props props,
+			ElasticsearchConfiguration elasticsearchConfiguration) {
+
+			String work = props.get(PropsKeys.LIFERAY_HOME);
+
+			_home = String.valueOf(
+				resolveHomePath(work, elasticsearchConfiguration));
+			_work = work;
+		}
+
+		private final String _home;
+		private final String _work;
+
+	}
 
 }
