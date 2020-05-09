@@ -15,17 +15,15 @@
 package com.liferay.portal.search.test.util.query;
 
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.search.document.Document;
-import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
-import com.liferay.portal.search.engine.adapter.search.SearchSearchRequest;
-import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
-import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
-import com.liferay.portal.search.query.MatchAllQuery;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.test.util.DocumentsAssert;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentCreationHelpers;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,85 +35,95 @@ public abstract class BaseMatchAllQueryTestCase extends BaseIndexingTestCase {
 
 	@Test
 	public void testMatchAllQuery() {
-		for (int i = 1; i <= 20; i++) {
-			addDocument(
-				DocumentCreationHelpers.singleNumber(Field.PRIORITY, i));
-		}
+		int count = 20;
 
-		MatchAllQuery matchAllQuery = queries.matchAll();
+		List<Double> list = IntStream.rangeClosed(
+			1, count
+		).mapToObj(
+			Double::valueOf
+		).collect(
+			Collectors.toList()
+		);
+
+		list.forEach(
+			i -> addDocument(
+				DocumentCreationHelpers.singleNumber(Field.PRIORITY, i)));
 
 		assertSearch(
 			indexingTestHelper -> {
-				SearchEngineAdapter searchEngineAdapter =
-					getSearchEngineAdapter();
+				indexingTestHelper.defineRequest(
+					searchRequestBuilder ->
+						searchRequestBuilder.withSearchRequestBuilder(
+							this::addMatchAllQuery
+						).size(
+							30
+						).sorts(
+							sorts.field(Field.PRIORITY)
+						));
 
-				SearchSearchResponse searchSearchResponse =
-					searchEngineAdapter.execute(
-						new SearchSearchRequest() {
-							{
-								addSorts(sorts.field(Field.PRIORITY));
-								setIndexNames("_all");
-								setQuery(matchAllQuery);
-								setSize(30);
-							}
-						});
+				indexingTestHelper.search();
 
-				SearchHits searchHits = searchSearchResponse.getSearchHits();
+				indexingTestHelper.verifyResponse(
+					searchResponse -> {
+						SearchHits searchHits = searchResponse.getSearchHits();
 
-				Assert.assertEquals(
-					"Total hits", 20, searchHits.getTotalHits());
+						Assert.assertEquals(
+							"Total hits: " + searchResponse.getRequestString(),
+							count, searchHits.getTotalHits());
 
-				List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-				Assert.assertEquals(
-					"Retrieved hits", 20, searchHitsList.size());
-
-				for (int i = 0; i < 20; i++) {
-					SearchHit searchHit = searchHitsList.get(i);
-
-					Document document = searchHit.getDocument();
-
-					Double priority = document.getDouble(Field.PRIORITY);
-
-					Assert.assertEquals("Priority value", i + 1.0, priority, 0);
-				}
+						DocumentsAssert.assertValues(
+							searchResponse.getRequestString(),
+							searchResponse.getDocumentsStream(), Field.PRIORITY,
+							String.valueOf(list));
+					});
 			});
 	}
 
 	@Test
 	public void testMatchAllQueryWithSize0() {
-		for (int i = 1; i <= 20; i++) {
-			addDocument(
-				DocumentCreationHelpers.singleNumber(Field.PRIORITY, i));
-		}
+		int count = 20;
+
+		IntStream.rangeClosed(
+			1, count
+		).forEach(
+			i -> addDocument(
+				DocumentCreationHelpers.singleNumber(Field.PRIORITY, i))
+		);
 
 		assertSearch(
 			indexingTestHelper -> {
-				MatchAllQuery matchAllQuery = queries.matchAll();
+				indexingTestHelper.defineRequest(
+					searchRequestBuilder ->
+						searchRequestBuilder.withSearchRequestBuilder(
+							this::addMatchAllQuery
+						).size(
+							0
+						));
 
-				SearchSearchRequest searchSearchRequest =
-					new SearchSearchRequest();
+				indexingTestHelper.search();
 
-				searchSearchRequest.setIndexNames("_all");
-				searchSearchRequest.setQuery(matchAllQuery);
-				searchSearchRequest.setSize(0);
+				indexingTestHelper.verifyResponse(
+					searchResponse -> {
+						SearchHits searchHits = searchResponse.getSearchHits();
 
-				SearchEngineAdapter searchEngineAdapter =
-					getSearchEngineAdapter();
+						Assert.assertEquals(
+							"Total hits: " + searchResponse.getRequestString(),
+							count, searchHits.getTotalHits());
 
-				SearchSearchResponse searchSearchResponse =
-					searchEngineAdapter.execute(searchSearchRequest);
-
-				SearchHits searchHits = searchSearchResponse.getSearchHits();
-
-				Assert.assertEquals(
-					"Total hits", 20, searchHits.getTotalHits());
-
-				List<SearchHit> searchHitsList = searchHits.getSearchHits();
-
-				Assert.assertTrue(
-					"Expected empty search hits", searchHitsList.isEmpty());
+						DocumentsAssert.assertValues(
+							searchResponse.getRequestString(),
+							searchResponse.getDocumentsStream(), Field.PRIORITY,
+							"[]");
+					});
 			});
+	}
+
+	protected void addMatchAllQuery(SearchRequestBuilder searchRequestBuilder) {
+		searchRequestBuilder.addComplexQueryPart(
+			complexQueryPartBuilderFactory.builder(
+			).query(
+				queries.matchAll()
+			).build());
 	}
 
 }
