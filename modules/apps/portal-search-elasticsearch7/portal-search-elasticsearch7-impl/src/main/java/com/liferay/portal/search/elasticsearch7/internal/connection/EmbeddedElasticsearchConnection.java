@@ -15,29 +15,22 @@
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.File;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
-import com.liferay.portal.search.elasticsearch7.internal.settings.SettingsBuilder;
-import com.liferay.portal.search.elasticsearch7.internal.util.ClassLoaderUtil;
 import com.liferay.portal.search.elasticsearch7.internal.util.LogUtil;
-import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
-import com.liferay.portal.search.elasticsearch7.settings.ClientSettingsHelper;
 import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
 import io.netty.buffer.ByteBufUtil;
 
 import java.io.IOException;
-
-import java.net.InetAddress;
 
 import java.util.Map;
 import java.util.Set;
@@ -48,10 +41,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.inject.Injector;
 import org.elasticsearch.common.settings.Settings;
@@ -149,10 +140,6 @@ public class EmbeddedElasticsearchConnection
 		return String.valueOf(OperationMode.EMBEDDED);
 	}
 
-	public Node getNode() {
-		return _node;
-	}
-
 	@Override
 	public OperationMode getOperationMode() {
 		return OperationMode.EMBEDDED;
@@ -171,6 +158,8 @@ public class EmbeddedElasticsearchConnection
 		elasticsearchConfiguration = ConfigurableUtil.createConfigurable(
 			ElasticsearchConfiguration.class, properties);
 
+		_httpPort = (String)properties.get("sidecarHttpPort");
+
 		java.io.File tempDir = bundleContext.getDataFile(JNA_TMP_DIR);
 
 		_jnaTmpDirName = tempDir.getAbsolutePath();
@@ -188,95 +177,6 @@ public class EmbeddedElasticsearchConnection
 		SettingsContributor settingsContributor) {
 
 		_settingsContributors.add(settingsContributor);
-	}
-
-	protected void configureClustering() {
-		settingsBuilder.put(
-			"cluster.name", elasticsearchConfiguration.clusterName());
-		settingsBuilder.put(
-			"cluster.routing.allocation.disk.threshold_enabled", false);
-		settingsBuilder.put("discovery.type", "single-node");
-	}
-
-	protected void configureHttp() {
-		settingsBuilder.put(
-			"http.port",
-			String.valueOf(elasticsearchConfiguration.embeddedHttpPort()));
-
-		settingsBuilder.put(
-			"http.cors.enabled", elasticsearchConfiguration.httpCORSEnabled());
-
-		if (!elasticsearchConfiguration.httpCORSEnabled()) {
-			return;
-		}
-
-		settingsBuilder.put(
-			"http.cors.allow-origin",
-			elasticsearchConfiguration.httpCORSAllowOrigin());
-
-		settingsBuilder.loadFromSource(
-			elasticsearchConfiguration.httpCORSConfigurations());
-	}
-
-	protected void configureNetworking() {
-		String networkBindHost = elasticsearchConfiguration.networkBindHost();
-
-		if (Validator.isNotNull(networkBindHost)) {
-			settingsBuilder.put("network.bind.host", networkBindHost);
-		}
-
-		String networkHost = elasticsearchConfiguration.networkHost();
-
-		if (Validator.isNull(networkBindHost) &&
-			Validator.isNull(networkHost) &&
-			Validator.isNull(elasticsearchConfiguration.networkPublishHost())) {
-
-			InetAddress localBindInetAddress =
-				clusterSettingsContext.getLocalBindInetAddress();
-
-			if (localBindInetAddress != null) {
-				networkHost = localBindInetAddress.getHostAddress();
-			}
-		}
-
-		if (Validator.isNotNull(networkHost)) {
-			settingsBuilder.put("network.host", networkHost);
-		}
-
-		String networkPublishHost =
-			elasticsearchConfiguration.networkPublishHost();
-
-		if (Validator.isNotNull(networkPublishHost)) {
-			settingsBuilder.put("network.publish_host", networkPublishHost);
-		}
-
-		String transportTcpPort = elasticsearchConfiguration.transportTcpPort();
-
-		if (Validator.isNotNull(transportTcpPort)) {
-			settingsBuilder.put("transport.tcp.port", transportTcpPort);
-		}
-
-		settingsBuilder.put("transport.type", "netty4");
-	}
-
-	protected void configurePaths() {
-		String liferayHome = props.get(PropsKeys.LIFERAY_HOME);
-
-		settingsBuilder.put(
-			"path.data", liferayHome.concat("/data/elasticsearch7/indices"));
-		settingsBuilder.put(
-			"path.home", liferayHome.concat("/data/elasticsearch7"));
-		settingsBuilder.put("path.logs", liferayHome.concat("/logs"));
-		settingsBuilder.put(
-			"path.repo", liferayHome.concat("/data/elasticsearch7/repo"));
-	}
-
-	protected void configureTestMode() {
-		if (!PortalRunMode.isTestMode()) {
-			return;
-		}
-
-		settingsBuilder.put("monitor.jvm.gc.enabled", StringPool.FALSE);
 	}
 
 	protected EmbeddedElasticsearchPluginManager
@@ -326,21 +226,39 @@ public class EmbeddedElasticsearchConnection
 
 		startNode();
 
-		Class<? extends EmbeddedElasticsearchConnection> clazz = getClass();
-
-		return ClassLoaderUtil.getWithContextClassLoader(
-			() -> new RestHighLevelClient(
-				RestClient.builder(
-					new HttpHost(
-						"localhost",
-						elasticsearchConfiguration.embeddedHttpPort(),
-						"http"))),
-			clazz);
+		return RestHighLevelClientFactory.builder(
+		).clusterName(
+			getClusterName()
+		).hostName(
+			"localhost"
+		).nodeName(
+			getNodeName()
+		).portRange(
+			getHttpPort()
+		).scheme(
+			"http"
+		).build(
+		).getRestHighLevelClientOptional(
+		).get();
 	}
 
 	@Deactivate
 	protected void deactivate(Map<String, Object> properties) {
 		close();
+	}
+
+	protected String getClusterName() {
+		return elasticsearchConfiguration.clusterName();
+	}
+
+	protected String getHttpPort() {
+		return GetterUtil.getString(
+			_httpPort,
+			String.valueOf(elasticsearchConfiguration.embeddedHttpPort()));
+	}
+
+	protected String getNodeName() {
+		return "liferay";
 	}
 
 	protected void installPlugin(String name, Settings settings) {
@@ -373,58 +291,6 @@ public class EmbeddedElasticsearchConnection
 		LogManager.shutdown();
 	}
 
-	protected void loadAdditionalConfigurations() {
-		settingsBuilder.loadFromSource(
-			elasticsearchConfiguration.additionalConfigurations());
-	}
-
-	protected void loadDefaultConfigurations() {
-		String defaultConfigurations = ResourceUtil.getResourceAsString(
-			getClass(), "/META-INF/elasticsearch-optional-defaults.yml");
-
-		settingsBuilder.loadFromSource(defaultConfigurations);
-
-		settingsBuilder.put("action.auto_create_index", false);
-		settingsBuilder.put(
-			"bootstrap.memory_lock",
-			elasticsearchConfiguration.bootstrapMlockAll());
-
-		configureClustering();
-
-		configureHttp();
-
-		configureNetworking();
-
-		settingsBuilder.put("node.data", true);
-		settingsBuilder.put("node.ingest", true);
-		settingsBuilder.put("node.master", true);
-		settingsBuilder.put("node.name", "liferay");
-
-		configurePaths();
-
-		configureTestMode();
-	}
-
-	protected void loadSettingsContributors() {
-		ClientSettingsHelper clientSettingsHelper = new ClientSettingsHelper() {
-
-			@Override
-			public void put(String setting, String value) {
-				settingsBuilder.put(setting, value);
-			}
-
-			@Override
-			public void putArray(String setting, String... values) {
-				settingsBuilder.putList(setting, values);
-			}
-
-		};
-
-		for (SettingsContributor settingsContributor : _settingsContributors) {
-			settingsContributor.populate(clientSettingsHelper);
-		}
-	}
-
 	protected void removeObsoletePlugin(String name, Settings settings) {
 		EmbeddedElasticsearchPluginManager embeddedElasticsearchPluginManager =
 			createEmbeddedElasticsearchPluginManager(name, settings);
@@ -445,12 +311,6 @@ public class EmbeddedElasticsearchConnection
 	}
 
 	protected void startNode() {
-		loadDefaultConfigurations();
-
-		loadAdditionalConfigurations();
-
-		loadSettingsContributors();
-
 		StopWatch stopWatch = new StopWatch();
 
 		stopWatch.start();
@@ -470,12 +330,28 @@ public class EmbeddedElasticsearchConnection
 			_log.warn(sb.toString());
 		}
 
-		Settings settings = settingsBuilder.build();
+		Settings settings = ElasticsearchInstanceSettingsBuilder.builder(
+		).clusterName(
+			getClusterName()
+		).elasticsearchConfiguration(
+			elasticsearchConfiguration
+		).elasticsearchInstancePaths(
+			new EmbeddedElasticsearchInstancePaths()
+		).httpPort(
+			getHttpPort()
+		).localBindInetAddressSupplier(
+			clusterSettingsContext::getLocalBindInetAddress
+		).nodeName(
+			getNodeName()
+		).settingsContributors(
+			_settingsContributors
+		).build();
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
-				"Starting embedded Elasticsearch cluster " +
-					elasticsearchConfiguration.clusterName());
+				StringBundler.concat(
+					"Starting embedded Elasticsearch cluster ",
+					getClusterName(), " with settings: ", settings.toString()));
 		}
 
 		_node = createNode(settings);
@@ -492,8 +368,8 @@ public class EmbeddedElasticsearchConnection
 
 			_log.debug(
 				StringBundler.concat(
-					"Started ", elasticsearchConfiguration.clusterName(),
-					" in ", stopWatch.getTime(), " ms"));
+					"Started ", getClusterName(), " in ", stopWatch.getTime(),
+					" ms"));
 		}
 	}
 
@@ -507,29 +383,23 @@ public class EmbeddedElasticsearchConnection
 	@Reference
 	protected Props props;
 
-	protected SettingsBuilder settingsBuilder = new SettingsBuilder(
-		Settings.builder());
+	private static void _logRejectedExecution(
+		Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Discarded ", runnable, " on ", threadPoolExecutor));
+		}
+	}
 
 	/**
 	 * Keep this as a static field to avoid the class loading failure during
 	 * Tomcat shutdown.
 	 */
 	private static final RejectedExecutionHandler _REJECTED_EXECUTION_HANDLER =
-		new RejectedExecutionHandler() {
-
-			@Override
-			public void rejectedExecution(
-				Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Discarded ", runnable, " on ",
-							threadPoolExecutor));
-				}
-			}
-
-		};
+		(runnable, threadPoolExecutor) -> _logRejectedExecution(
+			runnable, threadPoolExecutor);
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EmbeddedElasticsearchConnection.class);
@@ -539,8 +409,24 @@ public class EmbeddedElasticsearchConnection
 	@Reference
 	private File _file;
 
+	private String _httpPort;
 	private Node _node;
 	private final Set<SettingsContributor> _settingsContributors =
 		new ConcurrentSkipListSet<>();
+
+	private class EmbeddedElasticsearchInstancePaths
+		implements ElasticsearchInstancePaths {
+
+		@Override
+		public String getHome() {
+			return null;
+		}
+
+		@Override
+		public String getWork() {
+			return props.get(PropsKeys.LIFERAY_HOME);
+		}
+
+	}
 
 }
