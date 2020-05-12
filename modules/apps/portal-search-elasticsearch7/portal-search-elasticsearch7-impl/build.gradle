@@ -4,6 +4,7 @@ import com.liferay.gradle.util.StringUtil
 task cleanSidecar
 task deploySidecar(type: Copy)
 task deployTestSidecar(type: Copy)
+task deployTestSidecarDependencies
 
 String elasticsearchVersion = "7.3.0"
 String luceneVersion = "8.1.0"
@@ -32,6 +33,32 @@ configurations {
 	elasticsearchPlugins {
 		transitive = false
 	}
+}
+
+deployTestSidecarDependencies {
+	dependsOn configurations.compileOnly
+
+        doLast {
+ 	     File  sidecarExtDir = new File(sidecarTestDir.getPath() + "/ext")
+	     if (!sidecarExtDir.exists()) { 
+ 		sidecarExtDir.mkdir()
+	     }
+	    
+	     project.copy {
+		include "com.liferay.petra.*.jar"
+		include "com.liferay.portal.kernel*.jar"
+
+		configurations.compileOnly.allDependencies.each {
+        		rename "-${it.version}", ""
+    		} 
+
+		rename(/com\.liferay\.portal.kernel-.+\.jar/, "portal-kernel.jar")
+
+		into sidecarExtDir.getPath()
+                from configurations.compileOnly
+             }
+	}
+
 }
 
 dependencies {
@@ -258,6 +285,8 @@ processResources {
 
 test {
 	dependsOn deployTestSidecar
+
+	dependsOn deployTestSidecarDependencies
 
 	forkEvery = 0
 }
