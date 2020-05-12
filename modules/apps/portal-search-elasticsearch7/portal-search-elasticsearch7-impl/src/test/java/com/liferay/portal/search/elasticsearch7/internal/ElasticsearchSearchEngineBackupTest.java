@@ -16,9 +16,7 @@ package com.liferay.portal.search.elasticsearch7.internal;
 
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnection;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
 
 import java.io.IOException;
 
@@ -41,12 +39,15 @@ import org.junit.Test;
 /**
  * @author André de Oliveira
  */
-public class ElasticsearchSearchEngineTest {
+public class ElasticsearchSearchEngineBackupTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
-			createElasticsearchConnectionFixture();
+			ElasticsearchConnectionFixture.builder(
+			).clusterName(
+				ElasticsearchSearchEngineBackupTest.class.getSimpleName()
+			).build();
 
 		ElasticsearchSearchEngineFixture elasticsearchSearchEngineFixture =
 			new ElasticsearchSearchEngineFixture(
@@ -61,16 +62,7 @@ public class ElasticsearchSearchEngineTest {
 
 	@AfterClass
 	public static void tearDownClass() throws Exception {
-		if (_elasticsearchSearchEngineFixture != null) {
-			_elasticsearchSearchEngineFixture.tearDown();
-		}
-	}
-
-	public SnapshotClient getSnapshotClient() {
-		RestHighLevelClient restHighLevelClient =
-			_elasticsearchConnectionFixture.getRestHighLevelClient();
-
-		return restHighLevelClient.snapshot();
+		_elasticsearchSearchEngineFixture.tearDown();
 	}
 
 	@Test
@@ -95,22 +87,6 @@ public class ElasticsearchSearchEngineTest {
 	}
 
 	@Test
-	public void testInitializeAfterReconnect() {
-		ElasticsearchSearchEngine elasticsearchSearchEngine =
-			_elasticsearchSearchEngineFixture.getElasticsearchSearchEngine();
-
-		long companyId = RandomTestUtil.randomLong();
-
-		elasticsearchSearchEngine.initialize(companyId);
-
-		reconnect(
-			_elasticsearchSearchEngineFixture.
-				getElasticsearchConnectionManager());
-
-		elasticsearchSearchEngine.initialize(companyId);
-	}
-
-	@Test
 	public void testRestore() throws SearchException {
 		ElasticsearchSearchEngine elasticsearchSearchEngine =
 			_elasticsearchSearchEngineFixture.getElasticsearchSearchEngine();
@@ -127,15 +103,6 @@ public class ElasticsearchSearchEngineTest {
 		elasticsearchSearchEngine.restore(companyId, "restore_test");
 
 		deleteSnapshot("liferay_backup", "restore_test");
-	}
-
-	protected static ElasticsearchConnectionFixture
-		createElasticsearchConnectionFixture() {
-
-		return ElasticsearchConnectionFixture.builder(
-		).clusterName(
-			ElasticsearchSearchEngineTest.class.getSimpleName()
-		).build();
 	}
 
 	protected void createSnapshot(
@@ -194,15 +161,11 @@ public class ElasticsearchSearchEngineTest {
 		}
 	}
 
-	protected void reconnect(
-		ElasticsearchConnectionManager elasticsearchConnectionManager) {
+	protected SnapshotClient getSnapshotClient() {
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchConnectionFixture.getRestHighLevelClient();
 
-		ElasticsearchConnection elasticsearchConnection =
-			elasticsearchConnectionManager.getElasticsearchConnection();
-
-		elasticsearchConnection.close();
-
-		elasticsearchConnection.connect();
+		return restHighLevelClient.snapshot();
 	}
 
 	private static ElasticsearchConnectionFixture
