@@ -27,13 +27,18 @@ import com.liferay.portal.search.elasticsearch7.internal.cluster.UnicastSettings
 import com.liferay.portal.search.elasticsearch7.internal.settings.BaseSettingsContributor;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
 import com.liferay.portal.search.elasticsearch7.settings.ClientSettingsHelper;
+import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 import com.liferay.portal.util.FileImpl;
 
 import java.io.File;
 import java.io.IOException;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 
@@ -166,61 +171,6 @@ public class ElasticsearchConnectionFixture
 
 	}
 
-	protected void addClusterLoggingThresholdContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			new BaseSettingsContributor(0) {
-
-				@Override
-				public void populate(
-					ClientSettingsHelper clientSettingsHelper) {
-
-					clientSettingsHelper.put(
-						"cluster.service.slow_task_logging_threshold", "600s");
-				}
-
-			});
-	}
-
-	protected void addDiskThresholdSettingsContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			new BaseSettingsContributor(0) {
-
-				@Override
-				public void populate(
-					ClientSettingsHelper clientSettingsHelper) {
-
-					clientSettingsHelper.put(
-						"cluster.routing.allocation.disk.threshold_enabled",
-						"false");
-				}
-
-			});
-	}
-
-	protected void addUnicastSettingsContributor(
-		EmbeddedElasticsearchConnection embeddedElasticsearchConnection) {
-
-		if (_clusterSettingsContext == null) {
-			return;
-		}
-
-		UnicastSettingsContributor unicastSettingsContributor =
-			new UnicastSettingsContributor() {
-				{
-					setClusterSettingsContext(_clusterSettingsContext);
-
-					activate(_elasticsearchConfigurationProperties);
-				}
-			};
-
-		embeddedElasticsearchConnection.addSettingsContributor(
-			unicastSettingsContributor);
-	}
-
 	protected ElasticsearchConnection createElasticsearchConnection() {
 		if (_SIDECAR_NOT_EMBEDDED) {
 			return createSidecarElasticsearchConnection();
@@ -252,9 +202,11 @@ public class ElasticsearchConnectionFixture
 		EmbeddedElasticsearchConnection embeddedElasticsearchConnection =
 			new EmbeddedElasticsearchConnection();
 
-		addClusterLoggingThresholdContributor(embeddedElasticsearchConnection);
-		addDiskThresholdSettingsContributor(embeddedElasticsearchConnection);
-		addUnicastSettingsContributor(embeddedElasticsearchConnection);
+		List<SettingsContributor> settingsContributors =
+			getSettingsContributors();
+
+		settingsContributors.forEach(
+			embeddedElasticsearchConnection::addSettingsContributor);
 
 		embeddedElasticsearchConnection.clusterSettingsContext =
 			getClusterSettingsContext();
@@ -306,7 +258,7 @@ public class ElasticsearchConnectionFixture
 				getClusterSettingsContext(), elasticsearchConfiguration,
 				createElasticsearchInstancePaths(), "9200-9300",
 				new LocalProcessExecutor(), () -> _PETRA_LIB_PATH,
-				Collections.emptySet()));
+				getSettingsContributors()));
 	}
 
 	protected void deleteTmpDir() {
@@ -318,12 +270,65 @@ public class ElasticsearchConnectionFixture
 		}
 	}
 
+	protected SettingsContributor
+		getClusterLoggingThresholdSettingsContributor() {
+
+		return new BaseSettingsContributor(0) {
+
+			@Override
+			public void populate(ClientSettingsHelper clientSettingsHelper) {
+				clientSettingsHelper.put(
+					"cluster.service.slow_task_logging_threshold", "600s");
+			}
+
+		};
+	}
+
 	protected ClusterSettingsContext getClusterSettingsContext() {
 		if (_clusterSettingsContext != null) {
 			return _clusterSettingsContext;
 		}
 
 		return Mockito.mock(ClusterSettingsContext.class);
+	}
+
+	protected SettingsContributor getDiskThresholdSettingsContributor() {
+		return new BaseSettingsContributor(0) {
+
+			@Override
+			public void populate(ClientSettingsHelper clientSettingsHelper) {
+				clientSettingsHelper.put(
+					"cluster.routing.allocation.disk.threshold_enabled",
+					"false");
+			}
+
+		};
+	}
+
+	protected List<SettingsContributor> getSettingsContributors() {
+		return Stream.of(
+			getClusterLoggingThresholdSettingsContributor(),
+			getDiskThresholdSettingsContributor(),
+			getUnicastSettingsContributor()
+		).filter(
+			Objects::nonNull
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	protected SettingsContributor getUnicastSettingsContributor() {
+		if (_clusterSettingsContext != null) {
+			return new UnicastSettingsContributor() {
+				{
+					setClusterSettingsContext(_clusterSettingsContext);
+
+					activate(_elasticsearchConfigurationProperties);
+				}
+			};
+		}
+
+		return null;
 	}
 
 	protected ElasticsearchConnection openElasticsearchConnection() {
