@@ -33,13 +33,12 @@ import java.util.Map;
 
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.GetMappingsRequest;
+import org.elasticsearch.client.indices.GetMappingsResponse;
+import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -65,8 +64,6 @@ public class LiferayDocumentTypeFactory implements TypeMappingsHelper {
 				source, indexName,
 				LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE),
 			XContentType.JSON);
-		putMappingRequest.type(
-			LiferayTypeMappingsConstants.LIFERAY_DOCUMENT_TYPE);
 
 		try {
 			ActionResponse actionResponse = _indicesClient.putMapping(
@@ -133,7 +130,6 @@ public class LiferayDocumentTypeFactory implements TypeMappingsHelper {
 		GetMappingsRequest getMappingsRequest = new GetMappingsRequest();
 
 		getMappingsRequest.indices(indexName);
-		getMappingsRequest.types(typeName);
 
 		GetMappingsResponse getMappingsResponse = null;
 
@@ -145,12 +141,9 @@ public class LiferayDocumentTypeFactory implements TypeMappingsHelper {
 			throw new RuntimeException(ioException);
 		}
 
-		ImmutableOpenMap<String, ImmutableOpenMap<String, MappingMetaData>>
-			map = getMappingsResponse.mappings();
+		Map<String, MappingMetaData> mappings = getMappingsResponse.mappings();
 
-		ImmutableOpenMap<String, MappingMetaData> mappings = map.get(indexName);
-
-		MappingMetaData mappingMetaData = mappings.get(typeName);
+		MappingMetaData mappingMetaData = mappings.get(indexName);
 
 		CompressedXContent compressedXContent = mappingMetaData.source();
 
