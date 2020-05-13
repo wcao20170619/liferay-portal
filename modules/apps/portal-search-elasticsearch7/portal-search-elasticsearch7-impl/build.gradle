@@ -4,6 +4,7 @@ import com.liferay.gradle.util.StringUtil
 task cleanSidecar
 task deploySidecar(type: Copy)
 task deployTestSidecar(type: Copy)
+task deployTestSidecarDependencies
 
 String elasticsearchVersion = "7.3.0"
 String luceneVersion = "8.1.0"
@@ -91,7 +92,11 @@ dependencies {
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-metatype-api")
 	compileOnly project(":apps:static:portal-configuration:portal-configuration-persistence-api")
 	compileOnly project(":core:petra:petra-concurrent")
+	compileOnly project(":core:petra:petra-function")
 	compileOnly project(":core:petra:petra-io")
+	compileOnly project(":core:petra:petra-lang")
+	compileOnly project(":core:petra:petra-memory")
+	compileOnly project(":core:petra:petra-nio")
 	compileOnly project(":core:petra:petra-process")
 	compileOnly project(":core:petra:petra-reflect")
 	compileOnly project(":core:petra:petra-string")
@@ -209,8 +214,36 @@ deployTestSidecar {
 	}
 }
 
+deployTestSidecarDependencies {
+	dependsOn configurations.compileOnly
+
+	doLast {
+		File libProcessExecutorDir = new File(sidecarTestDir.getPath() + "/lib-liferay-process-executor")
+
+		if (!libProcessExecutorDir.exists()) {
+			libProcessExecutorDir.mkdir()
+		}
+
+		project.copy {
+			include "com.liferay.petra.*.jar"
+			//			include "com.liferay.portal.kernel*.jar"
+
+			configurations.compileOnly.allDependencies.each {
+				rename "-${it.version}", ""
+			}
+
+			//			rename(/com\.liferay\.portal.kernel-.+\.jar/, "portal-kernel.jar")
+
+			into libProcessExecutorDir.getPath()
+			from configurations.compileOnly
+		}
+	}
+}
+
 test {
 	dependsOn deployTestSidecar
+
+	dependsOn deployTestSidecarDependencies
 
 	forkEvery = 0
 }

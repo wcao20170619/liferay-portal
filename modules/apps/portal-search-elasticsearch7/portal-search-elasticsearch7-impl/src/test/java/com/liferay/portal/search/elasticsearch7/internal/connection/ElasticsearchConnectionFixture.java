@@ -257,7 +257,7 @@ public class ElasticsearchConnectionFixture
 			new Sidecar(
 				getClusterSettingsContext(), elasticsearchConfiguration,
 				createElasticsearchInstancePaths(), "9200-9300",
-				new LocalProcessExecutor(), () -> _PETRA_LIB_PATH,
+				new LocalProcessExecutor(), () -> _PROCESS_EXECUTOR_LIB_PATH,
 				getSettingsContributors()));
 	}
 
@@ -340,8 +340,8 @@ public class ElasticsearchConnectionFixture
 		return elasticsearchConnection;
 	}
 
-	private static final String _PETRA_LIB_PATH =
-		"/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext";
+	private static final String _PROCESS_EXECUTOR_LIB_PATH =
+		"classes/sidecar-elasticsearch/lib-liferay-process-executor";
 
 	private static final boolean _SIDECAR_NOT_EMBEDDED = true;
 

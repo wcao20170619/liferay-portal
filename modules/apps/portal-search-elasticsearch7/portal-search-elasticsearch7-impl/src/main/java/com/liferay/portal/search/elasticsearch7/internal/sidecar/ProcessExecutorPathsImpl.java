@@ -27,7 +27,7 @@ public class ProcessExecutorPathsImpl implements ProcessExecutorPaths {
 	}
 
 	@Override
-	public String getPetraLib() {
+	public String getProcessExecutorLib() {
 		return _props.get(PropsKeys.LIFERAY_LIB_GLOBAL_DIR);
 	}
 

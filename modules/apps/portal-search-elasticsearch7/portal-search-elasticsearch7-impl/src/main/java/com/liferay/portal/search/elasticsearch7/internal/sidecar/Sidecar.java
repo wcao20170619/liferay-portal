@@ -405,7 +405,7 @@ public class Sidecar {
 
 		processConfigBuilder.setArguments(_getJVMArguments(bundleURL));
 
-		File file = new File(_processExecutorPaths.getPetraLib());
+		File file = new File(_processExecutorPaths.getProcessExecutorLib());
 
 		String bootstrapClasspath = _createClasspath(
 			file.toPath(), path -> fileNameContains(path, "petra"));

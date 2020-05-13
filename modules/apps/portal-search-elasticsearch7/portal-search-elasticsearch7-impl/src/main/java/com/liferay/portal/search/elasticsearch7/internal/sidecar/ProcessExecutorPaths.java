@@ -19,6 +19,6 @@ package com.liferay.portal.search.elasticsearch7.internal.sidecar;
  */
 public interface ProcessExecutorPaths {
 
-	public String getPetraLib();
+	public String getProcessExecutorLib();
 
 }
