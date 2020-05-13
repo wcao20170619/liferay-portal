@@ -66,7 +66,6 @@ import java.util.Map;
 
 import org.apache.http.util.EntityUtils;
 
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -80,6 +79,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
@@ -102,8 +102,7 @@ public class ElasticsearchSearchEngineAdapterIndexRequestTest {
 	public static void setUpClass() throws Exception {
 		setUpJSONFactoryUtil();
 
-		_elasticsearchFixture = new ElasticsearchFixture(
-			ElasticsearchSearchEngineAdapterIndexRequestTest.class);
+		_elasticsearchFixture = new ElasticsearchFixture();
 
 		_elasticsearchFixture.setUp();
 
@@ -708,10 +707,10 @@ public class ElasticsearchSearchEngineAdapterIndexRequestTest {
 	}
 
 	private void _createIndex(String indexName) {
-		org.elasticsearch.action.admin.indices.create.CreateIndexRequest
+		org.elasticsearch.client.indices.CreateIndexRequest
 			elasticsearchCreateIndexRequest =
-				new org.elasticsearch.action.admin.indices.create.
-					CreateIndexRequest(indexName);
+				new org.elasticsearch.client.indices.CreateIndexRequest(
+					indexName);
 
 		try {
 			_indicesClient.create(
@@ -769,9 +768,7 @@ public class ElasticsearchSearchEngineAdapterIndexRequestTest {
 	}
 
 	private boolean _indiciesExists(String indexName) {
-		GetIndexRequest getIndexRequest = new GetIndexRequest();
-
-		getIndexRequest.indices(indexName);
+		GetIndexRequest getIndexRequest = new GetIndexRequest(indexName);
 
 		try {
 			return _indicesClient.exists(

@@ -228,7 +228,6 @@ public class ElasticsearchBulkableDocumentRequestTranslatorTest {
 		Assert.assertEquals(
 			expectedRefreshPolicy, indexRequest.getRefreshPolicy());
 		Assert.assertEquals(_INDEX_NAME, indexRequest.index());
-		Assert.assertEquals(_MAPPING_NAME, indexRequest.type());
 		Assert.assertEquals(id, indexRequest.id());
 
 		String source = XContentHelper.convertToJson(

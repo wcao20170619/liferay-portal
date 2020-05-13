@@ -19,14 +19,13 @@ import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 import java.io.IOException;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsRequest;
-import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsResponse;
-import org.elasticsearch.action.admin.indices.mapping.get.GetFieldMappingsResponse.FieldMappingMetaData;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.indices.GetFieldMappingsRequest;
+import org.elasticsearch.client.indices.GetFieldMappingsResponse;
+import org.elasticsearch.client.indices.GetFieldMappingsResponse.FieldMappingMetaData;
 
 import org.junit.Assert;
 
@@ -53,17 +52,8 @@ public class FieldMappingAssert {
 
 		IdempotentRetryAssert.retryAssert(
 			10, TimeUnit.SECONDS,
-			new Callable<Void>() {
-
-				@Override
-				public Void call() throws Exception {
-					doAssertFieldMappingMetaData(
-						expectedValue, key, field, type, index, indicesClient);
-
-					return null;
-				}
-
-			});
+			() -> doAssertFieldMappingMetaData(
+				expectedValue, key, field, type, index, indicesClient));
 	}
 
 	public static void assertType(
@@ -96,21 +86,19 @@ public class FieldMappingAssert {
 
 		getFieldMappingsRequest.fields(field);
 		getFieldMappingsRequest.indices(index);
-		getFieldMappingsRequest.types(type);
 
 		try {
 			GetFieldMappingsResponse getFieldMappingsResponse =
 				indicesClient.getFieldMapping(
 					getFieldMappingsRequest, RequestOptions.DEFAULT);
 
-			return getFieldMappingsResponse.fieldMappings(index, type, field);
+			return getFieldMappingsResponse.fieldMappings(index, field);
 		}
 		catch (IOException ioException) {
 			throw new RuntimeException(ioException);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	protected static String getFieldMappingMetaDataValue(
 		FieldMappingMetaData fieldMappingMetaData, String field, String key) {
 
