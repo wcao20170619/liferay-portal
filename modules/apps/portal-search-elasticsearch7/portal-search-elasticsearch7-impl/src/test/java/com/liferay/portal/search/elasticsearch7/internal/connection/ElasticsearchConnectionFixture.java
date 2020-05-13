@@ -26,7 +26,6 @@ import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettings
 import com.liferay.portal.search.elasticsearch7.internal.cluster.UnicastSettingsContributor;
 import com.liferay.portal.search.elasticsearch7.internal.settings.BaseSettingsContributor;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
-import com.liferay.portal.search.elasticsearch7.internal.sidecar.SidecarPaths;
 import com.liferay.portal.search.elasticsearch7.settings.ClientSettingsHelper;
 import com.liferay.portal.util.FileImpl;
 
@@ -230,6 +229,25 @@ public class ElasticsearchConnectionFixture
 		return createEmbeddedElasticsearchConnection();
 	}
 
+	protected ElasticsearchInstancePaths createElasticsearchInstancePaths() {
+		ElasticsearchInstancePaths elasticsearchInstancePaths = Mockito.mock(
+			ElasticsearchInstancePaths.class);
+
+		Mockito.doReturn(
+			"classes/sidecar-elasticsearch"
+		).when(
+			elasticsearchInstancePaths
+		).getHome();
+
+		Mockito.doReturn(
+			_tmpDirName
+		).when(
+			elasticsearchInstancePaths
+		).getWork();
+
+		return elasticsearchInstancePaths;
+	}
+
 	protected ElasticsearchConnection createEmbeddedElasticsearchConnection() {
 		EmbeddedElasticsearchConnection embeddedElasticsearchConnection =
 			new EmbeddedElasticsearchConnection();
@@ -238,14 +256,8 @@ public class ElasticsearchConnectionFixture
 		addDiskThresholdSettingsContributor(embeddedElasticsearchConnection);
 		addUnicastSettingsContributor(embeddedElasticsearchConnection);
 
-		ClusterSettingsContext clusterSettingsContext = _clusterSettingsContext;
-
-		if (clusterSettingsContext == null) {
-			clusterSettingsContext = Mockito.mock(ClusterSettingsContext.class);
-		}
-
 		embeddedElasticsearchConnection.clusterSettingsContext =
-			clusterSettingsContext;
+			getClusterSettingsContext();
 
 		embeddedElasticsearchConnection.props = createProps();
 
@@ -287,34 +299,14 @@ public class ElasticsearchConnectionFixture
 		ElasticsearchConfiguration elasticsearchConfiguration =
 			ConfigurableUtil.createConfigurable(
 				ElasticsearchConfiguration.class,
-				HashMapBuilder.putAll(
-					_elasticsearchConfigurationProperties
-				).put(
-					"sidecarHome", "classes/sidecar-elasticsearch"
-				).build());
+				_elasticsearchConfigurationProperties);
 
 		return new SidecarElasticsearchConnection(
 			new Sidecar(
-				elasticsearchConfiguration, "9200-9300",
-				new LocalProcessExecutor(), createSidecarPaths()));
-	}
-
-	protected SidecarPaths createSidecarPaths() {
-		SidecarPaths sidecarPaths = Mockito.mock(SidecarPaths.class);
-
-		Mockito.doReturn(
-			_tmpDirName
-		).when(
-			sidecarPaths
-		).getWork();
-
-		Mockito.doReturn(
-			"/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext"
-		).when(
-			sidecarPaths
-		).getLib();
-
-		return sidecarPaths;
+				getClusterSettingsContext(), elasticsearchConfiguration,
+				createElasticsearchInstancePaths(), "9200-9300",
+				new LocalProcessExecutor(), () -> _PETRA_LIB_PATH,
+				Collections.emptySet()));
 	}
 
 	protected void deleteTmpDir() {
@@ -326,6 +318,14 @@ public class ElasticsearchConnectionFixture
 		}
 	}
 
+	protected ClusterSettingsContext getClusterSettingsContext() {
+		if (_clusterSettingsContext != null) {
+			return _clusterSettingsContext;
+		}
+
+		return Mockito.mock(ClusterSettingsContext.class);
+	}
+
 	protected ElasticsearchConnection openElasticsearchConnection() {
 		ElasticsearchConnection elasticsearchConnection =
 			createElasticsearchConnection();
@@ -334,6 +334,9 @@ public class ElasticsearchConnectionFixture
 
 		return elasticsearchConnection;
 	}
+
+	private static final String _PETRA_LIB_PATH =
+		"/Users/arbo/Liferay/bundles/liferay-portal/tomcat-9.0.33/lib/ext";
 
 	private static final boolean _SIDECAR_NOT_EMBEDDED = true;
 
