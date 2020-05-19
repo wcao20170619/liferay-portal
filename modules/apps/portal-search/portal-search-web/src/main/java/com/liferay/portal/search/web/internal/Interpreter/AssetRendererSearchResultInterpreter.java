@@ -137,9 +137,7 @@ public class AssetRendererSearchResultInterpreter
 	}
 
 	@Override
-	public AssetRenderer<?> getAssetRenderer(Document document)
-		throws PortalException {
-
+	public AssetRenderer<?> getAssetRenderer(Document document) {
 		AssetRendererFactory<?> assetRendererFactory = getAssetRendererFactory(
 			document);
 
@@ -147,8 +145,13 @@ public class AssetRendererSearchResultInterpreter
 			return null;
 		}
 
-		return assetRendererFactory.getAssetRenderer(
-			GetterUtil.getLong(document.getLong(Field.ENTRY_CLASS_PK)));
+		try {
+			return assetRendererFactory.getAssetRenderer(
+				GetterUtil.getLong(document.getLong(Field.ENTRY_CLASS_PK)));
+		}
+		catch (Exception exception) {
+			return null;
+		}
 	}
 
 	@Override
