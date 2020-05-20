@@ -55,8 +55,7 @@ public interface SearchResultInterpreter {
 	public String getAssetIconCssClass(Document document)
 		throws PortalException;
 
-	public AssetRenderer<?> getAssetRenderer(Document document)
-		throws PortalException;
+	public AssetRenderer<?> getAssetRenderer(Document document);
 
 	public String getAssetSearchSummary(Document document, Locale locale)
 		throws PortalException;
