@@ -43,8 +43,10 @@ public class ClusterAssert {
 					setActiveShards(1);
 					setNumberOfDataNodes(1);
 					setNumberOfNodes(1);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(1);
+					//setStatus(ClusterHealthStatus.YELLOW);
+					setStatus(ClusterHealthStatus.GREEN);
+					//setUnassignedShards(1);
+					setUnassignedShards(0);
 				}
 			});
 	}
@@ -59,8 +61,10 @@ public class ClusterAssert {
 				{
 					setActivePrimaryShards(1);
 					setActiveShards(1);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
+//					setNumberOfDataNodes(2);
+//					setNumberOfNodes(2);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
 				}
@@ -94,11 +98,16 @@ public class ClusterAssert {
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
-					setActiveShards(2);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(1);
+//					setActiveShards(2);
+//					setNumberOfDataNodes(2);
+//					setNumberOfNodes(2);
+					setActiveShards(1);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
+					//setStatus(ClusterHealthStatus.YELLOW);
+					setStatus(ClusterHealthStatus.GREEN);
+					//setUnassignedShards(1);
+					setUnassignedShards(0);
 				}
 			});
 	}
@@ -112,9 +121,12 @@ public class ClusterAssert {
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
-					setActiveShards(2);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
+//					setActiveShards(2);
+//					setNumberOfDataNodes(2);
+//					setNumberOfNodes(2);
+					setActiveShards(1);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
 				}
@@ -129,12 +141,16 @@ public class ClusterAssert {
 			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
-					setActivePrimaryShards(2);
-					setActiveShards(2);
+				//	setActivePrimaryShards(2);
+				//	setActiveShards(2);
+					setActivePrimaryShards(1);
+					setActiveShards(1);
 					setNumberOfDataNodes(1);
 					setNumberOfNodes(1);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(2);
+				//	setStatus(ClusterHealthStatus.YELLOW);
+				//	setUnassignedShards(2);
+					setStatus(ClusterHealthStatus.GREEN);
+					setUnassignedShards(0);
 				}
 			});
 	}
@@ -147,10 +163,14 @@ public class ClusterAssert {
 			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
-					setActivePrimaryShards(2);
-					setActiveShards(4);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
+//					setActivePrimaryShards(2);
+//					setActiveShards(4);
+//					setNumberOfDataNodes(2);
+//					setNumberOfNodes(2);
+					setActivePrimaryShards(1);
+					setActiveShards(1);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
 				}
@@ -165,10 +185,14 @@ public class ClusterAssert {
 			elasticsearchClientResolver,
 			new HealthExpectations() {
 				{
-					setActivePrimaryShards(2);
-					setActiveShards(2);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
+//					setActivePrimaryShards(2);
+//					setActiveShards(2);
+//					setNumberOfDataNodes(2);
+//					setNumberOfNodes(2);
+					setActivePrimaryShards(1);
+					setActiveShards(1);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
 				}
@@ -184,9 +208,12 @@ public class ClusterAssert {
 			new HealthExpectations() {
 				{
 					setActivePrimaryShards(1);
-					setActiveShards(3);
-					setNumberOfDataNodes(3);
-					setNumberOfNodes(3);
+//					setActiveShards(3);
+//					setNumberOfDataNodes(3);
+//					setNumberOfNodes(3);
+					setActiveShards(1);
+					setNumberOfDataNodes(1);
+					setNumberOfNodes(1);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
 				}
@@ -211,7 +238,7 @@ public class ClusterAssert {
 	}
 
 	public static boolean isClusterTestingEnabled() {
-		return false;
+		return true;
 	}
 
 	private static void _assertHealth(

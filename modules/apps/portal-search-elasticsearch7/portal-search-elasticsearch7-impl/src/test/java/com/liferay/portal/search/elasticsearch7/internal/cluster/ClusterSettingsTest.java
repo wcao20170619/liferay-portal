@@ -14,14 +14,13 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.cluster;
 
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
 
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.elasticsearch.client.ClusterClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,18 +33,22 @@ public class ClusterSettingsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_elasticsearchFixture.setUp();
+		_testCluster.setUp();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_elasticsearchFixture.tearDown();
+		_testCluster.tearDown();
 	}
 
 	@Test
 	public void testClusterSettings() throws Exception {
+		
+		ElasticsearchConnectionFixture elasticsearchFixture = 
+			_testCluster.getNode(0);
+		
 		RestHighLevelClient restHighLevelClient =
-			_elasticsearchFixture.getRestHighLevelClient();
+			elasticsearchFixture.getRestHighLevelClient();
 
 		ClusterClient clusterClient = restHighLevelClient.cluster();
 
@@ -64,7 +67,6 @@ public class ClusterSettingsTest {
 				"cluster.service.slow_task_logging_threshold"));
 	}
 
-	private final ElasticsearchFixture _elasticsearchFixture =
-		new ElasticsearchFixture(getClass());
+	private final TestCluster _testCluster = new TestCluster(1, this, 9212, 9312);
 
 }

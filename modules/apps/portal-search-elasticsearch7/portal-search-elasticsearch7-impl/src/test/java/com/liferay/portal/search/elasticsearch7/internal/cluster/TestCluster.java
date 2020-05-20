@@ -20,7 +20,6 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-
 import java.util.HashMap;
 
 import org.mockito.Mockito;
@@ -30,12 +29,17 @@ import org.mockito.Mockito;
  */
 public class TestCluster {
 
-	public TestCluster(int size, Object object) {
+	public TestCluster(int size, Object object, int startingHttpPort, int startingTransportTcpPort) {
+		
 		String prefix = getPrefix(object);
 
 		_elasticsearchFixtures = new ElasticsearchConnectionFixture[size];
 
 		_prefix = prefix;
+		
+		_startingHttpPort = startingHttpPort;
+		
+		_startingTransportTcpPort = startingTransportTcpPort;
 	}
 
 	public ElasticsearchConnectionFixture createNode(int index) {
@@ -93,17 +97,21 @@ public class TestCluster {
 		createElasticsearchConfigurationProperties(
 			int index, String prefix, int size) {
 
-		String transportRange = getPortRange(9310, size);
+		String transportRange = getPortRange(_startingTransportTcpPort, size);
 
 		return HashMapBuilder.<String, Object>put(
-			"clusterName", prefix + "-Cluster"
-		).put(
-			"discoveryZenPingUnicastHostsPort", transportRange
-		).put(
-			"embeddedHttpPort", String.valueOf(9202 + index)
-		).put(
-			"transportTcpPort", transportRange
-		).build();
+				"clusterName", prefix + "-Cluster"
+			).put(
+				"embeddedHttpPort", String.valueOf(_startingHttpPort + index)
+			).put(
+				"nodeName", getNodeName(index) 
+			).put(
+				"transportTcpPort", transportRange
+			).build();
+	}
+
+	protected String getNodeName(int index) {
+		return "node" + "-" + index;
 	}
 
 	protected String getPortRange(int startingPort, int size) {
@@ -123,6 +131,8 @@ public class TestCluster {
 
 	private final ElasticsearchConnectionFixture[] _elasticsearchFixtures;
 	private final String _prefix;
+	private final int _startingTransportTcpPort;
+	private final int _startingHttpPort;
 
 	private static class TestClusterSettingsContext
 		implements ClusterSettingsContext {

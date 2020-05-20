@@ -62,7 +62,7 @@ public class ClusterUnicastTest {
 
 		Index index2 = createIndex(elasticsearchConnectionFixture2);
 
-		updateNumberOfReplicas(2, index0, elasticsearchConnectionFixture0);
+		//updateNumberOfReplicas(2, index0, elasticsearchConnectionFixture0);
 
 		ClusterAssert.assert2ReplicaShards(elasticsearchConnectionFixture0);
 		ClusterAssert.assert2ReplicaShards(elasticsearchConnectionFixture1);
@@ -75,7 +75,7 @@ public class ClusterUnicastTest {
 		ClusterAssert.assert1ReplicaAnd1UnassignedShard(
 			elasticsearchConnectionFixture2);
 
-		updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
+		//updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
 
 		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture1);
 		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture2);
@@ -120,6 +120,6 @@ public class ClusterUnicastTest {
 			numberOfReplicas, index.getName());
 	}
 
-	private final TestCluster _testCluster = new TestCluster(3, this);
+	private final TestCluster _testCluster = new TestCluster(3, this, 9206, 9306);
 
 }

@@ -168,7 +168,6 @@ public class ElasticsearchConnectionFixture
 		private ClusterSettingsContext _clusterSettingsContext;
 		private Map<String, Object> _elasticsearchConfigurationProperties =
 			Collections.<String, Object>emptyMap();
-
 	}
 
 	protected ElasticsearchConnection createElasticsearchConnection() {
@@ -292,6 +291,21 @@ public class ElasticsearchConnectionFixture
 		return Mockito.mock(ClusterSettingsContext.class);
 	}
 
+	protected SettingsContributor getClusterSettingsContributor() {
+		return new BaseSettingsContributor(0) {
+
+			@Override
+			public void populate(ClientSettingsHelper clientSettingsHelper) {
+				clientSettingsHelper.put(
+					"cluster.initial_master_nodes", getNodeName());
+				clientSettingsHelper.put("discovery.type", "zen");
+				clientSettingsHelper.put("node.master", "true");
+				clientSettingsHelper.put("node.name", getNodeName());
+			}
+
+		};
+	}
+	
 	protected SettingsContributor getDiskThresholdSettingsContributor() {
 		return new BaseSettingsContributor(0) {
 
@@ -309,12 +323,16 @@ public class ElasticsearchConnectionFixture
 		return Stream.of(
 			getClusterLoggingThresholdSettingsContributor(),
 			getDiskThresholdSettingsContributor(),
-			getUnicastSettingsContributor()
+			getClusterSettingsContributor()
 		).filter(
 			Objects::nonNull
 		).collect(
 			Collectors.toList()
 		);
+	}
+	
+	protected String getNodeName() {
+		return (String)_elasticsearchConfigurationProperties.get("nodeName");
 	}
 
 	protected SettingsContributor getUnicastSettingsContributor() {

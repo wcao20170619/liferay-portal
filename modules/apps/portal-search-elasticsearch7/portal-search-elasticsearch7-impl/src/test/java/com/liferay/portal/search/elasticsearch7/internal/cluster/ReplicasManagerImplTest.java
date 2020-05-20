@@ -155,6 +155,6 @@ public class ReplicasManagerImplTest {
 	private CompanyLocalService _companyLocalService;
 
 	private ReplicasClusterContext _replicasClusterContext;
-	private final TestCluster _testCluster = new TestCluster(2, this);
+	private final TestCluster _testCluster = new TestCluster(2, this, 9209, 9309);
 
 }

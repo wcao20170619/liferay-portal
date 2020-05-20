@@ -66,6 +66,6 @@ public class Cluster1InstanceTest {
 			new IndexName(testName.getMethodName()));
 	}
 
-	private final TestCluster _testCluster = new TestCluster(1, this);
+	private final TestCluster _testCluster = new TestCluster(1, this, 9200, 9300);
 
 }

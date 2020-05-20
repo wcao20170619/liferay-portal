@@ -76,7 +76,8 @@ public class Cluster2InstancesTest {
 
 		Index index1 = createIndex(elasticsearchConnectionFixture1);
 
-		updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
+//		updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
+		updateNumberOfReplicas(0, index1, elasticsearchConnectionFixture1);
 
 		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture0);
 		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture1);
@@ -119,6 +120,6 @@ public class Cluster2InstancesTest {
 			numberOfReplicas, index.getName());
 	}
 
-	private final TestCluster _testCluster = new TestCluster(2, this);
+	private final TestCluster _testCluster = new TestCluster(2, this, 9203, 9303);
 
 }
