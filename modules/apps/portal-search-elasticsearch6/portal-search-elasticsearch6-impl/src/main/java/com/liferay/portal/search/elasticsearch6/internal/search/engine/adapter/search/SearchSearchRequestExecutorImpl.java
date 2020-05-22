@@ -39,6 +39,8 @@ public class SearchSearchRequestExecutorImpl
 	public SearchSearchResponse execute(
 		SearchSearchRequest searchSearchRequest) {
 
+		System.out.println("Hello Andre");
+		
 		SearchRequestBuilder searchRequestBuilder =
 			SearchAction.INSTANCE.newRequestBuilder(
 				_elasticsearchClientResolver.getClient());
