@@ -70,6 +70,11 @@ public class FunctionScoreQueryTranslatorImpl
 				functionScoreQuery.getBoost());
 		}
 
+		if (functionScoreQuery.getBoost() != null) {
+			functionScoreQueryBuilder.boost(
+				functionScoreQuery.getBoost());
+		}
+
 		if (functionScoreQuery.getMinScore() != null) {
 			functionScoreQueryBuilder.setMinScore(
 				functionScoreQuery.getMinScore());
