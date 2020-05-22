@@ -32,18 +32,24 @@ import java.util.Set;
 public class MultiMatchQueryImpl
 	extends BaseQueryImpl implements MultiMatchQuery {
 
+	public MultiMatchQueryImpl(Object value, Map<String, Float> fieldsBoosts) {
+		_value = value;
+
+		_fieldsBoosts = new HashMap<String, Float>(fieldsBoosts);
+	}
+
 	public MultiMatchQueryImpl(Object value, Set<String> fields) {
 		_value = value;
 
-		_fields.addAll(fields);
+		_fieldsBoosts.keySet().addAll(fields);
 	}
 
 	public MultiMatchQueryImpl(Object value, String... fields) {
 		_value = value;
 
-		Collections.addAll(_fields, fields);
+		Collections.addAll(_fieldsBoosts.keySet(), fields);
 	}
-
+	
 	@Override
 	public <T> T accept(QueryVisitor<T> queryVisitor) {
 		return queryVisitor.visit(this);
@@ -58,7 +64,7 @@ public class MultiMatchQueryImpl
 	}
 
 	public Set<String> getFields() {
-		return _fields;
+		return _fieldsBoosts.keySet();
 	}
 
 	public Map<String, Float> getFieldsBoosts() {
@@ -114,7 +120,7 @@ public class MultiMatchQueryImpl
 	}
 
 	public boolean isFieldsEmpty() {
-		return _fields.isEmpty();
+		return _fieldsBoosts.isEmpty();
 	}
 
 	public Boolean isLenient() {
@@ -189,8 +195,8 @@ public class MultiMatchQueryImpl
 
 		sb.append(", cutOffFrequency=");
 		sb.append(_cutOffFrequency);
-		sb.append(", fields=");
-		sb.append(_fields);
+		sb.append(", fieldsBoosts=");
+		sb.append(_fieldsBoosts);
 		sb.append(", fuzziness=");
 		sb.append(_fuzziness);
 		sb.append(", lenient=");
@@ -220,8 +226,7 @@ public class MultiMatchQueryImpl
 
 	private String _analyzer;
 	private Float _cutOffFrequency;
-	private final Set<String> _fields = new HashSet<>();
-	private final Map<String, Float> _fieldsBoosts = new HashMap<>();
+	private Map<String, Float> _fieldsBoosts = new HashMap<String, Float>();
 	private String _fuzziness;
 	private MatchQuery.RewriteMethod _fuzzyRewriteMethod;
 	private Boolean _lenient;

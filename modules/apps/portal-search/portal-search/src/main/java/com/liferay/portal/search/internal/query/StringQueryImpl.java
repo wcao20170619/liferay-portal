@@ -19,6 +19,10 @@ import com.liferay.portal.search.query.Operator;
 import com.liferay.portal.search.query.QueryVisitor;
 import com.liferay.portal.search.query.StringQuery;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Provides support for parsing raw, human readable query syntax. No
  * transformation is made on user input.
@@ -30,17 +34,26 @@ import com.liferay.portal.search.query.StringQuery;
  * </p>
  *
  * @author Bruno Farache
+ * @author Petteri Karttunen
  */
 public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 
 	public StringQueryImpl(String query) {
 		_query = query;
 	}
-
+	
 	@Override
 	public <T> T accept(QueryVisitor<T> queryVisitor) {
 		return queryVisitor.visit(this);
 	}
+	
+	public void addField(String field) {
+		_fieldsBoosts.put(field, null);
+	}
+
+	public void addField(String field, float boost) {
+		_fieldsBoosts.put(field, boost);
+	}	
 
 	public Boolean getAllowLeadingWildcard() {
 		return _allowLeadingWildcard;
@@ -69,6 +82,18 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 	public Boolean getEnablePositionIncrements() {
 		return _enablePositionIncrements;
 	}
+	
+	public Boolean getEscape() {
+		return _escape;
+	}
+
+	public Set<String> getFields() {
+		return _fieldsBoosts.keySet();
+	}
+
+	public Map<String, Float> getFieldsBoosts() {
+		return _fieldsBoosts;
+	}
 
 	public Float getFuzziness() {
 		return _fuzziness;
@@ -81,6 +106,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 	public Integer getFuzzyPrefixLength() {
 		return _fuzzyPrefixLength;
 	}
+	
+	public String getFuzzyRewrite() {
+		return _fuzzyRewrite;
+	}
 
 	public Boolean getFuzzyTranspositions() {
 		return _fuzzyTranspositions;
@@ -92,6 +121,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 
 	public Integer getMaxDeterminedStates() {
 		return _maxDeterminedStates;
+	}
+
+	public String getMinimumShouldMatch() {
+		return _minimumShouldMatch;
 	}
 
 	public Integer getPhraseSlop() {
@@ -112,6 +145,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 
 	public String getRewrite() {
 		return _rewrite;
+	}
+
+	public Float getTieBreaker() {
+		return _tieBreaker;
 	}
 
 	public String getTimeZone() {
@@ -147,6 +184,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 	public void setEnablePositionIncrements(Boolean enablePositionIncrements) {
 		_enablePositionIncrements = enablePositionIncrements;
 	}
+	
+	public void setEscape(boolean escape) {
+		_escape = escape;
+	}
 
 	public void setFuzziness(Float fuzziness) {
 		_fuzziness = fuzziness;
@@ -158,6 +199,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 
 	public void setFuzzyPrefixLength(Integer fuzzyPrefixLength) {
 		_fuzzyPrefixLength = fuzzyPrefixLength;
+	}
+
+	public void setFuzzyRewrite(String fuzzyRewrite) {
+		_fuzzyRewrite = fuzzyRewrite;
 	}
 
 	public void setFuzzyTranspositions(Boolean fuzzyTranspositions) {
@@ -172,6 +217,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 		_maxDeterminedStates = maxDeterminedStates;
 	}
 
+	public void setMinimumShouldMatch(String minimumShouldMatch) {
+		_minimumShouldMatch = minimumShouldMatch;
+	}
+	
 	public void setPhraseSlop(Integer phraseSlop) {
 		_phraseSlop = phraseSlop;
 	}
@@ -187,6 +236,10 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 	public void setRewrite(String rewrite) {
 		_rewrite = rewrite;
 	}
+	
+	public void setTieBreaker(float tieBreaker) {
+		_tieBreaker = tieBreaker;
+	}	
 
 	public void setTimeZone(String timeZone) {
 		_timeZone = timeZone;
@@ -218,17 +271,21 @@ public class StringQueryImpl extends BaseQueryImpl implements StringQuery {
 	private String _defaultField;
 	private Operator _defaultOperator;
 	private Boolean _enablePositionIncrements;
+	private Boolean _escape;
+	private Map<String, Float> _fieldsBoosts = new HashMap<String, Float>();
 	private Float _fuzziness;
 	private Integer _fuzzyMaxExpansions;
 	private Integer _fuzzyPrefixLength;
+	private String _fuzzyRewrite;
 	private Boolean _fuzzyTranspositions;
 	private Boolean _lenient;
 	private Integer _maxDeterminedStates;
+	private String _minimumShouldMatch;
 	private Integer _phraseSlop;
 	private final String _query;
 	private String _quoteAnalyzer;
 	private String _quoteFieldSuffix;
 	private String _rewrite;
+	private Float _tieBreaker;
 	private String _timeZone;
-
 }
