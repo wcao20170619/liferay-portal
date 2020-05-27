@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
+import java.util.concurrent.TimeUnit;
+
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.search.elasticsearch7.internal.sidecar.Sidecar;
 
@@ -31,15 +33,21 @@ public class SidecarElasticsearchConnection
 
 	@Override
 	public void close() {
-		super.close();
-
+		super.close();	
+		
 		_sidecar.stop();
 	}
 
 	@Override
 	public void connect() {
 		_sidecar.start();
-
+		
+//		try {
+//			TimeUnit.SECONDS.sleep(10);
+//		} catch (InterruptedException e) {
+//			
+//		}
+		
 		super.connect();
 	}
 
@@ -73,6 +81,7 @@ public class SidecarElasticsearchConnection
 	}
 
 	protected String getHttpPort(String address) {
+		System.out.println("address = " + address);
 		return address.substring(address.indexOf(CharPool.COLON) + 1);
 	}
 

@@ -304,24 +304,49 @@ public class Sidecar {
 
 	protected Settings getSettings() {
 		if (true) {
-			return ElasticsearchInstanceSettingsBuilder.builder(
-			).clusterName(
-				getClusterName()
-			).elasticsearchConfiguration(
-				_elasticsearchConfiguration
-			).elasticsearchInstancePaths(
-				_elasticsearchInstancePaths
-			).httpPort(
-				getHttpPort()
-			).clusterInitialMasterNodes(
-				getNodeName()
-			).localBindInetAddressSupplier(
-				_clusterSettingsContext::getLocalBindInetAddress
-			).nodeName(
-				getNodeName()
-			).settingsContributors(
-				_settingsContributors
-			).build();
+//			return ElasticsearchInstanceSettingsBuilder.builder(	
+//			).clusterName(
+//				getClusterName()
+//			).elasticsearchConfiguration(
+//				_elasticsearchConfiguration
+//			).elasticsearchInstancePaths(
+//				_elasticsearchInstancePaths
+//			).httpPort(
+//				getHttpPort()
+//			).clusterInitialMasterNodes(
+//				getNodeName()
+//			).localBindInetAddressSupplier(
+//				_clusterSettingsContext::getLocalBindInetAddress
+//			).nodeName(
+//				getNodeName()
+//			).settingsContributors(
+//				_settingsContributors
+//			).build();
+			
+			Settings settings = ElasticsearchInstanceSettingsBuilder.builder(	
+					).clusterName(
+						"myCluster"
+					).elasticsearchConfiguration(
+						_elasticsearchConfiguration
+					).elasticsearchInstancePaths(
+						_elasticsearchInstancePaths
+					).httpPort(
+						getHttpPort()
+					).clusterInitialMasterNodes(
+						getNodeName()
+					).localBindInetAddressSupplier(
+						_clusterSettingsContext::getLocalBindInetAddress
+					).nodeName(
+						getNodeName()
+					).settingsContributors(
+						_settingsContributors
+					).build();
+			
+			Settings.Builder builder = settings.builder();
+			
+			builder.put("path.logs", _logsPath.toString());
+			
+			return settings;
 		}
 
 		SettingsBuilder settingsBuilder = new SettingsBuilder(
@@ -421,6 +446,7 @@ public class Sidecar {
 
 		processConfigBuilder.setProcessLogConsumer(
 			processLog -> {
+		
 				if (ProcessLog.Level.DEBUG == processLog.getLevel()) {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
@@ -489,7 +515,9 @@ public class Sidecar {
 					"logger.deprecation.name=org.elasticsearch.deprecation",
 					"logger.deprecation.level=error", getLogProperties(),
 					ResourceUtil.getResourceAsString(
-						Sidecar.class, "/log4j2.properties")));
+							Sidecar.class, "/log4j2.properties"),
+					ResourceUtil.getResourceAsString(
+						Sidecar.class, "/log4j2-es.properties")));
 		}
 		catch (IOException ioException) {
 			_log.error(
