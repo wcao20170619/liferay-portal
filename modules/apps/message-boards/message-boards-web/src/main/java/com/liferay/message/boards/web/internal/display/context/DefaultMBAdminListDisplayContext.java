@@ -28,12 +28,14 @@ import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.RelatedEntryIndexer;
+import com.liferay.portal.kernel.search.RelatedEntryIndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchContextFactory;
 import com.liferay.portal.kernel.search.SearchResultUtil;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -44,8 +46,10 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,10 +63,11 @@ public class DefaultMBAdminListDisplayContext
 
 	public DefaultMBAdminListDisplayContext(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, long categoryId) {
+		HttpServletResponse httpServletResponse,
+		FacetedSearcherManager facetedSearcherManager, long categoryId) {
 
 		_httpServletRequest = httpServletRequest;
-
+		_facetedSearcherManager = facetedSearcherManager;
 		_categoryId = categoryId;
 	}
 
@@ -123,9 +128,6 @@ public class DefaultMBAdminListDisplayContext
 			long[] categoryIdsArray = StringUtil.split(
 				StringUtil.merge(categoryIds), 0L);
 
-			Indexer<MBMessage> indexer = IndexerRegistryUtil.getIndexer(
-				MBMessage.class);
-
 			SearchContext searchContext = SearchContextFactory.getInstance(
 				_httpServletRequest);
 
@@ -165,7 +167,31 @@ public class DefaultMBAdminListDisplayContext
 
 			searchContext.setStart(searchContainer.getStart());
 
-			Hits hits = indexer.search(searchContext);
+			Set<String> entryClassNames = new HashSet<>();
+
+			for (RelatedEntryIndexer relatedEntryIndexer :
+					RelatedEntryIndexerRegistryUtil.getRelatedEntryIndexers()) {
+
+				relatedEntryIndexer.updateFullQuery(searchContext);
+			}
+
+			for (String entryClassName :
+					searchContext.getFullQueryEntryClassNames()) {
+
+				entryClassNames.add(entryClassName);
+			}
+
+			entryClassNames.add(MBMessage.class.getName());
+
+			String[] entryClassNamesArray = entryClassNames.toArray(
+				new String[0]);
+
+			searchContext.setEntryClassNames(entryClassNamesArray);
+
+			FacetedSearcher facetedSearcher =
+				_facetedSearcherManager.createFacetedSearcher();
+
+			Hits hits = facetedSearcher.search(searchContext);
 
 			searchContainer.setResults(
 				SearchResultUtil.getSearchResults(
@@ -283,6 +309,7 @@ public class DefaultMBAdminListDisplayContext
 		"f3efa0bd-ca31-43c5-bdfe-164ee683b39e");
 
 	private final long _categoryId;
+	private final FacetedSearcherManager _facetedSearcherManager;
 	private final HttpServletRequest _httpServletRequest;
 
 }

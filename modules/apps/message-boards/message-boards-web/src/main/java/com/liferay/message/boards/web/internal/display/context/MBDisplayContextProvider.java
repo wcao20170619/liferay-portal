@@ -18,6 +18,7 @@ import com.liferay.message.boards.display.context.MBAdminListDisplayContext;
 import com.liferay.message.boards.display.context.MBDisplayContextFactory;
 import com.liferay.message.boards.display.context.MBHomeDisplayContext;
 import com.liferay.message.boards.display.context.MBListDisplayContext;
+import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManager;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -45,7 +46,8 @@ public class MBDisplayContextProvider {
 
 		MBAdminListDisplayContext mbAdminListDisplayContext =
 			new DefaultMBAdminListDisplayContext(
-				httpServletRequest, httpServletResponse, categoryId);
+				httpServletRequest, httpServletResponse,
+				_facetedSearcherManager, categoryId);
 
 		for (MBDisplayContextFactory mbDisplayContextFactory :
 				_mbDisplayContextFactories) {
@@ -118,6 +120,9 @@ public class MBDisplayContextProvider {
 
 		_mbDisplayContextFactories.remove(mbDisplayContextFactory);
 	}
+
+	@Reference
+	private FacetedSearcherManager _facetedSearcherManager;
 
 	private final List<MBDisplayContextFactory> _mbDisplayContextFactories =
 		new CopyOnWriteArrayList<>();
