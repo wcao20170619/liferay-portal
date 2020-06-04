@@ -119,6 +119,12 @@ public class Sidecar {
 		String sidecarLibClassPath = _createClasspath(
 			_sidecarHomePath.resolve("lib"), path -> true);
 
+		if (!ElasticsearchInstallUtil.isElasticsearchInstalled(
+				sidecarLibClassPath)) {
+
+			ElasticsearchInstallUtil.downloadAndInstall(_sidecarHomePath);
+		}
+
 		try {
 			_processChannel = _processExecutor.execute(
 				_createProcessConfig(sidecarLibClassPath),
