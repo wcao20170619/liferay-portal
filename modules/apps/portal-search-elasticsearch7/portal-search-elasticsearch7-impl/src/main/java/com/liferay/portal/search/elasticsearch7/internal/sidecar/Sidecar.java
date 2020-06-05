@@ -116,6 +116,8 @@ public class Sidecar {
 			_log.info("Starting sidecar Elasticsearch");
 		}
 
+		_verifyElasticsearchInstallation(_sidecarHomePath.toString());
+
 		String sidecarLibClassPath = _createClasspath(
 			_sidecarHomePath.resolve("lib"), path -> true);
 
@@ -480,6 +482,12 @@ public class Sidecar {
 		}
 
 		return arguments.toArray(new String[0]);
+	}
+
+	private void _verifyElasticsearchInstallation(String sidecarHome) {
+		if (!ElasticsearchInstallUtil.isElasticsearchInstalled(sidecarHome)) {
+			ElasticsearchInstallUtil.downloadAndInstall(sidecarHome);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(Sidecar.class);
