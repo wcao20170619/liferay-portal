@@ -100,6 +100,11 @@ public interface ElasticsearchConfiguration {
 	public String clusterName();
 
 	@Meta.AD(
+		description = "node-name-help", name = "node-name", required = false
+	)
+	public String nodeName();
+
+	@Meta.AD(
 		deflt = "false", description = "bootstrap-mlockall-help",
 		name = "bootstrap-mlockall", required = false
 	)
@@ -117,8 +122,8 @@ public interface ElasticsearchConfiguration {
 	public int embeddedHttpPort();
 
 	@Meta.AD(
-		deflt = "9200-9300", description = "sidecar-http-port-help",
-		name = "sidecar-http-port", required = false
+		description = "sidecar-http-port-help", name = "sidecar-http-port",
+		required = false
 	)
 	public String sidecarHttpPort();
 
