@@ -26,12 +26,15 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstancePaths;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstanceSettingsBuilder;
+import com.liferay.portal.search.elasticsearch7.internal.connection.HttpPortRange;
 import com.liferay.portal.search.elasticsearch7.internal.util.ResourceUtil;
 import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
@@ -70,7 +73,7 @@ public class Sidecar {
 	public Sidecar(
 		ClusterSettingsContext clusterSettingsContext,
 		ElasticsearchConfiguration elasticsearchConfiguration,
-		ElasticsearchInstancePaths elasticsearchInstancePaths, String httpPort,
+		ElasticsearchInstancePaths elasticsearchInstancePaths,
 		ProcessExecutor processExecutor,
 		ProcessExecutorPaths processExecutorPaths,
 		Collection<SettingsContributor> settingsContributors) {
@@ -79,7 +82,6 @@ public class Sidecar {
 		_dataHomePath = elasticsearchInstancePaths.getDataPath();
 		_elasticsearchConfiguration = elasticsearchConfiguration;
 		_elasticsearchInstancePaths = elasticsearchInstancePaths;
-		_httpPort = httpPort;
 		_indicesPath = elasticsearchInstancePaths.getIndicesPath();
 		_processExecutor = processExecutor;
 		_processExecutorPaths = processExecutorPaths;
@@ -242,26 +244,13 @@ public class Sidecar {
 		).build();
 	}
 
-	protected String getHttpPort() {
-		if (!Validator.isBlank(_httpPort)) {
-			return _httpPort;
-		}
-
-		if (!Validator.isBlank(_elasticsearchConfiguration.sidecarHttpPort())) {
-			return _elasticsearchConfiguration.sidecarHttpPort();
-		}
-
-		int embeddedHttpPort = _elasticsearchConfiguration.embeddedHttpPort();
-
-		return embeddedHttpPort + StringPool.DASH + embeddedHttpPort;
-	}
-
 	protected String getLogProperties() {
 		return StringPool.BLANK;
 	}
 
 	protected String getNodeName() {
-		return "liferay";
+		return GetterUtil.getString(
+			_elasticsearchConfiguration.nodeName(), "liferay");
 	}
 
 	protected Path getPathData() {
@@ -279,14 +268,14 @@ public class Sidecar {
 		return ElasticsearchInstanceSettingsBuilder.builder(
 		).clusterName(
 			getClusterName()
+		).discoveryTypeSingleNode(
+			true
 		).elasticsearchConfiguration(
 			_elasticsearchConfiguration
 		).elasticsearchInstancePaths(
 			_elasticsearchInstancePaths
-		).httpPort(
-			getHttpPort()
-		).clusterInitialMasterNodes(
-			getNodeName()
+		).httpPortRange(
+			new HttpPortRange(_elasticsearchConfiguration)
 		).localBindInetAddressSupplier(
 			_clusterSettingsContext::getLocalBindInetAddress
 		).nodeName(
@@ -459,11 +448,11 @@ public class Sidecar {
 		for (String key : settings.keySet()) {
 			arguments.add("-E");
 
-			String value = settings.get(key);
+			List<String> list = settings.getAsList(key);
 
-			if (Validator.isNotNull(value)) {
+			if (!ListUtil.isEmpty(list)) {
 				String keyValue = StringBundler.concat(
-					key, StringPool.EQUAL, value);
+					key, StringPool.EQUAL, StringUtil.merge(list));
 
 				arguments.add(keyValue);
 
@@ -490,7 +479,6 @@ public class Sidecar {
 	private final Path _dataHomePath;
 	private final ElasticsearchConfiguration _elasticsearchConfiguration;
 	private final ElasticsearchInstancePaths _elasticsearchInstancePaths;
-	private final String _httpPort;
 	private final Path _indicesPath;
 	private ProcessChannel<Serializable> _processChannel;
 	private final ProcessExecutor _processExecutor;
