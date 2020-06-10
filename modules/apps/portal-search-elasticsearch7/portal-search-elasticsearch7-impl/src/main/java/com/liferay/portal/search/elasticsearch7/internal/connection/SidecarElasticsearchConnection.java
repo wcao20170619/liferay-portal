@@ -70,8 +70,8 @@ public class SidecarElasticsearchConnection
 		return RestHighLevelClientFactory.builder(
 		).hostName(
 			"localhost"
-		).portRange(
-			getHttpPort(_sidecar.getNetworkHostAddress())
+		).httpPortRange(
+			new HttpPortRange(getHttpPort(_sidecar.getNetworkHostAddress()))
 		).scheme(
 			"http"
 		).build(

@@ -160,8 +160,6 @@ public class EmbeddedElasticsearchConnection
 		elasticsearchConfiguration = ConfigurableUtil.createConfigurable(
 			ElasticsearchConfiguration.class, properties);
 
-		_httpPort = (String)properties.get("sidecarHttpPort");
-
 		java.io.File tempDir = bundleContext.getDataFile(JNA_TMP_DIR);
 
 		_jnaTmpDirName = tempDir.getAbsolutePath();
@@ -233,10 +231,10 @@ public class EmbeddedElasticsearchConnection
 			getClusterName()
 		).hostName(
 			"localhost"
+		).httpPortRange(
+			new HttpPortRange(elasticsearchConfiguration)
 		).nodeName(
 			getNodeName()
-		).portRange(
-			getHttpPort()
 		).scheme(
 			"http"
 		).build(
@@ -262,14 +260,9 @@ public class EmbeddedElasticsearchConnection
 		).build();
 	}
 
-	protected String getHttpPort() {
-		return GetterUtil.getString(
-			_httpPort,
-			String.valueOf(elasticsearchConfiguration.embeddedHttpPort()));
-	}
-
 	protected String getNodeName() {
-		return "liferay";
+		return GetterUtil.getString(
+			elasticsearchConfiguration.nodeName(), "liferay");
 	}
 
 	protected void installPlugin(String name, Settings settings) {
@@ -348,8 +341,8 @@ public class EmbeddedElasticsearchConnection
 			elasticsearchConfiguration
 		).elasticsearchInstancePaths(
 			getElasticsearchInstancePaths()
-		).httpPort(
-			getHttpPort()
+		).httpPortRange(
+			new HttpPortRange(elasticsearchConfiguration)
 		).localBindInetAddressSupplier(
 			clusterSettingsContext::getLocalBindInetAddress
 		).nodeName(
@@ -420,7 +413,6 @@ public class EmbeddedElasticsearchConnection
 	@Reference
 	private File _file;
 
-	private String _httpPort;
 	private Node _node;
 	private final Set<SettingsContributor> _settingsContributors =
 		new ConcurrentSkipListSet<>();

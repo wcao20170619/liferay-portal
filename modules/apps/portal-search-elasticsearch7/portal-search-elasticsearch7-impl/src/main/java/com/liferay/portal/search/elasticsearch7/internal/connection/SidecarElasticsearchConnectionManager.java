@@ -143,7 +143,7 @@ public class SidecarElasticsearchConnectionManager {
 					elasticsearchConfiguration.restClientLoggerLevel(),
 					new Sidecar(
 						_clusterSettingsContext, elasticsearchConfiguration,
-						elasticsearchInstancePaths, null, _processExecutor,
+						elasticsearchInstancePaths, _processExecutor,
 						new ProcessExecutorPathsImpl(_props),
 						_settingsContributors));
 			}

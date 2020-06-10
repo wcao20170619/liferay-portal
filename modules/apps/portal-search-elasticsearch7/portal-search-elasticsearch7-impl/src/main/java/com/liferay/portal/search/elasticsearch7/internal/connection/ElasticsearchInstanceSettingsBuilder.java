@@ -76,6 +76,14 @@ public class ElasticsearchInstanceSettingsBuilder {
 		return this;
 	}
 
+	public ElasticsearchInstanceSettingsBuilder discoveryTypeSingleNode(
+		boolean discoveryTypeSingleNode) {
+
+		_discoveryTypeSingleNode = discoveryTypeSingleNode;
+
+		return this;
+	}
+
 	public ElasticsearchInstanceSettingsBuilder elasticsearchConfiguration(
 		ElasticsearchConfiguration elasticsearchConfiguration) {
 
@@ -92,8 +100,10 @@ public class ElasticsearchInstanceSettingsBuilder {
 		return this;
 	}
 
-	public ElasticsearchInstanceSettingsBuilder httpPort(String httpPort) {
-		_httpPort = httpPort;
+	public ElasticsearchInstanceSettingsBuilder httpPortRange(
+		HttpPortRange httpPortRange) {
+
+		_httpPortRange = httpPortRange;
 
 		return this;
 	}
@@ -136,13 +146,21 @@ public class ElasticsearchInstanceSettingsBuilder {
 		put("cluster.name", _clusterName);
 		put("cluster.routing.allocation.disk.threshold_enabled", false);
 
-		if (Validator.isBlank(_clusterInitialMasterNodes)) {
+		if (!Validator.isBlank(_clusterInitialMasterNodes)) {
+			put("cluster.initial_master_nodes", _clusterInitialMasterNodes);
+		}
+
+		if (!Validator.isBlank(_discoverySeedHosts)) {
+			put("discovery.seed_hosts", _discoverySeedHosts);
+		}
+
+		if (_discoveryTypeSingleNode) {
 			put("discovery.type", "single-node");
 		}
 	}
 
 	protected void configureHttp() {
-		put("http.port", _httpPort);
+		put("http.port", _httpPortRange.toSettingsString());
 
 		put("http.cors.enabled", _elasticsearchConfiguration.httpCORSEnabled());
 
@@ -196,7 +214,7 @@ public class ElasticsearchInstanceSettingsBuilder {
 			_elasticsearchConfiguration.transportTcpPort();
 
 		if (Validator.isNotNull(transportTcpPort)) {
-			put("transport.tcp.port", transportTcpPort);
+			put("transport.port", transportTcpPort);
 		}
 
 		put("transport.type", "netty4");
@@ -303,14 +321,6 @@ public class ElasticsearchInstanceSettingsBuilder {
 	protected void loadSidecarConfigurations() {
 		put("bootstrap.system_call_filter", false);
 		put("node.store.allow_mmap", false);
-
-		if (!Validator.isBlank(_clusterInitialMasterNodes)) {
-			put("cluster.initial_master_nodes", _clusterInitialMasterNodes);
-		}
-
-		if (!Validator.isBlank(_discoverySeedHosts)) {
-			put("discovery.seed_hosts", _discoverySeedHosts);
-		}
 	}
 
 	protected void put(String key, boolean value) {
@@ -324,9 +334,10 @@ public class ElasticsearchInstanceSettingsBuilder {
 	private String _clusterInitialMasterNodes;
 	private String _clusterName;
 	private String _discoverySeedHosts;
+	private boolean _discoveryTypeSingleNode;
 	private ElasticsearchConfiguration _elasticsearchConfiguration;
 	private ElasticsearchInstancePaths _elasticsearchInstancePaths;
-	private String _httpPort;
+	private HttpPortRange _httpPortRange;
 	private Supplier<InetAddress> _localBindInetAddressSupplier;
 	private String _networkHost;
 	private String _nodeName;

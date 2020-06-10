@@ -69,17 +69,17 @@ public class RestHighLevelClientFactory {
 			return this;
 		}
 
-		public Builder nodeName(String nodeName) {
-			_restHighLevelClientFactory._nodeName = nodeName;
+		public Builder httpPortRange(HttpPortRange httpPortRange) {
+			int[] ports = getPorts(httpPortRange.toSettingsString());
+
+			_restHighLevelClientFactory._portFrom = ports[0];
+			_restHighLevelClientFactory._portTo = ports[1];
 
 			return this;
 		}
 
-		public Builder portRange(String portRange) {
-			int[] ports = getPorts(portRange);
-
-			_restHighLevelClientFactory._portFrom = ports[0];
-			_restHighLevelClientFactory._portTo = ports[1];
+		public Builder nodeName(String nodeName) {
+			_restHighLevelClientFactory._nodeName = nodeName;
 
 			return this;
 		}
