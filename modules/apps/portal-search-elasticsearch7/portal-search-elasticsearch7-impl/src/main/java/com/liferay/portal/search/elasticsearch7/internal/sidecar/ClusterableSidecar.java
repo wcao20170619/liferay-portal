@@ -42,6 +42,7 @@ import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfi
 import com.liferay.portal.search.elasticsearch7.internal.cluster.ClusterSettingsContext;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstancePaths;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchInstanceSettingsBuilder;
+import com.liferay.portal.search.elasticsearch7.internal.connection.HttpPortRange;
 import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 
 import java.io.IOException;
@@ -98,8 +99,8 @@ public class ClusterableSidecar
 
 		super(
 			clusterSettingsContext, elasticsearchConfiguration,
-			elasticsearchInstancePaths, null, processExecutor,
-			processExecutorPaths, settingsContributors);
+			elasticsearchInstancePaths, processExecutor, processExecutorPaths,
+			settingsContributors);
 
 		_clusterExecutor = clusterExecutor;
 		_clusterMasterExecutor = clusterMasterExecutor;
@@ -239,8 +240,8 @@ public class ClusterableSidecar
 			_elasticsearchConfiguration
 		).elasticsearchInstancePaths(
 			_elasticsearchInstancePaths
-		).httpPort(
-			getHttpPort()
+		).httpPortRange(
+			new HttpPortRange(_elasticsearchConfiguration)
 		).networkHost(
 			getLocalClusterNodeNetworkHost()
 		).nodeName(
