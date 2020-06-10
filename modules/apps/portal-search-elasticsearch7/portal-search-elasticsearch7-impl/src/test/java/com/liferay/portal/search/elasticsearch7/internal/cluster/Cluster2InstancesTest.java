@@ -22,7 +22,6 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,26 +34,16 @@ public class Cluster2InstancesTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(ClusterAssert.isClusterTestingEnabled());
-
-		_testCluster.setUp();
+		_testCluster.createNodes();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		_testCluster.tearDown();
+		_testCluster.destroyNodes();
 	}
 
 	@Test
 	public void test2Nodes1PrimaryShard() throws Exception {
-		ElasticsearchConnectionFixture elasticsearchConnectionFixture0 =
-			_testCluster.getNode(0);
-
-		createIndex(elasticsearchConnectionFixture0);
-
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(
-			elasticsearchConnectionFixture0);
-
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture1 =
 			_testCluster.getNode(1);
 
@@ -62,31 +51,39 @@ public class Cluster2InstancesTest {
 
 		ClusterAssert.assert1PrimaryShardAnd2Nodes(
 			elasticsearchConnectionFixture1);
+
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture2 =
+			_testCluster.getNode(2);
+
+		createIndex(elasticsearchConnectionFixture2);
+
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture2);
 	}
 
 	@Test
 	public void testExpandAndShrink() throws Exception {
-		ElasticsearchConnectionFixture elasticsearchConnectionFixture0 =
-			_testCluster.getNode(0);
-
-		Index index0 = createIndex(elasticsearchConnectionFixture0);
-
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture1 =
 			_testCluster.getNode(1);
 
 		Index index1 = createIndex(elasticsearchConnectionFixture1);
 
-		updateNumberOfReplicas(1, index1, elasticsearchConnectionFixture1);
+		ElasticsearchConnectionFixture elasticsearchConnectionFixture2 =
+			_testCluster.getNode(2);
 
-		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture0);
+		Index index2 = createIndex(elasticsearchConnectionFixture2);
+
+		updateNumberOfReplicas(1, index2, elasticsearchConnectionFixture2);
+
 		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture1);
+		ClusterAssert.assert1ReplicaShard(elasticsearchConnectionFixture2);
 
-		updateNumberOfReplicas(0, index0, elasticsearchConnectionFixture0);
+		updateNumberOfReplicas(0, index1, elasticsearchConnectionFixture1);
 
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(
-			elasticsearchConnectionFixture0);
 		ClusterAssert.assert1PrimaryShardAnd2Nodes(
 			elasticsearchConnectionFixture1);
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(
+			elasticsearchConnectionFixture2);
 	}
 
 	@Rule

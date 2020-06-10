@@ -19,15 +19,16 @@ import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionFixture;
+import com.liferay.portal.search.elasticsearch7.internal.connection.HealthExpectations;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexCreator;
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 
 import java.util.Collections;
 
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,8 +45,6 @@ public class ReplicasManagerImplTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Assume.assumeTrue(ClusterAssert.isClusterTestingEnabled());
-
 		MockitoAnnotations.initMocks(this);
 
 		_replicasClusterContext = createReplicasClusterContext();
@@ -64,19 +63,7 @@ public class ReplicasManagerImplTest {
 
 		setUpCompanyLocalService(companyId);
 
-		ElasticsearchConnectionFixture elasticsearchFixture0 = createNode(0);
-
-		IndexCreator indexCreator0 = new IndexCreator() {
-			{
-				setElasticsearchClientResolver(elasticsearchFixture0);
-			}
-		};
-
-		indexCreator0.createIndex(getTestIndexName(CompanyConstants.SYSTEM));
-
 		ElasticsearchConnectionFixture elasticsearchFixture1 = createNode(1);
-
-		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture0);
 
 		IndexCreator indexCreator1 = new IndexCreator() {
 			{
@@ -84,12 +71,24 @@ public class ReplicasManagerImplTest {
 			}
 		};
 
-		indexCreator1.createIndex(getTestIndexName(companyId));
+		indexCreator1.createIndex(getTestIndexName(CompanyConstants.SYSTEM));
 
-		ClusterAssert.assert2PrimaryShardsAnd2Nodes(elasticsearchFixture1);
+		ElasticsearchConnectionFixture elasticsearchFixture2 = createNode(2);
+
+		ClusterAssert.assert1PrimaryShardAnd2Nodes(elasticsearchFixture1);
+
+		IndexCreator indexCreator2 = new IndexCreator() {
+			{
+				setElasticsearchClientResolver(elasticsearchFixture2);
+			}
+		};
+
+		indexCreator2.createIndex(getTestIndexName(companyId));
+
+		ClusterAssert.assert2PrimaryShardsAnd2Nodes(elasticsearchFixture2);
 
 		RestHighLevelClient restHighLevelClient =
-			elasticsearchFixture0.getRestHighLevelClient();
+			elasticsearchFixture1.getRestHighLevelClient();
 
 		ReplicasManager replicasManager = new ReplicasManagerImpl(
 			restHighLevelClient.indices());
@@ -98,23 +97,34 @@ public class ReplicasManagerImplTest {
 			1, _replicasClusterContext.getTargetIndexNames());
 
 		ClusterAssert.assert2PrimaryShards1ReplicaAnd2Nodes(
-			elasticsearchFixture0);
-
-		_testCluster.destroyNode(0);
-
-		ClusterAssert.assert2Primary2UnassignedShardsAnd1Node(
 			elasticsearchFixture1);
+
+		createNode(3);
+		createNode(4);
+
+		_testCluster.destroyNode(1);
+
+		ClusterAssert.assertHealth(
+			elasticsearchFixture2,
+			new HealthExpectations() {
+				{
+					setActivePrimaryShards(2);
+					setActiveShards(3);
+					setNumberOfDataNodes(3);
+					setNumberOfNodes(3);
+					setStatus(ClusterHealthStatus.YELLOW);
+					setUnassignedShards(1);
+				}
+			});
 	}
 
 	@Rule
 	public TestName testName = new TestName();
 
-	protected ElasticsearchConnectionFixture createNode(int index)
-		throws Exception {
+	protected ElasticsearchConnectionFixture createNode(int number) {
+		_testCluster.createNode(number);
 
-		_testCluster.createNode(index);
-
-		return _testCluster.getNode(index);
+		return _testCluster.getNode(number);
 	}
 
 	protected ReplicasClusterContext createReplicasClusterContext() {
@@ -155,6 +165,6 @@ public class ReplicasManagerImplTest {
 	private CompanyLocalService _companyLocalService;
 
 	private ReplicasClusterContext _replicasClusterContext;
-	private final TestCluster _testCluster = new TestCluster(2, this);
+	private final TestCluster _testCluster = new TestCluster(4, this);
 
 }

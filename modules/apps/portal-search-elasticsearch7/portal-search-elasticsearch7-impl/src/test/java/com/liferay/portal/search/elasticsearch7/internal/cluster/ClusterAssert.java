@@ -31,24 +31,6 @@ import org.junit.Assert;
  */
 public class ClusterAssert {
 
-	public static void assert1PrimaryAnd1UnassignedShard(
-			ElasticsearchClientResolver elasticsearchClientResolver)
-		throws Exception {
-
-		assertHealth(
-			elasticsearchClientResolver,
-			new HealthExpectations() {
-				{
-					setActivePrimaryShards(1);
-					setActiveShards(1);
-					setNumberOfDataNodes(1);
-					setNumberOfNodes(1);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(1);
-				}
-			});
-	}
-
 	public static void assert1PrimaryShardAnd2Nodes(
 			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
@@ -85,24 +67,6 @@ public class ClusterAssert {
 			});
 	}
 
-	public static void assert1ReplicaAnd1UnassignedShard(
-			ElasticsearchClientResolver elasticsearchClientResolver)
-		throws Exception {
-
-		assertHealth(
-			elasticsearchClientResolver,
-			new HealthExpectations() {
-				{
-					setActivePrimaryShards(1);
-					setActiveShards(2);
-					setNumberOfDataNodes(2);
-					setNumberOfNodes(2);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(1);
-				}
-			});
-	}
-
 	public static void assert1ReplicaShard(
 			ElasticsearchClientResolver elasticsearchClientResolver)
 		throws Exception {
@@ -117,24 +81,6 @@ public class ClusterAssert {
 					setNumberOfNodes(2);
 					setStatus(ClusterHealthStatus.GREEN);
 					setUnassignedShards(0);
-				}
-			});
-	}
-
-	public static void assert2Primary2UnassignedShardsAnd1Node(
-			ElasticsearchClientResolver elasticsearchClientResolver)
-		throws Exception {
-
-		assertHealth(
-			elasticsearchClientResolver,
-			new HealthExpectations() {
-				{
-					setActivePrimaryShards(2);
-					setActiveShards(2);
-					setNumberOfDataNodes(1);
-					setNumberOfNodes(1);
-					setStatus(ClusterHealthStatus.YELLOW);
-					setUnassignedShards(2);
 				}
 			});
 	}
@@ -199,7 +145,7 @@ public class ClusterAssert {
 		throws Exception {
 
 		IdempotentRetryAssert.retryAssert(
-			10, TimeUnit.MINUTES,
+			25, TimeUnit.SECONDS,
 			() -> {
 				_assertHealth(
 					ClusterHealthResponseUtil.getClusterHealthResponse(
@@ -208,10 +154,6 @@ public class ClusterAssert {
 
 				return null;
 			});
-	}
-
-	public static boolean isClusterTestingEnabled() {
-		return false;
 	}
 
 	private static void _assertHealth(

@@ -43,7 +43,7 @@ public class Cluster1InstanceTest {
 	@Test
 	public void test1PrimaryShardByDefault() throws Exception {
 		ElasticsearchConnectionFixture elasticsearchConnectionFixture =
-			_testCluster.getNode(0);
+			_testCluster.getNode(1);
 
 		createIndex(elasticsearchConnectionFixture);
 
