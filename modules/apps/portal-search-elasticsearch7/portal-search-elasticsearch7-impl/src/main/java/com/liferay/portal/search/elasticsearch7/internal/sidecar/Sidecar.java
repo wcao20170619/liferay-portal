@@ -90,26 +90,6 @@ public class Sidecar {
 	}
 
 	public String getNetworkHostAddress() {
-		if (_address == null) {
-			try {
-				_address = _addressNoticeableFuture.get();
-
-				if (_log.isInfoEnabled()) {
-					_log.info(
-						StringBundler.concat(
-							"Sidecar Elasticsearch ", getNodeName(), " is at ",
-							_address));
-				}
-			}
-			catch (Exception exception) {
-				_processChannel.write(new StopSidecarProcessCallable());
-
-				throw new IllegalStateException(
-					"Unable to get sidecar Elasticsearch network host address",
-					exception);
-			}
-		}
-
 		return _address;
 	}
 
@@ -118,31 +98,25 @@ public class Sidecar {
 			_log.info("Starting sidecar Elasticsearch");
 		}
 
-		String sidecarLibClassPath = _createClasspath(
-			_sidecarHomePath.resolve("lib"), path -> true);
+		ProcessChannel processChannel = executeSidecarMainProcess();
 
-		try {
-			_processChannel = _processExecutor.execute(
-				_createProcessConfig(sidecarLibClassPath),
-				new SidecarMainProcessCallable(
-					_elasticsearchConfiguration.sidecarHeartbeatInterval(),
-					_getModifiedClasses(sidecarLibClassPath)));
+		FutureListener<Serializable> futureListener =
+			new RestartFutureListener();
+
+		addFutureListener(processChannel, futureListener);
+
+		String address = startElasticsearch(processChannel);
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Sidecar Elasticsearch ", getNodeName(), " is at ",
+					address));
 		}
-		catch (ProcessException processException) {
-			throw new RuntimeException(
-				"Unable to start sidecar Elasticsearch process",
-				processException);
-		}
 
-		NoticeableFuture<Serializable> noticeableFuture =
-			_processChannel.getProcessNoticeableFuture();
-
-		_restartFutureListener = new RestartFutureListener();
-
-		noticeableFuture.addFutureListener(_restartFutureListener);
-
-		_addressNoticeableFuture = _processChannel.write(
-			new StartSidecarProcessCallable(_getSidecarArguments()));
+		_address = address;
+		_processChannel = processChannel;
+		_restartFutureListener = futureListener;
 	}
 
 	public void stop() {
@@ -183,6 +157,16 @@ public class Sidecar {
 		_processChannel = null;
 	}
 
+	protected static void addFutureListener(
+		ProcessChannel processChannel,
+		FutureListener<Serializable> futureListener) {
+
+		NoticeableFuture<Serializable> noticeableFuture =
+			processChannel.getProcessNoticeableFuture();
+
+		noticeableFuture.addFutureListener(futureListener);
+	}
+
 	protected static boolean fileNameContains(Path path, String s) {
 		String name = String.valueOf(path.getFileName());
 
@@ -191,6 +175,22 @@ public class Sidecar {
 		}
 
 		return false;
+	}
+
+	protected static String waitForPublishedAddress(
+		NoticeableFuture<String> noticeableFuture,
+		ProcessChannel processChannel) {
+
+		try {
+			return noticeableFuture.get();
+		}
+		catch (Exception exception) {
+			processChannel.write(new StopSidecarProcessCallable());
+
+			throw new IllegalStateException(
+				"Unable to get sidecar Elasticsearch network host address",
+				exception);
+		}
 	}
 
 	protected void consumeProcessLog(ProcessLog processLog) {
@@ -211,6 +211,24 @@ public class Sidecar {
 		}
 		else {
 			_log.error(processLog.getMessage(), processLog.getThrowable());
+		}
+	}
+
+	protected ProcessChannel executeSidecarMainProcess() {
+		String sidecarLibClassPath = _createClasspath(
+			_sidecarHomePath.resolve("lib"), path -> true);
+
+		try {
+			return _processExecutor.execute(
+				_createProcessConfig(sidecarLibClassPath),
+				new SidecarMainProcessCallable(
+					_elasticsearchConfiguration.sidecarHeartbeatInterval(),
+					_getModifiedClasses(sidecarLibClassPath)));
+		}
+		catch (ProcessException processException) {
+			throw new RuntimeException(
+				"Unable to start sidecar Elasticsearch process",
+				processException);
 		}
 	}
 
@@ -283,6 +301,13 @@ public class Sidecar {
 		).settingsContributors(
 			_settingsContributors
 		).build();
+	}
+
+	protected String startElasticsearch(ProcessChannel processChannel) {
+		NoticeableFuture<String> noticeableFuture = processChannel.write(
+			new StartSidecarProcessCallable(_getSidecarArguments()));
+
+		return waitForPublishedAddress(noticeableFuture, processChannel);
 	}
 
 	private String _createClasspath(
@@ -474,7 +499,6 @@ public class Sidecar {
 	private static final Log _log = LogFactoryUtil.getLog(Sidecar.class);
 
 	private String _address;
-	private NoticeableFuture<String> _addressNoticeableFuture;
 	private final ClusterSettingsContext _clusterSettingsContext;
 	private final Path _dataHomePath;
 	private final ElasticsearchConfiguration _elasticsearchConfiguration;
@@ -488,7 +512,7 @@ public class Sidecar {
 	private final Path _sidecarHomePath;
 	private Path _sidecarTempDirPath;
 
-	private class RestartFutureListener
+	private static class RestartFutureListener
 		implements FutureListener<Serializable> {
 
 		@Override
