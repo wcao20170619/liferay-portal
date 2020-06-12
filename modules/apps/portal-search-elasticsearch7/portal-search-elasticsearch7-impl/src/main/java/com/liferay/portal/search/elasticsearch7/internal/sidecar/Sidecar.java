@@ -38,17 +38,13 @@ import com.liferay.portal.search.elasticsearch7.settings.SettingsContributor;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-
 import java.net.URL;
 import java.net.URLClassLoader;
-
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,7 +55,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.elasticsearch.common.settings.Settings;
-
 import org.objectweb.asm.Opcodes;
 
 /**
@@ -211,11 +206,24 @@ public class Sidecar {
 			_log.error(processLog.getMessage(), processLog.getThrowable());
 		}
 	}
+	
+//	protected String getBootstrapClassPath() {
+//		return _createClasspath(
+//			_processExecutorPaths.getLibPath(),
+//			path -> fileNameContains(path, "petra"));
+//	}
 
 	protected String getBootstrapClassPath() {
-		return _createClasspath(
+		String classpathForPetra =  _createClasspath(
 			_processExecutorPaths.getLibPath(),
 			path -> fileNameContains(path, "petra"));
+		
+		if ((_log.isWarnEnabled()) && 
+			Validator.isBlank(classpathForPetra)) {
+			_log.warn("The petra lib classpath is missing.");
+		}
+			
+		return classpathForPetra;
 	}
 
 	protected URL getBundleURL() {
