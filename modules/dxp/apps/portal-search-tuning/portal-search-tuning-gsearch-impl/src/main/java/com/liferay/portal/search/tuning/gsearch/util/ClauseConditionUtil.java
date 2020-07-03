@@ -2,7 +2,7 @@ package com.liferay.portal.search.tuning.gsearch.util;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.ClauseConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.ClauseConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.exception.ParameterEvaluationException;
 import com.liferay.portal.search.tuning.gsearch.message.Message;
 import com.liferay.portal.search.tuning.gsearch.message.Severity;
@@ -14,7 +14,7 @@ public class ClauseConditionUtil {
 		throws ParameterEvaluationException {
 
 		Object object = conditionJsonObject.get(
-			ClauseConfigurationKeys.MATCH_VALUE);
+			ClauseConfigurationKeys.MATCH_VALUE.getJsonKey());
 
 		if (!(object instanceof JSONArray)) {
 			throw new ParameterEvaluationException(
@@ -22,7 +22,8 @@ public class ClauseConditionUtil {
 					Severity.ERROR, "core",
 					"core.error.expected-clause-condition-array-match-value",
 					null, null, conditionJsonObject,
-					ClauseConfigurationKeys.MATCH_VALUE, object.toString()));
+					ClauseConfigurationKeys.MATCH_VALUE.getJsonKey(),
+					object.toString()));
 		}
 
 		return (JSONArray)object;

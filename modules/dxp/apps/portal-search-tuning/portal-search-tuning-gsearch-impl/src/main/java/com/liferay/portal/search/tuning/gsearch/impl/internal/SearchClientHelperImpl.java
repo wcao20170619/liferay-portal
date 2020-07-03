@@ -19,8 +19,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -28,16 +26,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.index.IndexNameBuilder;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.AggregationConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.ClauseConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.HighlightConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.KeywordIndexingConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.KeywordSuggesterConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.KeywordSuggestionsConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.ParameterRoles;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.SearchConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.SortConfigurationKeys;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.SpellCheckerConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.AdvancedConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.CommonConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.SearchConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.values.RequestParameterRoles;
 import com.liferay.portal.search.tuning.gsearch.configuration.model.SearchConfiguration;
 import com.liferay.portal.search.tuning.gsearch.configuration.service.SearchConfigurationService;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
@@ -194,14 +186,14 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONArray aggregationConfigurationJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				AggregationConfigurationKeys.AGGREGATION_CONFIGURATION);
+				SearchConfigurationKeys.AGGREGATION_CONFIGURATION.getJsonKey());
 
 		searchRequestContextBuilder.aggregationConfiguration(
 			aggregationConfigurationJsonArray);
 
 		JSONArray clauseConfigurationJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				ClauseConfigurationKeys.CLAUSE_CONFIGURATION);
+				SearchConfigurationKeys.CLAUSE_CONFIGURATION.getJsonKey());
 
 		searchRequestContextBuilder.clauseConfiguration(
 			clauseConfigurationJsonArray);
@@ -210,7 +202,8 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONArray excludeQueryContributorsJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				SearchConfigurationKeys.EXCLUDE_QUERY_CONTRIBUTORS);
+				AdvancedConfigurationKeys.EXCLUDE_QUERY_CONTRIBUTORS.
+					getJsonKey());
 
 		List<String> excludeQueryContributors =
 			GSearchJsonUtil.jsonArrayToStringList(
@@ -221,7 +214,8 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONArray excludeQueryPostProcessorsJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				SearchConfigurationKeys.EXCLUDE_QUERY_POST_PROCESSORS);
+				AdvancedConfigurationKeys.EXCLUDE_QUERY_POST_PROCESSORS.
+					getJsonKey());
 
 		List<String> excludeQueryPostProcessor =
 			GSearchJsonUtil.jsonArrayToStringList(
@@ -242,21 +236,22 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		if (Validator.isNotNull(
 				searchConfigurationJsonObject.get(
-					SearchConfigurationKeys.FETCH_SOURCE))) {
+					AdvancedConfigurationKeys.FETCH_SOURCE.getJsonKey()))) {
 
 			searchRequestContextBuilder.fetchSource(
 				searchConfigurationJsonObject.getBoolean(
-					SearchConfigurationKeys.FETCH_SOURCE));
+					AdvancedConfigurationKeys.FETCH_SOURCE.getJsonKey()));
 		}
 
 		if (Validator.isNotNull(
 				searchConfigurationJsonObject.get(
-					SearchConfigurationKeys.SOURCE_EXCLUDES))) {
+					AdvancedConfigurationKeys.SOURCE_EXCLUDES.getJsonKey()))) {
 
 			String[] fetchSourceExcludes =
 				GSearchJsonUtil.jsonArrayToStringArray(
 					searchConfigurationJsonObject.getJSONArray(
-						SearchConfigurationKeys.SOURCE_EXCLUDES));
+						AdvancedConfigurationKeys.SOURCE_EXCLUDES.
+							getJsonKey()));
 
 			searchRequestContextBuilder.fetchSourceExcludes(
 				fetchSourceExcludes);
@@ -264,12 +259,13 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		if (Validator.isNotNull(
 				searchConfigurationJsonObject.get(
-					SearchConfigurationKeys.SOURCE_INCLUDES))) {
+					AdvancedConfigurationKeys.SOURCE_INCLUDES.getJsonKey()))) {
 
 			String[] fetchSourceIncludes =
 				GSearchJsonUtil.jsonArrayToStringArray(
 					searchConfigurationJsonObject.getJSONArray(
-						SearchConfigurationKeys.SOURCE_INCLUDES));
+						AdvancedConfigurationKeys.SOURCE_INCLUDES.
+							getJsonKey()));
 
 			searchRequestContextBuilder.fetchSourceExcludes(
 				fetchSourceIncludes);
@@ -277,14 +273,14 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONObject highlightConfigurationJsonObject =
 			searchConfigurationJsonObject.getJSONObject(
-				HighlightConfigurationKeys.HIGHLIGHT_CONFIGURATION);
+				SearchConfigurationKeys.HIGHLIGHT_CONFIGURATION.getJsonKey());
 
 		searchRequestContextBuilder.highlightConfiguration(
 			highlightConfigurationJsonObject);
 
 		Optional<Parameter> includeResponseStringOptional =
 			searchParameterData.getByRole(
-				ParameterRoles.INCLUDE_RESPONSE_STRING);
+				RequestParameterRoles.INCLUDE_RESPONSE_STRING.getJsonValue());
 
 		if (includeResponseStringOptional.isPresent()) {
 			searchRequestContextBuilder.includeResponseString(
@@ -297,14 +293,14 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONObject keywordIndexingConfigurationJsonObject =
 			searchConfigurationJsonObject.getJSONObject(
-				KeywordIndexingConfigurationKeys.
-					KEYWORDS_INDEXING_CONFIGURATION);
+				SearchConfigurationKeys.KEYWORD_INDEXING_CONFIGURATION.
+					getJsonKey());
 
 		searchRequestContextBuilder.keywordIndexingConfiguration(
 			keywordIndexingConfigurationJsonObject);
 
 		Optional<Parameter> keywordsOptional = searchParameterData.getByRole(
-			ParameterRoles.KEYWORDS);
+			RequestParameterRoles.KEYWORDS.getJsonValue());
 
 		if (keywordsOptional.isPresent()) {
 			String keywords = GetterUtil.getString(
@@ -317,18 +313,10 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 			searchRequestContextBuilder.rawKeywords(keywords);
 		}
 
-		JSONArray keywordSuggesterConfigurationJsonArray =
-			searchConfigurationJsonObject.getJSONArray(
-				KeywordSuggesterConfigurationKeys.
-					KEYWORDS_SUGGESTER_CONFIGURATION);
-
-		searchRequestContextBuilder.keywordSuggesterConfiguration(
-			keywordSuggesterConfigurationJsonArray);
-
 		JSONObject keywordSuggestionsConfigurationJsonObject =
 			searchConfigurationJsonObject.getJSONObject(
-				KeywordSuggestionsConfigurationKeys.
-					KEYWORDS_SUGGESTIONS_CONFIGURATION);
+				SearchConfigurationKeys.KEYWORD_SUGGESTIONS_CONFIGURATION.
+					getJsonKey());
 
 		searchRequestContextBuilder.keywordSuggestionsConfiguration(
 			keywordSuggestionsConfigurationJsonObject);
@@ -341,11 +329,11 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 		searchRequestContextBuilder.searchParameterData(searchParameterData);
 
 		int size = searchConfigurationJsonObject.getInt(
-			SearchConfigurationKeys.SIZE, 10);
+			CommonConfigurationKeys.SIZE.getJsonKey(), 10);
 		searchRequestContextBuilder.size(size);
 
 		Optional<Parameter> fromOptional = searchParameterData.getByRole(
-			ParameterRoles.PAGE);
+			RequestParameterRoles.PAGE.getJsonValue());
 
 		if (fromOptional.isPresent()) {
 			int page = GetterUtil.getInteger(
@@ -359,14 +347,15 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		JSONArray sortConfigurationJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				SortConfigurationKeys.SORT_CONFIGURATION);
+				SearchConfigurationKeys.SORT_CONFIGURATION.getJsonKey());
 
 		searchRequestContextBuilder.sortConfiguration(
 			sortConfigurationJsonArray);
 
 		JSONArray spellCheckerConfigurationJsonArray =
 			searchConfigurationJsonObject.getJSONArray(
-				SpellCheckerConfigurationKeys.SPELLCHECKER_CONFIGURATION);
+				SearchConfigurationKeys.SPELLCHECKER_CONFIGURATION.
+					getJsonKey());
 
 		searchRequestContextBuilder.spellCheckerConfiguration(
 			spellCheckerConfigurationJsonArray);
@@ -375,9 +364,6 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		return searchRequestContextBuilder.build();
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SearchClientHelperImpl.class);
 
 	@Reference
 	private IndexNameBuilder _indexNameBuilder;

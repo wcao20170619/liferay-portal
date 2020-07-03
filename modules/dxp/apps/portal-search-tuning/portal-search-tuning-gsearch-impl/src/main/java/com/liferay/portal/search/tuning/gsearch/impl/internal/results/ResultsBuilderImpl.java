@@ -31,7 +31,7 @@ import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.highlight.HighlightField;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.FacetConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.FacetConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.constants.JSONResponseKeys;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.aggregations.facet.FacetHandlerFactory;
@@ -167,10 +167,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			}
 
 			String facetFieldName = facetConfigurationJsonObject.getString(
-				FacetConfigurationKeys.INDEX_FIELD);
+				FacetConfigurationKeys.INDEX_FIELD.getJsonKey());
 
 			String facetHandlerName = facetConfigurationJsonObject.getString(
-				FacetConfigurationKeys.HANDLER);
+				FacetConfigurationKeys.HANDLER.getJsonKey());
 
 			for (Map.Entry<String, AggregationResult> entry :
 					aggregations.entrySet()) {

@@ -15,7 +15,7 @@
 package com.liferay.portal.search.tuning.gsearch.impl.internal.parameter.contributor;
 
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.ParameterRoles;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.values.RequestParameterRoles;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.keywords.KeywordsProcessor;
 import com.liferay.portal.search.tuning.gsearch.parameter.Parameter;
 import com.liferay.portal.search.tuning.gsearch.parameter.ParameterDefinition;
@@ -47,7 +47,7 @@ public class KeywordsParameterContributor implements ParameterContributor {
 		SearchParameterData searchParameterData) {
 
 		Optional<Parameter> rawKeywords = searchParameterData.getByRole(
-			ParameterRoles.KEYWORDS);
+			RequestParameterRoles.KEYWORDS.getJsonValue());
 
 		if (rawKeywords.isPresent()) {
 			_contribute(

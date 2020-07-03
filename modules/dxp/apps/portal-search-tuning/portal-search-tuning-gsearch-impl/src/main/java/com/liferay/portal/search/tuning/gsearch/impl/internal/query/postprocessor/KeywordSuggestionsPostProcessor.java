@@ -7,7 +7,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHits;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.KeywordIndexingConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.KeywordIndexingConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
 import com.liferay.portal.search.tuning.gsearch.exception.SearchRequestDataException;
 import com.liferay.portal.search.tuning.gsearch.searchrequest.SearchRequestData;
@@ -40,7 +40,7 @@ public class KeywordSuggestionsPostProcessor implements QueryPostProcessor {
 			configurationJsonObjectOptional.get();
 
 		boolean enabled = configurationJsonObject.getBoolean(
-			KeywordIndexingConfigurationKeys.ENABLED);
+			KeywordIndexingConfigurationKeys.ENABLED.getJsonKey());
 
 		if (!enabled) {
 			return true;
@@ -49,7 +49,7 @@ public class KeywordSuggestionsPostProcessor implements QueryPostProcessor {
 		SearchHits searchHits = searchResponse.getSearchHits();
 
 		int hitsThreshold = configurationJsonObject.getInt(
-			KeywordIndexingConfigurationKeys.HITS_THRESHOLD, 1);
+			KeywordIndexingConfigurationKeys.HITS_THRESHOLD.getJsonKey(), 1);
 
 		if (searchHits.getTotalHits() >= hitsThreshold) {
 			return true;

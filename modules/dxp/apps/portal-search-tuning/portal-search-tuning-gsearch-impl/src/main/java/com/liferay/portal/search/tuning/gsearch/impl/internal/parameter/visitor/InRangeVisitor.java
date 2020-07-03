@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.tuning.gsearch.configuration.constants.ClauseConfigurationKeys;
+import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.ClauseConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.exception.ParameterEvaluationException;
 import com.liferay.portal.search.tuning.gsearch.message.Message;
 import com.liferay.portal.search.tuning.gsearch.message.Severity;
@@ -68,17 +68,18 @@ public class InRangeVisitor implements ClauseConditionEvaluationVisitor {
 		_checkRangeValue(jsonArray);
 
 		String dateFormatString = _conditionJsonObject.getString(
-			ClauseConfigurationKeys.DATE_FORMAT);
+			ClauseConfigurationKeys.DATE_FORMAT.getJsonKey());
 
 		String dateString = _conditionJsonObject.getString(
-			ClauseConfigurationKeys.MATCH_VALUE);
+			ClauseConfigurationKeys.MATCH_VALUE.getJsonKey());
 
 		if (Validator.isNull(dateFormatString)) {
 			throw new ParameterEvaluationException(
 				new Message(
 					Severity.ERROR, "core",
 					"core.error.clause-condition-date-format-missing",
-					_conditionJsonObject, ClauseConfigurationKeys.DATE_FORMAT,
+					_conditionJsonObject,
+					ClauseConfigurationKeys.DATE_FORMAT.getJsonKey(),
 					dateFormatString));
 		}
 
@@ -107,7 +108,8 @@ public class InRangeVisitor implements ClauseConditionEvaluationVisitor {
 					Severity.ERROR, "core",
 					"core.error.clause-condition-date-parsing-error",
 					e.getMessage(), e, _conditionJsonObject,
-					ClauseConfigurationKeys.MATCH_VALUE, dateString));
+					ClauseConfigurationKeys.MATCH_VALUE.getJsonKey(),
+					dateString));
 		}
 	}
 
@@ -237,7 +239,8 @@ public class InRangeVisitor implements ClauseConditionEvaluationVisitor {
 					Severity.ERROR, "core",
 					"core.error.invalid-clause-condition-range-value", null,
 					null, _conditionJsonObject,
-					ClauseConfigurationKeys.MATCH_VALUE, jsonArray.toString()));
+					ClauseConfigurationKeys.MATCH_VALUE.getJsonKey(),
+					jsonArray.toString()));
 		}
 	}
 

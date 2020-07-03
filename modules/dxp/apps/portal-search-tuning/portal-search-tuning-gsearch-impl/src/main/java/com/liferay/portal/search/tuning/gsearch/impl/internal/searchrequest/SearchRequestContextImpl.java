@@ -44,7 +44,6 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		boolean includeResponseString, String[] indexNames,
 		String initialKeywords,
 		JSONObject keywordIndexingConfigurationJsonObject, String keywords,
-		JSONArray keywordSuggesterConfigurationJsonArray,
 		JSONObject keywordSuggestionsConfigurationJsonObject, Locale locale,
 		String rawKeywords, long searchConfigurationId,
 		SearchParameterData searchParameterData, Integer size,
@@ -68,8 +67,6 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		_keywordIndexingConfigurationJsonObject =
 			keywordIndexingConfigurationJsonObject;
 		_keywords = keywords;
-		_keywordSuggesterConfigurationJsonArray =
-			keywordSuggesterConfigurationJsonArray;
 		_keywordSuggestionsConfigurationJsonObject =
 			keywordSuggestionsConfigurationJsonObject;
 		_locale = locale;
@@ -197,17 +194,6 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 	@Override
 	public String getKeywords() {
 		return _keywords;
-	}
-
-	@Override
-	public Optional<JSONArray> getKeywordSuggesterConfiguration() {
-		if ((_keywordSuggesterConfigurationJsonArray == null) ||
-			(_keywordSuggesterConfigurationJsonArray.length() == 0)) {
-
-			return Optional.of(_keywordSuggesterConfigurationJsonArray);
-		}
-
-		return Optional.empty();
 	}
 
 	@Override
@@ -339,29 +325,27 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 																																_initialKeywords +
 																																	", _keywordIndexingConfigurationJsonObject=" +
 																																		_keywordIndexingConfigurationJsonObject +
-																																			", _keywordSuggesterConfigurationJsonArray=" +
-																																				_keywordSuggesterConfigurationJsonArray +
-																																					", _keywordSuggestionsConfigurationJsonObject=" +
-																																						_keywordSuggestionsConfigurationJsonObject +
-																																							", _keywords=" +
-																																								_keywords +
-																																									", _locale=" +
-																																										_locale +
-																																											", _rawKeywords=" +
-																																												_rawKeywords +
-																																													", _searchConfigurationId=" +
-																																														_searchConfigurationId +
-																																															", _searchParameterData=" +
-																																																_searchParameterData +
-																																																	", _size=" +
-																																																		_size +
-																																																			", _sortConfigurationJsonArray=" +
-																																																				_sortConfigurationJsonArray +
-																																																					", _spellCheckerConfigurationJsonArray=" +
-																																																						_spellCheckerConfigurationJsonArray +
-																																																							", _userId=" +
-																																																								_userId +
-																																																									"]";
+																																			", _keywordSuggestionsConfigurationJsonObject=" +
+																																				_keywordSuggestionsConfigurationJsonObject +
+																																					", _keywords=" +
+																																						_keywords +
+																																							", _locale=" +
+																																								_locale +
+																																									", _rawKeywords=" +
+																																										_rawKeywords +
+																																											", _searchConfigurationId=" +
+																																												_searchConfigurationId +
+																																													", _searchParameterData=" +
+																																														_searchParameterData +
+																																															", _size=" +
+																																																_size +
+																																																	", _sortConfigurationJsonArray=" +
+																																																		_sortConfigurationJsonArray +
+																																																			", _spellCheckerConfigurationJsonArray=" +
+																																																				_spellCheckerConfigurationJsonArray +
+																																																					", _userId=" +
+																																																						_userId +
+																																																							"]";
 	}
 
 	private final JSONArray _aggregationConfigurationJsonArray;
@@ -380,7 +364,6 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 	private final String _initialKeywords;
 	private final JSONObject _keywordIndexingConfigurationJsonObject;
 	private final String _keywords;
-	private final JSONArray _keywordSuggesterConfigurationJsonArray;
 	private final JSONObject _keywordSuggestionsConfigurationJsonObject;
 	private final Locale _locale;
 	private final List<Message> _messages = new ArrayList<>();
