@@ -24,10 +24,9 @@ public enum AdvancedConfigurationKeys {
 
 	EXCLUDE_QUERY_CONTRIBUTORS("exclude_query_contributors"),
 	EXCLUDE_QUERY_POST_PROCESSORS("exclude_query_post_processors"),
-	FETCH_SOURCE("fetch_source"),
-	SOURCE_EXCLUDES("source_excludes"),
+	FETCH_SOURCE("fetch_source"), SOURCE_EXCLUDES("source_excludes"),
 	SOURCE_INCLUDES("source_includes");
-	
+
 	public static final AdvancedConfigurationKeys findByJsonKey(
 		String jsonKey) {
 
