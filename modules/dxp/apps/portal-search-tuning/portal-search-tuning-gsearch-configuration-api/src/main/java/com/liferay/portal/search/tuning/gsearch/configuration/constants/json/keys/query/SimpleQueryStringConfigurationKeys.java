@@ -25,8 +25,9 @@ public enum SimpleQueryStringConfigurationKeys {
 	ANALYZE_WILDCARD("analyze_wildcard"), ANALYZER("analyzer"),
 	AUTO_GENERATE_SYNONYMS_PHRASE_QUERY("auto_generate_synonyms_phrase_query"),
 	BOOST("boost"), DEFAULT_OPERATOR("default_operator"),
-	ENABLE_POSITION_INCREMENTS("enable_position_increments"), FIELDS("fields"),
-	FUZZINESS("fuzziness"), FUZZY_MAX_EXPANSIONS("fuzzy_max_expansions"),
+	ENABLE_POSITION_INCREMENTS("enable_position_increments"), FIELD("field"),
+	FIELDS("fields"), FUZZINESS("fuzziness"),
+	FUZZY_MAX_EXPANSIONS("fuzzy_max_expansions"),
 	FUZZY_PREFIX_LENGTH("fuzzy_prefix_length"),
 	FUZZY_TRANSPOSITIONS("fuzzy_transpositions"), LENIENT("lenient"),
 	QUERY("query"), QUOTE_FIELD_SUFFIX("quote_field_suffix");
