@@ -20,24 +20,23 @@ import java.util.stream.Stream;
 /**
  * @author Petteri Karttunen
  */
-public enum StringQueryConfigurationKeys {
+public enum SimpleQueryStringConfigurationKeys {
 
-	ALLOW_LEADING_WILDCARD("allow_leading_wildcard"),
-	ANALYZE_WILDCARD("analyze_wildcard"), ANALYZER("analyzer"), BOOST("boos"),
-	DEFAULT_OPERATOR("default_operator"),
-	ENABLE_POSITION_INCREMENTS("enable_position_increments"),
+	ANALYZE_WILDCARD("analyze_wildcard"), ANALYZER("analyzer"),
+	AUTO_GENERATE_SYNONYMS_PHRASE_QUERY("auto_generate_synonyms_phrase_query"),
+	BOOST("boost"), DEFAULT_OPERATOR("default_operator"),
+	ENABLE_POSITION_INCREMENTS("enable_position_increments"), FIELDS("fields"),
 	FUZZINESS("fuzziness"), FUZZY_MAX_EXPANSIONS("fuzzy_max_expansions"),
-	FUZZY_PREFIX_LENGTH("fuzzy_prefix_length"), LENIENT("lenient"),
-	MAX_DETERMINED_STATES("max_determined_states"), PHRASE_SLOP("phrase_slop"),
-	QUERY("query"), QUOTE_ANALYZER("quote_analyzer"),
-	QUOTE_FIELD_SUFFIX("quote_field_suffix");
+	FUZZY_PREFIX_LENGTH("fuzzy_prefix_length"),
+	FUZZY_TRANSPOSITIONS("fuzzy_transpositions"), LENIENT("lenient"),
+	QUERY("query"), QUOTE_FIELD_SUFFIX("quote_field_suffix");
 
-	public static final StringQueryConfigurationKeys findByJsonKey(
+	public static final SimpleQueryStringConfigurationKeys findByJsonKey(
 		String jsonKey) {
 
-		Stream<StringQueryConfigurationKeys>
+		Stream<SimpleQueryStringConfigurationKeys>
 			completionSuggesterConfigurationKeysStream = Arrays.stream(
-				StringQueryConfigurationKeys.values());
+				SimpleQueryStringConfigurationKeys.values());
 
 		return completionSuggesterConfigurationKeysStream.filter(
 			value -> value._jsonKey.equals(jsonKey)
@@ -51,7 +50,7 @@ public enum StringQueryConfigurationKeys {
 		return _jsonKey;
 	}
 
-	private StringQueryConfigurationKeys(String jsonKey) {
+	private SimpleQueryStringConfigurationKeys(String jsonKey) {
 		_jsonKey = jsonKey;
 	}
 
