@@ -43,10 +43,14 @@ public class DateParameter implements Parameter {
 
 		return evaluationVisitor.visit(this);
 	}
-
+	
 	@Override
-	public String accept(ToStringVisitor toStringVisitor) throws Exception {
-		return toStringVisitor.visit(this);
+	public String accept(ToStringVisitor parameterToStringVisitor) throws Exception {
+		throw new UnsupportedOperationException();
+	}
+	
+	public String accept(ToStringVisitor toStringVisitor, String dateOutputFormat) throws Exception {
+		return toStringVisitor.visit(this, dateOutputFormat);		
 	}
 
 	@Override
@@ -92,5 +96,4 @@ public class DateParameter implements Parameter {
 	private final String _name;
 	private final String _role;
 	private final Date _value;
-
 }

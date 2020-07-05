@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
@@ -45,6 +46,7 @@ import com.liferay.portal.search.tuning.gsearch.impl.internal.searchrequest.Sear
 import com.liferay.portal.search.tuning.gsearch.impl.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.parameter.Parameter;
 import com.liferay.portal.search.tuning.gsearch.parameter.SearchParameterData;
+import com.liferay.portal.search.tuning.gsearch.parameter.StringParameter;
 import com.liferay.portal.search.tuning.gsearch.results.ResultAttributes;
 import com.liferay.portal.search.tuning.gsearch.searchrequest.SearchRequestData;
 import com.liferay.portal.search.tuning.gsearch.util.SearchClientHelper;
@@ -81,7 +83,7 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		_parameterContributors.contribute(
 			httpServletRequest, searchParameterData);
-
+		
 		return _getSearchRequestContext(
 			searchConfigurationJsonObject, searchParameterData,
 			themeDisplay.getLocale(), themeDisplay.getCompanyId(),
@@ -98,6 +100,12 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 
 		SearchParameterData searchParameterData = new SearchParameterDataImpl();
 
+		// TODO: TESTING
+		
+		StringParameter q = new StringParameter("q", "keywords", "${keywords.keywords}", 
+				searchContext.getKeywords());
+		searchParameterData.addParameter(q);
+		
 		_parameterContributors.contribute(searchContext, searchParameterData);
 
 		return _getSearchRequestContext(

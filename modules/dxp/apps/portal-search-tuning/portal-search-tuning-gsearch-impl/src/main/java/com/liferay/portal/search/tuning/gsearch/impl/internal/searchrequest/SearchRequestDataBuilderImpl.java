@@ -221,7 +221,7 @@ public class SearchRequestDataBuilderImpl implements SearchRequestDataBuilder {
 						if (clauseOptional.isPresent()) {
 							_addClause(
 								searchRequestContext, searchRequestData,
-								queryJsonObject, clauseOptional.get());
+								clauseJsonObject, clauseOptional.get());
 						}
 					}
 					catch (IllegalArgumentException iae) {

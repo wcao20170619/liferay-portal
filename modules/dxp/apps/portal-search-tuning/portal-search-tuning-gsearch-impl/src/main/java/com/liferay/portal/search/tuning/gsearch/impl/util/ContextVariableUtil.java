@@ -31,7 +31,7 @@ public class ContextVariableUtil {
 			String variable = parameter.getConfigurationVariable();
 
 			if (queryString.contains(variable)) {
-				queryString = queryString.replaceAll(
+				queryString = queryString.replace(
 					variable,
 					parameter.accept(toConfigurationParameterStringVisitor));
 				changed = true;
