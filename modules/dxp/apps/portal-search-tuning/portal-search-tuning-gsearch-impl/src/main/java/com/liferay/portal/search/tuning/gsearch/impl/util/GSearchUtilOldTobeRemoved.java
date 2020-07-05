@@ -1,5 +1,5 @@
 
-package com.liferay.portal.search.tuning.gsearch.util;
+package com.liferay.portal.search.tuning.gsearch.impl.util;
 
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;

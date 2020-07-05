@@ -42,11 +42,11 @@ import com.liferay.portal.search.tuning.gsearch.impl.internal.request.parameter.
 import com.liferay.portal.search.tuning.gsearch.impl.internal.results.ResultsBuilder;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.searchrequest.SearchRequestContextBuilder;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.searchrequest.SearchRequestDataBuilder;
+import com.liferay.portal.search.tuning.gsearch.impl.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.parameter.Parameter;
 import com.liferay.portal.search.tuning.gsearch.parameter.SearchParameterData;
 import com.liferay.portal.search.tuning.gsearch.results.ResultAttributes;
 import com.liferay.portal.search.tuning.gsearch.searchrequest.SearchRequestData;
-import com.liferay.portal.search.tuning.gsearch.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.util.SearchClientHelper;
 
 import java.util.List;

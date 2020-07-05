@@ -59,7 +59,11 @@ public class AggregationBuilderFactoryImpl
 		);
 	}
 
-	protected void addAggregationBuilder(
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void registerAggregationBuilder(
 		AggregationBuilder aggregationBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("type");
@@ -92,7 +96,7 @@ public class AggregationBuilderFactoryImpl
 		}
 	}
 
-	protected void removeAggregationBuilder(
+	protected void unregisterAggregationBuilder(
 		AggregationBuilder aggregationBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("type");
@@ -107,12 +111,6 @@ public class AggregationBuilderFactoryImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		AggregationBuilderFactoryImpl.class);
 
-	@Reference(
-		bind = "addAggregationBuilder",
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC, service = AggregationBuilder.class,
-		unbind = "removeAggregationBuilder"
-	)
 	private volatile Map<String, ServiceComponentReference<AggregationBuilder>>
 		_aggregationBuilders = new ConcurrentHashMap<>();
 

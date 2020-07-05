@@ -54,7 +54,11 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		return serviceComponentReference.getServiceComponent();
 	}
 
-	protected void addResultItemBuilder(
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void registerResultItemBuilder(
 		ResultItemBuilder resultItemBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("model.class.name");
@@ -86,7 +90,7 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		}
 	}
 
-	protected void removeResultItemBuilder(
+	protected void unregisterResultItemBuilder(
 		ResultItemBuilder resultItemBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("model.class.name");
@@ -101,12 +105,6 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ResultItemBuilderFactoryImpl.class);
 
-	@Reference(
-		bind = "addResultItemBuilder",
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC, service = ResultItemBuilder.class,
-		unbind = "removeResultItemBuilder"
-	)
 	private volatile Map<String, ServiceComponentReference<ResultItemBuilder>>
 		_resultItemBuilders = new ConcurrentHashMap<>();
 

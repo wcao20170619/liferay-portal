@@ -26,10 +26,11 @@ import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.HighlightConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
+import com.liferay.portal.search.tuning.gsearch.impl.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.searchrequest.SearchRequestData;
 import com.liferay.portal.search.tuning.gsearch.spi.query.postprocessor.QueryPostProcessor;
-import com.liferay.portal.search.tuning.gsearch.util.GSearchJsonUtil;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,7 +108,12 @@ public class SearchExecutorImpl implements SearchExecutor {
 		return searchResponse;
 	}
 
-	protected void addQueryPostProcessor(
+	
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void registerQueryPostProcessor(
 		QueryPostProcessor queryPostProcessor, Map<String, Object> properties) {
 
 		String name = (String)properties.get("name");
@@ -124,7 +130,7 @@ public class SearchExecutorImpl implements SearchExecutor {
 		_queryPostProcessors.put(name, queryPostProcessor);
 	}
 
-	protected void removeQueryPostProcessor(
+	protected void unregisterQueryPostProcessor(
 		QueryPostProcessor queryPostProcessor, Map<String, Object> properties) {
 
 		String name = (String)properties.get("name");
@@ -258,13 +264,7 @@ public class SearchExecutorImpl implements SearchExecutor {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SearchExecutorImpl.class);
 
-	@Reference(
-		bind = "addQueryPostProcessor",
-		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC, service = QueryPostProcessor.class,
-		unbind = "removeQueryPostProcessor"
-	)
-	private volatile Map<String, QueryPostProcessor> _queryPostProcessors;
+	private volatile Map<String, QueryPostProcessor> _queryPostProcessors = new HashMap<String, QueryPostProcessor>();
 
 	@Reference
 	private SearchEngineAdapter _searchEngineAdapter;

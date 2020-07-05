@@ -1,4 +1,4 @@
-package com.liferay.portal.search.tuning.gsearch.util;
+package com.liferay.portal.search.tuning.gsearch.impl.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

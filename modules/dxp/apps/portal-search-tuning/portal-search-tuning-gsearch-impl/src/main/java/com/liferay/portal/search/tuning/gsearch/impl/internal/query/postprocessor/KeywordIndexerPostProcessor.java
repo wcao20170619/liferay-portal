@@ -24,8 +24,8 @@ import com.liferay.portal.search.engine.adapter.search.SearchSearchResponse;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.KeywordIndexingConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
+import com.liferay.portal.search.tuning.gsearch.impl.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.spi.query.postprocessor.QueryPostProcessor;
-import com.liferay.portal.search.tuning.gsearch.util.GSearchJsonUtil;
 
 import java.util.Optional;
 

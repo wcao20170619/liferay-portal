@@ -58,7 +58,11 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		);
 	}
 
-	protected void addClauseBuilder(
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC
+	)
+	protected void registerClauseBuilder(
 		ClauseBuilder clauseBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("type");
@@ -90,7 +94,7 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		}
 	}
 
-	protected void removeClauseBuilder(
+	protected void unregisterClauseBuilder(
 		ClauseBuilder clauseBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("type");
@@ -105,11 +109,6 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 	private static final Log _log = LogFactoryUtil.getLog(
 		ClauseBuilderFactoryImpl.class);
 
-	@Reference(
-		bind = "addClauseBuilder", cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC, service = ClauseBuilder.class,
-		unbind = "removeClauseBuilder"
-	)
 	private volatile Map<String, ServiceComponentReference<ClauseBuilder>>
 		_clauseBuilders = new ConcurrentHashMap<>();
 

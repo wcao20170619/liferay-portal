@@ -10,10 +10,10 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.tuning.gsearch.configuration.constants.json.keys.KeywordIndexingConfigurationKeys;
 import com.liferay.portal.search.tuning.gsearch.context.SearchRequestContext;
 import com.liferay.portal.search.tuning.gsearch.exception.SearchRequestDataException;
+import com.liferay.portal.search.tuning.gsearch.impl.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.searchrequest.SearchRequestData;
 import com.liferay.portal.search.tuning.gsearch.spi.query.postprocessor.QueryPostProcessor;
 import com.liferay.portal.search.tuning.gsearch.suggester.KeywordSuggester;
-import com.liferay.portal.search.tuning.gsearch.util.GSearchJsonUtil;
 import com.liferay.portal.search.tuning.gsearch.util.SearchClientHelper;
 
 import java.util.Optional;

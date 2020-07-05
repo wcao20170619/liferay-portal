@@ -39,6 +39,7 @@ import com.liferay.portal.search.tuning.gsearch.exception.SearchRequestDataExcep
 import com.liferay.portal.search.tuning.gsearch.impl.internal.aggregations.AggregationBuilderFactory;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.clause.ClauseBuilderFactory;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.clause.condition.ClauseConditionHandlerFactory;
+import com.liferay.portal.search.tuning.gsearch.impl.util.ContextVariableUtil;
 import com.liferay.portal.search.tuning.gsearch.message.Message;
 import com.liferay.portal.search.tuning.gsearch.message.Severity;
 import com.liferay.portal.search.tuning.gsearch.parameter.Parameter;
@@ -47,7 +48,6 @@ import com.liferay.portal.search.tuning.gsearch.spi.aggregation.AggregationBuild
 import com.liferay.portal.search.tuning.gsearch.spi.clause.ClauseBuilder;
 import com.liferay.portal.search.tuning.gsearch.spi.clause.ClauseConditionHandler;
 import com.liferay.portal.search.tuning.gsearch.spi.query.QueryContributor;
-import com.liferay.portal.search.tuning.gsearch.util.ContextVariableUtil;
 
 import java.util.ArrayList;
 import java.util.List;

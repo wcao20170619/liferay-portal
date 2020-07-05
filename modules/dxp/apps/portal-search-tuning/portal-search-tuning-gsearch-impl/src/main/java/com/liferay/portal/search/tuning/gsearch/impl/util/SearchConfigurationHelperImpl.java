@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.portal.search.tuning.gsearch.util;
+package com.liferay.portal.search.tuning.gsearch.impl.util;
 
 import com.liferay.portal.search.tuning.gsearch.impl.internal.aggregations.AggregationBuilderFactory;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.aggregations.facet.FacetHandlerFactory;
@@ -20,6 +20,7 @@ import com.liferay.portal.search.tuning.gsearch.impl.internal.clause.ClauseBuild
 import com.liferay.portal.search.tuning.gsearch.impl.internal.clause.condition.ClauseConditionHandlerFactory;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.parameter.contributor.ParameterContributors;
 import com.liferay.portal.search.tuning.gsearch.parameter.ParameterDefinition;
+import com.liferay.portal.search.tuning.gsearch.util.SearchConfigurationHelper;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
