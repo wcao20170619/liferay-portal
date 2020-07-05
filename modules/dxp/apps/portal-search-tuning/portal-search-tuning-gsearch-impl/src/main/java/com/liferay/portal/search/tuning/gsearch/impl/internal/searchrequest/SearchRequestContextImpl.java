@@ -90,10 +90,10 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_aggregationConfigurationJsonArray == null) ||
 			(_aggregationConfigurationJsonArray.length() == 0)) {
 
-			return Optional.of(_aggregationConfigurationJsonArray);
-		}
+			return Optional.empty();
 
-		return Optional.empty();
+		}
+		return Optional.of(_aggregationConfigurationJsonArray);
 	}
 
 	@Override
@@ -160,10 +160,10 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_highlightConfigurationJsonObject == null) ||
 			(_highlightConfigurationJsonObject.length() == 0)) {
 
-			return Optional.of(_highlightConfigurationJsonObject);
+			return Optional.empty();
 		}
+		return Optional.of(_highlightConfigurationJsonObject);
 
-		return Optional.empty();
 	}
 
 	@Override
@@ -185,10 +185,9 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_keywordIndexingConfigurationJsonObject == null) ||
 			(_keywordIndexingConfigurationJsonObject.length() == 0)) {
 
-			return Optional.of(_keywordIndexingConfigurationJsonObject);
+			return Optional.empty();
 		}
-
-		return Optional.empty();
+		return Optional.of(_keywordIndexingConfigurationJsonObject);
 	}
 
 	@Override
@@ -201,10 +200,10 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_keywordSuggestionsConfigurationJsonObject == null) ||
 			(_keywordSuggestionsConfigurationJsonObject.length() == 0)) {
 
-			return Optional.of(_keywordSuggestionsConfigurationJsonObject);
+			return Optional.empty();
 		}
+		return Optional.of(_keywordSuggestionsConfigurationJsonObject);
 
-		return Optional.empty();
 	}
 
 	@Override
@@ -242,10 +241,10 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_sortConfigurationJsonArray == null) ||
 			(_sortConfigurationJsonArray.length() == 0)) {
 
-			return Optional.of(_sortConfigurationJsonArray);
+			return Optional.empty();
 		}
+		return Optional.of(_sortConfigurationJsonArray);
 
-		return Optional.empty();
 	}
 
 	@Override
@@ -253,10 +252,9 @@ public class SearchRequestContextImpl implements SearchRequestContext {
 		if ((_spellCheckerConfigurationJsonArray == null) ||
 			(_spellCheckerConfigurationJsonArray.length() == 0)) {
 
-			return Optional.of(_spellCheckerConfigurationJsonArray);
+			return Optional.empty();
 		}
-
-		return Optional.empty();
+		return Optional.of(_spellCheckerConfigurationJsonArray);
 	}
 
 	@Override

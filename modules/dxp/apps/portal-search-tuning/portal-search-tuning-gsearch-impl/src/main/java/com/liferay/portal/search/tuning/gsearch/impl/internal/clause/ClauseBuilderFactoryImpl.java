@@ -66,7 +66,7 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		ClauseBuilder clauseBuilder, Map<String, Object> properties) {
 
 		String type = (String)properties.get("type");
-
+		
 		if (Validator.isBlank(type)) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
@@ -91,6 +91,8 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 			if (previousReference.compareTo(serviceComponentReference) < 0) {
 				_clauseBuilders.put(type, serviceComponentReference);
 			}
+		} else {
+			_clauseBuilders.put(type, serviceComponentReference);
 		}
 	}
 

@@ -87,6 +87,8 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 			if (previousReference.compareTo(serviceComponentReference) < 0) {
 				_resultItemBuilders.put(type, serviceComponentReference);
 			}
+		} else {
+			_resultItemBuilders.put(type, serviceComponentReference);
 		}
 	}
 

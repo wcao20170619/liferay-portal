@@ -93,6 +93,8 @@ public class AggregationBuilderFactoryImpl
 			if (previousReference.compareTo(serviceComponentReference) < 0) {
 				_aggregationBuilders.put(type, serviceComponentReference);
 			}
+		} else {
+			_aggregationBuilders.put(type, serviceComponentReference);
 		}
 	}
 

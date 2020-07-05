@@ -94,6 +94,8 @@ public class ClauseConditionHandlerFactoryImpl
 			if (previousReference.compareTo(serviceComponentReference) < 0) {
 				_clauseConditionHandlers.put(name, serviceComponentReference);
 			}
+		} else {
+			_clauseConditionHandlers.put(name, serviceComponentReference);
 		}
 	}
 

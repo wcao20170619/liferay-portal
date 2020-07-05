@@ -37,7 +37,7 @@ import com.liferay.portal.search.tuning.gsearch.exception.SearchRequestDataExcep
 import com.liferay.portal.search.tuning.gsearch.impl.internal.executor.SearchExecutor;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.keywords.KeywordsProcessor;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.parameter.SearchParameterDataImpl;
-import com.liferay.portal.search.tuning.gsearch.impl.internal.parameter.contributor.ParameterContributorsImpl;
+import com.liferay.portal.search.tuning.gsearch.impl.internal.parameter.contributor.ParameterContributors;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.request.parameter.RequestParameterBuilder;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.results.ResultsBuilder;
 import com.liferay.portal.search.tuning.gsearch.impl.internal.searchrequest.SearchRequestContextBuilder;
@@ -372,7 +372,7 @@ public class SearchClientHelperImpl implements SearchClientHelper {
 	private KeywordsProcessor _keywordsProcessor;
 
 	@Reference
-	private ParameterContributorsImpl _parameterContributors;
+	private ParameterContributors _parameterContributors;
 
 	@Reference
 	private RequestParameterBuilder _requestParameterBuilder;

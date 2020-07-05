@@ -93,6 +93,8 @@ public class FacetHandlerFactoryImpl implements FacetHandlerFactory {
 			if (previousReference.compareTo(serviceComponentReference) < 0) {
 				_facetHandlers.put(name, serviceComponentReference);
 			}
+		} else {
+			_facetHandlers.put(name, serviceComponentReference);
 		}
 	}
 
