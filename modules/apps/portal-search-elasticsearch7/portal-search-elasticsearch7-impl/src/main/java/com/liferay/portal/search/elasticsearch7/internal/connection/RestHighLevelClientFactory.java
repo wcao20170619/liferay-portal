@@ -19,16 +19,28 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.internal.util.ClassLoaderUtil;
 
-import java.io.IOException;
+import java.io.InputStream;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.security.KeyStore;
 
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.IntStream;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.MainResponse;
 
@@ -41,51 +53,72 @@ public class RestHighLevelClientFactory {
 		return new Builder();
 	}
 
-	public Optional<RestHighLevelClient> getRestHighLevelClientOptional() {
-		return IntStream.rangeClosed(
-			_portFrom, _portTo
-		).mapToObj(
-			this::newRestHighLevelClient
-		).filter(
-			this::isMatch
-		).findFirst();
+	public RestHighLevelClient newRestHighLevelClient() {
+		RestClientBuilder restClientBuilder = RestClient.builder(
+			_httpHosts
+		).setRequestConfigCallback(
+			requestConfigBuilder -> requestConfigBuilder.setSocketTimeout(
+				120000)
+		);
+
+		configureSecurity(restClientBuilder);
+
+		return ClassLoaderUtil.getWithContextClassLoader(
+			() -> new RestHighLevelClient(restClientBuilder), getClass());
 	}
 
 	public static class Builder {
+
+		public Builder authenticationEnabled(boolean authenticationEnabled) {
+			_restHighLevelClientFactory._authenticationEnabled =
+				authenticationEnabled;
+
+			return this;
+		}
 
 		public RestHighLevelClientFactory build() {
 			return new RestHighLevelClientFactory(_restHighLevelClientFactory);
 		}
 
-		public Builder clusterName(String clusterName) {
-			_restHighLevelClientFactory._clusterName = clusterName;
+		public Builder httpHosts(HttpHost[] httpHosts) {
+			_restHighLevelClientFactory._httpHosts = httpHosts;
 
 			return this;
 		}
 
-		public Builder hostName(String hostName) {
-			_restHighLevelClientFactory._hostName = hostName;
+		public Builder httpSSLEnabled(boolean httpSSLEnabled) {
+			_restHighLevelClientFactory._httpSSLEnabled = httpSSLEnabled;
 
 			return this;
 		}
 
-		public Builder httpPortRange(HttpPortRange httpPortRange) {
-			int[] ports = getPorts(httpPortRange.toSettingsString());
-
-			_restHighLevelClientFactory._portFrom = ports[0];
-			_restHighLevelClientFactory._portTo = ports[1];
+		public Builder password(String password) {
+			_restHighLevelClientFactory._password = password;
 
 			return this;
 		}
 
-		public Builder nodeName(String nodeName) {
-			_restHighLevelClientFactory._nodeName = nodeName;
+		public Builder truststorePassword(String truststorePassword) {
+			_restHighLevelClientFactory._truststorePassword =
+				truststorePassword;
 
 			return this;
 		}
 
-		public Builder scheme(String scheme) {
-			_restHighLevelClientFactory._scheme = scheme;
+		public Builder truststorePath(String truststorePath) {
+			_restHighLevelClientFactory._truststorePath = truststorePath;
+
+			return this;
+		}
+
+		public Builder truststoreType(String truststoreType) {
+			_restHighLevelClientFactory._truststoreType = truststoreType;
+
+			return this;
+		}
+
+		public Builder userName(String userName) {
+			_restHighLevelClientFactory._userName = userName;
 
 			return this;
 		}
@@ -137,48 +170,54 @@ public class RestHighLevelClientFactory {
 		return false;
 	}
 
-	protected boolean isMatch(MainResponse mainResponse) {
-		if (Validator.isBlank(_clusterName) && Validator.isBlank(_nodeName)) {
-			return true;
-		}
+	protected void configureSecurity(RestClientBuilder restClientBuilder) {
+		restClientBuilder.setHttpClientConfigCallback(
+			httpClientBuilder -> {
+				if (_authenticationEnabled) {
+					httpClientBuilder.setDefaultCredentialsProvider(
+						createCredentialsProvider());
+				}
 
-		if (!isClusterName(_clusterName, mainResponse)) {
-			return false;
-		}
+				if (_httpSSLEnabled) {
+					httpClientBuilder.setSSLContext(createSSLContext());
+				}
 
-		if (!isNodeName(_nodeName, mainResponse)) {
-			return false;
-		}
-
-		return true;
+				return httpClientBuilder;
+			});
 	}
 
-	protected boolean isMatch(RestHighLevelClient restHighLevelClient) {
+	protected CredentialsProvider createCredentialsProvider() {
+		CredentialsProvider credentialsProvider =
+			new BasicCredentialsProvider();
+
+		credentialsProvider.setCredentials(
+			AuthScope.ANY,
+			new UsernamePasswordCredentials(_userName, _password));
+
+		return credentialsProvider;
+	}
+
+	protected SSLContext createSSLContext() {
 		try {
-			MainResponse mainResponse = restHighLevelClient.info(
-				RequestOptions.DEFAULT);
+			Path path = Paths.get(_truststorePath);
 
-			if (isMatch(mainResponse)) {
-				return true;
-			}
+			InputStream is = Files.newInputStream(path);
 
-			return false;
+			KeyStore keyStore = KeyStore.getInstance(_truststoreType);
+
+			keyStore.load(is, _truststorePassword.toCharArray());
+
+			SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+
+			sslContextBuilder.loadKeyMaterial(
+				keyStore, _truststorePassword.toCharArray());
+			sslContextBuilder.loadTrustMaterial(keyStore, null);
+
+			return sslContextBuilder.build();
 		}
-		catch (IOException ioException) {
-			return false;
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
 		}
-	}
-
-	protected RestHighLevelClient newRestHighLevelClient(int port) {
-		return ClassLoaderUtil.getWithContextClassLoader(
-			() -> new RestHighLevelClient(
-				RestClient.builder(
-					new HttpHost(_hostName, port, _scheme)
-				).setRequestConfigCallback(
-					requestConfigBuilder ->
-						requestConfigBuilder.setSocketTimeout(120000)
-				)),
-			getClass());
 	}
 
 	private RestHighLevelClientFactory() {
@@ -187,19 +226,24 @@ public class RestHighLevelClientFactory {
 	private RestHighLevelClientFactory(
 		RestHighLevelClientFactory restHighLevelClientFactory) {
 
-		_clusterName = restHighLevelClientFactory._clusterName;
-		_hostName = restHighLevelClientFactory._hostName;
-		_nodeName = restHighLevelClientFactory._nodeName;
-		_portFrom = restHighLevelClientFactory._portFrom;
-		_portTo = restHighLevelClientFactory._portTo;
-		_scheme = restHighLevelClientFactory._scheme;
+		_authenticationEnabled =
+			restHighLevelClientFactory._authenticationEnabled;
+		_httpHosts = restHighLevelClientFactory._httpHosts;
+		_httpSSLEnabled = restHighLevelClientFactory._httpSSLEnabled;
+		_password = restHighLevelClientFactory._password;
+		_truststorePassword = restHighLevelClientFactory._truststorePassword;
+		_truststorePath = restHighLevelClientFactory._truststorePath;
+		_truststoreType = restHighLevelClientFactory._truststoreType;
+		_userName = restHighLevelClientFactory._userName;
 	}
 
-	private String _clusterName;
-	private String _hostName;
-	private String _nodeName;
-	private int _portFrom;
-	private int _portTo;
-	private String _scheme;
+	private boolean _authenticationEnabled;
+	private HttpHost[] _httpHosts;
+	private boolean _httpSSLEnabled;
+	private String _password;
+	private String _truststorePassword;
+	private String _truststorePath;
+	private String _truststoreType;
+	private String _userName;
 
 }
