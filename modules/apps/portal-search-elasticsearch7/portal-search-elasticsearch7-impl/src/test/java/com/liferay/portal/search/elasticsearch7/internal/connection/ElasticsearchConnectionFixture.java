@@ -19,6 +19,7 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration;
 import com.liferay.portal.search.elasticsearch7.internal.configuration.ElasticsearchConfigurationWrapper;
 import com.liferay.portal.search.elasticsearch7.internal.connection.constants.ConnectionConstants;
@@ -142,6 +143,8 @@ public class ElasticsearchConnectionFixture
 
 			elasticsearchConnectionFixture._discoveryTypeZen =
 				_discoveryTypeZen;
+			elasticsearchConnectionFixture._initialMasterNodes =
+				_initialMasterNodes;
 			elasticsearchConnectionFixture.
 				_elasticsearchConfigurationProperties =
 					createElasticsearchConfigurationProperties(
@@ -180,6 +183,12 @@ public class ElasticsearchConnectionFixture
 			return this;
 		}
 
+		public Builder initialMasterNodes(String initialMasterNodes) {
+			_initialMasterNodes = initialMasterNodes;
+
+			return this;
+		}
+
 		protected static final Map<String, Object>
 			createElasticsearchConfigurationProperties(
 				Map<String, Object> elasticsearchConfigurationProperties,
@@ -204,6 +213,7 @@ public class ElasticsearchConnectionFixture
 		private Boolean _discoveryTypeZen;
 		private Map<String, Object> _elasticsearchConfigurationProperties =
 			Collections.<String, Object>emptyMap();
+		private String _initialMasterNodes;
 
 	}
 
@@ -282,11 +292,28 @@ public class ElasticsearchConnectionFixture
 		};
 	}
 
+	protected SettingsContributor getInitialMasterNodesSettingsContributor() {
+		return new BaseSettingsContributor(0) {
+
+			@Override
+			public void populate(ClientSettingsHelper clientSettingsHelper) {
+				if (Validator.isBlank(_initialMasterNodes)) {
+					return;
+				}
+
+				clientSettingsHelper.put(
+					"cluster.initial_master_nodes", _initialMasterNodes);
+			}
+
+		};
+	}
+
 	protected List<SettingsContributor> getSettingsContributors() {
 		return Stream.of(
 			getClusterLoggingThresholdSettingsContributor(),
 			getDiskThresholdSettingsContributor(),
-			getDiscoveryTypeZenContributor()
+			getDiscoveryTypeZenContributor(),
+			getInitialMasterNodesSettingsContributor()
 		).filter(
 			Objects::nonNull
 		).collect(
@@ -300,6 +327,7 @@ public class ElasticsearchConnectionFixture
 	private Map<String, Object> _elasticsearchConfigurationProperties =
 		Collections.<String, Object>emptyMap();
 	private ElasticsearchConnection _elasticsearchConnection;
+	private String _initialMasterNodes;
 	private Path _workPath;
 
 }

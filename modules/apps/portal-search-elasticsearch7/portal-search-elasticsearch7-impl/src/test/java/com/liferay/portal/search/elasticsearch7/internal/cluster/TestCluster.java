@@ -45,6 +45,8 @@ public class TestCluster {
 				createElasticsearchConfigurationProperties(
 					getClusterName(), getNodeName(number),
 					getPortRange(9310, _elasticsearchFixtures.length))
+			).initialMasterNodes(
+				getNodeName(_elasticsearchFixtures.length)
 			).build();
 
 		elasticsearchConnectionFixture.createNode();
@@ -124,6 +126,10 @@ public class TestCluster {
 		Class<?> clazz = object.getClass();
 
 		return clazz.getSimpleName();
+	}
+
+	protected String getTransportPort(int startingPort, int number) {
+		return String.valueOf(startingPort + number - 1);
 	}
 
 	private final ElasticsearchConnectionFixture[] _elasticsearchFixtures;
