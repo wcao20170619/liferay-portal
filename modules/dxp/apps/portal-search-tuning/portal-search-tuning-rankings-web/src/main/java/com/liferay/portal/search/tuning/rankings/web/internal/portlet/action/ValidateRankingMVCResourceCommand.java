@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.tuning.rankings.web.internal.constants.ResultRankingsPortletKeys;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.DuplicateQueryStringsDetector;
@@ -128,12 +127,11 @@ public class ValidateRankingMVCResourceCommand implements MVCResourceCommand {
 	protected DuplicateQueryStringsDetector duplicateQueryStringsDetector;
 
 	@Reference
-	protected IndexNameBuilder indexNameBuilder;
-
-	@Reference
 	protected Portal portal;
 
-	@Reference
+	@Reference(
+		target = "(search.index.name.builder=ranking)"
+	)
 	protected RankingIndexNameBuilder rankingIndexNameBuilder;
 
 	@Reference
@@ -187,7 +185,7 @@ public class ValidateRankingMVCResourceCommand implements MVCResourceCommand {
 	}
 
 	private String _getIndexName(ResourceRequest resourceRequest) {
-		return indexNameBuilder.getIndexName(
+		return rankingIndexNameBuilder.getIndexName(
 			portal.getCompanyId(resourceRequest));
 	}
 
@@ -195,7 +193,7 @@ public class ValidateRankingMVCResourceCommand implements MVCResourceCommand {
 		ResourceRequest resourceRequest) {
 
 		return rankingIndexNameBuilder.getRankingIndexName(
-			_getIndexName(resourceRequest));
+			portal.getCompanyId(resourceRequest));
 	}
 
 	private boolean _isUpdateSpecial(String string) {

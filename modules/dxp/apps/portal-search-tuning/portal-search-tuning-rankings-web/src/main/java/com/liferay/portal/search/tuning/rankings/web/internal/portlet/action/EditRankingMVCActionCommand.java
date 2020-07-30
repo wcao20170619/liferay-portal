@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.tuning.rankings.web.internal.configuration.DefaultResultRankingsConfiguration;
 import com.liferay.portal.search.tuning.rankings.web.internal.configuration.ResultRankingsConfiguration;
 import com.liferay.portal.search.tuning.rankings.web.internal.constants.ResultRankingsConstants;
@@ -279,8 +278,7 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 
 		RankingIndexName rankingIndexName =
 			rankingIndexNameBuilder.getRankingIndexName(
-				indexNameBuilder.getIndexName(
-					portal.getCompanyId(actionRequest)));
+				portal.getCompanyId(actionRequest));
 
 		Optional<Ranking> optional = rankingIndexReader.fetchOptional(
 			rankingIndexName, id);
@@ -334,13 +332,13 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected String getIndexName(ActionRequest actionRequest) {
-		return indexNameBuilder.getIndexName(
+		return rankingIndexNameBuilder.getIndexName(
 			portal.getCompanyId(actionRequest));
 	}
 
 	protected RankingIndexName getRankingIndexName() {
 		return rankingIndexNameBuilder.getRankingIndexName(
-			_getCompanyIndexName());
+			_companyId);
 	}
 
 	protected String getSaveAndContinueRedirect(
@@ -401,12 +399,11 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 	protected DuplicateQueryStringsDetector duplicateQueryStringsDetector;
 
 	@Reference
-	protected IndexNameBuilder indexNameBuilder;
-
-	@Reference
 	protected Portal portal;
 
-	@Reference
+	@Reference(
+		target = "(search.index.name.builder=ranking)"
+	)
 	protected RankingIndexNameBuilder rankingIndexNameBuilder;
 
 	@Reference
@@ -471,7 +468,7 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private String _getCompanyIndexName() {
-		return indexNameBuilder.getIndexName(_companyId);
+		return rankingIndexNameBuilder.getIndexName(_companyId);
 	}
 
 	private String _getNameForUpdate(

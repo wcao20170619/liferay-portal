@@ -16,7 +16,6 @@ package com.liferay.portal.search.tuning.rankings.web.internal.searcher;
 
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
@@ -87,8 +86,7 @@ public class RankingSearchRequestContributor
 		builder.withSearchContext(
 			searchContext -> companyIds[0] = searchContext.getCompanyId());
 
-		return rankingIndexNameBuilder.getRankingIndexName(
-			indexNameBuilder.getIndexName(companyIds[0]));
+		return rankingIndexNameBuilder.getRankingIndexName(companyIds[0]);
 	}
 
 	protected boolean isSearchEngine(String engine) {
@@ -100,10 +98,9 @@ public class RankingSearchRequestContributor
 		return vendor.equals(engine);
 	}
 
-	@Reference
-	protected IndexNameBuilder indexNameBuilder;
-
-	@Reference
+	@Reference(
+		target = "(search.index.name.builder=ranking)"
+	)
 	protected RankingIndexNameBuilder rankingIndexNameBuilder;
 
 	@Reference

@@ -17,6 +17,7 @@ package com.liferay.portal.search.tuning.rankings.web.internal.index.importer;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
@@ -68,20 +69,20 @@ public class SingleIndexToMultipleIndexImporterImpl
 		}
 	}
 
-	protected static Map<String, List<Document>> groupDocumentByIndex(
+	protected static Map<Long, List<Document>> groupDocumentByCompanyId(
 		List<Document> documents) {
 
 		Stream<Document> stream = documents.stream();
 
 		return stream.collect(
-			Collectors.groupingBy(document -> document.getString("index")));
+			Collectors.groupingBy(document -> document.getLong(Field.COMPANY_ID)));
 	}
 
-	protected boolean addDocuments(String indexName, List<Document> documents) {
+	protected boolean addDocuments(Long companyId, List<Document> documents) {
 		boolean successed = true;
 
 		RankingIndexName rankingIndexName =
-			_rankingIndexNameBuilder.getRankingIndexName(indexName);
+			_rankingIndexNameBuilder.getRankingIndexName(companyId);
 
 		BulkDocumentRequest bulkDocumentRequest = new BulkDocumentRequest();
 
@@ -112,10 +113,10 @@ public class SingleIndexToMultipleIndexImporterImpl
 
 		stream.map(
 			Company::getCompanyId
+		).map(		
+			_rankingIndexNameBuilder::getIndexName			
 		).map(
-			_indexNameBuilder::getIndexName
-		).map(
-			_rankingIndexNameBuilder::getRankingIndexName
+			_rankingIndexNameBuilder::getRankingIndexName	
 		).filter(
 			rankingIndexName -> !_rankingIndexReader.isExists(rankingIndexName)
 		).forEach(
@@ -145,25 +146,45 @@ public class SingleIndexToMultipleIndexImporterImpl
 			Collectors.toList()
 		);
 	}
-
+	
 	protected void importDocuments() {
-		if (!_rankingIndexReader.isExists(SINGLE_INDEX_NAME)) {
+		
+		importDocuments(SINGLE_INDEX_NAME);
+		
+		List<Company> companies = _companyService.getCompanies();
+
+		Stream<Company> stream = companies.stream();
+
+		stream.map(
+			Company::getCompanyId
+		).map(		
+			_indexNameBuilder::getIndexName			
+		).map(
+			_rankingIndexNameBuilder::getRanking73IndexName	
+		).forEach(
+			this::importDocuments
+		);
+	}
+
+	protected void importDocuments(RankingIndexName singleIndexName) {
+		if (!_rankingIndexReader.isExists(singleIndexName)) {
 			return;
 		}
 
-		List<Document> documents = getDocuments(SINGLE_INDEX_NAME);
+		List<Document> documents = getDocuments(singleIndexName);
 
 		if (documents.isEmpty()) {
+			_rankingIndexCreator.delete(singleIndexName);
 			return;
 		}
 
-		Map<String, List<Document>> documentsMap = groupDocumentByIndex(
+		Map<Long, List<Document>> documentsMap = groupDocumentByCompanyId(
 			documents);
 
-		Set<Map.Entry<String, List<Document>>> entrySet =
+		Set<Map.Entry<Long, List<Document>>> entrySet =
 			documentsMap.entrySet();
 
-		Stream<Map.Entry<String, List<Document>>> stream = entrySet.stream();
+		Stream<Map.Entry<Long, List<Document>>> stream = entrySet.stream();
 
 		boolean success = stream.map(
 			entry -> addDocuments(entry.getKey(), entry.getValue())
@@ -172,7 +193,7 @@ public class SingleIndexToMultipleIndexImporterImpl
 		);
 
 		if (success) {
-			_rankingIndexCreator.delete(SINGLE_INDEX_NAME);
+			_rankingIndexCreator.delete(singleIndexName);
 		}
 	}
 
@@ -191,7 +212,7 @@ public class SingleIndexToMultipleIndexImporterImpl
 
 	@Reference
 	private CompanyService _companyService;
-
+	
 	@Reference
 	private IndexNameBuilder _indexNameBuilder;
 
@@ -201,7 +222,9 @@ public class SingleIndexToMultipleIndexImporterImpl
 	@Reference
 	private RankingIndexCreator _rankingIndexCreator;
 
-	@Reference
+	@Reference(
+		target = "(search.index.name.builder=ranking)"
+	)
 	private RankingIndexNameBuilder _rankingIndexNameBuilder;
 
 	@Reference

@@ -14,11 +14,16 @@
 
 package com.liferay.portal.search.tuning.rankings.web.internal.index.name;
 
+import com.liferay.portal.search.index.IndexNameBuilder;
+
 /**
  * @author Adam Brandizzi
  */
-public interface RankingIndexNameBuilder {
+public interface RankingIndexNameBuilder extends IndexNameBuilder {
 
-	public RankingIndexName getRankingIndexName(String companyIndexName);
-
+	public RankingIndexName getRankingIndexName(long companyId);
+	
+	public RankingIndexName getRankingIndexName(String indexName);
+	
+	public RankingIndexName getRanking73IndexName(String companyIndexName);
 }

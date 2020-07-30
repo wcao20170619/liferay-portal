@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.search.engine.SearchEngineInformation;
-import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexCreator;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.RankingIndexReader;
 import com.liferay.portal.search.tuning.rankings.web.internal.index.name.RankingIndexName;
@@ -74,21 +73,20 @@ public class RankingIndexCreationCompanyModelListener
 	}
 
 	protected String getCompanyIndexName(Company company) {
-		return _indexNameBuilder.getIndexName(company.getCompanyId());
+		return _rankingIndexNameBuilder.getIndexName(company.getCompanyId());
 	}
 
 	protected RankingIndexName getRankingIndexName(Company company) {
 		return _rankingIndexNameBuilder.getRankingIndexName(
-			getCompanyIndexName(company));
+			company.getCompanyId());
 	}
-
-	@Reference
-	private IndexNameBuilder _indexNameBuilder;
 
 	@Reference
 	private RankingIndexCreator _rankingIndexCreator;
 
-	@Reference
+	@Reference(
+		target = "(search.index.name.builder=ranking)"
+	)
 	private RankingIndexNameBuilder _rankingIndexNameBuilder;
 
 	@Reference

@@ -63,7 +63,7 @@ public class RankingPortletDisplayBuilder {
 	public RankingPortletDisplayBuilder(
 		DocumentToRankingTranslator documentToRankingTranslator,
 		HttpServletRequest httpServletRequest,
-		IndexNameBuilder indexNameBuilder, Language language, Portal portal,
+		Language language, Portal portal,
 		Queries queries, RankingIndexNameBuilder rankingIndexNameBuilder,
 		Sorts sorts, RenderRequest renderRequest, RenderResponse renderResponse,
 		SearchEngineAdapter searchEngineAdapter,
@@ -71,7 +71,7 @@ public class RankingPortletDisplayBuilder {
 
 		_documentToRankingTranslator = documentToRankingTranslator;
 		_httpServletRequest = httpServletRequest;
-		_indexNameBuilder = indexNameBuilder;
+	//	_indexNameBuilder = indexNameBuilder;
 		_language = language;
 		_portal = portal;
 		_queries = queries;
@@ -126,9 +126,8 @@ public class RankingPortletDisplayBuilder {
 	}
 
 	protected RankingIndexName buildRankingIndexName() {
-		return _rankingIndexNameBuilder.getRankingIndexName(
-			_indexNameBuilder.getIndexName(
-				_portal.getCompanyId(_httpServletRequest)));
+		return _rankingIndexNameBuilder.getRankingIndexName(		
+				_portal.getCompanyId(_httpServletRequest));
 	}
 
 	protected List<DropdownItem> getActionDropdownItems() {
@@ -383,7 +382,7 @@ public class RankingPortletDisplayBuilder {
 
 	private final DocumentToRankingTranslator _documentToRankingTranslator;
 	private final HttpServletRequest _httpServletRequest;
-	private final IndexNameBuilder _indexNameBuilder;
+//	private final IndexNameBuilder _indexNameBuilder;
 	private final Language _language;
 	private final Portal _portal;
 	private final Queries _queries;
