@@ -22,6 +22,7 @@ import com.liferay.source.formatter.checks.util.SourceUtil;
 import com.liferay.source.formatter.checkstyle.util.CheckstyleLogger;
 import com.liferay.source.formatter.checkstyle.util.CheckstyleUtil;
 import com.liferay.source.formatter.checkstyle.util.JSPCheckstyleUtil;
+import com.liferay.source.formatter.util.FileUtil;
 import com.liferay.source.formatter.util.SourceFormatterUtil;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -49,7 +50,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 	@Override
 	protected List<String> doGetFileNames() throws Exception {
-		String[] excludes = {"**/null.jsp", "**/tools/**"};
+		String[] excludes = {"**/null.jsp", "**/tools/**", "**/*.xml.tpl"};
 
 		List<String> fileNames = getFileNames(excludes, getIncludes());
 
@@ -123,7 +124,7 @@ public class JSPSourceProcessor extends BaseSourceProcessor {
 
 		file = super.format(file, fileName, absolutePath, content);
 
-		_processCheckstyle(absolutePath, content);
+		_processCheckstyle(absolutePath, FileUtil.read(file));
 
 		return file;
 	}

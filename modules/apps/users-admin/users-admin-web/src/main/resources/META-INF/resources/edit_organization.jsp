@@ -35,9 +35,16 @@ if (Validator.isNotNull(redirect)) {
 	portletURL.setParameter("redirect", redirect);
 }
 
-if (Validator.isNotNull(backURL)) {
-	portletURL.setParameter("backURL", backURL);
+if (Validator.isNull(backURL)) {
+	PortletURL viewOrganizationsURL = liferayPortletResponse.createRenderURL();
+
+	viewOrganizationsURL.setParameter("toolbarItem", "view-all-organizations");
+	viewOrganizationsURL.setParameter("usersListView", UserConstants.LIST_VIEW_FLAT_ORGANIZATIONS);
+
+	backURL = viewOrganizationsURL.toString();
 }
+
+portletURL.setParameter("backURL", backURL);
 
 if (organization != null) {
 	portletURL.setParameter("organizationId", String.valueOf(organizationId));

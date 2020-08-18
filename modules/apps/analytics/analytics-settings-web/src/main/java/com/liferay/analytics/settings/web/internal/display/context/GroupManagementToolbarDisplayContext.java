@@ -40,16 +40,14 @@ public class GroupManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public GroupManagementToolbarDisplayContext(
+		GroupDisplayContext groupDisplayContext,
 		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		GroupDisplayContext groupDisplayContext) {
+		LiferayPortletResponse liferayPortletResponse) {
 
 		super(
 			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			groupDisplayContext.getGroupSearch());
-
-		_groupDisplayContext = groupDisplayContext;
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
@@ -135,7 +133,6 @@ public class GroupManagementToolbarDisplayContext
 		return new String[] {"site-name"};
 	}
 
-	private final GroupDisplayContext _groupDisplayContext;
 	private final ResourceBundle _resourceBundle;
 
 }

@@ -164,6 +164,34 @@ definition {
 		SelectFrameTop(value1 = "relative=top");
 	}
 
+	macro editWidgetTemplate {
+		SiteAdmin.viewPortletTitle(portletTitle = "${oldWidgetTemplateName}");
+
+		if (isSet(newWidgetTemplateName)) {
+			PortletEntry.inputName(name = "${newWidgetTemplateName}");
+		}
+
+		if (isSet(adtFile)) {
+			UploadCommonFile(
+				locator1 = "DDMEditTemplate#SCRIPT_FILE_FIELD",
+				value1 = "${adtFile}");
+		}
+
+		PortletEntry.save();
+	}
+
+	macro gotoWidgetTemplatesEllipsisItem {
+		Click.waitForMenuToggleJSClick(
+			key_tableEntry = "${widgetTemplateName}",
+			locator1 = "LexiconTable#TABLE_ENTRY_ELLIPSIS_LINK");
+
+		MenuItem.clickNoError(menuItem = "${item}");
+	}
+
+	macro openWidgetTemplatesAdmin {
+		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_dynamic_data_mapping_web_portlet_PortletDisplayTemplatePortlet");
+	}
+
 	macro selectPortletADT {
 		Portlet.gotoPortletOptions(
 			portletName = "${portletName}",
