@@ -68,7 +68,7 @@ public interface MultiMatchQuery extends Query {
 	 */
 	@Deprecated
 	public boolean isFieldsEmpty();
-	
+
 	public Boolean isLenient();
 
 	public void setAnalyzer(String analyzer);
