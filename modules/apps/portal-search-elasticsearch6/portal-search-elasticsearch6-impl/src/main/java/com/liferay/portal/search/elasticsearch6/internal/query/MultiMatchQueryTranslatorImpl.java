@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Michael C. Han
+ * @author Petteri Karttunen
  */
 @Component(service = MultiMatchQueryTranslator.class)
 public class MultiMatchQueryTranslatorImpl
@@ -42,6 +43,10 @@ public class MultiMatchQueryTranslatorImpl
 
 		if (Validator.isNotNull(multiMatchQuery.getAnalyzer())) {
 			multiMatchQueryBuilder.analyzer(multiMatchQuery.getAnalyzer());
+		}
+
+		if (multiMatchQuery.getBoost() !=  null) {
+			multiMatchQueryBuilder.boost(multiMatchQuery.getBoost());
 		}
 
 		if (multiMatchQuery.getCutOffFrequency() != null) {
