@@ -33,7 +33,6 @@ import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Michael C. Han
- * @author Petteri Karttunen
  */
 @Component(service = SimpleStringQueryTranslator.class)
 public class SimpleStringQueryTranslatorImpl
@@ -58,11 +57,6 @@ public class SimpleStringQueryTranslatorImpl
 				simpleStringQuery.getAutoGenerateSynonymsPhraseQuery());
 		}
 
-		if (simpleStringQuery.getBoost() != null) {
-			simpleQueryStringBuilder.boost(
-				simpleStringQuery.getBoost());
-		}
-		
 		Map<String, Float> fieldBoostMap = simpleStringQuery.getFieldBoostMap();
 
 		if (MapUtil.isNotEmpty(fieldBoostMap)) {
