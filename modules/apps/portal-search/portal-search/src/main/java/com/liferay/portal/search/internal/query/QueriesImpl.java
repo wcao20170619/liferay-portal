@@ -241,6 +241,13 @@ public class QueriesImpl implements Queries {
 	}
 
 	@Override
+	public MultiMatchQuery multiMatch(
+		Object value, Map<String, Float> fieldsBoosts) {
+
+		return new MultiMatchQueryImpl(value, fieldsBoosts);
+	}
+
+	@Override
 	public MultiMatchQuery multiMatch(Object value, Set<String> fields) {
 		return new MultiMatchQueryImpl(value, fields);
 	}
