@@ -68,7 +68,7 @@ AssetVocabulary vocabulary = assetCategoriesDisplayContext.getVocabulary();
 		int categoriesCount = vocabulary.getCategoriesCount();
 
 		if (categoriesCount > 0) {
-			confirmationMessage = LanguageUtil.format(request, "this-vocabulary-has-x-categories-that-might-be-being-used-in-content", categoriesCount);
+			confirmationMessage = LanguageUtil.format(request, "this-vocabulary-has-x-categories-that-might-be-being-used-in-some-contents", categoriesCount);
 		}
 		%>
 

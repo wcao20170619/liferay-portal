@@ -93,7 +93,7 @@ const MODES = {
 			const cursor = cm.getCursor();
 			const token = cm.getTokenAt(cursor);
 
-			if (token.type) {
+			if (token.type && token.type !== 'string') {
 				const content = token.string;
 
 				const htmlCompletion = CodeMirror.hint.html(cm, options);

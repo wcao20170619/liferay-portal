@@ -18,6 +18,7 @@ import React, {useCallback, useContext} from 'react';
 import {AppContext} from '../../AppContext.es';
 import Button from '../../components/button/Button.es';
 import {ControlMenuBase} from '../../components/control-menu/ControlMenu.es';
+import useDataDefinition from '../../hooks/useDataDefinition.es';
 import withDDMForm, {
 	useDDMFormSubmit,
 	useDDMFormValidation,
@@ -30,8 +31,12 @@ export const EditEntry = ({
 	dataRecordId,
 	ddmForm,
 	redirect,
+	userLanguageId,
 }) => {
 	const {basePortletURL} = useContext(AppContext);
+	const {availableLanguageIds, defaultLanguageId} = useDataDefinition(
+		dataDefinitionId
+	);
 
 	const onCancel = useCallback(() => {
 		if (redirect) {
@@ -41,6 +46,13 @@ export const EditEntry = ({
 			Liferay.Util.navigate(basePortletURL);
 		}
 	}, [basePortletURL, redirect]);
+
+	const ddmReactForm = ddmForm.reactComponentRef.current;
+
+	ddmReactForm.updateEditingLanguageId({
+		editingLanguageId: userLanguageId,
+		preserveValue: true,
+	});
 
 	const onSubmit = useDDMFormValidation(
 		ddmForm,
@@ -70,7 +82,9 @@ export const EditEntry = ({
 				}
 			},
 			[dataDefinitionId, dataRecordId, onCancel]
-		)
+		),
+		defaultLanguageId,
+		availableLanguageIds
 	);
 
 	useDDMFormSubmit(ddmForm, onSubmit);

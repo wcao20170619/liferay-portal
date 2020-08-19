@@ -25,7 +25,12 @@ export function useDDMFormSubmit(ddmForm, onSubmit) {
 	}, [ddmForm, onSubmit]);
 }
 
-export function useDDMFormValidation(ddmForm, onSubmitCallback) {
+export function useDDMFormValidation(
+	ddmForm,
+	onSubmitCallback,
+	languageId,
+	availableLanguageIds
+) {
 	return useCallback(
 		(event) => {
 			if (typeof event.stopImmediatePropagation === 'function') {
@@ -39,16 +44,12 @@ export function useDDMFormValidation(ddmForm, onSubmitCallback) {
 					return;
 				}
 
-				const dataRecord = {
-					dataRecordValues: {},
-				};
+				const dataRecordValues = {};
 
-				const languageId = themeDisplay.getLanguageId();
 				const visitor = new PagesVisitor(ddmReactForm.get('pages'));
 
 				const setDataRecord = ({
 					fieldName,
-					localizable,
 					repeatable,
 					type,
 					value,
@@ -64,27 +65,25 @@ export function useDDMFormValidation(ddmForm, onSubmitCallback) {
 						_value = '';
 					}
 
-					if (localizable) {
-						if (!dataRecord.dataRecordValues[fieldName]) {
-							dataRecord.dataRecordValues[fieldName] = {
-								[languageId]: [],
-							};
-						}
+					if (!dataRecordValues[fieldName]) {
+						dataRecordValues[fieldName] = {
+							[languageId]: [],
+						};
+					}
 
-						if (repeatable) {
-							dataRecord.dataRecordValues[fieldName][
-								languageId
-							].push(_value);
-						}
-						else {
-							dataRecord.dataRecordValues[fieldName] = {
-								[languageId]: _value,
-							};
-						}
+					if (repeatable) {
+						dataRecordValues[fieldName][languageId].push(_value);
 					}
 					else {
-						dataRecord.dataRecordValues[fieldName] = _value;
+						dataRecordValues[fieldName] = {
+							[languageId]: _value,
+						};
 					}
+
+					availableLanguageIds.forEach((key) => {
+						dataRecordValues[fieldName][key] =
+							dataRecordValues[fieldName][languageId];
+					});
 				};
 
 				visitor.mapFields(
@@ -95,10 +94,15 @@ export function useDDMFormValidation(ddmForm, onSubmitCallback) {
 					true
 				);
 
-				onSubmitCallback(dataRecord);
+				onSubmitCallback({dataRecordValues});
 			});
 		},
-		[ddmForm, onSubmitCallback]
+		[
+			availableLanguageIds,
+			ddmForm.reactComponentRef,
+			languageId,
+			onSubmitCallback,
+		]
 	);
 }
 

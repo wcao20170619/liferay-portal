@@ -45,6 +45,7 @@ export default function ({appTab, ...props}) {
 					setUserLanguageId={setUserLanguageId}
 					userLanguageId={userLanguageId}
 				/>
+
 				<PermissionsContextProvider
 					dataDefinitionId={props.dataDefinitionId}
 				>

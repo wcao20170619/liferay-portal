@@ -342,6 +342,18 @@ public class EditFragmentEntryDisplayContext {
 
 		freeMarkerVariables.add("configuration");
 
+		FragmentCollection fragmentCollection =
+			FragmentCollectionServiceUtil.fetchFragmentCollection(
+				getFragmentCollectionId());
+
+		List<String> resources = new ArrayList<>();
+
+		if (fragmentCollection != null) {
+			for (FileEntry fileEntry : fragmentCollection.getResources()) {
+				resources.add(fileEntry.getFileName());
+			}
+		}
+
 		return HashMapBuilder.<String, Object>put(
 			"allowedStatus",
 			HashMapBuilder.<String, Object>put(
@@ -389,6 +401,15 @@ public class EditFragmentEntryDisplayContext {
 						"start", "${"
 					).build());
 
+				htmlEditorCustomEntities.add(
+					HashMapBuilder.<String, Object>put(
+						"content", resources
+					).put(
+						"end", "]"
+					).put(
+						"start", "[resources:"
+					).build());
+
 				return htmlEditorCustomEntities;
 			}
 		).put(
@@ -416,27 +437,9 @@ public class EditFragmentEntryDisplayContext {
 		).put(
 			"readOnly", _isReadOnlyFragmentEntry()
 		).put(
-			"resources",
-			() -> {
-				FragmentCollection fragmentCollection =
-					FragmentCollectionServiceUtil.fetchFragmentCollection(
-						getFragmentCollectionId());
-
-				if (fragmentCollection == null) {
-					return Collections.<String>emptyList();
-				}
-
-				List<String> resources = new ArrayList<>();
-
-				for (FileEntry fileEntry : fragmentCollection.getResources()) {
-					resources.add(fileEntry.getFileName());
-				}
-
-				return resources;
-			}
+			"resources", resources
 		).put(
-			"spritemap",
-			_themeDisplay.getPathThemeImages() + "/lexicon/icons.svg"
+			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
 			"status",
 			() -> {

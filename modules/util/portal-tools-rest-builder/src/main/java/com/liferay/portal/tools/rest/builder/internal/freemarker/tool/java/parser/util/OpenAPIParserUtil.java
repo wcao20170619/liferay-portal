@@ -409,7 +409,9 @@ public class OpenAPIParserUtil {
 	}
 
 	public static String getReferenceName(String reference) {
-		if (!reference.contains("#/components/schemas")) {
+		if (!reference.contains("#/components/parameters") &&
+			!reference.contains("#/components/schemas")) {
+
 			return reference.substring(reference.lastIndexOf("#") + 1);
 		}
 

@@ -321,11 +321,11 @@ public class DDMFormAdminDisplayContext {
 			ddmFormRenderingContext.setViewMode(true);
 
 			try {
-				Map<String, Object> settingsContext =
+				Map<String, Object> ddmFormTemplateContext =
 					_ddmFormTemplateContextFactory.create(
 						ddmForm, ddmFormLayout, ddmFormRenderingContext);
 
-				jsonObject.put("settingsContext", settingsContext);
+				jsonObject.put("settingsContext", ddmFormTemplateContext);
 			}
 			catch (PortalException portalException) {
 				_log.error(portalException, portalException);
@@ -724,7 +724,7 @@ public class DDMFormAdminDisplayContext {
 		StringBundler sb = new StringBundler(3);
 
 		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/lexicon/icons.svg");
+		sb.append("/clay/icons.svg");
 		sb.append(StringPool.POUND);
 
 		return sb.toString();

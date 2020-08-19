@@ -62,17 +62,28 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 
 		return _ddmFormRenderer.render(
 			ddmForm, ddmStructureLayout.getDDMFormLayout(),
-			_toDDMFormRenderingContext(dataLayoutRendererContext, ddmForm));
+			_toDDMFormRenderingContext(
+				dataLayoutId, dataLayoutRendererContext, ddmForm));
 	}
 
 	private DDMFormRenderingContext _toDDMFormRenderingContext(
-		DataLayoutRendererContext dataLayoutRendererContext, DDMForm ddmForm) {
+		Long dataLayoutId, DataLayoutRendererContext dataLayoutRendererContext,
+		DDMForm ddmForm) {
 
 		DDMFormRenderingContext ddmFormRenderingContext =
 			new DDMFormRenderingContext();
 
 		ddmFormRenderingContext.setContainerId(
 			dataLayoutRendererContext.getContainerId());
+		ddmFormRenderingContext.setDDMFormValues(
+			DataRecordValuesUtil.toDDMFormValues(
+				dataLayoutRendererContext.getDataRecordValues(), ddmForm,
+				null));
+		ddmFormRenderingContext.setDDMStructureLayoutId(dataLayoutId);
+		ddmFormRenderingContext.setHttpServletRequest(
+			dataLayoutRendererContext.getHttpServletRequest());
+		ddmFormRenderingContext.setHttpServletResponse(
+			dataLayoutRendererContext.getHttpServletResponse());
 
 		Locale locale = null;
 
@@ -88,16 +99,8 @@ public class DataLayoutRendererImpl implements DataLayoutRenderer {
 			locale = LocaleUtil.fromLanguageId(languageId);
 		}
 
-		ddmFormRenderingContext.setDDMFormValues(
-			DataRecordValuesUtil.toDDMFormValues(
-				dataLayoutRendererContext.getDataRecordValues(), ddmForm,
-				locale));
-
-		ddmFormRenderingContext.setHttpServletRequest(
-			dataLayoutRendererContext.getHttpServletRequest());
-		ddmFormRenderingContext.setHttpServletResponse(
-			dataLayoutRendererContext.getHttpServletResponse());
 		ddmFormRenderingContext.setLocale(locale);
+
 		ddmFormRenderingContext.setPortletNamespace(
 			dataLayoutRendererContext.getPortletNamespace());
 		ddmFormRenderingContext.setReadOnly(

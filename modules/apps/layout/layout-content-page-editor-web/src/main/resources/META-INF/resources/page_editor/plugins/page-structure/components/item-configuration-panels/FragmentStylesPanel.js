@@ -17,6 +17,7 @@ import React, {useCallback} from 'react';
 
 import {FRAGMENT_CONFIGURATION_ROLES} from '../../../../app/config/constants/fragmentConfigurationRoles';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../../../../app/config/constants/freemarkerFragmentEntryProcessor';
+import {VIEWPORT_SIZES} from '../../../../app/config/constants/viewportSizes';
 import {config} from '../../../../app/config/index';
 import selectSegmentsExperienceId from '../../../../app/selectors/selectSegmentsExperienceId';
 import {
@@ -26,6 +27,7 @@ import {
 } from '../../../../app/store/index';
 import updateFragmentConfiguration from '../../../../app/thunks/updateFragmentConfiguration';
 import updateItemConfig from '../../../../app/thunks/updateItemConfig';
+import {getResponsiveConfig} from '../../../../app/utils/getResponsiveConfig';
 import {getLayoutDataItemPropTypes} from '../../../../prop-types/index';
 import {FieldSet} from './FieldSet';
 
@@ -40,6 +42,9 @@ export const FragmentStylesPanel = ({item}) => {
 	);
 
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
+	const selectedViewportSize = useSelector(
+		(state) => state.selectedViewportSize
+	);
 
 	const onCustomStyleValueSelect = useCallback(
 		(name, value) => {
@@ -63,18 +68,31 @@ export const FragmentStylesPanel = ({item}) => {
 		[dispatch, fragmentEntryLink, segmentsExperienceId]
 	);
 
-	const onCommonStylesValueSelect = (name, value) =>
-		dispatch(
-			updateItemConfig({
-				itemConfig: {
+	const onCommonStylesValueSelect = (name, value) => {
+		let itemConfig = {
+			styles: {
+				[name]: value,
+			},
+		};
+
+		if (selectedViewportSize !== VIEWPORT_SIZES.desktop) {
+			itemConfig = {
+				[selectedViewportSize]: {
 					styles: {
 						[name]: value,
 					},
 				},
+			};
+		}
+
+		dispatch(
+			updateItemConfig({
+				itemConfig,
 				itemId: item.itemId,
 				segmentsExperienceId,
 			})
 		);
+	};
 
 	return (
 		<>
@@ -85,7 +103,10 @@ export const FragmentStylesPanel = ({item}) => {
 
 			<CommonStyles
 				commonStyles={commonStyles}
-				item={item}
+				itemConfig={getResponsiveConfig(
+					item.config,
+					selectedViewportSize
+				)}
 				onValueSelect={onCommonStylesValueSelect}
 			/>
 		</>
@@ -128,21 +149,23 @@ CustomStyles.propTypes = {
 	onValueSelect: PropTypes.func.isRequired,
 };
 
-const CommonStyles = ({commonStyles, item, onValueSelect}) => (
-	<div className="page-editor__floating-toolbar__panel__common-styles">
-		{commonStyles.map((fieldSet, index) => {
-			return (
-				<FieldSet
-					fields={fieldSet.styles}
-					key={index}
-					label={fieldSet.label}
-					onValueSelect={onValueSelect}
-					values={item.config.styles}
-				/>
-			);
-		})}
-	</div>
-);
+const CommonStyles = ({commonStyles, itemConfig, onValueSelect}) => {
+	return (
+		<div className="page-editor__floating-toolbar__panel__common-styles">
+			{commonStyles.map((fieldSet, index) => {
+				return (
+					<FieldSet
+						fields={fieldSet.styles}
+						key={index}
+						label={fieldSet.label}
+						onValueSelect={onValueSelect}
+						values={itemConfig.styles}
+					/>
+				);
+			})}
+		</div>
+	);
+};
 
 CommonStyles.propTypes = {
 	commonStyles: PropTypes.array.isRequired,

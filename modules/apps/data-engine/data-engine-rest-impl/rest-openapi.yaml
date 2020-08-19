@@ -193,6 +193,21 @@ components:
                         type: object
                     type: object
             type: object
+        DataLayoutRenderingContext:
+            properties:
+                containerId:
+                    type: string
+                dataRecordValues:
+                    additionalProperties:
+                        type: object
+                    type: object
+                namespace:
+                    type: string
+                pathThemeImages:
+                    type: string
+                readOnly:
+                    type: boolean
+            type: object
         DataLayoutRow:
             properties:
                 dataLayoutColumns:
@@ -943,6 +958,40 @@ paths:
                         application/xml:
                             schema:
                                 $ref: "#/components/schemas/DataLayout"
+                    description:
+                        ""
+            tags: ["DataLayout"]
+    "/data-layouts/{dataLayoutId}/context":
+        post:
+            operationId: postDataLayoutContext
+            parameters:
+                - in: path
+                  name: dataLayoutId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DataLayoutRenderingContext"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/DataLayoutRenderingContext"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                additionalProperties:
+                                    type: object
+                                type: object
+                        application/xml:
+                            schema:
+                                additionalProperties:
+                                    type: object
+                                type: object
                     description:
                         ""
             tags: ["DataLayout"]

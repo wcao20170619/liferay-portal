@@ -57,7 +57,7 @@ public class AnalyticsReportsUtil {
 
 	public static String getAnalyticsReportsPanelURL(
 			long classNameId, long classPK,
-			HttpServletRequest httpServletRequest,
+			HttpServletRequest httpServletRequest, Portal portal,
 			PortletURLFactory portletURLFactory)
 		throws WindowStateException {
 
@@ -66,11 +66,11 @@ public class AnalyticsReportsUtil {
 			RenderRequest.RENDER_PHASE);
 
 		portletURL.setParameter("mvcPath", "/analytics_reports_panel.jsp");
-
-		portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
-
+		portletURL.setParameter(
+			"redirect", portal.getCurrentCompleteURL(httpServletRequest));
 		portletURL.setParameter("classNameId", String.valueOf(classNameId));
 		portletURL.setParameter("classPK", String.valueOf(classPK));
+		portletURL.setWindowState(LiferayWindowState.EXCLUSIVE);
 
 		return portletURL.toString();
 	}

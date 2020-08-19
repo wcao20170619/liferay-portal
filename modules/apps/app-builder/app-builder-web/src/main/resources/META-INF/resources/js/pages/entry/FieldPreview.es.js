@@ -264,7 +264,9 @@ export const FieldValuePreview = ({
 	if (dataDefinitionField.localizable) {
 		return (
 			<Renderer
-				value={value ? value[themeDisplay.getLanguageId()] : undefined}
+				value={
+					value ? value[dataDefinition.defaultLanguageId] : undefined
+				}
 			/>
 		);
 	}

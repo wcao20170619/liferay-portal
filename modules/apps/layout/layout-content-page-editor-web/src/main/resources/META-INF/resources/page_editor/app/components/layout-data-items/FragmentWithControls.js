@@ -20,12 +20,20 @@ import {
 	LayoutDataPropTypes,
 	getLayoutDataItemPropTypes,
 } from '../../../prop-types/index';
+import {useSelector} from '../../store/index';
+import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import loadBackgroundImage from '../../utils/loadBackgroundImage';
 import Topper from '../Topper';
 import FragmentContent from '../fragment-content/FragmentContent';
 
 const FragmentWithControls = React.forwardRef(({item, layoutData}, ref) => {
 	const [setRef, itemElement] = useSetRef(ref);
+
+	const selectedViewportSize = useSelector(
+		(state) => state.selectedViewportSize
+	);
+
+	const itemConfig = getResponsiveConfig(item.config, selectedViewportSize);
 
 	const {
 		backgroundColor,
@@ -55,7 +63,7 @@ const FragmentWithControls = React.forwardRef(({item, layoutData}, ref) => {
 		textAlign,
 		textColor,
 		width,
-	} = item.config.styles;
+	} = itemConfig.styles;
 
 	const [backgroundImageValue, setBackgroundImageValue] = useState('');
 
@@ -76,54 +84,48 @@ const FragmentWithControls = React.forwardRef(({item, layoutData}, ref) => {
 		style.fontSize = fontSize;
 	}
 
-	if (minHeight !== 'auto') {
-		style.minHeight = minHeight;
-	}
-
-	if (minWidth !== 'auto') {
-		style.minWidth = minWidth;
-	}
-
 	style.border = `solid ${borderWidth}px`;
+	style.height = height;
 	style.maxHeight = maxHeight;
 	style.maxWidth = maxWidth;
+	style.minHeight = minHeight;
+	style.minWidth = minWidth;
 	style.opacity = opacity;
 	style.overflow = overflow;
+	style.width = width;
 
 	return (
-		<Topper item={item} itemElement={itemElement} layoutData={layoutData}>
-			<div
-				className={classNames(
-					fontWeight,
-					height,
-					`mb-${marginBottom}`,
-					`ml-${marginLeft}`,
-					`mr-${marginRight}`,
-					`mt-${marginTop}`,
-					`pb-${paddingBottom}`,
-					`pl-${paddingLeft}`,
-					`pr-${paddingRight}`,
-					`pt-${paddingTop}`,
-					shadow,
-					width,
-					{
-						[`bg-${backgroundColor?.cssClass}`]: backgroundColor,
-						[`border-${borderColor?.cssClass}`]: borderColor,
-						[borderRadius]: !!borderRadius,
-						[`text-${fontFamily}`]: fontFamily !== 'default',
-						'no-gutters': !item.config.gutters,
-						[textAlign]: textAlign !== 'none',
-						[`text-${textColor?.cssClass}`]: textColor,
-					}
-				)}
-				style={style}
-			>
-				<FragmentContent
-					elementRef={setRef}
-					fragmentEntryLinkId={item.config.fragmentEntryLinkId}
-					itemId={item.itemId}
-				/>
-			</div>
+		<Topper
+			className={classNames(
+				fontWeight,
+				`mb-${marginBottom}`,
+				`ml-${marginLeft}`,
+				`mr-${marginRight}`,
+				`mt-${marginTop}`,
+				`pb-${paddingBottom}`,
+				`pl-${paddingLeft}`,
+				`pr-${paddingRight}`,
+				`pt-${paddingTop}`,
+				shadow,
+				{
+					[`bg-${backgroundColor?.cssClass}`]: backgroundColor,
+					[`border-${borderColor?.cssClass}`]: borderColor,
+					[borderRadius]: !!borderRadius,
+					[`text-${fontFamily}`]: fontFamily !== 'default',
+					[textAlign]: textAlign !== 'none',
+					[`text-${textColor?.cssClass || textColor}`]: textColor,
+				}
+			)}
+			item={item}
+			itemElement={itemElement}
+			layoutData={layoutData}
+			style={style}
+		>
+			<FragmentContent
+				elementRef={setRef}
+				fragmentEntryLinkId={item.config.fragmentEntryLinkId}
+				itemId={item.itemId}
+			/>
 		</Topper>
 	);
 });

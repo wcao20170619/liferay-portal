@@ -135,6 +135,9 @@ public class DDMFormTemplateContextFactoryImpl
 				ddmFormRenderingContext.getHttpServletRequest(), "currentPage",
 				"1"));
 		templateContext.put(
+			"ddmStructureLayoutId",
+			ddmFormRenderingContext.getDDMStructureLayoutId());
+		templateContext.put(
 			"editingLanguageId", LanguageUtil.getLanguageId(locale));
 		templateContext.put(
 			"evaluatorURL", getDDMFormContextProviderServletURL());

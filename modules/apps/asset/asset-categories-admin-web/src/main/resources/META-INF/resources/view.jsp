@@ -58,6 +58,7 @@
 
 													<clay:link
 														borderless="<%= true %>"
+														cssClass="component-action"
 														href="<%= editVocabularyURL.toString() %>"
 														icon="plus"
 														type="button"
@@ -113,6 +114,7 @@
 														icon="lock"
 														iconCssClass="text-muted"
 														markupView="lexicon"
+														message="this-vocabulary-can-only-be-edited-from-the-global-site"
 													/>
 
 													<c:if test="<%= vocabulary.getVisibilityType() == AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL %>">
@@ -209,7 +211,7 @@
 							</clay:content-col>
 
 							<clay:content-col
-								cssClass="inline-item-after"
+								cssClass="component-action inline-item-after justify-content-end"
 							>
 								<liferay-util:include page="/vocabulary_action.jsp" servletContext="<%= application %>" />
 							</clay:content-col>
@@ -230,7 +232,7 @@
 						sb.append("\" target=\"_blank\">");
 						%>
 
-						<p>
+						<p class="mb-5 text-secondary">
 							<liferay-ui:message arguments='<%= new String[] {sb.toString(), "</a>"} %>' key="x-learn-how-x-to-tailor-categories-to-your-needs" />
 						</p>
 					</c:if>

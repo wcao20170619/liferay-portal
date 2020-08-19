@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.time.format.DateTimeFormatter;
 
@@ -51,6 +52,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -101,8 +103,29 @@ public class AnalyticsReportsDisplayContext<T> {
 		return _data;
 	}
 
-	public String getLiferayAnalyticsURL(long companyId) {
-		return PrefsPropsUtil.getString(companyId, "liferayAnalyticsURL");
+	public String getHideAnalyticsReportsPanelURL() {
+		PortletURL portletURL = _renderResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/analytics_reports/hide_panel");
+
+		String redirect = ParamUtil.getString(_renderRequest, "redirect");
+
+		if (Validator.isNotNull(redirect)) {
+			portletURL.setParameter("redirect", redirect);
+		}
+		else {
+			portletURL.setParameter(
+				"redirect",
+				_themeDisplay.getLayoutFriendlyURL(_themeDisplay.getLayout()));
+		}
+
+		return String.valueOf(portletURL);
+	}
+
+	public String getLiferayAnalyticsURL() {
+		return PrefsPropsUtil.getString(
+			_themeDisplay.getCompanyId(), "liferayAnalyticsURL");
 	}
 
 	private Map<String, Object> _getContext() {
@@ -148,7 +171,7 @@ public class AnalyticsReportsDisplayContext<T> {
 		).put(
 			"languageTag",
 			() -> {
-				Locale locale = _getLocale();
+				Locale locale = _themeDisplay.getLocale();
 
 				return locale.toLanguageTag();
 			}
@@ -210,6 +233,8 @@ public class AnalyticsReportsDisplayContext<T> {
 			"authorUserId",
 			_analyticsReportsInfoItem.getAuthorUserId(
 				_analyticsReportsInfoItemObject)
+		).put(
+			"canonicalURL", _canonicalURL
 		).put(
 			"publishDate",
 			() -> _analyticsReportsInfoItem.getPublishDate(
@@ -317,7 +342,8 @@ public class AnalyticsReportsDisplayContext<T> {
 					).findFirst(
 					).map(
 						trafficSource -> trafficSource.toJSONObject(
-							helpMessageMap.get(name), _getLocale(), title)
+							helpMessageMap.get(name), _themeDisplay.getLocale(),
+							title)
 					).orElse(
 						JSONUtil.put(
 							"helpMessage", helpMessageMap.get(name)

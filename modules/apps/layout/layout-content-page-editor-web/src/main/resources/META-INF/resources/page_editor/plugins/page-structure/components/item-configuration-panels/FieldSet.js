@@ -12,13 +12,24 @@
  * details.
  */
 
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 import {FRAGMENT_CONFIGURATION_FIELDS} from '../../../../app/components/fragment-configuration-fields/index';
+import {LAYOUT_DATA_ITEM_TYPES} from '../../../../app/config/constants/layoutDataItemTypes';
 import {ConfigurationFieldPropTypes} from '../../../../prop-types/index';
 
-export const FieldSet = ({fields, label, onValueSelect, values}) => {
+const DISPLAY_SIZES = {
+	small: 'small',
+};
+
+const fieldIsDisabled = (item, field) =>
+	item.type === LAYOUT_DATA_ITEM_TYPES.container &&
+	item.config?.widthType === 'fixed' &&
+	(field.name === 'marginRight' || field.name === 'marginLeft');
+
+export const FieldSet = ({fields, item = {}, label, onValueSelect, values}) => {
 	return (
 		<>
 			{label && (
@@ -27,30 +38,45 @@ export const FieldSet = ({fields, label, onValueSelect, values}) => {
 				</div>
 			)}
 
-			{fields.map((field, index) => {
-				const FieldComponent =
-					field.type && FRAGMENT_CONFIGURATION_FIELDS[field.type];
+			<div className="page-editor__sidebar__fieldset">
+				{fields.map((field, index) => {
+					const FieldComponent =
+						field.type && FRAGMENT_CONFIGURATION_FIELDS[field.type];
 
-				const fieldValue = values[field.name] || field.defaultValue;
+					const fieldValue = values[field.name] || field.defaultValue;
 
-				const visible =
-					!field.dependencies ||
-					field.dependencies.every(
-						(dependency) =>
-							values[dependency.styleName] === dependency.value
+					const visible =
+						!field.dependencies ||
+						field.dependencies.every(
+							(dependency) =>
+								values[dependency.styleName] ===
+								dependency.value
+						);
+
+					return (
+						visible && (
+							<div
+								className={classNames(
+									'page-editor__sidebar__fieldset__field',
+									{
+										'page-editor__sidebar__fieldset__field-small':
+											field.displaySize ===
+											DISPLAY_SIZES.small,
+									}
+								)}
+								key={index}
+							>
+								<FieldComponent
+									disabled={fieldIsDisabled(item, field)}
+									field={field}
+									onValueSelect={onValueSelect}
+									value={fieldValue}
+								/>
+							</div>
+						)
 					);
-
-				return (
-					visible && (
-						<FieldComponent
-							field={field}
-							key={index}
-							onValueSelect={onValueSelect}
-							value={fieldValue}
-						/>
-					)
-				);
-			})}
+				})}
+			</div>
 		</>
 	);
 };

@@ -160,11 +160,15 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			return StringPool.BLANK;
 		}
 
-		StringBundler sb = new StringBundler(9);
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
+
+		if (themeDisplay == null) {
+			return StringPool.BLANK;
+		}
+
+		StringBundler sb = new StringBundler(9);
 
 		sb.append(themeDisplay.getPathContext());
 
@@ -214,10 +218,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+		if (themeDisplay == null) {
+			return StringPool.BLANK;
+		}
+
 		StringBundler sb = new StringBundler(3);
 
 		sb.append(themeDisplay.getPathThemeImages());
-		sb.append("/lexicon/icons.svg");
+		sb.append("/clay/icons.svg");
 		sb.append(StringPool.POUND);
 
 		return sb.toString();

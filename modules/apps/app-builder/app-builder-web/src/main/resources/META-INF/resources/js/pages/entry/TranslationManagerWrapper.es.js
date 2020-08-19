@@ -19,28 +19,22 @@ import {createPortal} from 'react-dom';
 import {AppContext} from '../../AppContext.es';
 import {getItem} from '../../utils/client.es';
 import {getLocalizedUserPreferenceValue} from '../../utils/lang.es';
-import {navigateToEditPage} from './utils.es';
 
-const storageKey = '@app-builder/standalone/language';
+const STORAGE_KEY = '@app-builder/standalone/language';
 
-export const setStorageLanguageId = (value, appId) => {
-	localStorage.setItem(`${storageKey}/${appId}`, value);
+const setStorageLanguageId = (appId, value) => {
+	localStorage.setItem(`${STORAGE_KEY}/${appId}`, value);
 };
 
 export const getStorageLanguageId = (appId) => {
 	return (
-		localStorage.getItem(`${storageKey}/${appId}`) ||
+		localStorage.getItem(`${STORAGE_KEY}/${appId}`) ||
 		themeDisplay.getLanguageId()
 	);
 };
 
-export default ({
-	dataDefinitionId,
-	reloadPage,
-	setUserLanguageId,
-	userLanguageId,
-}) => {
-	const {appId, basePortletURL, dataRecordId} = useContext(AppContext);
+export default ({dataDefinitionId, setUserLanguageId, userLanguageId}) => {
+	const {appId} = useContext(AppContext);
 	const [{app, dataDefinition}, setState] = useState({
 		app: {
 			name: {},
@@ -50,15 +44,11 @@ export default ({
 			defaultLanguageId: '',
 		},
 	});
+
 	const defaultLanguageId = dataDefinition.defaultLanguageId;
 
 	const onEditingLanguageIdChange = (languageId) => {
-		setStorageLanguageId(languageId, appId);
-
-		if (reloadPage) {
-			navigateToEditPage(basePortletURL, {dataRecordId, languageId});
-		}
-
+		setStorageLanguageId(appId, languageId);
 		setUserLanguageId(languageId);
 	};
 

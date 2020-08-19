@@ -49,6 +49,10 @@ public class DDMFormRenderingContext {
 		return _ddmFormValues;
 	}
 
+	public long getDDMStructureLayoutId() {
+		return _ddmStructureLayoutId;
+	}
+
 	public long getGroupId() {
 		return _groupId;
 	}
@@ -121,6 +125,10 @@ public class DDMFormRenderingContext {
 		_ddmFormValues = ddmFormValues;
 	}
 
+	public void setDDMStructureLayoutId(long ddmStructureLayoutId) {
+		_ddmStructureLayoutId = ddmStructureLayoutId;
+	}
+
 	public void setGroupId(long groupId) {
 		_groupId = groupId;
 	}
@@ -184,6 +192,7 @@ public class DDMFormRenderingContext {
 	private String _cancelLabel;
 	private String _containerId;
 	private DDMFormValues _ddmFormValues;
+	private long _ddmStructureLayoutId;
 	private long _groupId;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;

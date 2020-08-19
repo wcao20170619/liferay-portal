@@ -38,6 +38,7 @@ import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalServiceUtil;
+import com.liferay.layout.responsive.ResponsiveLayoutStructureUtil;
 import com.liferay.layout.util.structure.CollectionStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.ContainerStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -283,7 +284,8 @@ public class PortletLayoutDisplayContext {
 	}
 
 	public String getCssClass(
-		StyledLayoutStructureItem styledLayoutStructureItem) {
+			StyledLayoutStructureItem styledLayoutStructureItem)
+		throws Exception {
 
 		StringBundler cssClassSB = new StringBundler(43);
 
@@ -334,13 +336,6 @@ public class PortletLayoutDisplayContext {
 		}
 
 		if (Validator.isNotNull(
-				styledLayoutStructureItem.getFontSizeCssClass())) {
-
-			cssClassSB.append(StringPool.SPACE);
-			cssClassSB.append(styledLayoutStructureItem.getFontSizeCssClass());
-		}
-
-		if (Validator.isNotNull(
 				styledLayoutStructureItem.getHeightCssClass())) {
 
 			cssClassSB.append(StringPool.SPACE);
@@ -367,55 +362,50 @@ public class PortletLayoutDisplayContext {
 					"fixed")) {
 
 				cssClassSB.append(" container");
-			}
-
-			if (!Objects.equals(
-					containerStyledLayoutStructureItem.getWidthType(),
-					"fixed")) {
 
 				addHorizontalMargin = false;
 			}
 		}
 
 		if (styledLayoutStructureItem.getMarginBottom() != -1L) {
-			cssClassSB.append(" mb-");
+			cssClassSB.append(" mb-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getMarginBottom());
 		}
 
 		if (addHorizontalMargin) {
 			if (styledLayoutStructureItem.getMarginLeft() != -1L) {
-				cssClassSB.append(" ml-");
+				cssClassSB.append(" ml-lg-");
 				cssClassSB.append(styledLayoutStructureItem.getMarginLeft());
 			}
 
 			if (styledLayoutStructureItem.getMarginRight() != -1L) {
-				cssClassSB.append(" mr-");
+				cssClassSB.append(" mr-lg-");
 				cssClassSB.append(styledLayoutStructureItem.getMarginRight());
 			}
 		}
 
 		if (styledLayoutStructureItem.getMarginTop() != -1L) {
-			cssClassSB.append(" mt-");
+			cssClassSB.append(" mt-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getMarginTop());
 		}
 
 		if (styledLayoutStructureItem.getPaddingBottom() != -1L) {
-			cssClassSB.append(" pb-");
+			cssClassSB.append(" pb-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingBottom());
 		}
 
 		if (styledLayoutStructureItem.getPaddingLeft() != -1L) {
-			cssClassSB.append(" pl-");
+			cssClassSB.append(" pl-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingLeft());
 		}
 
 		if (styledLayoutStructureItem.getPaddingRight() != -1L) {
-			cssClassSB.append(" pr-");
+			cssClassSB.append(" pr-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingRight());
 		}
 
 		if (styledLayoutStructureItem.getPaddingTop() != -1L) {
-			cssClassSB.append(" pt-");
+			cssClassSB.append(" pt-lg-");
 			cssClassSB.append(styledLayoutStructureItem.getPaddingTop());
 		}
 
@@ -436,13 +426,22 @@ public class PortletLayoutDisplayContext {
 		if (Validator.isNotNull(
 				styledLayoutStructureItem.getTextColorCssClass())) {
 
-			cssClassSB.append(StringPool.SPACE);
+			cssClassSB.append(" text-");
 			cssClassSB.append(styledLayoutStructureItem.getTextColorCssClass());
 		}
 
 		if (Validator.isNotNull(styledLayoutStructureItem.getWidthCssClass())) {
 			cssClassSB.append(StringPool.SPACE);
 			cssClassSB.append(styledLayoutStructureItem.getWidthCssClass());
+		}
+
+		String responsiveCssClassValues =
+			ResponsiveLayoutStructureUtil.getResponsiveCssClassValues(
+				styledLayoutStructureItem);
+
+		if (Validator.isNotNull(responsiveCssClassValues)) {
+			cssClassSB.append(StringPool.SPACE);
+			cssClassSB.append(responsiveCssClassValues);
 		}
 
 		return cssClassSB.toString();
@@ -521,7 +520,7 @@ public class PortletLayoutDisplayContext {
 	public String getStyle(StyledLayoutStructureItem styledLayoutStructureItem)
 		throws PortalException {
 
-		StringBundler styleSB = new StringBundler(39);
+		StringBundler styleSB = new StringBundler(42);
 
 		styleSB.append("box-sizing: border-box;");
 
@@ -559,6 +558,12 @@ public class PortletLayoutDisplayContext {
 		if (Validator.isNotNull(styledLayoutStructureItem.getFontFamily())) {
 			styleSB.append("font-family: ");
 			styleSB.append(styledLayoutStructureItem.getFontFamily());
+			styleSB.append(StringPool.SEMICOLON);
+		}
+
+		if (Validator.isNotNull(styledLayoutStructureItem.getFontSize())) {
+			styleSB.append("font-size: ");
+			styleSB.append(styledLayoutStructureItem.getFontSize());
 			styleSB.append(StringPool.SEMICOLON);
 		}
 

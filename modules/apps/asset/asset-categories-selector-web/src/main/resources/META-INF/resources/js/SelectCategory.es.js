@@ -37,11 +37,7 @@ function SelectCategory({
 	nodes,
 }) {
 	const flattenedNodes = useMemo(() => {
-		if (
-			nodes.length === 1 &&
-			nodes[0].vocabulary &&
-			nodes[0].children.length > 0
-		) {
+		if (nodes.length === 1 && nodes[0].vocabulary) {
 			return nodes[0].children;
 		}
 
@@ -179,14 +175,25 @@ function SelectCategory({
 						className="category-tree"
 						id={`${namespace}categoryContainer`}
 					>
-						<Treeview
-							filterQuery={filterQuery}
-							initialSelectedNodeIds={initialSelectedNodeIds}
-							multiSelection={multiSelection}
-							NodeComponent={Treeview.Card}
-							nodes={flattenedNodes}
-							onSelectedNodesChange={handleSelectionChange}
-						/>
+						{flattenedNodes.length > 0 ? (
+							<Treeview
+								filterQuery={filterQuery}
+								initialSelectedNodeIds={initialSelectedNodeIds}
+								multiSelection={multiSelection}
+								NodeComponent={Treeview.Card}
+								nodes={flattenedNodes}
+								onSelectedNodesChange={handleSelectionChange}
+							/>
+						) : (
+							<div className="border-0 pt-0 sheet taglib-empty-result-message">
+								<div className="taglib-empty-result-message-header"></div>
+								<div className="sheet-text text-center">
+									{Liferay.Language.get(
+										'no-categories-were-found'
+									)}
+								</div>
+							</div>
+						)}
 					</div>
 				</ClayLayout.ContainerFluid>
 			</form>

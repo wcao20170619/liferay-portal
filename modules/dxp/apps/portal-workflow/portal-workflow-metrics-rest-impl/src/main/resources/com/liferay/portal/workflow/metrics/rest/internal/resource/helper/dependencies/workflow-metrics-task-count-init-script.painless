@@ -1,4 +1,11 @@
-state.assigneeIds = params.assigneeIds;
+if (params.containsKey("assigneeIds")) {
+	state.assigneeIds = new HashSet();	
+
+	for (assigneeId in params.assigneeIds) {
+		state.assigneeIds.add(Long.parseLong(assigneeId));
+	}
+}
+
 state.assigneeType = params.assigneeType;
 state.slaStatuses = params.slaStatuses;
 state.slaStatusMap = new HashMap();

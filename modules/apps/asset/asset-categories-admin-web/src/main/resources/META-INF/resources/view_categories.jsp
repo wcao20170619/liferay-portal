@@ -29,9 +29,16 @@ AssetCategoriesManagementToolbarDisplayContext assetCategoriesManagementToolbarD
 </portlet:actionURL>
 
 <aui:form action="<%= deleteCategoryURL %>" cssClass="container-fluid-1280" name="fm">
-	<liferay-site-navigation:breadcrumb
-		breadcrumbEntries="<%= AssetCategoryUtil.getAssetCategoriesBreadcrumbEntries(assetCategoriesDisplayContext.getVocabulary(), assetCategoriesDisplayContext.getCategory(), request, renderResponse) %>"
-	/>
+
+	<%
+	List<BreadcrumbEntry> breadcrumbEntries = AssetCategoryUtil.getAssetCategoriesBreadcrumbEntries(assetCategoriesDisplayContext.getVocabulary(), assetCategoriesDisplayContext.getCategory(), request, renderResponse);
+	%>
+
+	<c:if test="<%= ListUtil.isNotEmpty(breadcrumbEntries) %>">
+		<liferay-site-navigation:breadcrumb
+			breadcrumbEntries="<%= breadcrumbEntries %>"
+		/>
+	</c:if>
 
 	<liferay-ui:search-container
 		id="assetCategories"

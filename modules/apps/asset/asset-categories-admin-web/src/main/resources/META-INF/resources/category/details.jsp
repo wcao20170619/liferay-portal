@@ -182,6 +182,10 @@ renderResponse.setTitle(title);
 		</c:when>
 		<c:otherwise>
 			<aui:script>
+				var formSheet = document.querySelector('.lfr-form-content .sheet');
+
+				formSheet.classList.add('border-0');
+
 				var dialog = Liferay.Util.getWindow(
 					'<%= assetCategoriesDisplayContext.getItemSelectorEventName() %>'
 				);
@@ -204,7 +208,7 @@ renderResponse.setTitle(title);
 					var cancelButton = document.createElement('button');
 					cancelButton.setAttribute(
 						'class',
-						'add-category-toolbar-button btn btn-link'
+						'add-category-toolbar-button btn btn-link ml-3'
 					);
 					cancelButton.setAttribute('type', 'button');
 					cancelButton.innerText = '<liferay-ui:message key="cancel" />';
@@ -218,7 +222,7 @@ renderResponse.setTitle(title);
 					var saveAndAddNewButton = document.createElement('button');
 					saveAndAddNewButton.setAttribute(
 						'class',
-						'add-category-toolbar-button btn btn-secondary'
+						'add-category-toolbar-button btn btn-secondary ml-3'
 					);
 					saveAndAddNewButton.setAttribute('type', 'submit');
 					saveAndAddNewButton.innerText =
@@ -232,7 +236,7 @@ renderResponse.setTitle(title);
 					var submitButton = document.createElement('button');
 					submitButton.setAttribute(
 						'class',
-						'add-category-toolbar-button btn btn-primary'
+						'add-category-toolbar-button btn btn-primary ml-3'
 					);
 					submitButton.setAttribute('type', 'submit');
 					submitButton.innerText = '<liferay-ui:message key="save" />';

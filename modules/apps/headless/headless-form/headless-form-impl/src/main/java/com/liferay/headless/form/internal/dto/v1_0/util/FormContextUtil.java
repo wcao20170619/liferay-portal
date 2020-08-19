@@ -50,19 +50,21 @@ public class FormContextUtil {
 
 		DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
-		Map<String, Object> formContext = ddmFormTemplateContextFactory.create(
-			ddmStructure.getDDMForm(), ddmStructure.getDDMFormLayout(),
-			ddmFormRenderingContext);
+		Map<String, Object> ddmFormTemplateContext =
+			ddmFormTemplateContextFactory.create(
+				ddmStructure.getDDMForm(), ddmStructure.getDDMFormLayout(),
+				ddmFormRenderingContext);
 
 		return new FormContext() {
 			{
 				formPageContexts = TransformUtil.transformToArray(
-					_getMaps(formContext, "pages"),
+					_getMaps(ddmFormTemplateContext, "pages"),
 					FormContextUtil::_toFormPageContext, FormPageContext.class);
-				readOnly = _getBoolean(formContext, "readOnly");
+				readOnly = _getBoolean(ddmFormTemplateContext, "readOnly");
 				showRequiredFieldsWarning = _getBoolean(
-					formContext, "showRequiredFieldsWarning");
-				showSubmitButton = _getBoolean(formContext, "showSubmitButton");
+					ddmFormTemplateContext, "showRequiredFieldsWarning");
+				showSubmitButton = _getBoolean(
+					ddmFormTemplateContext, "showSubmitButton");
 			}
 		};
 	}

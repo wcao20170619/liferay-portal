@@ -12,54 +12,103 @@
  * details.
  */
 
-CKEDITOR.on('dialogDefinition', (event) => {
-	if (event.editor === ckEditor) {
-		var dialogName = event.data.name;
+CKEDITOR.on(
+	'dialogDefinition',
+	(event) => {
+		if (event.editor === ckEditor) {
+			var boundingWindow = event.editor.window;
 
-		var dialogDefinition = event.data.definition;
+			var dialogName = event.data.name;
 
-		var infoTab;
+			var dialogDefinition = event.data.definition;
 
-		if (dialogName === 'cellProperties') {
-			infoTab = dialogDefinition.getContents('info');
+			var dialog = event.data.dialog;
 
-			infoTab.remove('bgColor');
-			infoTab.remove('bgColorChoose');
-			infoTab.remove('borderColor');
-			infoTab.remove('borderColorChoose');
-			infoTab.remove('colSpan');
-			infoTab.remove('hAlign');
-			infoTab.remove('height');
-			infoTab.remove('htmlHeightType');
-			infoTab.remove('rowSpan');
-			infoTab.remove('vAlign');
-			infoTab.remove('width');
-			infoTab.remove('widthType');
-			infoTab.remove('wordWrap');
+			var onShow = dialogDefinition.onShow;
 
-			dialogDefinition.minHeight = 40;
-			dialogDefinition.minWidth = 210;
+			dialogDefinition.onShow = function () {
+				if (typeof onShow === 'function') {
+					onShow.apply(this, arguments);
+				}
+
+				centerDialog();
+			};
+
+			var centerDialog = function () {
+				var dialogSize = dialog.getSize();
+
+				var x = window.innerWidth / 2 - dialogSize.width / 2;
+				var y = window.innerHeight / 2 - dialogSize.height / 2;
+
+				dialog.move(x, y, false);
+			};
+
+			var debounce = function (fn, delay) {
+				return function debounced() {
+					var args = arguments;
+					clearTimeout(debounced.id);
+					debounced.id = setTimeout(() => {
+						fn.apply(null, args);
+					}, delay);
+				};
+			};
+
+			boundingWindow.on(
+				'resize',
+				debounce(() => {
+					centerDialog();
+				}, 250)
+			);
+
+			var infoTab;
+
+			if (dialogName === 'cellProperties') {
+				infoTab = dialogDefinition.getContents('info');
+
+				infoTab.remove('bgColor');
+				infoTab.remove('bgColorChoose');
+				infoTab.remove('borderColor');
+				infoTab.remove('borderColorChoose');
+				infoTab.remove('colSpan');
+				infoTab.remove('hAlign');
+				infoTab.remove('height');
+				infoTab.remove('htmlHeightType');
+				infoTab.remove('rowSpan');
+				infoTab.remove('vAlign');
+				infoTab.remove('width');
+				infoTab.remove('widthType');
+				infoTab.remove('wordWrap');
+
+				dialogDefinition.minHeight = 40;
+				dialogDefinition.minWidth = 210;
+			}
+			else if (
+				dialogName === 'table' ||
+				dialogName === 'tableProperties'
+			) {
+				infoTab = dialogDefinition.getContents('info');
+
+				infoTab.remove('cmbAlign');
+				infoTab.remove('cmbWidthType');
+				infoTab.remove('cmbWidthType');
+				infoTab.remove('htmlHeightType');
+				infoTab.remove('txtBorder');
+				infoTab.remove('txtCellPad');
+				infoTab.remove('txtCellSpace');
+				infoTab.remove('txtHeight');
+				infoTab.remove('txtSummary');
+				infoTab.remove('txtWidth');
+
+				dialogDefinition.minHeight = 180;
+				dialogDefinition.minWidth = 210;
+			}
+			else if (dialogName === 'image') {
+				dialogDefinition.removeContents('Link');
+				dialogDefinition.removeContents('advanced');
+			}
 		}
-		else if (dialogName === 'table' || dialogName === 'tableProperties') {
-			infoTab = dialogDefinition.getContents('info');
-
-			infoTab.remove('cmbAlign');
-			infoTab.remove('cmbWidthType');
-			infoTab.remove('cmbWidthType');
-			infoTab.remove('htmlHeightType');
-			infoTab.remove('txtBorder');
-			infoTab.remove('txtCellPad');
-			infoTab.remove('txtCellSpace');
-			infoTab.remove('txtHeight');
-			infoTab.remove('txtSummary');
-			infoTab.remove('txtWidth');
-
-			dialogDefinition.minHeight = 180;
-			dialogDefinition.minWidth = 210;
-		}
-		else if (dialogName === 'image') {
-			dialogDefinition.removeContents('Link');
-			dialogDefinition.removeContents('advanced');
-		}
-	}
-});
+	},
+	null,
+	null,
+	100
+);

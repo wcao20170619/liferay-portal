@@ -291,7 +291,13 @@ const Main = ({
 		];
 
 	return (
-		<FieldBase {...otherProps} id={id} name={name} readOnly={readOnly}>
+		<FieldBase
+			{...otherProps}
+			id={id}
+			localizedValue={localizedValue}
+			name={name}
+			readOnly={readOnly}
+		>
 			<Component
 				defaultLanguageId={defaultLanguageId}
 				disabled={readOnly}

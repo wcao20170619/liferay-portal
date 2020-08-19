@@ -23,10 +23,10 @@ import React, {
 	useRef,
 } from 'react';
 
-import {EVENT_TYPES} from '../actions/eventTypes.es';
 import Pages from '../components/Pages.es';
 import {FormProvider, useForm} from '../hooks/useForm.es';
 import formValidate from '../thunks/formValidate.es';
+import pageLanguageUpdate from '../thunks/pageLanguageUpdate.es';
 import {getConnectedReactComponentAdapter} from '../util/ReactComponentAdapter.es';
 import {evaluate} from '../util/evaluation.es';
 import {getFormId, getFormNode} from '../util/formId.es';
@@ -36,6 +36,8 @@ const Form = React.forwardRef(
 	(
 		{
 			activePage,
+			dataRecordValues,
+			ddmStructureLayoutId,
 			defaultLanguageId,
 			description,
 			editingLanguageId,
@@ -137,11 +139,21 @@ const Form = React.forwardRef(
 				rules,
 				successPageSettings,
 			}),
-			updateEditingLanguageId: ({editingLanguageId}) =>
-				dispatch({
-					payload: {editingLanguageId},
-					type: EVENT_TYPES.ALL,
-				}),
+			updateEditingLanguageId: ({
+				editingLanguageId: nextEditingLanguageId = '',
+				preserveValue,
+			}) =>
+				dispatch(
+					pageLanguageUpdate({
+						ddmStructureLayoutId,
+						nextEditingLanguageId,
+						pages,
+						portletNamespace,
+						preserveValue,
+						prevDataRecordValues: dataRecordValues,
+						prevEditingLanguageId: editingLanguageId,
+					})
+				),
 			validate,
 		}));
 

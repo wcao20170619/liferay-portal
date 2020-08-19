@@ -4,195 +4,69 @@
 		"styles": [
 			{
 				"dataType": "string",
-				"defaultValue": "w-auto",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "width",
 				"name": "width",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "auto",
-						"value": "w-auto"
-					},
-					{
-						"label": "25",
-						"value": "w-25"
-					},
-					{
-						"label": "50",
-						"value": "w-50"
-					},
-					{
-						"label": "75",
-						"value": "w-75"
-					},
-					{
-						"label": "100",
-						"value": "w-100"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
-				"defaultValue": "h-auto",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "height",
 				"name": "height",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "auto",
-						"value": "h-auto"
-					},
-					{
-						"label": "25",
-						"value": "h-25"
-					},
-					{
-						"label": "50",
-						"value": "h-50"
-					},
-					{
-						"label": "75",
-						"value": "h-75"
-					},
-					{
-						"label": "100",
-						"value": "h-100"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
-				"defaultValue": "auto",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "min-width",
 				"name": "minWidth",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "auto",
-						"value": "auto"
-					},
-					{
-						"label": "25",
-						"value": "25%"
-					},
-					{
-						"label": "50",
-						"value": "50%"
-					},
-					{
-						"label": "75",
-						"value": "75%"
-					},
-					{
-						"label": "100",
-						"value": "100%"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
-				"defaultValue": "none",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "max-width",
 				"name": "maxWidth",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "none",
-						"value": "none"
-					},
-					{
-						"label": "25",
-						"value": "25%"
-					},
-					{
-						"label": "50",
-						"value": "50%"
-					},
-					{
-						"label": "75",
-						"value": "75%"
-					},
-					{
-						"label": "100",
-						"value": "100%"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
-				"defaultValue": "auto",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "min-height",
 				"name": "minHeight",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "auto",
-						"value": "auto"
-					},
-					{
-						"label": "25",
-						"value": "25%"
-					},
-					{
-						"label": "50",
-						"value": "50%"
-					},
-					{
-						"label": "75",
-						"value": "75%"
-					},
-					{
-						"label": "100",
-						"value": "100%"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
-				"defaultValue": "none",
+				"defaultValue": "",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "max-height",
 				"name": "maxHeight",
 				"responsive": false,
-				"type": "select",
-				"validValues": [
-					{
-						"label": "none",
-						"value": "none"
-					},
-					{
-						"label": "25",
-						"value": "25%"
-					},
-					{
-						"label": "50",
-						"value": "50%"
-					},
-					{
-						"label": "75",
-						"value": "75%"
-					},
-					{
-						"label": "100",
-						"value": "100%"
-					}
-				]
+				"type": "text"
 			},
 			{
 				"dataType": "string",
@@ -225,16 +99,18 @@
 		]
 	},
 	{
-		"label": "spacing",
+		"label": "margin",
 		"styles": [
 			{
 				"dataType": "string",
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "margin-top",
 				"name": "marginTop",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "mt{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -268,9 +144,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "margin-bottom",
 				"name": "marginBottom",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "mb{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -304,9 +182,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "margin-left",
 				"name": "marginLeft",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "ml{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -340,9 +220,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "margin-right",
 				"name": "marginRight",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "mr{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -370,15 +252,22 @@
 						"value": "5"
 					}
 				]
-			},
+			}
+		]
+	},
+	{
+		"label": "padding",
+		"styles": [
 			{
 				"dataType": "string",
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "padding-top",
 				"name": "paddingTop",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "pt{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -412,9 +301,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "padding-bottom",
 				"name": "paddingBottom",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "pb{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -448,9 +339,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "padding-left",
 				"name": "paddingLeft",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "pl{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -484,9 +377,11 @@
 				"defaultValue": "0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "padding-right",
 				"name": "paddingRight",
-				"responsive": false,
+				"responsive": true,
+				"responsiveTemplate": "pr{viewport}{value}",
 				"type": "select",
 				"validValues": [
 					{
@@ -672,6 +567,7 @@
 				"defaultValue": 0,
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "border-width",
 				"name": "borderWidth",
 				"responsive": false,
@@ -687,6 +583,7 @@
 				"defaultValue": "rounded-0",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "border-radius",
 				"name": "borderRadius",
 				"responsive": false,
@@ -729,6 +626,7 @@
 				"defaultValue": 100,
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "opacity",
 				"name": "opacity",
 				"responsive": false,
@@ -744,6 +642,7 @@
 				"defaultValue": "shadow-none",
 				"dependencies": [
 				],
+				"displaySize": "small",
 				"label": "shadow",
 				"name": "shadow",
 				"responsive": false,

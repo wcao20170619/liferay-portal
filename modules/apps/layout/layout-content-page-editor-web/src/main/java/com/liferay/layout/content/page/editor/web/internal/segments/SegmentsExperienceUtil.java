@@ -242,7 +242,8 @@ public class SegmentsExperienceUtil {
 				CounterLocalServiceUtil.increment());
 			newFragmentEntryLink.setCreateDate(new Date());
 			newFragmentEntryLink.setModifiedDate(new Date());
-			newFragmentEntryLink.setOriginalFragmentEntryLinkId(0);
+			newFragmentEntryLink.setOriginalFragmentEntryLinkId(
+				fragmentEntryLink.getFragmentEntryLinkId());
 			newFragmentEntryLink.setSegmentsExperienceId(
 				targetSegmentsExperienceId);
 

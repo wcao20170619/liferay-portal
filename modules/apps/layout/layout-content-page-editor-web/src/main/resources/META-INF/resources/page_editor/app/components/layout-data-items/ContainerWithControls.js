@@ -23,6 +23,7 @@ import {
 import selectCanUpdateItemConfiguration from '../../selectors/selectCanUpdateItemConfiguration';
 import selectCanUpdatePageStructure from '../../selectors/selectCanUpdatePageStructure';
 import {useSelector} from '../../store/index';
+import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import Topper from '../Topper';
 import Container from './Container';
 
@@ -34,15 +35,37 @@ const ContainerWithControls = React.forwardRef(
 		const canUpdatePageStructure = useSelector(
 			selectCanUpdatePageStructure
 		);
+		const selectedViewportSize = useSelector(
+			(state) => state.selectedViewportSize
+		);
 
 		const [setRef, itemElement] = useSetRef(ref);
 
-		const {widthType} = item.config;
-		const {marginLeft, marginRight, shadow, width} = item.config.styles;
+		const itemConfig = getResponsiveConfig(
+			item.config,
+			selectedViewportSize
+		);
+
+		const {widthType} = itemConfig;
+
+		const {
+			marginLeft,
+			marginRight,
+			maxWidth,
+			minWidth,
+			shadow,
+			width,
+		} = itemConfig.styles;
+
+		const style = {};
+
+		style.maxWidth = maxWidth;
+		style.minWidth = minWidth;
+		style.width = width;
 
 		return (
 			<Topper
-				className={classNames(shadow, width, {
+				className={classNames(shadow, {
 					container: widthType === 'fixed',
 					[`ml-${marginLeft}`]: widthType !== 'fixed',
 					[`mr-${marginRight}`]: widthType !== 'fixed',
@@ -51,6 +74,7 @@ const ContainerWithControls = React.forwardRef(
 				item={item}
 				itemElement={itemElement}
 				layoutData={layoutData}
+				style={style}
 			>
 				<Container
 					className={classNames({

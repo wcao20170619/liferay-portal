@@ -55,6 +55,10 @@ export default (state, action) => {
 
 			return action.payload;
 		}
+		case EVENT_TYPES.UPDATE_DATA_RECORD_VALUES:
+			return {
+				dataRecordValues: action.payload,
+			};
 		default:
 			return state;
 	}
