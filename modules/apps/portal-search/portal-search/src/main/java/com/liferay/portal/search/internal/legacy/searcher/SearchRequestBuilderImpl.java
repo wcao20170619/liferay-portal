@@ -157,6 +157,35 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	}
 
 	@Override
+	public SearchRequest combine(SearchRequest searchRequest) {
+		_addAggregationsMap(searchRequest);
+
+		_addComplexQueryParts(searchRequest);
+
+		_addIndexes(searchRequest);
+
+		_addPipelineAggregationsMap(searchRequest);
+
+		_addExcludeContributors(searchRequest);
+
+		_addIncludeContributors(searchRequest);
+
+		_setQuery(searchRequest);
+
+		_setEntryClassNames(searchRequest);
+
+		_setSorts(searchRequest);
+
+		_setStatsRequests(searchRequest);
+
+		addFederatedSearchRequests(searchRequest.getFederatedSearchRequests());
+
+		postFilterQuery(searchRequest.getPostFilterQuery());
+
+		return withSearchRequestGet(Function.identity());
+	}
+
+	@Override
 	public SearchRequestBuilder companyId(Long companyId) {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setCompanyId(companyId));
@@ -559,6 +588,72 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 			searchRequestImplConsumer.accept(
 				getSearchRequestImpl(_searchContext));
 		}
+	}
+
+	private void _addAggregationsMap(SearchRequest searchRequest) {
+		Map<String, Aggregation> aggregationsMap =
+			searchRequest.getAggregationsMap();
+
+		aggregationsMap.forEach(
+			(key, value) -> addAggregation((Aggregation)value));
+	}
+
+	private void _addComplexQueryParts(SearchRequest searchRequest) {
+		List<ComplexQueryPart> complexQueryParts =
+			searchRequest.getComplexQueryParts();
+
+		complexQueryParts.forEach(
+			complexQueryPart -> addComplexQueryPart(complexQueryPart));
+	}
+
+	private void _addExcludeContributors(SearchRequest searchRequest) {
+		List<String> excludeContributors =
+			searchRequest.getExcludeContributors();
+
+		excludeContributors(excludeContributors.toArray(new String[0]));
+	}
+
+	private void _addIncludeContributors(SearchRequest searchRequest) {
+		List<String> includeContributors =
+			searchRequest.getIncludeContributors();
+
+		includeContributors(includeContributors.toArray(new String[0]));
+	}
+
+	private void _addIndexes(SearchRequest searchRequest) {
+		List<String> indexes = searchRequest.getIndexes();
+
+		indexes.forEach(index -> addIndex(index));
+	}
+
+	private void _addPipelineAggregationsMap(SearchRequest searchRequest) {
+		Map<String, PipelineAggregation> pipelineAggregationsMap =
+			searchRequest.getPipelineAggregationsMap();
+
+		pipelineAggregationsMap.forEach(
+			(key, value) -> addPipelineAggregation((PipelineAggregation)value));
+	}
+
+	private void _setEntryClassNames(SearchRequest searchRequest) {
+		List<String> entryClassNames = searchRequest.getEntryClassNames();
+
+		entryClassNames(entryClassNames.toArray(new String[0]));
+	}
+
+	private void _setQuery(SearchRequest searchRequest) {
+		query(searchRequest.getQuery());
+	}
+
+	private void _setSorts(SearchRequest searchRequest) {
+		List<Sort> sortList = searchRequest.getSorts();
+
+		sorts(sortList.toArray(new Sort[0]));
+	}
+
+	private void _setStatsRequests(SearchRequest searchRequest) {
+		List<StatsRequest> statsRequests = searchRequest.getStatsRequests();
+
+		statsRequests(statsRequests.toArray(new StatsRequest[0]));
 	}
 
 	private static final String _SEARCH_CONTEXT_KEY_SEARCH_REQUEST =

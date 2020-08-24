@@ -79,26 +79,40 @@ public class BlueprintsSearchRequestContributor
 		}
 
 		try {
-			SearchRequestContext searchRequestContext =
-				_searchClientHelper.getSearchRequestContext(
-					searchContext, blueprintId);
+//			SearchRequestContext searchRequestContext =
+//				_searchClientHelper.getSearchRequestContext(
+//					searchContext, blueprintId);
+//
+//			SearchRequestData searchRequestData =
+//				_searchClientHelper.getSearchRequestData(searchRequestContext);
+//
+//			BooleanQuery query = searchRequestData.getQuery();
+//
+//			if (!query.hasClauses()) {
+//				return searchRequest;
+//			}
+//
+//			return _searchRequestBuilderFactory.builder(
+//				searchRequest
+//			).query(
+//				query
+//			).indexes(
+//				searchRequestContext.getIndexNames()
+//			).build();
+			SearchRequest fragmentSearchRequest = _blueprintsSearchRequestLookup.lookup(
+					blueprintId, searchContext);
 
-			SearchRequestData searchRequestData =
-				_searchClientHelper.getSearchRequestData(searchRequestContext);
+				BooleanQuery query = (BooleanQuery)fragmentSearchRequest.getQuery();
 
-			BooleanQuery query = searchRequestData.getQuery();
+				if (!query.hasClauses()) {
+					return searchRequest;
+				}
 
-			if (!query.hasClauses()) {
-				return searchRequest;
-			}
-
-			return _searchRequestBuilderFactory.builder(
-				searchRequest
-			).query(
-				query
-			).indexes(
-				searchRequestContext.getIndexNames()
-			).build();
+				return _searchRequestBuilderFactory.builder(
+					searchRequest
+				).combine(
+					fragmentSearchRequest
+				);
 		}
 		catch (Exception exception) {
 			_log.error(exception.getMessage(), exception);
@@ -126,6 +140,9 @@ public class BlueprintsSearchRequestContributor
 
 	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+	
+	@Reference
+	private BlueprintsSearchRequestLookup _blueprintsSearchRequestLookup;
 
 	@Reference
 	private UserLocalService _userLocalService;

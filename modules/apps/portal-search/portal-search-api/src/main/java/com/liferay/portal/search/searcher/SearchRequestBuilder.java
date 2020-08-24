@@ -70,6 +70,8 @@ public interface SearchRequestBuilder {
 	 * @return the search request
 	 */
 	public SearchRequest build();
+	
+	public SearchRequest combine(SearchRequest searchRequest);
 
 	public SearchRequestBuilder companyId(Long companyId);
 
