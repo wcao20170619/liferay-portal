@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.internal.searcher;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -38,6 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author André de Oliveira
@@ -221,6 +225,21 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 	}
 
 	@Override
+	public List<String> getModelIndexerClassNames() {
+		List<Class<?>> modelIndexerClasses = Collections.unmodifiableList(
+			_modelIndexerClasses);
+
+		Stream<Class<?>> modelIndexerClassesStream =
+			modelIndexerClasses.stream();
+
+		return modelIndexerClassesStream.map(
+			modelIndexerClass -> modelIndexerClass.getCanonicalName()
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	@Override
 	public String getPaginationStartParameterName() {
 		return _paginationStartParameterName;
 	}
@@ -393,6 +412,31 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 		Collections.addAll(_modelIndexerClasses, classes);
 	}
 
+	public void setModelIndexerClassNames(String... classNames) {
+		Stream<String> classStream = Arrays.stream(classNames);
+
+		Class<?>[] classes = classStream.map(
+			className -> {
+				Class<?> clazz = null;
+
+				try {
+					clazz = Class.forName(className);
+				}
+				catch (Exception exception) {
+					_log.error(exception, exception);
+				}
+
+				return clazz;
+			}
+		).toArray(
+			Class[]::new
+		);
+
+		_modelIndexerClasses.clear();
+
+		Collections.addAll(_modelIndexerClasses, classes);
+	}
+
 	public void setOwnerUserId(Long userId) {
 		_searchContext.setOwnerUserId(GetterUtil.getLong(userId));
 	}
@@ -440,6 +484,9 @@ public class SearchRequestImpl implements SearchRequest, Serializable {
 
 		Collections.addAll(_statsRequests, statsRequests);
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SearchRequestImpl.class);
 
 	private final Map<String, Aggregation> _aggregationsMap =
 		new LinkedHashMap<>();
