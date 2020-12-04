@@ -377,6 +377,15 @@ public class SearchRequestBuilderImpl implements SearchRequestBuilder {
 	}
 
 	@Override
+	public SearchRequestBuilder modelIndexerClassNames(String... classNames) {
+		withSearchRequestImpl(
+			searchRequestImpl -> searchRequestImpl.setModelIndexerClassNames(
+				classNames));
+
+		return this;
+	}
+
+	@Override
 	public SearchRequestBuilder modelIndexerClasses(Class<?>... classes) {
 		withSearchRequestImpl(
 			searchRequestImpl -> searchRequestImpl.setModelIndexerClasses(

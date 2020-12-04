@@ -147,6 +147,8 @@ public interface SearchRequestBuilder {
 
 	public SearchRequestBuilder modelIndexerClasses(Class<?>... classes);
 
+	public SearchRequestBuilder modelIndexerClassNames(String... classeNames);
+
 	public SearchRequestBuilder ownerUserId(Long userId);
 
 	public void paginationStartParameterName(
