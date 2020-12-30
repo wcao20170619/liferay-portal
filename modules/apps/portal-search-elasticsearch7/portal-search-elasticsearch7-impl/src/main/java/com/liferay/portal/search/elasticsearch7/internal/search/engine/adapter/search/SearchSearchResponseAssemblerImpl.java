@@ -36,6 +36,7 @@ import com.liferay.portal.search.highlight.HighlightFieldBuilderFactory;
 import com.liferay.portal.search.hits.SearchHitBuilderFactory;
 import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
+import com.liferay.portal.search.searcher.SearchTimeValue;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -43,6 +44,7 @@ import java.util.stream.Stream;
 import org.apache.lucene.search.TotalHits;
 
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -74,6 +76,7 @@ public class SearchSearchResponseAssemblerImpl
 		setScrollId(searchResponse, searchSearchResponse);
 		setSearchHits(
 			searchResponse, searchSearchResponse, searchSearchRequest);
+		setTook(searchResponse, searchSearchResponse);
 
 		_searchResponseTranslator.populate(
 			searchSearchResponse, searchResponse, searchSearchRequest);
@@ -227,6 +230,19 @@ public class SearchSearchResponseAssemblerImpl
 		SearchResponseTranslator searchResponseTranslator) {
 
 		_searchResponseTranslator = searchResponseTranslator;
+	}
+
+	protected void setTook(
+		SearchResponse searchResponse,
+		SearchSearchResponse searchSearchResponse) {
+
+		TimeValue took = searchResponse.getTook();
+
+		SearchTimeValue.Builder searchTimeValueBuilder =
+			SearchTimeValue.Builder.newBuilder(
+				took.duration(), took.timeUnit());
+
+		searchSearchResponse.setTook(searchTimeValueBuilder.build());
 	}
 
 	private AggregationResults _aggregationResults;
