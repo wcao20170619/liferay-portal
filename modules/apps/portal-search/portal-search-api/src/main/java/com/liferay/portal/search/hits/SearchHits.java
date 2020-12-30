@@ -29,6 +29,11 @@ public interface SearchHits {
 
 	public List<SearchHit> getSearchHits();
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             com.liferay.portal.search.searcher.SearchResponse#getTook()}
+	 */
+	@Deprecated
 	public long getSearchTime();
 
 	public long getTotalHits();

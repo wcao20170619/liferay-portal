@@ -94,6 +94,8 @@ public interface SearchResponse {
 	 */
 	public Map<String, StatsResponse> getStatsResponseMap();
 
+	public SearchTimeValue getTook();
+
 	public int getTotalHits();
 
 	public void withFacetContext(Consumer<FacetContext> facetContextConsumer);
