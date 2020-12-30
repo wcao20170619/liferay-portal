@@ -23,6 +23,7 @@ import com.liferay.portal.search.internal.searcher.SearchResponseImpl;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
+import com.liferay.portal.search.searcher.SearchTimeValue;
 import com.liferay.portal.search.stats.StatsResponse;
 
 import java.io.Serializable;
@@ -147,6 +148,14 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 		withSearchResponseImpl(
 			searchResponseImpl -> searchResponseImpl.setStatsResponseMap(map));
+
+		return this;
+	}
+
+	@Override
+	public SearchResponseBuilder took(SearchTimeValue took) {
+		withSearchResponseImpl(
+			searchResponseImpl -> searchResponseImpl.setTook(took));
 
 		return this;
 	}
