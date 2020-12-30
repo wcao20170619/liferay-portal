@@ -95,4 +95,6 @@ public interface SearchResponseBuilder {
 	public SearchResponseBuilder statsResponseMap(
 		Map<String, StatsResponse> statsResponseMap);
 
+	public SearchResponseBuilder took(SearchTimeValue took);
+
 }
