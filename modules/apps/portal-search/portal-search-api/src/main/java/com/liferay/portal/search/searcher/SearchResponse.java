@@ -93,6 +93,8 @@ public interface SearchResponse {
 	 * @return the map containing the metrics aggregations per field
 	 */
 	public Map<String, StatsResponse> getStatsResponseMap();
+	
+	public List<String> getSuggestKeywords();
 
 	public int getTotalHits();
 

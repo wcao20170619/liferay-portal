@@ -157,6 +157,11 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	public Map<String, StatsResponse> getStatsResponseMap() {
 		return Collections.unmodifiableMap(_statsResponseMap);
 	}
+	
+	@Override
+	public List<String> getSuggestKeywords() {
+		return Collections.unmodifiableList(_suggestKeywords);
+	}
 
 	@Override
 	public int getTotalHits() {
@@ -214,6 +219,12 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 
 		_statsResponseMap.putAll(map);
 	}
+	
+	public void setSuggestKeywords(List<String> suggestKeywords) {
+		_suggestKeywords.clear();
+
+		_suggestKeywords.addAll(suggestKeywords);
+	}
 
 	@Override
 	public void withFacetContext(Consumer<FacetContext> facetContextConsumer) {
@@ -267,5 +278,6 @@ public class SearchResponseImpl implements SearchResponse, Serializable {
 	private SearchRequest _searchRequest;
 	private final Map<String, StatsResponse> _statsResponseMap =
 		new LinkedHashMap<>();
+	private final List<String> _suggestKeywords = new ArrayList<String>();
 
 }

@@ -28,7 +28,9 @@ import com.liferay.portal.search.searcher.SearchResponseBuilder;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.spi.searcher.SearchRequestContributor;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -144,6 +146,8 @@ public class SearcherImpl implements Searcher {
 		SearchResponseBuilder searchResponseBuilder =
 			searchResponseBuilderFactory.builder(
 				searchRequestImpl.getSearchContext());
+		
+		doSuggestKeywordQueries(searchRequestImpl, searchResponseBuilder);
 
 		doSmartSearch(searchRequestImpl, searchResponseBuilder);
 
@@ -174,6 +178,34 @@ public class SearcherImpl implements Searcher {
 
 		searchResponseBuilder.hits(hits);
 	}
+	
+	protected void doMultiIndexerSuggestKeywordQueries(
+			SearchRequestImpl searchRequestImpl,
+			SearchResponseBuilder searchResponseBuilder) {
+
+		SearchContext searchContext = searchRequestImpl.getSearchContext();
+		String[] suggestKeywords = indexSearcherHelper.suggestKeywordQueries(searchContext, 10);
+
+		searchResponseBuilder.suggestKeywords(
+			Arrays.asList(
+				Optional.ofNullable(
+					suggestKeywords).orElse(
+						new String[0])));
+	}
+	
+	protected void doSingleIndexerSuggestKeywordQueries(
+			Class<?> clazz, SearchRequestImpl searchRequestImpl,
+			SearchResponseBuilder searchResponseBuilder) {
+
+		SearchContext searchContext = searchRequestImpl.getSearchContext();
+		String[] suggestKeywords = indexSearcherHelper.suggestKeywordQueries(searchContext, 10);
+
+		searchResponseBuilder.suggestKeywords(
+			Arrays.asList(
+				Optional.ofNullable(
+					suggestKeywords).orElse(
+						new String[0])));
+	}
 
 	protected void doSmartSearch(
 		SearchRequestImpl searchRequestImpl,
@@ -186,6 +218,19 @@ public class SearcherImpl implements Searcher {
 		}
 		else {
 			doLowLevelSearch(searchRequestImpl, searchResponseBuilder);
+		}
+	}
+	
+	protected void doSuggestKeywordQueries(SearchRequestImpl searchRequestImpl,
+		SearchResponseBuilder searchResponseBuilder) {
+		Class<?> singleIndexerClass = getSingleIndexerClass(searchRequestImpl);
+		
+		if (singleIndexerClass != null) {
+			doSingleIndexerSuggestKeywordQueries(
+				singleIndexerClass, searchRequestImpl, searchResponseBuilder);
+		}
+		else {
+			doMultiIndexerSuggestKeywordQueries(searchRequestImpl, searchResponseBuilder);
 		}
 	}
 

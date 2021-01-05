@@ -94,5 +94,8 @@ public interface SearchResponseBuilder {
 	 */
 	public SearchResponseBuilder statsResponseMap(
 		Map<String, StatsResponse> statsResponseMap);
+	
+	public SearchResponseBuilder suggestKeywords(
+			List<String> suggestKeywords);
 
 }

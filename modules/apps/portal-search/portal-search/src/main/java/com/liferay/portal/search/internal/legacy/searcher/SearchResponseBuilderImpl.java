@@ -150,6 +150,15 @@ public class SearchResponseBuilderImpl implements SearchResponseBuilder {
 
 		return this;
 	}
+	
+	@Override
+	public SearchResponseBuilder suggestKeywords(List<String> suggestKeywords) {
+
+		withSearchResponseImpl(
+			searchResponseImpl -> searchResponseImpl.setSuggestKeywords(suggestKeywords));
+
+		return this;
+	}
 
 	protected static SearchResponseImpl getSearchResponseImpl(
 		SearchContext searchContext) {
