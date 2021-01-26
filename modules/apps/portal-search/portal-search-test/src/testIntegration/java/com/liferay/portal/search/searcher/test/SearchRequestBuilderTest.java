@@ -26,9 +26,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
+import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.DataGuard;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -61,7 +63,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -70,7 +71,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Wade Cao
  */
-@Ignore
+@DataGuard(scope = DataGuard.Scope.METHOD)
 @RunWith(Arquillian.class)
 public class SearchRequestBuilderTest {
 
@@ -104,10 +105,10 @@ public class SearchRequestBuilderTest {
 
 	@Test
 	public void testAddPostFilterQueryPart() throws Exception {
-		_addUser("alpha", "alpha", "omega");
-		_addUser("omega", "alpha", "omega");
-		_addUser("phi", "alpha", "omega");
-		_addUser("sigma", "zeta", "omega");
+		_addUser("alpha", "omega", "alpha");
+		_addUser("alpha", "omega", "omega");
+		_addUser("alpha", "omega", "phi");
+		_addUser("zeta", "omega", "sigma");
 
 		String queryString = "omega";
 
@@ -119,6 +120,8 @@ public class SearchRequestBuilderTest {
 				_group.getGroupId()
 			).queryString(
 				queryString
+			).addSort(
+				_sorts.field("userName", SortOrder.ASC)
 			);
 
 		_assertSearch(
@@ -163,10 +166,10 @@ public class SearchRequestBuilderTest {
 
 	@Test
 	public void testAddPostFilterQueryPartAdditive() throws Exception {
-		_addUser("alpha", "alpha", "delta");
-		_addUser("omega", "alpha", "delta");
-		_addUser("gamma", "alpha", "delta");
-		_addUser("sigma", "omega", "delta");
+		_addUser("alpha", "delta", "alpha");
+		_addUser("alpha", "delta", "omega");
+		_addUser("alpha", "delta", "gamma");
+		_addUser("omega", "delta", "sigma");
 
 		String queryString = "delta";
 
@@ -185,6 +188,8 @@ public class SearchRequestBuilderTest {
 				).query(
 					_queries.term("screenName", "alpha")
 				).build()
+			).addSort(
+				_sorts.field("userName", SortOrder.ASC)
 			);
 
 		_assertSearch("[alpha delta]", "userName", searchRequestBuilder);
@@ -203,9 +208,9 @@ public class SearchRequestBuilderTest {
 
 	@Test
 	public void testAddRescore() throws Exception {
-		_addUser("AlphaDelta", "alpha", "delta");
-		_addUser("BetaDelta", "beta", "delta");
-		_addUser("GammaDelta", "gamma", "delta");
+		_addUser("alpha", "delta", "AlphaDelta");
+		_addUser("beta", "delta", "BetaDelta");
+		_addUser("gamma", "delta", "GammaDelta");
 
 		_assertSearch(
 			"[alpha delta, beta delta, gamma delta]", "userName", "delta",
@@ -229,9 +234,9 @@ public class SearchRequestBuilderTest {
 
 	@Test
 	public void testAddSort() throws Exception {
-		_addUser("name1", "firstName2", "lastName3");
-		_addUser("name2", "firstName3", "lastName1");
-		_addUser("name3", "firstName1", "lastName2");
+		_addUser("firstName2", "lastName3", "name1");
+		_addUser("firstName3", "lastName1", "name2");
+		_addUser("firstName1", "lastName2", "name3");
 
 		FieldSort fieldSort = _sorts.field("screenName", SortOrder.DESC);
 
@@ -247,9 +252,9 @@ public class SearchRequestBuilderTest {
 
 	@Test
 	public void testModelIndexerClassNames() throws Exception {
-		_addUser("epsilon", "epsilon", "lambda1");
-		_addUser("theta", "theta", "lambda2");
-		_addUser("kappa", "kappa", "lambda3");
+		_addUser("epsilon", "lambda1", "epsilon");
+		_addUser("theta", "lambda2", "theta");
+		_addUser("kappa", "lambda3", "kappa");
 
 		String queryString = "lambda";
 
@@ -265,17 +270,19 @@ public class SearchRequestBuilderTest {
 				User.class.getCanonicalName()
 			).queryString(
 				queryString
+			).addSort(
+				_sorts.field("userName", SortOrder.ASC)
 			);
 
 		_assertSearch(
-			"[epsilon lambda1, theta lambda2, kappa lambda3]", "userName",
+			"[epsilon lambda1, kappa lambda3, theta lambda2]", "userName",
 			searchRequestBuilder);
 
 		searchRequestBuilder.modelIndexerClassNames(
 			User.class.getCanonicalName(), UserGroup.class.getCanonicalName());
 
 		_assertSearch(
-			"[epsilon lambda1, theta lambda2, kappa lambda3]", "userName",
+			"[epsilon lambda1, kappa lambda3, theta lambda2]", "userName",
 			searchRequestBuilder);
 
 		searchRequestBuilder.modelIndexerClassNames(
@@ -304,6 +311,8 @@ public class SearchRequestBuilderTest {
 				JournalArticle.class.getCanonicalName()
 			).queryString(
 				queryString
+			).addSort(
+				_sorts.field("title_en_US_sortable", SortOrder.ASC)
 			);
 
 		_assertSearch(
@@ -361,19 +370,23 @@ public class SearchRequestBuilderTest {
 			});
 	}
 
-	private void _addUser(String userName, String firstName, String lastName)
+	private void _addUser(String firstName, String lastName, String screenName)
 		throws Exception {
 
 		String[] assetTagNames = {};
 
 		_userSearchFixture.addUser(
-			userName, firstName, lastName, LocaleUtil.US, _group,
+			screenName, firstName, lastName, LocaleUtil.US, _group,
 			assetTagNames);
 	}
 
 	private void _assertSearch(
 		String expected, String fieldName,
 		SearchRequestBuilder searchRequestBuilder) {
+
+		if (!_isElasticsearch()) {
+			return;
+		}
 
 		SearchResponse searchResponse = _searcher.search(
 			searchRequestBuilder.build());
@@ -386,6 +399,10 @@ public class SearchRequestBuilderTest {
 	private void _assertSearch(
 		String expected, String fieldName, String queryString,
 		List<Rescore> rescores) {
+
+		if (!_isElasticsearch()) {
+			return;
+		}
 
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder(
@@ -444,6 +461,12 @@ public class SearchRequestBuilderTest {
 		).build();
 	}
 
+	private boolean _isElasticsearch() {
+		String vendor = _searchEngine.getVendor();
+
+		return vendor.equals("Elasticsearch");
+	}
+
 	@Inject
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
 
@@ -465,6 +488,9 @@ public class SearchRequestBuilderTest {
 
 	@Inject
 	private RescoreBuilderFactory _rescoreBuilderFactory;
+
+	@Inject(filter = "search.engine.id=SYSTEM_ENGINE")
+	private SearchEngine _searchEngine;
 
 	@Inject
 	private Searcher _searcher;
