@@ -4,6 +4,7 @@
 
 @import '_configuration_json_modal';
 @import '_edit_title_modal';
+@import '_field_row_dropdown';
 @import '_searchable_assets_modal';
 
 .codemirror-editor-wrapper {
@@ -17,6 +18,10 @@
 
 	.blueprints-search-container {
 		margin-top: 20px;
+
+		.id-text {
+			margin-right: 16px;
+		}
 	}
 
 	.edit-blueprint-root {
@@ -38,10 +43,6 @@
 		.semibold {
 			font-weight: 600;
 		}
-	}
-
-	.id-text {
-		margin-right: 16px;
 	}
 
 	.edit-element-root {

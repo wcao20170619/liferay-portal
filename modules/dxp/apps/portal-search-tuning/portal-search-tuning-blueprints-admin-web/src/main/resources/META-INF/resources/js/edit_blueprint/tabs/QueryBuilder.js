@@ -60,6 +60,7 @@ function QueryBuilder({
 	frameworkConfig,
 	initialSelectedElements = [],
 	onFrameworkConfigChange,
+	indexFields,
 	onToggleSidebar,
 	searchableAssetTypes,
 	selectedElements,
@@ -102,6 +103,7 @@ function QueryBuilder({
 							elementTemplateJSON={element.elementTemplateJSON}
 							entityJSON={entityJSON}
 							id={element.id}
+							indexFields={indexFields}
 							initialUIConfigurationValues={
 								initialSelectedElements[index]
 									? initialSelectedElements[index]

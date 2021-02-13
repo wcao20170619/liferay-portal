@@ -9,98 +9,203 @@
  * distribution rights of the Software.
  */
 
+import ClayAutocomplete from '@clayui/autocomplete';
 import ClayButton from '@clayui/button';
+import ClayDropDown from '@clayui/drop-down';
 import ClayForm, {ClayInput, ClaySelect} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
+import {FocusScope} from '@clayui/shared';
 import {ClayTooltipProvider} from '@clayui/tooltip';
-import React, {useContext} from 'react';
+import fuzzy from 'fuzzy';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 
-import {toNumber} from '../../utils/utils';
 import ThemeContext from '../ThemeContext';
 
+function AutocompleteItem({indexField, match = '', onClick}) {
+	const fuzzyMatch = fuzzy.match(match, indexField.name, {
+		post: '</strong>',
+		pre: '<strong>',
+	});
+
+	return (
+		<ClayDropDown.Item onClick={onClick}>
+			{fuzzyMatch ? (
+				<span
+					dangerouslySetInnerHTML={{
+						__html: fuzzyMatch.rendered,
+					}}
+				/>
+			) : (
+				indexField.name
+			)}
+
+			{indexField.language_id_position > -1 && (
+				<ClayIcon symbol="globe" />
+			)}
+
+			<span className="type">{indexField.type}</span>
+		</ClayDropDown.Item>
+	);
+}
+
+/**
+ * Displays an autocomplete input for selecting an indexed field.
+ *
+ * Example index field object:
+ * {
+ * 	language_id_position: -1,
+ * 	name: 'ddmTemplateKey',
+ * 	type: 'keyword'
+ * }
+ */
 function FieldRow({
-	boost,
-	configKey,
+	boost = 0,
+	defaultValue = [],
 	disabled,
-	index,
-	item,
+	field,
+	id,
+	index = 0,
+	indexFields = [],
+	languageIdPosition,
+	locale,
+	onBlur,
 	onChange,
 	onDelete,
-	typeOptions,
+	showBoost,
 }) {
 	const {availableLanguages} = useContext(ThemeContext);
+
+	const inputRef = useRef();
+
+	const [filteredIndexFields, setFilteredIndexFields] = useState(
+		indexFields.filter((indexField) => indexField.name.includes(field))
+	);
+	const [showDropDown, setShowDropDown] = useState(false);
+
+	useEffect(() => {
+		setFilteredIndexFields(
+			indexFields.filter((indexField) => indexField.name.includes(field))
+		);
+	}, [indexFields, field]);
+
+	const _getIndexField = (fieldName) => {
+		return (
+			defaultValue.find((item) => item.field === fieldName) ||
+			indexFields.find((item) => item.name === fieldName)
+		);
+	};
+
+	const _handleFieldChange = (event) => {
+		const indexField = _getIndexField(event.target.value) || {};
+
+		let languageIdPosition = indexField.language_id_position || -1;
+
+		if (indexField.locale && languageIdPosition === -1) {
+			languageIdPosition = event.target.value.length;
+		}
+
+		onChange({
+			field: event.target.value,
+			languageIdPosition,
+			locale: languageIdPosition > -1 ? '' : undefined,
+		});
+	};
+
+	const _handleAutocompleteItemClick = (indexField) => () => {
+		onChange({
+			field: indexField.name,
+			languageIdPosition: indexField.language_id_position,
+		});
+
+		inputRef.current.focus();
+
+		setShowDropDown(false);
+	};
+
+	const _handleBoostChange = (event) => onChange({boost: event.target.value});
+
+	const _handleLocaleChange = (event) =>
+		onChange({locale: event.target.value});
+
+	const _isLocalizable = () =>
+		languageIdPosition > -1 || locale !== undefined;
 
 	return (
 		<ClayForm.Group>
 			<ClayInput.Group small>
 				<ClayInput.GroupItem>
-					{typeOptions ? (
+					<FocusScope>
+						<ClayAutocomplete>
+							<ClayAutocomplete.Input
+								autoComplete="off"
+								id={id}
+								onBlur={onBlur}
+								onChange={_handleFieldChange}
+								onFocus={() => setShowDropDown(true)}
+								onKeyDown={() => setShowDropDown(true)}
+								ref={inputRef}
+								sizing="sm"
+								value={field}
+							/>
+
+							<ClayAutocomplete.DropDown
+								active={
+									showDropDown && filteredIndexFields.length
+								}
+								onSetActive={setShowDropDown}
+							>
+								<ClayDropDown.ItemList className="blueprint-field-row-dropdown">
+									{filteredIndexFields.map((indexField) => (
+										<AutocompleteItem
+											indexField={indexField}
+											key={indexField.name}
+											match={field}
+											onClick={_handleAutocompleteItemClick(
+												indexField
+											)}
+										/>
+									))}
+								</ClayDropDown.ItemList>
+							</ClayAutocomplete.DropDown>
+						</ClayAutocomplete>
+					</FocusScope>
+				</ClayInput.GroupItem>
+
+				{_isLocalizable() && (
+					<ClayInput.GroupItem>
 						<ClaySelect
-							aria-label={Liferay.Language.get('field')}
+							aria-label={Liferay.Language.get('locale')}
 							className="form-control-sm"
 							disabled={disabled}
-							id={`field-${index}`}
-							onChange={(event) => {
-								onChange('field', event.target.value);
-							}}
-							value={item.field}
+							id={`${id}_locale`}
+							onBlur={onBlur}
+							onChange={_handleLocaleChange}
+							value={locale}
 						>
-							{typeOptions &&
-								typeOptions.map((option) => (
-									<ClaySelect.Option
-										key={option.value}
-										label={option.label}
-										value={option.value}
-									/>
-								))}
-						</ClaySelect>
-					) : (
-						<ClayInput
-							aria-label={Liferay.Language.get('field')}
-							disabled={disabled}
-							onChange={(event) => {
-								onChange('field', event.target.value);
-							}}
-							type="text"
-							value={item.field}
-						/>
-					)}
-				</ClayInput.GroupItem>
-
-				<ClayInput.GroupItem>
-					<ClaySelect
-						aria-label={Liferay.Language.get('locale')}
-						className="form-control-sm"
-						disabled={disabled}
-						id={`locale-${index}`}
-						onChange={(event) =>
-							onChange('locale', event.target.value)
-						}
-						value={item.locale}
-					>
-						<ClaySelect.Option
-							key={`no-localization-${index}`}
-							label={Liferay.Language.get('no-localization')}
-							value=""
-						/>
-
-						<ClaySelect.Option
-							key={`users-language-${index}`}
-							label={Liferay.Language.get('users-language')}
-							value={'${context.language_id}'}
-						/>
-
-						{Object.keys(availableLanguages).map((locale) => (
 							<ClaySelect.Option
-								key={`${index}-${locale}`}
-								label={availableLanguages[locale]}
-								value={locale}
+								key={`no-localization-${index}`}
+								label={Liferay.Language.get('no-localization')}
+								value=""
 							/>
-						))}
-					</ClaySelect>
-				</ClayInput.GroupItem>
 
-				{!!boost && (
+							<ClaySelect.Option
+								key={`users-language-${index}`}
+								label={Liferay.Language.get('users-language')}
+								value={'${context.language_id}'}
+							/>
+
+							{Object.keys(availableLanguages).map((locale) => (
+								<ClaySelect.Option
+									key={`${index}-${locale}`}
+									label={availableLanguages[locale]}
+									value={locale}
+								/>
+							))}
+						</ClaySelect>
+					</ClayInput.GroupItem>
+				)}
+
+				{showBoost && (
 					<ClayInput.GroupItem shrink>
 						<ClayTooltipProvider>
 							<ClayInput
@@ -108,16 +213,13 @@ function FieldRow({
 								className="field-boost-input"
 								data-tooltip-align="top"
 								disabled={disabled}
-								id={`${configKey}_boost`}
-								onChange={(event) => {
-									onChange(
-										'boost',
-										toNumber(event.target.value)
-									);
-								}}
+								id={`${id}_boost`}
+								min="0"
+								onBlur={onBlur}
+								onChange={_handleBoostChange}
 								title={Liferay.Language.get('boost')}
-								type={'number'}
-								value={item.boost}
+								type="number"
+								value={boost}
 							/>
 						</ClayTooltipProvider>
 					</ClayInput.GroupItem>

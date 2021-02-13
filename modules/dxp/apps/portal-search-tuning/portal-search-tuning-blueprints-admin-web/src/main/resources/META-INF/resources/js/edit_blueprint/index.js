@@ -48,6 +48,7 @@ function EditBlueprintForm({
 	initialConfigurationString = '{}',
 	initialDescription = {},
 	initialSelectedElementsString = '{}',
+	indexFields,
 	initialTitle = {},
 	queryElements = [],
 	redirectURL = '',
@@ -380,6 +381,7 @@ function EditBlueprintForm({
 								deleteElement={deleteElement}
 								entityJSON={entityJSON}
 								frameworkConfig={frameworkConfig}
+								indexFields={indexFields}
 								initialSelectedElements={
 									initialSelectedElements[
 										'query_configuration'

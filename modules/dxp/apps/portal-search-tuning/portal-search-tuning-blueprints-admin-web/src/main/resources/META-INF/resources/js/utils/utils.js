@@ -345,29 +345,58 @@ export const replaceUIConfigurationValues = (
 				);
 			}
 			else if (config.type === INPUT_TYPES.FIELD) {
-				configValue = `${configValue.field}${
-					configValue.locale == '' || configValue.locale.includes('$')
-						? configValue.locale
-						: '_' + configValue.locale
-				}${
-					configValue.boost && JSON.parse(configValue.boost) > 1
-						? '^' + configValue.boost
-						: ''
-				}`;
+				const {
+					boost,
+					field,
+					languageIdPosition,
+					locale = '',
+				} = uiConfigurationValues[config.key];
+
+				const transformedLocale =
+					!locale || locale.includes('$') ? locale : `_${locale}`;
+
+				let localizedField;
+
+				if (languageIdPosition > -1) {
+					localizedField =
+						field.substring(0, languageIdPosition) +
+						transformedLocale +
+						field.substring(languageIdPosition);
+				}
+				else {
+					localizedField = field + transformedLocale;
+				}
+
+				configValue =
+					boost && boost > 0
+						? `${localizedField}^${boost}`
+						: localizedField;
 			}
 			else if (config.type === INPUT_TYPES.FIELD_LIST) {
-				const fields = uiConfigurationValues[config.key].map(
-					(item) =>
-						`${item.field}${
-							item.locale == '' || item.locale.includes('$')
-								? item.locale
-								: '_' + item.locale
-						}${
-							item.boost && JSON.parse(item.boost) > 1
-								? '^' + item.boost
-								: ''
-						}`
-				);
+				const fields = uiConfigurationValues[config.key]
+					.filter(({field}) => !!field) // Remove blank fields
+					.map(({boost, field, languageIdPosition, locale = ''}) => {
+						const transformedLocale =
+							!locale || locale.includes('$')
+								? locale
+								: `_${locale}`;
+
+						let localizedField;
+
+						if (languageIdPosition > -1) {
+							localizedField =
+								field.substring(0, languageIdPosition) +
+								transformedLocale +
+								field.substring(languageIdPosition);
+						}
+						else {
+							localizedField = field + transformedLocale;
+						}
+
+						return boost && boost > 0
+							? `${localizedField}^${boost}`
+							: localizedField;
+					});
 
 				configValue = JSON.stringify(fields);
 			}

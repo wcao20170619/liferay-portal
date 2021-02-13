@@ -12,42 +12,77 @@
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayIcon from '@clayui/icon';
-import React from 'react';
+import React, {useRef, useState} from 'react';
 
 import FieldRow from './FieldRow';
 
 function FieldListInput({
-	boost,
+	showBoost,
 	configKey,
+	defaultValue = [],
 	disabled,
+	id,
+	indexFields,
+	initialValue,
 	onChange,
 	typeOptions,
-	value,
 }) {
+	const idCounter = useRef(0);
+
+	const [value, setValue] = useState(
+		(initialValue || defaultValue).map((item) => ({
+			...item,
+			id: idCounter.current++,
+		}))
+	);
+
+	const _handleBlur = () => {
+		onChange(
+			configKey,
+			value.map((item) => ({
+				boost: item.boost,
+				field: item.field,
+				languageIdPosition: item.languageIdPosition,
+				locale: item.locale,
+			}))
+		); // Removes temporary ID
+	};
+
+	const _handleChange = (index) => (newValue) => {
+		setValue(
+			value.map((field, i) =>
+				index === i ? {...field, ...newValue} : field
+			)
+		); // Filters through values and replace the modified index with the new value
+	};
+
+	const _handleFieldRowAdd = () => {
+		setValue([...value, {field: '', id: idCounter.current++}]);
+	};
+
+	const _handleFieldRowDelete = (index) => () => {
+		setValue([...value.filter((_, i) => index !== i)]);
+	};
+
 	return (
 		<div className="field">
 			{value.map((item, index) => (
 				<FieldRow
-					boost={boost}
+					boost={item.boost}
 					configKey={configKey}
+					defaultValue={defaultValue}
 					disabled={disabled}
+					field={item.field}
+					id={`${id}_${index}`}
 					index={index}
-					item={item}
-					key={`${configKey}_${index}`}
-					onChange={(property, newValue) => {
-						value[index] = {
-							...item,
-							[`${property}`]: newValue,
-						};
-
-						onChange(configKey, value);
-					}}
-					onDelete={() =>
-						onChange(
-							configKey,
-							value.filter((_, i) => index !== i)
-						)
-					}
+					indexFields={indexFields}
+					key={item.id}
+					languageIdPosition={item.languageIdPosition}
+					locale={item.locale}
+					onBlur={_handleBlur}
+					onChange={_handleChange(index)}
+					onDelete={_handleFieldRowDelete(index)}
+					showBoost={showBoost}
 					typeOptions={typeOptions}
 				/>
 			))}
@@ -59,16 +94,7 @@ function FieldListInput({
 						disabled={disabled}
 						displayType="secondary"
 						monospaced
-						onClick={() =>
-							onChange(configKey, [
-								...value,
-								{
-									boost: 1,
-									field: typeOptions[0].value,
-									locale: '',
-								},
-							])
-						}
+						onClick={_handleFieldRowAdd}
 						small
 					>
 						<ClayIcon symbol="plus" />

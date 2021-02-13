@@ -13,7 +13,7 @@ import {fireEvent, render, waitForElement} from '@testing-library/react';
 import React from 'react';
 
 import Element from '../../../../src/main/resources/META-INF/resources/js/shared/element/index';
-import {SELECTED_ELEMENTS} from '../../mocks/data';
+import {INDEX_FIELDS, SELECTED_ELEMENTS} from '../../mocks/data';
 
 import '@testing-library/jest-dom/extend-expect';
 
@@ -33,6 +33,7 @@ function renderElement(props) {
 			collapseAll={false}
 			deleteElement={deleteElement}
 			elementTemplateJSON={SELECTED_ELEMENTS[0].elementTemplateJSON}
+			indexFields={INDEX_FIELDS}
 			initialUIConfigurationValues={
 				SELECTED_ELEMENTS[0].uiConfigurationValues
 			}

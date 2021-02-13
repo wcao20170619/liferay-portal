@@ -9,33 +9,46 @@
  * distribution rights of the Software.
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 
 import FieldRow from './FieldRow';
 
 function FieldInput({
-	boost,
 	configKey,
+	defaultValue,
 	disabled,
+	id,
+	indexFields,
+	initialValue,
 	onChange,
+	showBoost,
 	typeOptions,
-	value,
 }) {
+	const [value, setValue] = useState(initialValue || defaultValue);
+
+	const _handleBlur = () => {
+		onChange(configKey, value);
+	};
+
+	const _handleChange = (newValue) => {
+		setValue({...value, ...newValue});
+	};
+
 	return (
 		<div className="single-field">
 			<FieldRow
-				boost={boost}
+				boost={value.boost}
 				configKey={configKey}
+				defaultValue={defaultValue ? [defaultValue] : undefined}
 				disabled={disabled}
-				index={configKey}
-				item={value}
-				key={configKey}
-				onChange={(label, newValue) => {
-					onChange(configKey, {
-						...value,
-						[label]: newValue,
-					});
-				}}
+				field={value.field}
+				id={id}
+				indexFields={indexFields}
+				languageIdPosition={value.languageIdPosition}
+				locale={value.locale}
+				onBlur={_handleBlur}
+				onChange={_handleChange}
+				showBoost={showBoost}
 				typeOptions={typeOptions}
 			/>
 		</div>

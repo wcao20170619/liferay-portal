@@ -37,14 +37,15 @@ import TextInput from './TextInput';
 
 function Element({
 	collapseAll,
-	uiConfigurationJSON,
-	uiConfigurationValues,
 	deleteElement,
 	elementOutput,
 	elementTemplateJSON,
 	entityJSON,
 	id,
+	indexFields,
 	initialUIConfigurationValues = {},
+	uiConfigurationJSON,
+	uiConfigurationValues,
 	updateElement = () => {},
 }) {
 	const {locale} = useContext(ThemeContext);
@@ -116,15 +117,32 @@ function Element({
 						value={uiConfigurationValues[config.key]}
 					/>
 				);
+			case INPUT_TYPES.FIELD:
+				return (
+					<FieldInput
+						configKey={config.key}
+						defaultValue={config.defaultValue}
+						disabled={disabled}
+						id={inputId}
+						indexFields={indexFields}
+						initialValue={initialUIConfigurationValues[config.key]}
+						onChange={_handleChange}
+						showBoost={config.boost}
+						value={uiConfigurationValues[config.key]}
+					/>
+				);
 			case INPUT_TYPES.FIELD_LIST:
 				return (
 					<FieldListInput
-						boost={config.boost}
 						configKey={config.key}
+						defaultValue={config.defaultValue}
 						disabled={disabled}
+						id={inputId}
+						indexFields={indexFields}
+						initialValue={initialUIConfigurationValues[config.key]}
 						onChange={_handleChange}
+						showBoost={config.boost}
 						typeOptions={config.typeOptions}
-						value={uiConfigurationValues[config.key]}
 					/>
 				);
 			case INPUT_TYPES.JSON:
@@ -162,22 +180,12 @@ function Element({
 						unit={config.unit}
 					/>
 				);
-			case INPUT_TYPES.FIELD:
-				return (
-					<FieldInput
-						boost={config.boost}
-						configKey={config.key}
-						disabled={disabled}
-						onChange={_handleChange}
-						typeOptions={config.typeOptions}
-						value={uiConfigurationValues[config.key]}
-					/>
-				);
 			case INPUT_TYPES.SELECT:
 				return (
 					<SelectInput
 						configKey={config.key}
 						disabled={disabled}
+						id={inputId}
 						label={config.label}
 						onChange={_handleChange}
 						typeOptions={config.typeOptions}
