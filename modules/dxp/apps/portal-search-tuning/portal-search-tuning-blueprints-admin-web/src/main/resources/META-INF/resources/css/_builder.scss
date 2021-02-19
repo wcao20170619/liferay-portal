@@ -1,6 +1,8 @@
 .builder {
 	max-width: 700px;
 	padding-bottom: 40px;
+	padding-left: 0;
+	padding-right: 0;
 	padding-top: $pageToolbarHeight + 40px;
 
 	.configuration-element {
@@ -89,5 +91,25 @@
 
 	.sheet + .sheet {
 		margin-top: 0;
+	}
+}
+
+$pageContentMaxWidth: 768px;
+
+@media (min-width: $pageContentMaxWidth) {
+	.open-sidebar {
+		.builder {
+			padding-right: calc(
+				#{$sidebarWidth} - ((100% - #{$pageContentMaxWidth}) / 2)
+			);
+		}
+	}
+
+	.open-preview {
+		.builder {
+			padding-right: calc(
+				#{$previewWidth} - ((100% - #{$pageContentMaxWidth}) / 2)
+			);
+		}
 	}
 }

@@ -1,18 +1,14 @@
-$controlMenuToolbarHeight: 56px;
-$navigationBarHeight: 56px;
-
 .sidebar {
 	background-color: $white;
 	display: flex;
 	flex-direction: column;
 	height: calc(100% - #{$controlMenuToolbarHeight} - #{$navigationBarHeight});
 	margin-top: $navigationBarHeight;
-	min-width: 380px;
 	position: fixed;
 	right: 0;
 	transform: translateX(100%);
 	transition: transform ease 0.2s;
-	width: 20%;
+	width: $sidebarWidth;
 	z-index: 972;
 
 	&.open {
@@ -22,7 +18,7 @@ $navigationBarHeight: 56px;
 
 	&.preview {
 		overflow-x: overlay;
-		width: 600px;
+		width: $previewWidth;
 
 		.btn:focus {
 			box-shadow: unset;

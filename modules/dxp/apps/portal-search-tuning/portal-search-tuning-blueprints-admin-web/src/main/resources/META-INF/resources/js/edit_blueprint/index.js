@@ -370,22 +370,31 @@ function EditBlueprintForm({
 							visible={showSidebar}
 						/>
 
-						<QueryBuilder
-							deleteElement={deleteElement}
-							entityJSON={entityJSON}
-							frameworkConfig={frameworkConfig}
-							initialSelectedElements={
-								initialSelectedElements['query_configuration']
-							}
-							onFrameworkConfigChange={handleFrameworkChange}
-							onToggleSidebar={() => {
-								setShowPreview(false);
-								setShowSidebar(!showSidebar);
-							}}
-							searchableAssetTypes={searchableAssetTypes}
-							selectedElements={selectedQueryElements}
-							updateElement={updateQueryElement}
-						/>
+						<div
+							className={getCN('query-builder', {
+								'open-preview': showPreview,
+								'open-sidebar': showSidebar,
+							})}
+						>
+							<QueryBuilder
+								deleteElement={deleteElement}
+								entityJSON={entityJSON}
+								frameworkConfig={frameworkConfig}
+								initialSelectedElements={
+									initialSelectedElements[
+										'query_configuration'
+									]
+								}
+								onFrameworkConfigChange={handleFrameworkChange}
+								onToggleSidebar={() => {
+									setShowPreview(false);
+									setShowSidebar(!showSidebar);
+								}}
+								searchableAssetTypes={searchableAssetTypes}
+								selectedElements={selectedQueryElements}
+								updateElement={updateQueryElement}
+							/>
+						</div>
 					</>
 				);
 		}
