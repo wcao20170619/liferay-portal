@@ -19,7 +19,6 @@ import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import ClayPanel from '@clayui/panel';
-import ClaySticker from '@clayui/sticker';
 import ClayTable from '@clayui/table';
 import getCN from 'classnames';
 import PropTypes from 'prop-types';
@@ -76,22 +75,20 @@ function Preview({fetchResults, onClose, results, visible}) {
 	const _renderManagementBar = () => (
 		<ClayManagementToolbar>
 			<ClayManagementToolbar.ItemList>
-				{results.data.meta && (
-					<ClayManagementToolbar.Item>
-						<span className="component-text text-truncate-inline">
-							<span className="text-truncate">
-								{sub(Liferay.Language.get('x-results'), [
-									results.data.meta.totalHits,
-								])}
-							</span>
+				<ClayManagementToolbar.Item>
+					<span className="component-text text-truncate-inline">
+						<span className="text-truncate">
+							{sub(Liferay.Language.get('x-results'), [
+								results.data.meta.totalHits,
+							])}
 						</span>
-					</ClayManagementToolbar.Item>
-				)}
+					</span>
+				</ClayManagementToolbar.Item>
 
 				<ClayManagementToolbar.Item>
 					<ClayButton
 						aria-label={Liferay.Language.get('refresh')}
-						disabled={!value || !results.data.meta}
+						disabled={!value || results.loading}
 						displayType="secondary"
 						onClick={_handleFetch}
 						small
@@ -137,7 +134,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 				</div>
 			</nav>
 
-			{results.data.warning ? _renderErrors() : _renderManagementBar()}
+			{results.data.meta && _renderManagementBar()}
 
 			{!results.loading ? (
 				results.data.hits && results.data.hits.length ? (
@@ -171,14 +168,14 @@ function Preview({fetchResults, onClose, results, visible}) {
 					<div className="empty-list-message">
 						<ClayEmptyState />
 					</div>
+				) : results.data.warning ? (
+					_renderErrors()
 				) : (
-					!results.data.warning && (
-						<div className="try-search-message">
-							{Liferay.Language.get(
-								'try-a-search-to-see-how-your-blueprint-influences-your-search-results'
-							)}
-						</div>
-					)
+					<div className="try-search-message">
+						{Liferay.Language.get(
+							'try-a-search-to-see-how-your-blueprint-influences-your-search-results'
+						)}
+					</div>
 				)
 			) : (
 				<ClayLoadingIndicator />
@@ -217,10 +214,8 @@ function ResultListItem({item}) {
 					size="lg"
 					title={Liferay.Language.get('explanation-of-score')}
 				>
-					<ClayButton displayType="unstyled">
-						<ClaySticker displayType="primary" size="sm">
-							{item.score.toFixed(2)}
-						</ClaySticker>
+					<ClayButton className="score" displayType="unstyled" small>
+						{item.score.toFixed(2)}
 					</ClayButton>
 				</PreviewModal>
 			</ClayList.ItemField>

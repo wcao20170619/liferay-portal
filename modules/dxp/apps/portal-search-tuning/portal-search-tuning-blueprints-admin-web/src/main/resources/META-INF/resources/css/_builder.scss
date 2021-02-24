@@ -1,9 +1,11 @@
 .builder {
-	max-width: 700px;
 	padding-bottom: 40px;
-	padding-left: 0;
-	padding-right: 0;
 	padding-top: $pageToolbarHeight + 40px;
+
+	.builder-shift {
+		margin: auto;
+		max-width: $builderMaxWidth;
+	}
 
 	.configuration-element {
 		margin-bottom: 1rem;
@@ -94,22 +96,24 @@
 	}
 }
 
-$pageContentMaxWidth: 768px;
-
-@media (min-width: $pageContentMaxWidth) {
-	.open-sidebar {
-		.builder {
-			padding-right: calc(
-				#{$sidebarWidth} - ((100% - #{$pageContentMaxWidth}) / 2)
-			);
-		}
+@media (min-width: calc(#{$builderMinWidth} + #{$sidebarWidth})) {
+	.open-sidebar .builder-shift {
+		margin-right: calc(
+			max(
+				50% - (#{$builderMaxWidth} / 2),
+				#{$sidebarWidth} - (50vw - 50%) + 24px
+			)
+		);
 	}
+}
 
-	.open-preview {
-		.builder {
-			padding-right: calc(
-				#{$previewWidth} - ((100% - #{$pageContentMaxWidth}) / 2)
-			);
-		}
+@media (min-width: calc(#{$builderMinWidth} + #{$previewWidth})) {
+	.open-preview .builder-shift {
+		margin-right: calc(
+			max(
+				50% - (#{$builderMaxWidth} / 2),
+				#{$previewWidth} - (50vw - 50%) + 24px
+			)
+		);
 	}
 }
