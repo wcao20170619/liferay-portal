@@ -3,8 +3,10 @@
 	padding-top: $pageToolbarHeight + 40px;
 
 	.builder-shift {
-		margin: auto;
+		margin-left: auto;
+		margin-right: calc(50% - #{$builderMaxWidth} / 2);
 		max-width: $builderMaxWidth;
+		transition: margin-right ease 0.2s;
 	}
 
 	.configuration-element {
