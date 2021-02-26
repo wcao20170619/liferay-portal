@@ -123,7 +123,7 @@ public class ViewURLHitContributor implements HitContributor {
 			return StringPool.BLANK;
 		}
 	}
-	
+
 	private long _getClassNameId(String className) {
 		return _portal.getClassNameId(className);
 	}
@@ -289,7 +289,6 @@ public class ViewURLHitContributor implements HitContributor {
 	}
 
 	private boolean _isComment(Document document) {
-
 		String entryClassName = document.getString(Field.ENTRY_CLASS_NAME);
 
 		long classNameId = _getClassNameId(entryClassName);

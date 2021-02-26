@@ -89,11 +89,11 @@ BlueprintsOptionsPortletPreferences blueprintsOptionsPortletPreferences = new Bl
 						</div>
 
 						<%
-						String handleRemoveBlueprint = "Liferay.Util.removeEntitySelection('blueprintId', 'blueprintName', this, '" + liferayPortletResponse.getNamespace() + "');";
+						String taglibHandleRemoveBlueprint = "Liferay.Util.removeEntitySelection('blueprintId', 'blueprintName', this, '" + liferayPortletResponse.getNamespace() + "');";
 						%>
 
 						<div class="input-group-item input-group-item-shrink">
-							<aui:button name="removeBlueprintButton" onClick="<%= handleRemoveBlueprint %>" value="remove" />
+							<aui:button name="removeBlueprintButton" onClick="<%= taglibHandleRemoveBlueprint %>" value="remove" />
 						</div>
 					</div>
 
@@ -105,7 +105,7 @@ BlueprintsOptionsPortletPreferences blueprintsOptionsPortletPreferences = new Bl
 						if (<portlet:namespace />selectBlueprintButton) {
 							<portlet:namespace />selectBlueprintButton.addEventListener(
 								'click',
-								function (event) {
+								(event) => {
 									Liferay.Util.selectEntity(
 										{
 											dialog: {
@@ -131,7 +131,7 @@ BlueprintsOptionsPortletPreferences blueprintsOptionsPortletPreferences = new Bl
 
 											uri: '<%= selectBlueprintURL.toString() %>',
 										},
-										function (event) {
+										(event) => {
 											var blueprintId = document.getElementById(
 												'<portlet:namespace />blueprintId'
 											);

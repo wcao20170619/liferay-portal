@@ -57,8 +57,7 @@ export default function Results({
 							<ClaySticker displayType="secondary" size="md">
 								<ClayIcon
 									symbol={
-										item.type &&
-										ICON_MAP[item.type]
+										item.type && ICON_MAP[item.type]
 											? ICON_MAP[item.type]
 											: ICON_MAP.DEFAULT
 									}
@@ -89,9 +88,7 @@ export default function Results({
 								)}
 							</ClayList.ItemTitle>
 
-							{(item.type ||
-								item.author ||
-								item.date) && (
+							{(item.type || item.author || item.date) && (
 								<ClayList.ItemText
 									className="result-subtext"
 									subtext

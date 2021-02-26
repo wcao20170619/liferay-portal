@@ -22,7 +22,6 @@
 	<h1><liferay-ui:message key="bulk-loader-title" /></h1>
 
 	<aui:form action="<%= importActionURL %>" name="importform">
-
 		<aui:fieldset>
 			<aui:select label="select-data-type" name="type">
 				<aui:option label="all-places-data" value="<%= ImportTypeKeys.ALL_PLACES_DATA %>" />
@@ -65,19 +64,17 @@
 </div>
 
 <aui:script>
+	AUI().ready((A) => {
+		var importTypeElement = A.one('#<portlet:namespace />type');
 
-	AUI().ready(function(A) {
-
-		var importTypeElement = A.one("#<portlet:namespace />type");
-
-		importTypeElement.on("change", function () {
-
+		importTypeElement.on('change', function () {
 			let value = this.val();
-			let wikifields = A.one("#<portlet:namespace />wikifields");
+			let wikifields = A.one('#<portlet:namespace />wikifields');
 
 			if (value == '<%=ImportTypeKeys.WIKIPEDIA_ARTICLES %>') {
 				wikifields.removeClass('hide');
-			} else {
+			}
+			else {
 				wikifields.addClass('hide');
 			}
 		});

@@ -170,7 +170,8 @@ public class BlueprintHelperImpl implements BlueprintHelper {
 	public Optional<JSONObject> getFrameworkConfigurationOptional(
 		Blueprint blueprint) {
 
-		JSONObject configurationJSONObject = _getBlueprintConfigurationJSONObject(blueprint);
+		JSONObject configurationJSONObject =
+			_getBlueprintConfigurationJSONObject(blueprint);
 
 		JSONObject frameworkConfigurationJSONObject =
 			configurationJSONObject.getJSONObject(
@@ -251,7 +252,8 @@ public class BlueprintHelperImpl implements BlueprintHelper {
 	public Optional<JSONObject> getParameterConfigurationOptional(
 		Blueprint blueprint) {
 
-		JSONObject configurationJSONObject = _getBlueprintConfigurationJSONObject(blueprint);
+		JSONObject configurationJSONObject =
+			_getBlueprintConfigurationJSONObject(blueprint);
 
 		JSONObject parameterConfigurationJSONObject =
 			configurationJSONObject.getJSONObject(
@@ -410,7 +412,9 @@ public class BlueprintHelperImpl implements BlueprintHelper {
 		);
 	}
 
-	private JSONObject _getBlueprintConfigurationJSONObject(Blueprint blueprint) {
+	private JSONObject _getBlueprintConfigurationJSONObject(
+		Blueprint blueprint) {
+
 		try {
 			return _jsonFactory.createJSONObject(blueprint.getConfiguration());
 		}
