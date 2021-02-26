@@ -147,7 +147,12 @@ function EditBlueprintForm({
 		catch {
 			setPreviewInfo({
 				data: {
-					warning: [Liferay.Language.get('the-json-is-invalid')],
+					errors: [
+						{
+							msg: Liferay.Language.get('the-json-is-invalid'),
+							severity: Liferay.Language.get('error'),
+						},
+					],
 				},
 				loading: false,
 			});
@@ -174,8 +179,13 @@ function EditBlueprintForm({
 				setTimeout(() => {
 					setPreviewInfo({
 						data: {
-							warning: [
-								Liferay.Language.get('the-json-is-invalid'),
+							errors: [
+								{
+									msg: Liferay.Language.get(
+										'the-json-is-invalid'
+									),
+									severity: Liferay.Language.get('error'),
+								},
 							],
 						},
 						loading: false,
@@ -431,7 +441,7 @@ function EditBlueprintForm({
 					</ClayButton>
 				</ClayToolbar.Item>
 
-				{previewInfo.data.warning && (
+				{previewInfo.data.errors && previewInfo.data.errors.length && (
 					<ClayToolbar.Item>
 						<ClayButton
 							displayType="unstyled"
@@ -442,7 +452,7 @@ function EditBlueprintForm({
 						>
 							<ClayBadge
 								displayType="danger"
-								label={previewInfo.data.warning.length}
+								label={previewInfo.data.errors.length}
 								onClick={() => {
 									setShowSidebar(false);
 									setShowPreview(!showPreview);

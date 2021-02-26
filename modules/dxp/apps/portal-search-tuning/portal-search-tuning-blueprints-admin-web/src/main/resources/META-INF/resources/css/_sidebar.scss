@@ -47,9 +47,6 @@
 	}
 
 	.panel.text-danger {
-		margin: 0;
-		position: static;
-
 		.panel-header {
 			background-color: $errorL2;
 			border-color: $errorL1;
@@ -59,6 +56,25 @@
 			color: $danger;
 			margin: 0 16px;
 			width: calc(100% - 32px);
+		}
+
+		.list-group-item {
+			.error-details {
+				padding: 2px;
+			}
+
+			.error-title {
+				height: 1.5rem;
+
+				.label {
+					margin: 0 12px 0 0;
+				}
+
+				.list-group-title {
+					margin-top: 0;
+					min-height: unset;
+				}
+			}
 		}
 	}
 
