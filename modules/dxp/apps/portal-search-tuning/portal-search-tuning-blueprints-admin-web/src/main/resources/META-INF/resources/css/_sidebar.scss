@@ -46,21 +46,20 @@
 		margin-right: 16px;
 	}
 
-	.panel.text-danger {
-		.panel-header {
+	.preview-error-list {
+		margin: 0 16px;
+		width: calc(100% - 32px);
+
+		.list-group-item {
 			background-color: $errorL2;
 			border-color: $errorL1;
 			border-radius: 0.25rem;
 			border-style: solid;
 			border-width: 0.0625rem;
-			color: $danger;
-			margin: 0 16px;
-			width: calc(100% - 32px);
-		}
+			margin-bottom: 1rem;
 
-		.list-group-item {
 			.error-details {
-				padding: 2px;
+				padding: 4px 0;
 			}
 
 			.error-title {
@@ -71,7 +70,6 @@
 				}
 
 				.list-group-title {
-					margin-top: 0;
 					min-height: unset;
 				}
 			}

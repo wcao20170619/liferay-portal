@@ -441,7 +441,7 @@ function EditBlueprintForm({
 					</ClayButton>
 				</ClayToolbar.Item>
 
-				{previewInfo.data.errors && previewInfo.data.errors.length && (
+				{previewInfo.data.errors && !!previewInfo.data.errors.length && (
 					<ClayToolbar.Item>
 						<ClayButton
 							displayType="unstyled"

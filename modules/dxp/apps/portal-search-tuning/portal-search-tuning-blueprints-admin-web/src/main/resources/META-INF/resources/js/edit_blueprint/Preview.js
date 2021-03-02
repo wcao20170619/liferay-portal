@@ -19,7 +19,6 @@ import ClayList from '@clayui/list';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
-import ClayPanel from '@clayui/panel';
 import getCN from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
@@ -29,7 +28,8 @@ import PreviewModal from '../shared/PreviewModal';
 import SearchInput from '../shared/SearchInput';
 import {sub} from './../utils/utils';
 
-const COLLAPSED_VIEW = ['type', 'description', 'date', 'userName'];
+const RESULTS_DEFAULT_KEYS = ['type', 'description', 'date', 'userName'];
+const ERROR_OMIT_KEYS = ['msg', 'severity', 'localizationKey'];
 
 function Preview({fetchResults, onClose, results, visible}) {
 	const [value, setValue] = useState('');
@@ -47,21 +47,11 @@ function Preview({fetchResults, onClose, results, visible}) {
 	}, [activeDelta, activePage]); //eslint-disable-line
 
 	const _renderErrors = () => (
-		<ClayPanel
-			className="text-danger"
-			displayTitle={sub(Liferay.Language.get('x-errors'), [
-				results.data.errors.length,
-			])}
-			expanded
-		>
-			<ClayPanel.Body>
-				<ClayList>
-					{results.data.errors.map((error, idx) => (
-						<ErrorListItem item={error} key={idx} />
-					))}
-				</ClayList>
-			</ClayPanel.Body>
-		</ClayPanel>
+		<ClayList className="preview-error-list text-danger">
+			{results.data.errors.map((error, idx) => (
+				<ErrorListItem item={error} key={idx} />
+			))}
+		</ClayList>
 	);
 
 	const _renderHits = () => (
@@ -184,7 +174,9 @@ function Preview({fetchResults, onClose, results, visible}) {
 }
 
 function ErrorListItem({item}) {
-	const [collapse, setCollapse] = useState(true);
+	const [collapse, setCollapse] = useState(false);
+
+	const itemKeys = Object.keys(item);
 
 	return (
 		<ClayList.Item flex key={item.msg}>
@@ -194,54 +186,57 @@ function ErrorListItem({item}) {
 						<ClayLabel displayType="danger">
 							{item.severity}
 						</ClayLabel>
-						{item.msg}
+						<span className="text-danger text-truncate">
+							{item.msg}
+						</span>
 					</ClayList.ItemTitle>
 				</div>
 
-				{!collapse && (
-					<div className="error-details">
-						{Object.keys(item).map((property) => (
-							<ClayLayout.Row
-								justify="start"
-								key={`${item.msg}_${property}`}
-							>
-								<ClayLayout.Col className="semibold" size={4}>
-									{property}
-								</ClayLayout.Col>
-								<ClayLayout.Col size={8}>
-									{typeof item[property] === 'object' ? (
-										<div>
-											{JSON.stringify(
-												item[property],
-												null,
-												2
-											)}
-										</div>
-									) : (
-										item[property]
-									)}
-								</ClayLayout.Col>
-							</ClayLayout.Row>
-						))}
+				{!collapse && itemKeys.length > ERROR_OMIT_KEYS.length && (
+					<div className="error-details text-danger">
+						{itemKeys.map(
+							(property) =>
+								!ERROR_OMIT_KEYS.includes(property) && (
+									<ClayLayout.Row
+										justify="start"
+										key={`${item.msg}_${property}`}
+									>
+										<ClayLayout.Col
+											className="semibold"
+											size={4}
+										>
+											{property}
+										</ClayLayout.Col>
+										<ClayLayout.Col size={8}>
+											{typeof item[property] === 'object'
+												? JSON.stringify(item[property])
+												: item[property]}
+										</ClayLayout.Col>
+									</ClayLayout.Row>
+								)
+						)}
 					</div>
 				)}
 			</ClayList.ItemField>
 
-			<ClayList.ItemField>
-				<ClayButton
-					aria-label={
-						collapse
-							? Liferay.Language.get('expand')
-							: Liferay.Language.get('collapse')
-					}
-					displayType="unstyled"
-					onClick={() => setCollapse(!collapse)}
-				>
-					<ClayIcon
-						symbol={collapse ? 'angle-right' : 'angle-down'}
-					/>
-				</ClayButton>
-			</ClayList.ItemField>
+			{itemKeys.length > ERROR_OMIT_KEYS.length && (
+				<ClayList.ItemField>
+					<ClayButton
+						aria-label={
+							collapse
+								? Liferay.Language.get('expand')
+								: Liferay.Language.get('collapse')
+						}
+						className="text-danger"
+						displayType="unstyled"
+						onClick={() => setCollapse(!collapse)}
+					>
+						<ClayIcon
+							symbol={collapse ? 'angle-right' : 'angle-down'}
+						/>
+					</ClayButton>
+				</ClayList.ItemField>
+			)}
 		</ClayList.Item>
 	);
 }
@@ -290,11 +285,13 @@ function ResultListItem({item}) {
 					</ClayLink>
 				</ClayList.ItemTitle>
 
-				{COLLAPSED_VIEW.map((property) => _renderListRow(property))}
+				{RESULTS_DEFAULT_KEYS.map((property) =>
+					_renderListRow(property)
+				)}
 
 				{!collapse &&
 					Object.keys(item).map((property) => {
-						if (!COLLAPSED_VIEW.includes(property)) {
+						if (!RESULTS_DEFAULT_KEYS.includes(property)) {
 							return _renderListRow(property);
 						}
 					})}
