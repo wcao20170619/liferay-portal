@@ -9,6 +9,7 @@
  * distribution rights of the Software.
  */
 
+import ClayForm from '@clayui/form';
 import getCN from 'classnames';
 import React, {useState} from 'react';
 
@@ -24,6 +25,7 @@ function JSONInput({
 	const [value, setValue] = useState(
 		JSON.stringify(initialValue, null, '\t')
 	);
+	const [hasError, setHasError] = useState(false);
 
 	const _handleBlur = () => {
 		try {
@@ -32,11 +34,42 @@ function JSONInput({
 		catch {}
 	};
 
+	function _handleChange(value) {
+		setValue(value);
+
+		try {
+			JSON.parse(value);
+
+			setHasError(false);
+		}
+		catch {
+			setHasError(true);
+		}
+	}
+
 	return (
-		<div className={getCN('custom-json', {disabled})} onBlur={_handleBlur}>
+		<div
+			className={getCN(
+				'custom-json',
+				{disabled},
+				{'has-error': hasError}
+			)}
+			onBlur={_handleBlur}
+		>
 			<label>{label}</label>
 
-			<CodeMirrorEditor onChange={setValue} value={value} />
+			<CodeMirrorEditor onChange={_handleChange} value={value} />
+
+			{hasError && (
+				<ClayForm.FeedbackGroup>
+					<ClayForm.FeedbackItem>
+						<ClayForm.FeedbackIndicator symbol="exclamation-full" />
+						{Liferay.Language.get(
+							'unable-to-apply-changes-due-to-invalid-json'
+						)}
+					</ClayForm.FeedbackItem>
+				</ClayForm.FeedbackGroup>
+			)}
 		</div>
 	);
 }

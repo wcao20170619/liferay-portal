@@ -28,6 +28,7 @@
 
 	.CodeMirror {
 		background-color: $lightBackground;
+		border-radius: 4px;
 		font-size: 13px;
 
 		.CodeMirror-gutters {
@@ -164,6 +165,20 @@
 
 			.slider-configuration {
 				padding: 10px;
+			}
+		}
+	}
+
+	.has-error {
+		.codemirror-editor-wrapper {
+			border: 1px solid $errorL1;
+
+			.CodeMirror {
+				background-color: $errorL2;
+			}
+
+			.CodeMirror-gutters {
+				background-color: $errorL2;
 			}
 		}
 	}
