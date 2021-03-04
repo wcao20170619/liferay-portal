@@ -138,6 +138,7 @@ function FieldRow({
 						<ClayAutocomplete>
 							<ClayAutocomplete.Input
 								autoComplete="off"
+								disabled={disabled}
 								id={id}
 								onBlur={onBlur}
 								onChange={_handleFieldChange}
