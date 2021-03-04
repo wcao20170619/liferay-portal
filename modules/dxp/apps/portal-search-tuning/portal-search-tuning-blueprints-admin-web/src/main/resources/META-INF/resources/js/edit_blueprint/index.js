@@ -69,12 +69,19 @@ function EditBlueprintForm({
 		...queryElements,
 	]);
 
-	const elementIdCounter = useRef(1);
-
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const initialConfiguration = JSON.parse(initialConfigurationString);
 	const initialSelectedElements = JSON.parse(initialSelectedElementsString);
+
+	const initialSelectedElementsId = initialSelectedElements[
+		'query_configuration'
+	].map((selectedElement, index) => ({
+		...selectedElement,
+		id: index,
+	}));
+
+	const elementIdCounter = useRef(initialSelectedElementsId.length);
 
 	const [advancedConfig, setAdvancedConfig] = useState(
 		JSON.stringify(
@@ -107,12 +114,7 @@ function EditBlueprintForm({
 		JSON.stringify(initialConfiguration['sort_configuration'], null, '\t')
 	);
 	const [selectedQueryElements, setSelectedQueryElements] = useState(
-		initialSelectedElements['query_configuration'].map(
-			(selectedElement) => ({
-				...selectedElement,
-				id: elementIdCounter.current++,
-			})
-		)
+		initialSelectedElementsId
 	);
 
 	const [previewInfo, setPreviewInfo] = useState(() => ({
@@ -393,9 +395,7 @@ function EditBlueprintForm({
 								frameworkConfig={frameworkConfig}
 								indexFields={indexFields}
 								initialSelectedElements={
-									initialSelectedElements[
-										'query_configuration'
-									]
+									initialSelectedElementsId
 								}
 								onFrameworkConfigChange={handleFrameworkChange}
 								onToggleSidebar={() => {

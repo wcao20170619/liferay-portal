@@ -94,7 +94,7 @@ function QueryBuilder({
 					</ClayAlert>
 				)}
 
-				{selectedElements.map((element, index) => {
+				{selectedElements.map((element) => {
 					return element.uiConfigurationJSON ? (
 						<Element
 							collapseAll={collapseAll}
@@ -105,9 +105,12 @@ function QueryBuilder({
 							id={element.id}
 							indexFields={indexFields}
 							initialUIConfigurationValues={
-								initialSelectedElements[index]
-									? initialSelectedElements[index]
-											.uiConfigurationValues
+								initialSelectedElements.find(
+									(item) => item.id === element.id
+								)
+									? initialSelectedElements.find(
+											(item) => item.id === element.id
+									  ).uiConfigurationValues
 									: undefined
 							}
 							key={element.id}
