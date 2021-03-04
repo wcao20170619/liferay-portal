@@ -27,9 +27,10 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.MatchQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.processor.MisspellingsProcessor;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.util.MisspellingsQueryHelper;
 
 import java.util.List;
 
@@ -56,41 +57,6 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 		return keywords;
 	}
 
-	private void _addCompanyFilterClause(
-		BooleanQuery booleanQuery, long companyId) {
-
-		booleanQuery.addFilterQueryClauses(
-			_queries.term(MisspellingSetFields.COMPANY_ID, companyId));
-	}
-
-	private void _addGroupFilterClause(
-		BooleanQuery booleanQuery, long groupId) {
-
-		BooleanQuery groupQuery = _queries.booleanQuery();
-
-		groupQuery.addShouldQueryClauses(
-			_queries.term(MisspellingSetFields.GROUP_ID, groupId));
-
-		groupQuery.addShouldQueryClauses(
-			_queries.term(MisspellingSetFields.GROUP_ID, "*"));
-
-		booleanQuery.addFilterQueryClauses(groupQuery);
-	}
-
-	private void _addLanguageFilterClause(
-		BooleanQuery booleanQuery, String languageId) {
-
-		BooleanQuery languageQuery = _queries.booleanQuery();
-
-		languageQuery.addShouldQueryClauses(
-			_queries.term(MisspellingSetFields.LANGUAGE_ID, languageId));
-
-		languageQuery.addShouldQueryClauses(
-			_queries.term(MisspellingSetFields.LANGUAGE_ID, "*"));
-
-		booleanQuery.addFilterQueryClauses(languageQuery);
-	}
-
 	private void _addSearchClauses(BooleanQuery booleanQuery, String keywords) {
 		MatchQuery matchQuery = _queries.match(
 			MisspellingSetFields.MISSPELLINGS, keywords);
@@ -98,17 +64,14 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 		booleanQuery.addMustQueryClauses(matchQuery);
 	}
 
-	private Query _getQuery(
-		long companyId, long groupId, String languageId, String keywords) {
-
+	private Query _getQuery(long groupId, String languageId, String keywords) {
 		BooleanQuery booleanQuery = _queries.booleanQuery();
 
-		_addCompanyFilterClause(booleanQuery, companyId);
-
-		_addGroupFilterClause(booleanQuery, groupId);
+		_misspellingsQueryHelper.addGroupFilterClause(booleanQuery, groupId);
 
 		if (!Validator.isBlank(languageId)) {
-			_addLanguageFilterClause(booleanQuery, languageId);
+			_misspellingsQueryHelper.addLanguageFilterClause(
+				booleanQuery, languageId);
 		}
 
 		_addSearchClauses(booleanQuery, keywords);
@@ -127,8 +90,7 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 				companyId
 			).getIndexName());
 		searchSearchRequest.setPreferLocalCluster(false);
-		searchSearchRequest.setQuery(
-			_getQuery(companyId, groupId, languageId, keywords));
+		searchSearchRequest.setQuery(_getQuery(groupId, languageId, keywords));
 		searchSearchRequest.setSize(1);
 		searchSearchRequest.setStart(0);
 
@@ -167,6 +129,9 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 
 	@Reference
 	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+
+	@Reference
+	private MisspellingsQueryHelper _misspellingsQueryHelper;
 
 	@Reference
 	private Queries _queries;

@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.hits.SearchHits;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,8 +42,6 @@ public class DocumentToMisspellingSetTranslatorImpl
 	@Override
 	public MisspellingSet translate(Document document, String id) {
 		return builder(
-		).companyId(
-			document.getLong(MisspellingSetFields.COMPANY_ID)
 		).created(
 			_parseDateStringFieldValue(
 				document.getDate(MisspellingSetFields.CREATED))

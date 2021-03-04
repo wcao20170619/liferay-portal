@@ -19,8 +19,6 @@ package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.in
  */
 public class MisspellingSetFields {
 
-	public static final String COMPANY_ID = "companyId";
-
 	public static final String CREATED = "created";
 
 	public static final String GROUP_ID = "groupId";

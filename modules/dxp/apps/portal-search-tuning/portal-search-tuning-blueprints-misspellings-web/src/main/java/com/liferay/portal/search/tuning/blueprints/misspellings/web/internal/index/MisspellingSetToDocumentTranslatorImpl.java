@@ -16,9 +16,11 @@ package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.in
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.DocumentBuilder;
 import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,11 +43,6 @@ public class MisspellingSetToDocumentTranslatorImpl
 	public Document translate(MisspellingSet misspellingSet) {
 		DocumentBuilder documentBuilder = _documentBuilderFactory.builder();
 
-		if (misspellingSet.getCompanyId() != null) {
-			documentBuilder.setLong(
-				MisspellingSetFields.COMPANY_ID, misspellingSet.getCompanyId());
-		}
-
 		if (misspellingSet.getCreated() != null) {
 			documentBuilder.setDate(
 				MisspellingSetFields.CREATED,
@@ -62,7 +59,7 @@ public class MisspellingSetToDocumentTranslatorImpl
 				MisspellingSetFields.ID, misspellingSet.getMisspellingSetId());
 		}
 
-		if (misspellingSet.getLanguageId() != null) {
+		if (!Validator.isBlank(misspellingSet.getLanguageId())) {
 			documentBuilder.setString(
 				MisspellingSetFields.LANGUAGE_ID,
 				misspellingSet.getLanguageId());
@@ -74,7 +71,7 @@ public class MisspellingSetToDocumentTranslatorImpl
 			Stream<String> stream = misspellings.stream();
 
 			documentBuilder.setStrings(
-				MisspellingSetFields.LANGUAGE_ID,
+				MisspellingSetFields.MISSPELLINGS,
 				stream.toArray(String[]::new));
 		}
 
@@ -84,7 +81,7 @@ public class MisspellingSetToDocumentTranslatorImpl
 				_toIndexDateString(misspellingSet.getModified()));
 		}
 
-		if (misspellingSet.getPhrase() != null) {
+		if (!Validator.isBlank(misspellingSet.getPhrase())) {
 			documentBuilder.setString(
 				MisspellingSetFields.PHRASE, misspellingSet.getPhrase());
 		}

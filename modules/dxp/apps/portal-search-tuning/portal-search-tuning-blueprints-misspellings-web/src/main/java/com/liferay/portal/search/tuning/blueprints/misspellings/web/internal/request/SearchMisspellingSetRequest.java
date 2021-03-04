@@ -29,9 +29,9 @@ import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSet;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexName;
 
 import java.util.Arrays;
 import java.util.Collection;

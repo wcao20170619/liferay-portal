@@ -31,12 +31,12 @@ page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
+page import="com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.display.context.EditMisspellingSetDisplayContext" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.display.context.ViewMisspellingSetsDisplayContext" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.display.context.ViewMisspellingSetsManagementToolbarDisplayContext" %><%@
-page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSet" %><%@
 page import="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.util.MisspellingsUtil" %>
 
 <%@ page import="java.util.Date" %>

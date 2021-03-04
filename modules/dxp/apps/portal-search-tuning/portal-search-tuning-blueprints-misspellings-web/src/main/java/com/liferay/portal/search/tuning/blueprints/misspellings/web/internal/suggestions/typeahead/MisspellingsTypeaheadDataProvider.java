@@ -26,9 +26,10 @@ import com.liferay.portal.search.query.MatchQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.tuning.blueprints.misspellings.configuration.MisspellingsConfiguration;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.util.MisspellingsQueryHelper;
 import com.liferay.portal.search.tuning.blueprints.suggestions.attributes.SuggestionsAttributes;
 import com.liferay.portal.search.tuning.blueprints.suggestions.spi.provider.TypeaheadDataProvider;
 import com.liferay.portal.search.tuning.blueprints.suggestions.suggestion.Suggestion;
@@ -47,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "com.liferay.portal.search.tuning.blueprints.query.index.configuration.QueryIndexConfiguration",
+	configurationPid = "com.liferay.portal.search.tuning.blueprints.misspellings.configuration.MisspellingsConfiguration",
 	immediate = true, property = "name=misspellings",
 	service = TypeaheadDataProvider.class
 )
@@ -84,43 +85,6 @@ public class MisspellingsTypeaheadDataProvider
 			MisspellingsConfiguration.class, properties);
 	}
 
-	private void _addCompanyFilterClause(
-		BooleanQuery booleanQuery,
-		SuggestionsAttributes suggestionsAttributes) {
-
-		booleanQuery.addFilterQueryClauses(
-			_queries.term(
-				MisspellingSetFields.COMPANY_ID,
-				suggestionsAttributes.getCompanyId()));
-	}
-
-	private void _addGroupFilterClause(
-		BooleanQuery booleanQuery,
-		SuggestionsAttributes suggestionsAttributes) {
-
-		booleanQuery.addFilterQueryClauses(
-			_queries.term(
-				MisspellingSetFields.GROUP_ID,
-				suggestionsAttributes.getGroupId()));
-	}
-
-	private void _addLanguageFilterClause(
-		BooleanQuery booleanQuery,
-		SuggestionsAttributes suggestionsAttributes) {
-
-		BooleanQuery languageQuery = _queries.booleanQuery();
-
-		languageQuery.addShouldQueryClauses(
-			_queries.term(
-				MisspellingSetFields.LANGUAGE_ID,
-				suggestionsAttributes.getLanguageId()));
-
-		languageQuery.addShouldQueryClauses(
-			_queries.term(MisspellingSetFields.LANGUAGE_ID, "*"));
-
-		booleanQuery.addFilterQueryClauses(languageQuery);
-	}
-
 	private void _addSearchClauses(
 		BooleanQuery booleanQuery,
 		SuggestionsAttributes suggestionsAttributes) {
@@ -137,11 +101,11 @@ public class MisspellingsTypeaheadDataProvider
 	private Query _getQuery(SuggestionsAttributes suggestionsAttributes) {
 		BooleanQuery booleanQuery = _queries.booleanQuery();
 
-		_addCompanyFilterClause(booleanQuery, suggestionsAttributes);
+		_misspellingsQueryHelper.addGroupFilterClause(
+			booleanQuery, suggestionsAttributes.getGroupId());
 
-		_addGroupFilterClause(booleanQuery, suggestionsAttributes);
-
-		_addLanguageFilterClause(booleanQuery, suggestionsAttributes);
+		_misspellingsQueryHelper.addLanguageFilterClause(
+			booleanQuery, suggestionsAttributes.getLanguageId());
 
 		_addSearchClauses(booleanQuery, suggestionsAttributes);
 
@@ -193,6 +157,9 @@ public class MisspellingsTypeaheadDataProvider
 
 	@Reference
 	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+
+	@Reference
+	private MisspellingsQueryHelper _misspellingsQueryHelper;
 
 	@Reference
 	private Queries _queries;

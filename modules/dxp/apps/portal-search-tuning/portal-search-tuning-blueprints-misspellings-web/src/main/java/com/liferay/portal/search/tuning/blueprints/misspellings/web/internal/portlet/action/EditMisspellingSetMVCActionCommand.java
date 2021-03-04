@@ -16,23 +16,20 @@ package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.po
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.index.IndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.util.MisspellingsHelper;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSet;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexWriter;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexNameBuilder;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,47 +63,24 @@ public class EditMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected void editMisspellingSet(ActionRequest actionRequest) {
-		MisspellingSetIndexName misspellingSetIndexName =
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
-				_portal.getCompanyId(actionRequest));
-
 		Optional<MisspellingSet> misspellingSetOptional =
-			_getMisspellingSetOptional(actionRequest, misspellingSetIndexName);
+			_getMisspellingSetOptional(actionRequest);
 
 		if (misspellingSetOptional.isPresent()) {
-			_updateMisspellingSet(
-				actionRequest, misspellingSetIndexName,
-				misspellingSetOptional.get());
+			MisspellingSet misspellingSet = misspellingSetOptional.get();
+
+			_misspellingsHelper.updateMisspellingSet(
+				_portal.getCompanyId(actionRequest), _getGroupId(actionRequest),
+				misspellingSet.getMisspellingSetId(),
+				_getLanguageId(actionRequest), _getPhrase(actionRequest),
+				_getMisspellings(actionRequest));
 		}
 		else {
-			_addMisspellingSet(actionRequest, misspellingSetIndexName);
+			_misspellingsHelper.addMisspellingSet(
+				_portal.getCompanyId(actionRequest), _getGroupId(actionRequest),
+				_getLanguageId(actionRequest), _getPhrase(actionRequest),
+				_getMisspellings(actionRequest));
 		}
-	}
-
-	private void _addMisspellingSet(
-		ActionRequest actionRequest,
-		MisspellingSetIndexName misspellingSetIndexName) {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		_misspellingSetIndexWriter.create(
-			misspellingSetIndexName,
-			new MisspellingSet.MisspellingSetBuilder().companyId(
-				themeDisplay.getCompanyId()
-			).created(
-				new Date()
-			).groupId(
-				_getGroupId(actionRequest)
-			).languageId(
-				_getLanguageId(actionRequest)
-			).misspellings(
-				_getMisspellings(actionRequest)
-			).modified(
-				new Date()
-			).phrase(
-				_getPhrase(actionRequest)
-			).build());
 	}
 
 	private long _getGroupId(ActionRequest actionRequest) {
@@ -132,39 +106,17 @@ public class EditMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private Optional<MisspellingSet> _getMisspellingSetOptional(
-		ActionRequest actionRequest,
-		MisspellingSetIndexName misspellingSetIndexName) {
+		ActionRequest actionRequest) {
 
 		return _misspellingSetIndexReader.fetchMisspellingSetOptional(
-			misspellingSetIndexName,
+			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+				_portal.getCompanyId(actionRequest)),
 			ParamUtil.getString(
 				actionRequest, MisspellingsWebKeys.MISSPELLING_SET_ID));
 	}
 
 	private String _getPhrase(ActionRequest actionRequest) {
 		return ParamUtil.getString(actionRequest, MisspellingsWebKeys.PHRASE);
-	}
-
-	private void _updateMisspellingSet(
-		ActionRequest actionRequest,
-		MisspellingSetIndexName misspellingSetIndexName,
-		MisspellingSet misspellingSet) {
-
-		_misspellingSetIndexWriter.update(
-			misspellingSetIndexName,
-			new MisspellingSet.MisspellingSetBuilder().groupId(
-				_getGroupId(actionRequest)
-			).languageId(
-				_getLanguageId(actionRequest)
-			).misspellings(
-				_getMisspellings(actionRequest)
-			).misspellingSetId(
-				misspellingSet.getMisspellingSetId()
-			).modified(
-				new Date()
-			).phrase(
-				_getPhrase(actionRequest)
-			).build());
 	}
 
 	@Reference
@@ -178,6 +130,9 @@ public class EditMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private MisspellingSetIndexWriter _misspellingSetIndexWriter;
+
+	@Reference
+	private MisspellingsHelper _misspellingsHelper;
 
 	@Reference
 	private Portal _portal;

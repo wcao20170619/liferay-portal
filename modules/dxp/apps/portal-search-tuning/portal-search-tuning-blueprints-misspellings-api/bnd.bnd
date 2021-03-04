@@ -3,4 +3,7 @@ Bundle-SymbolicName: com.liferay.portal.search.tuning.blueprints.misspellings.ap
 Bundle-Version: 1.0.0
 Export-Package:\
 	com.liferay.portal.search.tuning.blueprints.misspellings.configuration,\
-	com.liferay.portal.search.tuning.blueprints.misspellings.processor
+	com.liferay.portal.search.tuning.blueprints.misspellings.index,\
+	com.liferay.portal.search.tuning.blueprints.misspellings.index.name,\
+	com.liferay.portal.search.tuning.blueprints.misspellings.processor,\
+	com.liferay.portal.search.tuning.blueprints.misspellings.util

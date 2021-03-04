@@ -12,10 +12,8 @@
  *
  */
 
-package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index;
+package com.liferay.portal.search.tuning.blueprints.misspellings.util;
 
-import com.liferay.portal.search.document.Document;
-import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
 
 import java.util.List;
@@ -23,10 +21,20 @@ import java.util.List;
 /**
  * @author Petteri Karttunen
  */
-public interface DocumentToMisspellingSetTranslator {
+public interface MisspellingsHelper {
 
-	public MisspellingSet translate(Document document, String id);
+	public void addMisspellingSet(
+		long companyId, long groupId, String languageId, String phrase,
+		List<String> misspellings);
 
-	public List<MisspellingSet> translateAll(SearchHits searchHits);
+	public void deleteCompanyMisspellings(long companyId);
+
+	public List<MisspellingSet> getCompanyMisspellings(long companyId);
+
+	public int getCompanyMisspellingsCount(long companyId);
+
+	public void updateMisspellingSet(
+		long companyId, long groupId, String misspellingSetId,
+		String languageId, String phrase, List<String> misspellings);
 
 }

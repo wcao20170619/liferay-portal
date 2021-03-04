@@ -42,7 +42,7 @@ ViewMisspellingSetsDisplayContext viewMisspellingSetsDisplayContext = (ViewMissp
 			searchContainer="<%= viewMisspellingSetsDisplayContext.getSearchContainer() %>"
 		>
 			<liferay-ui:search-container-row
-				className="com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSet"
+				className="com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet"
 				keyProperty="misspellingSetId"
 				modelVar="entry"
 			>

@@ -2,10 +2,6 @@
 	"mappings": {
 		"_doc": {
 			"properties": {
-				"companyId": {
-					"store": true,
-					"type": "keyword"
-				},
 				"created": {
 					"format": "yyyyMMddHHmmss",
 					"store": true,

@@ -14,7 +14,8 @@
 
 package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index;
 
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
 
 /**
  * @author Petteri Karttunen
