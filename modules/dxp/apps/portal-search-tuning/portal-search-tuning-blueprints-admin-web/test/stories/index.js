@@ -258,6 +258,7 @@ storiesOf('Components|PageToolbar', module)
 			}}
 			onCancel=""
 			onPublish={action('onPublish')}
+			onSubmit={action('onSubmit')}
 			tab={'query-builder'}
 			tabs={{
 				'query-builder': 'query-builder',
@@ -328,10 +329,11 @@ storiesOf('Components|Preview', module)
 			fetchResults={action('fetchResults')}
 			results={{
 				data: {
-					warning: [
-						'Blueprint missing match clause',
-						'Blueprint has no proximity clause',
-						'Blueprint is missing a value',
+					errors: [
+						{
+							msg: 'The JSON is invalid',
+							severity: 'ERROR',
+						},
 					],
 				},
 				loading: false,
