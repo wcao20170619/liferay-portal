@@ -29,7 +29,6 @@ import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.tuning.blueprints.admin.web.internal.constants.BlueprintsAdminMVCCommandNames;
@@ -45,6 +44,8 @@ import java.util.Objects;
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
 import javax.portlet.PortletURL;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -124,8 +125,8 @@ public class ImportBlueprintMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	private PortletURL _getSuccessRedirectURL(
-		ActionRequest actionRequest, ActionResponse actionResponse) {
+	private PortletURL _getSuccessRedirectURL(ActionResponse actionResponse)
+		throws WindowStateException {
 
 		LiferayActionResponse liferayActionResponse =
 			(LiferayActionResponse)_portal.getLiferayPortletResponse(
@@ -133,10 +134,7 @@ public class ImportBlueprintMVCActionCommand extends BaseMVCActionCommand {
 
 		PortletURL portletURL = liferayActionResponse.createRenderURL();
 
-		portletURL.setParameter(
-			"mvcRenderCommandName", BlueprintsAdminMVCCommandNames.VIEW);
-		portletURL.setParameter(
-			"redirect", ParamUtil.getString(actionRequest, "redirect"));
+		portletURL.setWindowState(WindowState.MAXIMIZED);
 
 		return portletURL;
 	}
@@ -150,8 +148,7 @@ public class ImportBlueprintMVCActionCommand extends BaseMVCActionCommand {
 
 			_blueprintImporter.importBlueprint(actionRequest, inputStream);
 
-			PortletURL successURL = _getSuccessRedirectURL(
-				actionRequest, actionResponse);
+			PortletURL successURL = _getSuccessRedirectURL(actionResponse);
 
 			JSONPortletResponseUtil.writeJSON(
 				actionRequest, actionResponse,

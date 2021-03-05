@@ -47,12 +47,12 @@ public class BlueprintExceptionRequestHandler {
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		PortalException portalException) {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
 		if (portalException instanceof BlueprintValidationException) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
 			BlueprintValidationException blueprintValidationException =
 				(BlueprintValidationException)portalException;
 
@@ -74,9 +74,7 @@ public class BlueprintExceptionRequestHandler {
 				});
 		}
 		else {
-			jsonArray.put(
-				_language.get(
-					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
+			jsonArray.put(portalException.getMessage());
 		}
 
 		JSONObject jsonObject = JSONUtil.put("error", jsonArray);

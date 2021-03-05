@@ -89,23 +89,6 @@ public class ViewBlueprintsManagementToolbarDisplayContext
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "add-blueprint"));
 			}
-		).addDropdownItem(
-			dropdownItem -> {
-				dropdownItem.putData("action", "importBlueprint");
-				dropdownItem.putData(
-					"defaultLocale",
-					LocaleUtil.toLanguageId(LocaleUtil.getDefault()));
-
-				dropdownItem.putData(
-					"importBlueprintURL",
-					createActionURL(
-						BlueprintsAdminMVCCommandNames.IMPORT_BLUEPRINT, null));
-
-				dropdownItem.putData(
-					"type", String.valueOf(BlueprintTypes.BLUEPRINT));
-				dropdownItem.setLabel(
-					LanguageUtil.get(httpServletRequest, "import-blueprint"));
-			}
 		).build();
 	}
 
