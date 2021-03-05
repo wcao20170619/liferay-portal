@@ -92,6 +92,8 @@ public class PreviewBlueprintMVCResourceCommand extends BaseMVCResourceCommand {
 			responseJSONObject = _blueprintsJSONResponseBuilder.translate(
 				searchResponse, blueprint, blueprintsResponseAttributes,
 				_getResourceBundle(resourceRequest), messages);
+
+			responseJSONObject.put(JSONKeys.ERRORS, messages.getMessages());
 		}
 		catch (JSONException jsonException) {
 			_log.error(jsonException.getMessage(), jsonException);

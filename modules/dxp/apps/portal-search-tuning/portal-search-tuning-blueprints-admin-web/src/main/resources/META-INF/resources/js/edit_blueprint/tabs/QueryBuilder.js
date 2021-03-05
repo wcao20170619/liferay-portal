@@ -60,6 +60,7 @@ function QueryBuilder({
 	frameworkConfig,
 	initialSelectedElements = [],
 	onFrameworkConfigChange,
+	indexFields,
 	onToggleSidebar,
 	searchableAssetTypes,
 	selectedElements,
@@ -93,7 +94,11 @@ function QueryBuilder({
 					</ClayAlert>
 				)}
 
-				{selectedElements.map((element, index) => {
+				{selectedElements.map((element) => {
+					const initialSelectedElement = initialSelectedElements.find(
+						(item) => item.id === element.id
+					);
+
 					return element.uiConfigurationJSON ? (
 						<Element
 							collapseAll={collapseAll}
@@ -102,10 +107,10 @@ function QueryBuilder({
 							elementTemplateJSON={element.elementTemplateJSON}
 							entityJSON={entityJSON}
 							id={element.id}
+							indexFields={indexFields}
 							initialUIConfigurationValues={
-								initialSelectedElements[index]
-									? initialSelectedElements[index]
-											.uiConfigurationValues
+								initialSelectedElement
+									? initialSelectedElement.uiConfigurationValues
 									: undefined
 							}
 							key={element.id}
@@ -131,149 +136,158 @@ function QueryBuilder({
 	};
 
 	return (
-		<ClayLayout.ContainerFluid className="builder" size="md">
-			<ClayLayout.Row className="configuration-header" justify="between">
-				<ClayLayout.Col size={6}>
-					{Liferay.Language.get('query-builder')}
-				</ClayLayout.Col>
+		<ClayLayout.ContainerFluid className="builder" size="xl">
+			<div className="builder-shift">
+				<ClayLayout.Row
+					className="configuration-header"
+					justify="between"
+				>
+					<ClayLayout.Col size={6}>
+						{Liferay.Language.get('query-builder')}
+					</ClayLayout.Col>
 
-				<ClayLayout.Col size={6}>
-					<div className="builder-actions">
-						<ClayButton
-							aria-label={Liferay.Language.get('collapse-all')}
-							className="collapse-button"
-							displayType="unstyled"
-							onClick={() => setCollapseAll(!collapseAll)}
-						>
-							{collapseAll
-								? Liferay.Language.get('expand-all')
-								: Liferay.Language.get('collapse-all')}
-						</ClayButton>
-
-						<ClayTooltipProvider>
+					<ClayLayout.Col size={6}>
+						<div className="builder-actions">
 							<ClayButton
 								aria-label={Liferay.Language.get(
-									'add-query-element'
+									'collapse-all'
 								)}
-								displayType="primary"
-								monospaced
-								onClick={onToggleSidebar}
-								small
-								title={Liferay.Language.get(
-									'add-query-element'
-								)}
+								className="collapse-button"
+								displayType="unstyled"
+								onClick={() => setCollapseAll(!collapseAll)}
 							>
-								<ClayIcon symbol="plus" />
+								{collapseAll
+									? Liferay.Language.get('expand-all')
+									: Liferay.Language.get('collapse-all')}
 							</ClayButton>
-						</ClayTooltipProvider>
-					</div>
-				</ClayLayout.Col>
-			</ClayLayout.Row>
 
-			{selectedElements.length === 0 ? (
-				<div className="sheet">
-					<div className="selected-elements-empty-text">
-						{Liferay.Language.get(
-							'add-elements-to-optimize-the-search-results-for-your-use-cases'
-						)}
+							<ClayTooltipProvider>
+								<ClayButton
+									aria-label={Liferay.Language.get(
+										'add-query-element'
+									)}
+									displayType="primary"
+									monospaced
+									onClick={onToggleSidebar}
+									small
+									title={Liferay.Language.get(
+										'add-query-element'
+									)}
+								>
+									<ClayIcon symbol="plus" />
+								</ClayButton>
+							</ClayTooltipProvider>
+						</div>
+					</ClayLayout.Col>
+				</ClayLayout.Row>
+
+				{selectedElements.length === 0 ? (
+					<div className="sheet">
+						<div className="selected-elements-empty-text">
+							{Liferay.Language.get(
+								'add-elements-to-optimize-the-search-results-for-your-use-cases'
+							)}
+						</div>
 					</div>
+				) : (
+					_renderSelectedElements()
+				)}
+
+				<ClayLayout.Row
+					className="configuration-header configuration-header-settings"
+					justify="between"
+				>
+					<ClayLayout.Col size={12}>
+						{Liferay.Language.get('settings')}
+					</ClayLayout.Col>
+				</ClayLayout.Row>
+
+				<div className="settings-content-container sheet">
+					<ClayPanel.Group flush>
+						<ClayPanel
+							className="searchable-asset-types"
+							displayTitle={Liferay.Language.get(
+								'searchable-asset-types'
+							)}
+							displayType="unstyled"
+							expanded
+							showCollapseIcon
+						>
+							<ClayPanel.Body>
+								<div className="sheet-text">
+									{Liferay.Language.get(
+										'select-the-searchable-asset-types'
+									)}
+								</div>
+
+								<div className="sheet-text">
+									{Liferay.Language.get(
+										'please-note-that-blueprints-selected-framework-determines-whether-the-asset-types-default-clause-is-used'
+									)}
+								</div>
+							</ClayPanel.Body>
+
+							<SelectAssetTypes
+								onFrameworkConfigChange={
+									onFrameworkConfigChange
+								}
+								searchableAssetTypes={searchableAssetTypes}
+								selectedAssetTypes={
+									frameworkConfig.searchable_asset_types
+								}
+							/>
+						</ClayPanel>
+					</ClayPanel.Group>
+
+					<ClayPanel.Group flush>
+						<ClayPanel
+							displayTitle={Liferay.Language.get('framework')}
+							displayType="unstyled"
+							expanded
+							showCollapseIcon
+						>
+							<ClayPanel.Body>
+								<ClayList>
+									<FrameworkListItem
+										checked={
+											frameworkConfig.apply_indexer_clauses
+										}
+										description={Liferay.Language.get(
+											'compose-elements-on-top-of-liferay-default-search-clauses'
+										)}
+										imagePath={`${contextPath}/images/liferay-default-clauses.svg`}
+										onChange={() =>
+											onFrameworkConfigChange({
+												apply_indexer_clauses: true,
+											})
+										}
+										title={Liferay.Language.get(
+											'liferay-default-clauses'
+										)}
+									/>
+
+									<FrameworkListItem
+										checked={
+											!frameworkConfig.apply_indexer_clauses
+										}
+										description={Liferay.Language.get(
+											'compose-elements-from-the-ground-up'
+										)}
+										imagePath={`${contextPath}/images/custom-clauses.svg`}
+										onChange={() =>
+											onFrameworkConfigChange({
+												apply_indexer_clauses: false,
+											})
+										}
+										title={Liferay.Language.get(
+											'custom-clauses'
+										)}
+									/>
+								</ClayList>
+							</ClayPanel.Body>
+						</ClayPanel>
+					</ClayPanel.Group>
 				</div>
-			) : (
-				_renderSelectedElements()
-			)}
-
-			<ClayLayout.Row
-				className="configuration-header configuration-header-settings"
-				justify="between"
-			>
-				<ClayLayout.Col size={12}>
-					{Liferay.Language.get('settings')}
-				</ClayLayout.Col>
-			</ClayLayout.Row>
-
-			<div className="settings-content-container sheet">
-				<ClayPanel.Group flush>
-					<ClayPanel
-						className="searchable-asset-types"
-						displayTitle={Liferay.Language.get(
-							'searchable-asset-types'
-						)}
-						displayType="unstyled"
-						expanded
-						showCollapseIcon
-					>
-						<ClayPanel.Body>
-							<div className="sheet-text">
-								{Liferay.Language.get(
-									'select-the-searchable-asset-types'
-								)}
-							</div>
-
-							<div className="sheet-text">
-								{Liferay.Language.get(
-									'please-note-that-blueprints-selected-framework-determines-whether-the-asset-types-default-clause-is-used'
-								)}
-							</div>
-						</ClayPanel.Body>
-
-						<SelectAssetTypes
-							onFrameworkConfigChange={onFrameworkConfigChange}
-							searchableAssetTypes={searchableAssetTypes}
-							selectedAssetTypes={
-								frameworkConfig.searchable_asset_types
-							}
-						/>
-					</ClayPanel>
-				</ClayPanel.Group>
-
-				<ClayPanel.Group flush>
-					<ClayPanel
-						displayTitle={Liferay.Language.get('framework')}
-						displayType="unstyled"
-						expanded
-						showCollapseIcon
-					>
-						<ClayPanel.Body>
-							<ClayList>
-								<FrameworkListItem
-									checked={
-										frameworkConfig.apply_indexer_clauses
-									}
-									description={Liferay.Language.get(
-										'compose-elements-on-top-of-liferay-default-search-clauses'
-									)}
-									imagePath={`${contextPath}/images/liferay-default-clauses.svg`}
-									onChange={() =>
-										onFrameworkConfigChange({
-											apply_indexer_clauses: true,
-										})
-									}
-									title={Liferay.Language.get(
-										'liferay-default-clauses'
-									)}
-								/>
-
-								<FrameworkListItem
-									checked={
-										!frameworkConfig.apply_indexer_clauses
-									}
-									description={Liferay.Language.get(
-										'compose-elements-from-the-ground-up'
-									)}
-									imagePath={`${contextPath}/images/custom-clauses.svg`}
-									onChange={() =>
-										onFrameworkConfigChange({
-											apply_indexer_clauses: false,
-										})
-									}
-									title={Liferay.Language.get(
-										'custom-clauses'
-									)}
-								/>
-							</ClayList>
-						</ClayPanel.Body>
-					</ClayPanel>
-				</ClayPanel.Group>
 			</div>
 		</ClayLayout.ContainerFluid>
 	);

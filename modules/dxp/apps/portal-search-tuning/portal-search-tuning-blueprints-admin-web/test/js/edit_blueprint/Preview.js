@@ -94,15 +94,26 @@ describe('Preview', () => {
 	});
 
 	it('renders warning messages', () => {
-		const warning = ['invalid field', 'missing text', 'more info'];
+		const errors = [
+			{
+				msg: 'invalid',
+				severity: 'error',
+			},
+			{
+				msg: 'missing text',
+				severity: 'error',
+			},
+		];
 
 		const {getByText} = renderPreview({
 			results: {
-				data: {warning},
+				data: {
+					errors,
+				},
 				loading: false,
 			},
 		});
 
-		warning.map((message) => getByText(message));
+		errors.map((err) => getByText(err.msg));
 	});
 });

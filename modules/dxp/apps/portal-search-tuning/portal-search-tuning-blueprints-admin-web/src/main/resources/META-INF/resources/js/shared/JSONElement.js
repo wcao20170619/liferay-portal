@@ -11,9 +11,11 @@
 
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
+import ClayForm from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayList from '@clayui/list';
 import ClaySticker from '@clayui/sticker';
+import getCN from 'classnames';
 import {PropTypes} from 'prop-types';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 
@@ -31,6 +33,7 @@ function JSONElement({
 
 	const [active, setActive] = useState(false);
 	const [collapse, setCollapse] = useState(collapseAll);
+	const [hasError, setHasError] = useState(false);
 
 	useEffect(() => {
 		setCollapse(collapseAll);
@@ -44,8 +47,12 @@ function JSONElement({
 				elementOutput: parseJSON,
 				elementTemplateJSON: parseJSON,
 			});
+
+			setHasError(false);
 		}
-		catch {}
+		catch {
+			setHasError(true);
+		}
 	}
 
 	return (
@@ -141,13 +148,28 @@ function JSONElement({
 			])}
 
 			{!collapse && (
-				<div className="json-configuration-editor">
+				<div
+					className={getCN('json-configuration-editor', {
+						'has-error': hasError,
+					})}
+				>
 					<label>{Liferay.Language.get('json')}</label>
 
 					<CodeMirrorEditor
 						onChange={handleChange}
 						value={JSON.stringify(elementTemplateJSON, null, '\t')}
 					/>
+
+					{hasError && (
+						<ClayForm.FeedbackGroup>
+							<ClayForm.FeedbackItem>
+								<ClayForm.FeedbackIndicator symbol="exclamation-full" />
+								{Liferay.Language.get(
+									'unable-to-apply-changes-due-to-invalid-json'
+								)}
+							</ClayForm.FeedbackItem>
+						</ClayForm.FeedbackGroup>
+					)}
 				</div>
 			)}
 		</div>

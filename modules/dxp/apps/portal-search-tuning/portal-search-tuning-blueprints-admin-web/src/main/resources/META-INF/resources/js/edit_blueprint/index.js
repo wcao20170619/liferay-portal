@@ -48,6 +48,7 @@ function EditBlueprintForm({
 	initialConfigurationString = '{}',
 	initialDescription = {},
 	initialSelectedElementsString = '{}',
+	indexFields,
 	initialTitle = {},
 	queryElements = [],
 	redirectURL = '',
@@ -68,12 +69,19 @@ function EditBlueprintForm({
 		...queryElements,
 	]);
 
-	const elementIdCounter = useRef(1);
-
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const initialConfiguration = JSON.parse(initialConfigurationString);
 	const initialSelectedElements = JSON.parse(initialSelectedElementsString);
+
+	const initialSelectedElementsId = initialSelectedElements[
+		'query_configuration'
+	].map((selectedElement, index) => ({
+		...selectedElement,
+		id: index,
+	}));
+
+	const elementIdCounter = useRef(initialSelectedElementsId.length);
 
 	const [advancedConfig, setAdvancedConfig] = useState(
 		JSON.stringify(
@@ -106,12 +114,7 @@ function EditBlueprintForm({
 		JSON.stringify(initialConfiguration['sort_configuration'], null, '\t')
 	);
 	const [selectedQueryElements, setSelectedQueryElements] = useState(
-		initialSelectedElements['query_configuration'].map(
-			(selectedElement) => ({
-				...selectedElement,
-				id: elementIdCounter.current++,
-			})
-		)
+		initialSelectedElementsId
 	);
 
 	const [previewInfo, setPreviewInfo] = useState(() => ({
@@ -146,7 +149,12 @@ function EditBlueprintForm({
 		catch {
 			setPreviewInfo({
 				data: {
-					warning: [Liferay.Language.get('the-json-is-invalid')],
+					errors: [
+						{
+							msg: Liferay.Language.get('the-json-is-invalid'),
+							severity: Liferay.Language.get('error'),
+						},
+					],
 				},
 				loading: false,
 			});
@@ -173,8 +181,13 @@ function EditBlueprintForm({
 				setTimeout(() => {
 					setPreviewInfo({
 						data: {
-							warning: [
-								Liferay.Language.get('the-json-is-invalid'),
+							errors: [
+								{
+									msg: Liferay.Language.get(
+										'the-json-is-invalid'
+									),
+									severity: Liferay.Language.get('error'),
+								},
 							],
 						},
 						loading: false,
@@ -370,22 +383,30 @@ function EditBlueprintForm({
 							visible={showSidebar}
 						/>
 
-						<QueryBuilder
-							deleteElement={deleteElement}
-							entityJSON={entityJSON}
-							frameworkConfig={frameworkConfig}
-							initialSelectedElements={
-								initialSelectedElements['query_configuration']
-							}
-							onFrameworkConfigChange={handleFrameworkChange}
-							onToggleSidebar={() => {
-								setShowPreview(false);
-								setShowSidebar(!showSidebar);
-							}}
-							searchableAssetTypes={searchableAssetTypes}
-							selectedElements={selectedQueryElements}
-							updateElement={updateQueryElement}
-						/>
+						<div
+							className={getCN('query-builder', {
+								'open-preview': showPreview,
+								'open-sidebar': showSidebar,
+							})}
+						>
+							<QueryBuilder
+								deleteElement={deleteElement}
+								entityJSON={entityJSON}
+								frameworkConfig={frameworkConfig}
+								indexFields={indexFields}
+								initialSelectedElements={
+									initialSelectedElementsId
+								}
+								onFrameworkConfigChange={handleFrameworkChange}
+								onToggleSidebar={() => {
+									setShowPreview(false);
+									setShowSidebar(!showSidebar);
+								}}
+								searchableAssetTypes={searchableAssetTypes}
+								selectedElements={selectedQueryElements}
+								updateElement={updateQueryElement}
+							/>
+						</div>
 					</>
 				);
 		}
@@ -420,7 +441,7 @@ function EditBlueprintForm({
 					</ClayButton>
 				</ClayToolbar.Item>
 
-				{previewInfo.data.warning && (
+				{previewInfo.data.errors && !!previewInfo.data.errors.length && (
 					<ClayToolbar.Item>
 						<ClayButton
 							displayType="unstyled"
@@ -431,7 +452,7 @@ function EditBlueprintForm({
 						>
 							<ClayBadge
 								displayType="danger"
-								label={previewInfo.data.warning.length}
+								label={previewInfo.data.errors.length}
 								onClick={() => {
 									setShowSidebar(false);
 									setShowPreview(!showPreview);

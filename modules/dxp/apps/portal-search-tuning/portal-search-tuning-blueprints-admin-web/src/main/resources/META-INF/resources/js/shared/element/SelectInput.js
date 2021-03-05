@@ -15,6 +15,7 @@ import React from 'react';
 function SelectInput({
 	configKey,
 	disabled,
+	id,
 	label,
 	onChange,
 	typeOptions,
@@ -25,7 +26,7 @@ function SelectInput({
 			aria-label={label}
 			className="form-control-sm"
 			disabled={disabled}
-			id={configKey}
+			id={id}
 			onChange={(event) => {
 				const value =
 					typeof typeOptions[0].value == 'boolean' ||

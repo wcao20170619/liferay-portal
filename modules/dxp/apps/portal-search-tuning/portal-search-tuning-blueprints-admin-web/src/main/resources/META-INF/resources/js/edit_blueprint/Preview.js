@@ -12,15 +12,13 @@
 import ClayButton from '@clayui/button';
 import ClayEmptyState from '@clayui/empty-state';
 import ClayIcon from '@clayui/icon';
+import ClayLabel from '@clayui/label';
 import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import ClayList from '@clayui/list';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
-import ClayPanel from '@clayui/panel';
-import ClaySticker from '@clayui/sticker';
-import ClayTable from '@clayui/table';
 import getCN from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
@@ -30,7 +28,8 @@ import PreviewModal from '../shared/PreviewModal';
 import SearchInput from '../shared/SearchInput';
 import {sub} from './../utils/utils';
 
-const COLLAPSED_VIEW = ['type', 'description', 'date', 'userName'];
+const RESULTS_DEFAULT_KEYS = ['type', 'description', 'date', 'userName'];
+const ERROR_OMIT_KEYS = ['msg', 'severity', 'localizationKey'];
 
 function Preview({fetchResults, onClose, results, visible}) {
 	const [value, setValue] = useState('');
@@ -48,50 +47,59 @@ function Preview({fetchResults, onClose, results, visible}) {
 	}, [activeDelta, activePage]); //eslint-disable-line
 
 	const _renderErrors = () => (
-		<ClayPanel
-			className="text-danger"
-			displayTitle={sub(Liferay.Language.get('x-errors'), [
-				results.data.warning.length,
-			])}
-			expanded
-		>
-			<ClayPanel.Body>
-				<ClayTable>
-					<ClayTable.Body>
-						{results.data.warning.map((warning, idx) => (
-							<ClayTable.Row key={idx}>
-								<ClayTable.Cell expanded headingTitle>
-									<span className="text-danger">
-										{warning}
-									</span>
-								</ClayTable.Cell>
-							</ClayTable.Row>
-						))}
-					</ClayTable.Body>
-				</ClayTable>
-			</ClayPanel.Body>
-		</ClayPanel>
+		<ClayList className="preview-error-list text-danger">
+			{results.data.errors.map((error, idx) => (
+				<ErrorListItem item={error} key={idx} />
+			))}
+		</ClayList>
 	);
 
-	const _renderManagementBar = () => (
+	const _renderHits = () => (
+		<div className="preview-results-list">
+			<ClayList>
+				{results.data.hits.map((result) => (
+					<ResultListItem item={result} key={result.id} />
+				))}
+			</ClayList>
+
+			<ClayPaginationBarWithBasicItems
+				activeDelta={activeDelta}
+				activePage={activePage}
+				ellipsisBuffer={1}
+				labels={{
+					paginationResults: Liferay.Language.get(
+						'showing-x-to-x-of-x-entries'
+					),
+					perPageItems: Liferay.Language.get('x-entries'),
+					selectPerPageItems: '{0}',
+				}}
+				onDeltaChange={(delta) => {
+					setActiveDelta(delta);
+					setActivePage(1);
+				}}
+				onPageChange={setActivePage}
+				totalItems={results.data.meta.totalHits}
+			/>
+		</div>
+	);
+
+	const ResultsManagementBar = () => (
 		<ClayManagementToolbar>
 			<ClayManagementToolbar.ItemList>
-				{results.data.meta && (
-					<ClayManagementToolbar.Item>
-						<span className="component-text text-truncate-inline">
-							<span className="text-truncate">
-								{sub(Liferay.Language.get('x-results'), [
-									results.data.meta.totalHits,
-								])}
-							</span>
+				<ClayManagementToolbar.Item>
+					<span className="component-text text-truncate-inline">
+						<span className="text-truncate">
+							{sub(Liferay.Language.get('x-results'), [
+								results.data.meta.totalHits,
+							])}
 						</span>
-					</ClayManagementToolbar.Item>
-				)}
+					</span>
+				</ClayManagementToolbar.Item>
 
 				<ClayManagementToolbar.Item>
 					<ClayButton
 						aria-label={Liferay.Language.get('refresh')}
-						disabled={!value || !results.data.meta}
+						disabled={!value || results.loading}
 						displayType="secondary"
 						onClick={_handleFetch}
 						small
@@ -137,53 +145,99 @@ function Preview({fetchResults, onClose, results, visible}) {
 				</div>
 			</nav>
 
-			{results.data.warning ? _renderErrors() : _renderManagementBar()}
+			{results.data.meta &&
+				(!results.data.errors || !results.data.errors.length) && (
+					<ResultsManagementBar />
+				)}
 
 			{!results.loading ? (
-				results.data.hits && results.data.hits.length ? (
-					<div className="preview-results-list">
-						<ClayList>
-							{results.data.hits.map((result) => (
-								<ResultListItem item={result} key={result.id} />
-							))}
-						</ClayList>
-
-						<ClayPaginationBarWithBasicItems
-							activeDelta={activeDelta}
-							activePage={activePage}
-							ellipsisBuffer={1}
-							labels={{
-								paginationResults: Liferay.Language.get(
-									'showing-x-to-x-of-x-entries'
-								),
-								perPageItems: Liferay.Language.get('x-entries'),
-								selectPerPageItems: '{0}',
-							}}
-							onDeltaChange={(delta) => {
-								setActiveDelta(delta);
-								setActivePage(1);
-							}}
-							onPageChange={setActivePage}
-							totalItems={results.data.meta.totalHits}
-						/>
-					</div>
+				results.data.errors && results.data.errors.length ? (
+					_renderErrors()
+				) : results.data.hits && results.data.hits.length ? (
+					_renderHits()
 				) : results.data.meta ? (
 					<div className="empty-list-message">
 						<ClayEmptyState />
 					</div>
 				) : (
-					!results.data.warning && (
-						<div className="try-search-message">
-							{Liferay.Language.get(
-								'try-a-search-to-see-how-your-blueprint-influences-your-search-results'
-							)}
-						</div>
-					)
+					<div className="try-search-message">
+						{Liferay.Language.get(
+							'try-a-search-to-see-how-your-blueprint-influences-your-search-results'
+						)}
+					</div>
 				)
 			) : (
 				<ClayLoadingIndicator />
 			)}
 		</div>
+	);
+}
+
+function ErrorListItem({item}) {
+	const [collapse, setCollapse] = useState(false);
+
+	const itemKeys = Object.keys(item);
+
+	return (
+		<ClayList.Item flex key={item.msg}>
+			<ClayList.ItemField expand>
+				<div className="error-title">
+					<ClayList.ItemTitle>
+						<ClayLabel displayType="danger">
+							{item.severity}
+						</ClayLabel>
+						<span className="text-danger text-truncate">
+							{item.msg}
+						</span>
+					</ClayList.ItemTitle>
+				</div>
+
+				{!collapse && itemKeys.length > ERROR_OMIT_KEYS.length && (
+					<div className="error-details text-danger">
+						{itemKeys.map(
+							(property) =>
+								!ERROR_OMIT_KEYS.includes(property) && (
+									<ClayLayout.Row
+										justify="start"
+										key={`${item.msg}_${property}`}
+									>
+										<ClayLayout.Col
+											className="semibold"
+											size={4}
+										>
+											{property}
+										</ClayLayout.Col>
+										<ClayLayout.Col size={8}>
+											{typeof item[property] === 'object'
+												? JSON.stringify(item[property])
+												: item[property]}
+										</ClayLayout.Col>
+									</ClayLayout.Row>
+								)
+						)}
+					</div>
+				)}
+			</ClayList.ItemField>
+
+			{itemKeys.length > ERROR_OMIT_KEYS.length && (
+				<ClayList.ItemField>
+					<ClayButton
+						aria-label={
+							collapse
+								? Liferay.Language.get('expand')
+								: Liferay.Language.get('collapse')
+						}
+						className="text-danger"
+						displayType="unstyled"
+						onClick={() => setCollapse(!collapse)}
+					>
+						<ClayIcon
+							symbol={collapse ? 'angle-right' : 'angle-down'}
+						/>
+					</ClayButton>
+				</ClayList.ItemField>
+			)}
+		</ClayList.Item>
 	);
 }
 
@@ -217,10 +271,8 @@ function ResultListItem({item}) {
 					size="lg"
 					title={Liferay.Language.get('explanation-of-score')}
 				>
-					<ClayButton displayType="unstyled">
-						<ClaySticker displayType="primary" size="sm">
-							{item.score.toFixed(2)}
-						</ClaySticker>
+					<ClayButton className="score" displayType="unstyled" small>
+						{item.score.toFixed(2)}
 					</ClayButton>
 				</PreviewModal>
 			</ClayList.ItemField>
@@ -233,11 +285,13 @@ function ResultListItem({item}) {
 					</ClayLink>
 				</ClayList.ItemTitle>
 
-				{COLLAPSED_VIEW.map((property) => _renderListRow(property))}
+				{RESULTS_DEFAULT_KEYS.map((property) =>
+					_renderListRow(property)
+				)}
 
 				{!collapse &&
 					Object.keys(item).map((property) => {
-						if (!COLLAPSED_VIEW.includes(property)) {
+						if (!RESULTS_DEFAULT_KEYS.includes(property)) {
 							return _renderListRow(property);
 						}
 					})}

@@ -152,9 +152,9 @@ storiesOf('Pages|BlueprintForm', module)
 					query_configuration: [],
 				}),
 				searchResultsURL:
-					'https://run.mocky.io/v3/01b0bf73-9e80-42d3-b2c2-b9dc9df6eee5',
+					'https://run.mocky.io/v3/fb22dc3f-532b-489a-bf7a-741223a40e13',
 
-				// https://designer.mocky.io/manage/delete/01b0bf73-9e80-42d3-b2c2-b9dc9df6eee5/xHtw3DQuZNsXJUKjh7ZZCHfnmRYfFEoX9P7S
+				// https://designer.mocky.io/manage/delete/fb22dc3f-532b-489a-bf7a-741223a40e13/2Wox2XTXmh4lvpvTYVaV1oo4eRSmWgXCKOCK
 
 			}}
 		/>
@@ -258,6 +258,7 @@ storiesOf('Components|PageToolbar', module)
 			}}
 			onCancel=""
 			onPublish={action('onPublish')}
+			onSubmit={action('onSubmit')}
 			tab={'query-builder'}
 			tabs={{
 				'query-builder': 'query-builder',
@@ -328,10 +329,11 @@ storiesOf('Components|Preview', module)
 			fetchResults={action('fetchResults')}
 			results={{
 				data: {
-					warning: [
-						'Blueprint missing match clause',
-						'Blueprint has no proximity clause',
-						'Blueprint is missing a value',
+					errors: [
+						{
+							msg: 'The JSON is invalid',
+							severity: 'ERROR',
+						},
 					],
 				},
 				loading: false,
