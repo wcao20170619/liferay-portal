@@ -95,6 +95,10 @@ function QueryBuilder({
 				)}
 
 				{selectedElements.map((element) => {
+					const initialSelectedElement = initialSelectedElements.find(
+						(item) => item.id === element.id
+					);
+
 					return element.uiConfigurationJSON ? (
 						<Element
 							collapseAll={collapseAll}
@@ -105,12 +109,8 @@ function QueryBuilder({
 							id={element.id}
 							indexFields={indexFields}
 							initialUIConfigurationValues={
-								initialSelectedElements.find(
-									(item) => item.id === element.id
-								)
-									? initialSelectedElements.find(
-											(item) => item.id === element.id
-									  ).uiConfigurationValues
+								initialSelectedElement
+									? initialSelectedElement.uiConfigurationValues
 									: undefined
 							}
 							key={element.id}
