@@ -26,8 +26,8 @@ import com.liferay.portal.search.query.MatchQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.tuning.blueprints.misspellings.configuration.MisspellingsConfiguration;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.util.MisspellingsQueryHelper;
 import com.liferay.portal.search.tuning.blueprints.suggestions.attributes.SuggestionsAttributes;
@@ -135,13 +135,12 @@ public class MisspellingsTypeaheadDataProvider
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
-		MisspellingSetIndexName misspellingSetIndexName =
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+		MisspellingsIndexName misspellingsIndexName =
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				suggestionsAttributes.getCompanyId());
 
 		searchSearchRequest.setFetchSource(true);
-		searchSearchRequest.setIndexNames(
-			misspellingSetIndexName.getIndexName());
+		searchSearchRequest.setIndexNames(misspellingsIndexName.getIndexName());
 		searchSearchRequest.setPreferLocalCluster(false);
 		searchSearchRequest.setQuery(query);
 		searchSearchRequest.setSize(suggestionsAttributes.getSize());
@@ -156,7 +155,7 @@ public class MisspellingsTypeaheadDataProvider
 	private volatile MisspellingsConfiguration _misspellingsConfiguration;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
 	private MisspellingsQueryHelper _misspellingsQueryHelper;

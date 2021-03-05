@@ -17,7 +17,7 @@ package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.in
 /**
  * @author Petteri Karttunen
  */
-public interface MisspellingSetIndexName {
+public interface MisspellingsIndexName {
 
 	public String getIndexName();
 

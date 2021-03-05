@@ -16,8 +16,8 @@ package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.in
 
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.search.index.IndexNameBuilder;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -25,15 +25,15 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(service = MisspellingSetIndexNameBuilder.class)
-public class MisspellingSetIndexNameBuilderImpl
-	implements MisspellingSetIndexNameBuilder {
+@Component(service = MisspellingsIndexNameBuilder.class)
+public class MisspellingsIndexNameBuilderImpl
+	implements MisspellingsIndexNameBuilder {
 
 	@Override
-	public MisspellingSetIndexName getMisspellingSetIndexName(long companyId) {
-		return new MisspellingSetIndexNameImpl(
+	public MisspellingsIndexName getMisspellingsIndexName(long companyId) {
+		return new MisspellingsIndexNameImpl(
 			_indexNameBuilder.getIndexName(companyId) + StringPool.DASH +
-				MISSPELLING_SET_INDEX_NAME_SUFFIX);
+				MISSPELLINGS_INDEX_NAME_SUFFIX);
 	}
 
 	@Reference(unbind = "-")
@@ -41,15 +41,15 @@ public class MisspellingSetIndexNameBuilderImpl
 		_indexNameBuilder = indexNameBuilder;
 	}
 
-	protected static final String MISSPELLING_SET_INDEX_NAME_SUFFIX =
-		"search-tuning-blueprints-misspelling-sets";
+	protected static final String MISSPELLINGS_INDEX_NAME_SUFFIX =
+		"search-tuning-blueprints-misspellings";
 
 	private IndexNameBuilder _indexNameBuilder;
 
-	private static class MisspellingSetIndexNameImpl
-		implements MisspellingSetIndexName {
+	private static class MisspellingsIndexNameImpl
+		implements MisspellingsIndexName {
 
-		public MisspellingSetIndexNameImpl(String indexName) {
+		public MisspellingsIndexNameImpl(String indexName) {
 			_indexName = indexName;
 		}
 

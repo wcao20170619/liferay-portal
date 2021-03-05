@@ -28,7 +28,7 @@ import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
@@ -67,7 +67,7 @@ public class ViewMisspellingSetsMVCRenderCommand implements MVCRenderCommand {
 				_portal.getLiferayPortletRequest(renderRequest),
 				_portal.getLiferayPortletResponse(renderResponse),
 				_documentToMisspellingSetTranslator,
-				_misspellingSetIndexNameBuilder, _portal, _queries,
+				_misspellingsIndexNameBuilder, _portal, _queries,
 				_searchEngineAdapter, _sorts);
 
 		renderRequest.setAttribute(
@@ -121,7 +121,7 @@ public class ViewMisspellingSetsMVCRenderCommand implements MVCRenderCommand {
 	private Language _language;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
 	private Portal _portal;

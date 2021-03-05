@@ -30,7 +30,7 @@ import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.DocumentToMisspellingSetTranslator;
@@ -55,7 +55,7 @@ public class ViewMisspellingSetsDisplayContext {
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		DocumentToMisspellingSetTranslator documentToMisspellingSetTranslator,
-		MisspellingSetIndexNameBuilder misspellingSetIndexNameBuilder,
+		MisspellingsIndexNameBuilder misspellingsIndexNameBuilder,
 		Portal portal, Queries queries, SearchEngineAdapter searchEngineAdapter,
 		Sorts sorts) {
 
@@ -63,7 +63,7 @@ public class ViewMisspellingSetsDisplayContext {
 		_liferayPortletResponse = liferayPortletResponse;
 		_documentToMisspellingSetTranslator =
 			documentToMisspellingSetTranslator;
-		_misspellingSetIndexNameBuilder = misspellingSetIndexNameBuilder;
+		_misspellingsIndexNameBuilder = misspellingsIndexNameBuilder;
 		_portal = portal;
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
@@ -140,7 +140,7 @@ public class ViewMisspellingSetsDisplayContext {
 
 		SearchMisspellingSetRequest searchMisspellingSetRequest =
 			new SearchMisspellingSetRequest(
-				_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+				_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 					_portal.getCompanyId(_liferayPortletRequest)),
 				_httpServletRequest, _queries, _sorts, searchContainer,
 				_searchEngineAdapter);
@@ -161,8 +161,7 @@ public class ViewMisspellingSetsDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final MisspellingSetIndexNameBuilder
-		_misspellingSetIndexNameBuilder;
+	private final MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 	private final Portal _portal;
 	private final PortalPreferences _portalPreferences;
 	private final Queries _queries;

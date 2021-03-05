@@ -20,13 +20,13 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexWriter;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexWriter;
 
 import java.util.List;
 import java.util.Optional;
@@ -57,24 +57,24 @@ public class DeleteMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		MisspellingSetIndexName misspellingSetIndexName =
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+		MisspellingsIndexName misspellingsIndexName =
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				_portal.getCompanyId(actionRequest));
 
 		_deleteMisspellingSets(
-			misspellingSetIndexName,
-			_getMisspellingSets(actionRequest, misspellingSetIndexName));
+			misspellingsIndexName,
+			_getMisspellingSets(actionRequest, misspellingsIndexName));
 
 		sendRedirect(actionRequest, actionResponse);
 	}
 
 	private void _deleteMisspellingSets(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		List<MisspellingSet> misspellingSets) {
 
 		for (MisspellingSet misspellingSet : misspellingSets) {
-			_misspellingSetIndexWriter.remove(
-				misspellingSetIndexName, misspellingSet.getMisspellingSetId());
+			_misspellingsIndexWriter.remove(
+				misspellingsIndexName, misspellingSet.getMisspellingSetId());
 		}
 	}
 
@@ -85,13 +85,13 @@ public class DeleteMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 
 	private List<MisspellingSet> _getMisspellingSets(
 		ActionRequest actionRequest,
-		MisspellingSetIndexName misspellingSetIndexName) {
+		MisspellingsIndexName misspellingsIndexName) {
 
 		return Stream.of(
 			_getMisspellingSetIds(actionRequest)
 		).map(
-			id -> _misspellingSetIndexReader.fetchMisspellingSetOptional(
-				misspellingSetIndexName, id)
+			id -> _misspellingsIndexReader.fetchMisspellingSetOptional(
+				misspellingsIndexName, id)
 		).filter(
 			Optional::isPresent
 		).map(
@@ -105,13 +105,13 @@ public class DeleteMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 	private IndexNameBuilder _indexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexReader _misspellingSetIndexReader;
+	private MisspellingsIndexReader _misspellingsIndexReader;
 
 	@Reference
-	private MisspellingSetIndexWriter _misspellingSetIndexWriter;
+	private MisspellingsIndexWriter _misspellingsIndexWriter;
 
 	@Reference
 	private Portal _portal;

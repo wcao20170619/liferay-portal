@@ -18,10 +18,10 @@ import com.liferay.portal.instance.lifecycle.BasePortalInstanceLifecycleListener
 import com.liferay.portal.instance.lifecycle.PortalInstanceLifecycleListener;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.search.engine.SearchEngineInformation;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexCreator;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexCreator;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
 
 import java.util.Objects;
 
@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Petteri Karttunen
  */
 @Component(immediate = true, service = PortalInstanceLifecycleListener.class)
-public class MisspellingSetIndexCreationPortalInstanceLifecycleListener
+public class MisspellingsIndexCreationPortalInstanceLifecycleListener
 	extends BasePortalInstanceLifecycleListener {
 
 	@Override
@@ -43,25 +43,23 @@ public class MisspellingSetIndexCreationPortalInstanceLifecycleListener
 			return;
 		}
 
-		MisspellingSetIndexName misspellingSetIndexName =
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+		MisspellingsIndexName misspellingsIndexName =
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				company.getCompanyId());
 
-		if (!_misspellingSetIndexReader.isIndexExists(
-				misspellingSetIndexName)) {
-
-			_misspellingSetIndexCreator.create(misspellingSetIndexName);
+		if (!_misspellingsIndexReader.isIndexExists(misspellingsIndexName)) {
+			_misspellingsIndexCreator.create(misspellingsIndexName);
 		}
 	}
 
 	@Reference
-	private MisspellingSetIndexCreator _misspellingSetIndexCreator;
+	private MisspellingsIndexCreator _misspellingsIndexCreator;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexReader _misspellingSetIndexReader;
+	private MisspellingsIndexReader _misspellingsIndexReader;
 
 	@Reference
 	private SearchEngineInformation _searchEngineInformation;

@@ -25,7 +25,7 @@ import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
 
 import java.util.Optional;
 
@@ -35,28 +35,24 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(service = MisspellingSetIndexReader.class)
-public class MisspellingSetIndexReaderImpl
-	implements MisspellingSetIndexReader {
+@Component(service = MisspellingsIndexReader.class)
+public class MisspellingsIndexReaderImpl implements MisspellingsIndexReader {
 
 	@Override
 	public Optional<MisspellingSet> fetchMisspellingSetOptional(
-		MisspellingSetIndexName misspellingSetIndexName, String id) {
+		MisspellingsIndexName misspellingsIndexName, String id) {
 
 		return _getDocumentOptional(
-			misspellingSetIndexName, id
+			misspellingsIndexName, id
 		).map(
 			document -> translate(document, id)
 		);
 	}
 
 	@Override
-	public boolean isIndexExists(
-		MisspellingSetIndexName misspellingSetIndexName) {
-
+	public boolean isIndexExists(MisspellingsIndexName misspellingsIndexName) {
 		IndicesExistsIndexRequest indicesExistsIndexRequest =
-			new IndicesExistsIndexRequest(
-				misspellingSetIndexName.getIndexName());
+			new IndicesExistsIndexRequest(misspellingsIndexName.getIndexName());
 
 		indicesExistsIndexRequest.setPreferLocalCluster(false);
 
@@ -78,14 +74,14 @@ public class MisspellingSetIndexReaderImpl
 	}
 
 	private Optional<Document> _getDocumentOptional(
-		MisspellingSetIndexName misspellingSetIndexName, String id) {
+		MisspellingsIndexName misspellingsIndexName, String id) {
 
 		if (Validator.isNull(id)) {
 			return Optional.empty();
 		}
 
 		GetDocumentRequest getDocumentRequest = new GetDocumentRequest(
-			misspellingSetIndexName.getIndexName(), id);
+			misspellingsIndexName.getIndexName(), id);
 
 		getDocumentRequest.setFetchSource(true);
 		getDocumentRequest.setPreferLocalCluster(false);

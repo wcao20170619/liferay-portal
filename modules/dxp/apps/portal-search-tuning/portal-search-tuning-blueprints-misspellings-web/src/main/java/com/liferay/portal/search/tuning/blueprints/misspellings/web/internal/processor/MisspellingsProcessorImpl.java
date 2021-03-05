@@ -27,7 +27,7 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.MatchQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.processor.MisspellingsProcessor;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.util.MisspellingsQueryHelper;
@@ -86,7 +86,7 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 
 		searchSearchRequest.setFetchSource(true);
 		searchSearchRequest.setIndexNames(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				companyId
 			).getIndexName());
 		searchSearchRequest.setPreferLocalCluster(false);
@@ -128,7 +128,7 @@ public class MisspellingsProcessorImpl implements MisspellingsProcessor {
 	private ComplexQueryPartBuilderFactory _complexQueryPartBuilderFactory;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
 	private MisspellingsQueryHelper _misspellingsQueryHelper;

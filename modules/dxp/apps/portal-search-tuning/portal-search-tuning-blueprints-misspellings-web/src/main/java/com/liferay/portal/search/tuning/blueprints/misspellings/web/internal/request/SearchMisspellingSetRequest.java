@@ -30,7 +30,7 @@ import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetFields;
 
 import java.util.Arrays;
@@ -45,12 +45,12 @@ import javax.servlet.http.HttpServletRequest;
 public class SearchMisspellingSetRequest {
 
 	public SearchMisspellingSetRequest(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		HttpServletRequest httpServletRequest, Queries queries, Sorts sorts,
 		SearchContainer<MisspellingSet> searchContainer,
 		SearchEngineAdapter searchEngineAdapter) {
 
-		_misspellingSetIndexName = misspellingSetIndexName;
+		_misspellingsIndexName = misspellingsIndexName;
 		_httpServletRequest = httpServletRequest;
 		_queries = queries;
 		_sorts = sorts;
@@ -65,7 +65,7 @@ public class SearchMisspellingSetRequest {
 
 		searchSearchRequest.setFetchSource(true);
 		searchSearchRequest.setIndexNames(
-			_misspellingSetIndexName.getIndexName());
+			_misspellingsIndexName.getIndexName());
 		searchSearchRequest.setPreferLocalCluster(false);
 		searchSearchRequest.setQuery(_getQuery());
 		searchSearchRequest.setSize(_searchContainer.getDelta());
@@ -124,7 +124,7 @@ public class SearchMisspellingSetRequest {
 	}
 
 	private final HttpServletRequest _httpServletRequest;
-	private final MisspellingSetIndexName _misspellingSetIndexName;
+	private final MisspellingsIndexName _misspellingsIndexName;
 	private final Queries _queries;
 	private final SearchContainer<MisspellingSet> _searchContainer;
 	private final SearchContext _searchContext;

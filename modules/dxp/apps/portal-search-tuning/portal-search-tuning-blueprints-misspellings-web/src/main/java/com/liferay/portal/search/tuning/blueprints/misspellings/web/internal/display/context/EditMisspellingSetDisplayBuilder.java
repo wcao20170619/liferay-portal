@@ -24,11 +24,11 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,16 +50,16 @@ public class EditMisspellingSetDisplayBuilder {
 	public EditMisspellingSetDisplayBuilder(
 		HttpServletRequest httpServletRequest, Language language, Portal portal,
 		RenderRequest renderRequest, RenderResponse renderResponse,
-		MisspellingSetIndexNameBuilder misspellingSetIndexNameBuilder,
-		MisspellingSetIndexReader misspellingSetIndexReader) {
+		MisspellingsIndexNameBuilder misspellingsIndexNameBuilder,
+		MisspellingsIndexReader misspellingsIndexReader) {
 
 		_httpServletRequest = httpServletRequest;
 		_language = language;
 		_portal = portal;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_misspellingSetIndexNameBuilder = misspellingSetIndexNameBuilder;
-		_misspellingSetIndexReader = misspellingSetIndexReader;
+		_misspellingsIndexNameBuilder = misspellingsIndexNameBuilder;
+		_misspellingsIndexReader = misspellingsIndexReader;
 
 		_misspellingSetId = ParamUtil.getString(
 			renderRequest, MisspellingsWebKeys.MISSPELLING_SET_ID);
@@ -128,12 +128,12 @@ public class EditMisspellingSetDisplayBuilder {
 	}
 
 	private Optional<MisspellingSet> _getMisspellingSetOptional() {
-		MisspellingSetIndexName misspellingSetIndexName =
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+		MisspellingsIndexName misspellingsIndexName =
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				_getCompanyId());
 
-		return _misspellingSetIndexReader.fetchMisspellingSetOptional(
-			misspellingSetIndexName, _misspellingSetId);
+		return _misspellingsIndexReader.fetchMisspellingSetOptional(
+			misspellingsIndexName, _misspellingSetId);
 	}
 
 	private String _getModified() {
@@ -246,10 +246,9 @@ public class EditMisspellingSetDisplayBuilder {
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
 	private final String _misspellingSetId;
-	private final MisspellingSetIndexNameBuilder
-		_misspellingSetIndexNameBuilder;
-	private final MisspellingSetIndexReader _misspellingSetIndexReader;
 	private final Optional<MisspellingSet> _misspellingSetOptional;
+	private final MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
+	private final MisspellingsIndexReader _misspellingsIndexReader;
 	private final Portal _portal;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;

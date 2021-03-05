@@ -20,7 +20,7 @@ import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,17 +28,16 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(service = MisspellingSetIndexWriter.class)
-public class MisspellingSetIndexWriterImpl
-	implements MisspellingSetIndexWriter {
+@Component(service = MisspellingsIndexWriter.class)
+public class MisspellingsIndexWriterImpl implements MisspellingsIndexWriter {
 
 	@Override
 	public String create(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		MisspellingSet misspellingSet) {
 
 		IndexDocumentRequest documentRequest = new IndexDocumentRequest(
-			misspellingSetIndexName.getIndexName(),
+			misspellingsIndexName.getIndexName(),
 			_misspellingsToDocumentTranslator.translate(misspellingSet));
 
 		documentRequest.setRefresh(true);
@@ -50,11 +49,9 @@ public class MisspellingSetIndexWriterImpl
 	}
 
 	@Override
-	public void remove(
-		MisspellingSetIndexName misspellingSetIndexName, String id) {
-
+	public void remove(MisspellingsIndexName misspellingsIndexName, String id) {
 		DeleteDocumentRequest deleteDocumentRequest = new DeleteDocumentRequest(
-			misspellingSetIndexName.getIndexName(), id);
+			misspellingsIndexName.getIndexName(), id);
 
 		deleteDocumentRequest.setRefresh(true);
 
@@ -63,11 +60,11 @@ public class MisspellingSetIndexWriterImpl
 
 	@Override
 	public void update(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		MisspellingSet misspellingSet) {
 
 		UpdateDocumentRequest updateDocumentRequest = new UpdateDocumentRequest(
-			misspellingSetIndexName.getIndexName(),
+			misspellingsIndexName.getIndexName(),
 			misspellingSet.getMisspellingSetId(),
 			_misspellingsToDocumentTranslator.translate(misspellingSet));
 

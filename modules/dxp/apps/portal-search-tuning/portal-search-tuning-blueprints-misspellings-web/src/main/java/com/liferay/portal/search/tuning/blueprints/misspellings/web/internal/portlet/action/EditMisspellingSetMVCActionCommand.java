@@ -21,13 +21,13 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.util.MisspellingsHelper;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexWriter;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,8 +108,8 @@ public class EditMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 	private Optional<MisspellingSet> _getMisspellingSetOptional(
 		ActionRequest actionRequest) {
 
-		return _misspellingSetIndexReader.fetchMisspellingSetOptional(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+		return _misspellingsIndexReader.fetchMisspellingSetOptional(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				_portal.getCompanyId(actionRequest)),
 			ParamUtil.getString(
 				actionRequest, MisspellingsWebKeys.MISSPELLING_SET_ID));
@@ -123,16 +123,16 @@ public class EditMisspellingSetMVCActionCommand extends BaseMVCActionCommand {
 	private IndexNameBuilder _indexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
-
-	@Reference
-	private MisspellingSetIndexReader _misspellingSetIndexReader;
-
-	@Reference
-	private MisspellingSetIndexWriter _misspellingSetIndexWriter;
-
-	@Reference
 	private MisspellingsHelper _misspellingsHelper;
+
+	@Reference
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
+
+	@Reference
+	private MisspellingsIndexReader _misspellingsIndexReader;
+
+	@Reference
+	private MisspellingsIndexWriter _misspellingsIndexWriter;
 
 	@Reference
 	private Portal _portal;

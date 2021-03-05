@@ -27,11 +27,11 @@ public interface MisspellingsHelper {
 		long companyId, long groupId, String languageId, String phrase,
 		List<String> misspellings);
 
-	public void deleteCompanyMisspellings(long companyId);
+	public void deleteCompanyMisspellingSets(long companyId);
 
-	public List<MisspellingSet> getCompanyMisspellings(long companyId);
+	public int getCompanyMisspellingSetCount(long companyId);
 
-	public int getCompanyMisspellingsCount(long companyId);
+	public List<MisspellingSet> getCompanyMisspellingSets(long companyId);
 
 	public void updateMisspellingSet(
 		long companyId, long groupId, String misspellingSetId,

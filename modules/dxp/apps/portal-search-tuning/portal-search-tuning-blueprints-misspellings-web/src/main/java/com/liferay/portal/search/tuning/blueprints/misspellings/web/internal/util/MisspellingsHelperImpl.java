@@ -25,11 +25,11 @@ import com.liferay.portal.search.hits.SearchHits;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.util.MisspellingsHelper;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.DocumentToMisspellingSetTranslator;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexWriter;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexWriter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,9 +51,8 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 		long companyId, long groupId, String languageId, String phrase,
 		List<String> misspellings) {
 
-		_misspellingSetIndexWriter.create(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
-				companyId),
+		_misspellingsIndexWriter.create(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(companyId),
 			new MisspellingSet.MisspellingSetBuilder().created(
 				new Date()
 			).groupId(
@@ -70,9 +69,9 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 	}
 
 	@Override
-	public void deleteCompanyMisspellings(long companyId) {
+	public void deleteCompanyMisspellingSets(long companyId) {
 		int count = GetterUtil.getInteger(
-			getCompanyMisspellingsCount(companyId));
+			getCompanyMisspellingSetCount(companyId));
 
 		if (count == 0) {
 			return;
@@ -84,23 +83,11 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 	}
 
 	@Override
-	public List<MisspellingSet> getCompanyMisspellings(long companyId) {
-		SearchHits searchHits = _searchCompanyMisspellings(
-			companyId, 0, getCompanyMisspellingsCount(companyId));
-
-		if (searchHits.getTotalHits() == 0) {
-			return Collections.emptyList();
-		}
-
-		return _translateToMisspellings(searchHits);
-	}
-
-	@Override
-	public int getCompanyMisspellingsCount(long companyId) {
+	public int getCompanyMisspellingSetCount(long companyId) {
 		CountSearchRequest countSearchRequest = new CountSearchRequest();
 
 		countSearchRequest.setIndexNames(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				companyId
 			).getIndexName());
 		countSearchRequest.setQuery(_queries.matchAll());
@@ -112,13 +99,24 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 	}
 
 	@Override
+	public List<MisspellingSet> getCompanyMisspellingSets(long companyId) {
+		SearchHits searchHits = _searchCompanyMisspellings(
+			companyId, 0, getCompanyMisspellingSetCount(companyId));
+
+		if (searchHits.getTotalHits() == 0) {
+			return Collections.emptyList();
+		}
+
+		return _translateToMisspellings(searchHits);
+	}
+
+	@Override
 	public void updateMisspellingSet(
 		long companyId, long groupId, String misspellingSetId,
 		String languageId, String phrase, List<String> misspellings) {
 
-		_misspellingSetIndexWriter.update(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
-				companyId),
+		_misspellingsIndexWriter.update(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(companyId),
 			new MisspellingSet.MisspellingSetBuilder().groupId(
 				groupId
 			).languageId(
@@ -142,8 +140,8 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 		Stream<SearchHit> stream = hits.stream();
 
 		stream.forEach(
-			s -> _misspellingSetIndexWriter.remove(
-				_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+			s -> _misspellingsIndexWriter.remove(
+				_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 					companyId),
 				s.getId()));
 	}
@@ -162,7 +160,7 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 
 		searchSearchRequest.setFetchSource(true);
 		searchSearchRequest.setIndexNames(
-			_misspellingSetIndexNameBuilder.getMisspellingSetIndexName(
+			_misspellingsIndexNameBuilder.getMisspellingsIndexName(
 				companyId
 			).getIndexName());
 		searchSearchRequest.setPreferLocalCluster(false);
@@ -198,13 +196,13 @@ public class MisspellingsHelperImpl implements MisspellingsHelper {
 		_documentToMisspellingSetTranslator;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexReader _misspellingSetIndexReader;
+	private MisspellingsIndexReader _misspellingsIndexReader;
 
 	@Reference
-	private MisspellingSetIndexWriter _misspellingSetIndexWriter;
+	private MisspellingsIndexWriter _misspellingsIndexWriter;
 
 	@Reference
 	private MisspellingsQueryHelper _misspellingsQueryHelper;

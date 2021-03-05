@@ -14,15 +14,19 @@
 
 package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index;
 
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
+
+import java.util.Optional;
 
 /**
  * @author Petteri Karttunen
  */
-public interface MisspellingSetIndexCreator {
+public interface MisspellingsIndexReader {
 
-	public void create(MisspellingSetIndexName misspellingSetIndexName);
+	public Optional<MisspellingSet> fetchMisspellingSetOptional(
+		MisspellingsIndexName misspellingsIndexName, String id);
 
-	public void delete(MisspellingSetIndexName misspellingSetIndexName);
+	public boolean isIndexExists(MisspellingsIndexName misspellingsIndexName);
 
 }

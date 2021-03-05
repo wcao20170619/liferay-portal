@@ -18,12 +18,12 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.index.IndexNameBuilder;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexNameBuilder;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexNameBuilder;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsMVCCommandNames;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsPortletKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.constants.MisspellingsWebKeys;
 import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.display.context.EditMisspellingSetDisplayBuilder;
-import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingSetIndexReader;
+import com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index.MisspellingsIndexReader;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -54,7 +54,7 @@ public class EditMisspellingSetMVCRenderCommand implements MVCRenderCommand {
 			new EditMisspellingSetDisplayBuilder(
 				_portal.getHttpServletRequest(renderRequest), _language,
 				_portal, renderRequest, renderResponse,
-				_misspellingSetIndexNameBuilder, _misspellingSetIndexReader);
+				_misspellingsIndexNameBuilder, _misspellingsIndexReader);
 
 		renderRequest.setAttribute(
 			MisspellingsWebKeys.EDIT_MISSPELLING_SET_DISPLAY_CONTEXT,
@@ -70,10 +70,10 @@ public class EditMisspellingSetMVCRenderCommand implements MVCRenderCommand {
 	private Language _language;
 
 	@Reference
-	private MisspellingSetIndexNameBuilder _misspellingSetIndexNameBuilder;
+	private MisspellingsIndexNameBuilder _misspellingsIndexNameBuilder;
 
 	@Reference
-	private MisspellingSetIndexReader _misspellingSetIndexReader;
+	private MisspellingsIndexReader _misspellingsIndexReader;
 
 	@Reference
 	private Portal _portal;

@@ -15,22 +15,21 @@
 package com.liferay.portal.search.tuning.blueprints.misspellings.web.internal.index;
 
 import com.liferay.portal.search.tuning.blueprints.misspellings.index.MisspellingSet;
-import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingSetIndexName;
+import com.liferay.portal.search.tuning.blueprints.misspellings.index.name.MisspellingsIndexName;
 
 /**
  * @author Petteri Karttunen
  */
-public interface MisspellingSetIndexWriter {
+public interface MisspellingsIndexWriter {
 
 	public String create(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		MisspellingSet misspellingSet);
 
-	public void remove(
-		MisspellingSetIndexName misspellingSetIndexName, String id);
+	public void remove(MisspellingsIndexName misspellingsIndexName, String id);
 
 	public void update(
-		MisspellingSetIndexName misspellingSetIndexName,
+		MisspellingsIndexName misspellingsIndexName,
 		MisspellingSet misspellingSet);
 
 }
