@@ -18,7 +18,6 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -46,6 +45,7 @@ import com.liferay.portal.search.tuning.blueprints.constants.json.keys.advanced.
 import com.liferay.portal.search.tuning.blueprints.constants.json.keys.framework.FrameworkConfigurationKeys;
 import com.liferay.portal.search.tuning.blueprints.constants.json.keys.parameter.ParameterConfigurationKeys;
 import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
+import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsEngineHelper;
 import com.liferay.portal.search.tuning.blueprints.facets.constants.FacetsBlueprintContributorKeys;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
@@ -280,7 +280,7 @@ public abstract class BaseBlueprintsTestCase {
 	private SearchResponse _getSearchResponse(
 			Blueprint blueprint, String configurationString, String keywords,
 			String selectedElementString)
-		throws Exception, JSONException, PortalException {
+		throws Exception, BlueprintsEngineException, PortalException {
 
 		if (!Validator.isBlank(configurationString) &&
 			!Validator.isBlank(selectedElementString)) {

@@ -15,7 +15,8 @@
 package com.liferay.portal.search.tuning.blueprints.admin.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -37,6 +38,7 @@ import com.liferay.portal.search.tuning.blueprints.constants.BlueprintsPortletKe
 import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
 import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsEngineHelper;
+import com.liferay.portal.search.tuning.blueprints.message.Message;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 import com.liferay.portal.search.tuning.blueprints.model.Blueprint;
 import com.liferay.portal.search.tuning.blueprints.searchresponse.json.translator.SearchResponseJSONTranslator;
@@ -45,7 +47,9 @@ import com.liferay.portal.search.tuning.blueprints.searchresponse.json.translato
 import com.liferay.portal.search.tuning.blueprints.service.BlueprintLocalService;
 import com.liferay.portal.search.tuning.blueprints.util.attributes.BlueprintsAttributesHelper;
 
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -92,22 +96,26 @@ public class PreviewBlueprintMVCResourceCommand extends BaseMVCResourceCommand {
 			responseJSONObject = _blueprintsJSONResponseBuilder.translate(
 				searchResponse, blueprint, blueprintsResponseAttributes,
 				_getResourceBundle(resourceRequest), messages);
-
-			responseJSONObject.put(JSONKeys.ERRORS, messages.getMessages());
-		}
-		catch (JSONException jsonException) {
-			_log.error(jsonException.getMessage(), jsonException);
-
-			responseJSONObject = JSONUtil.put(
-				JSONKeys.ERRORS, jsonException.getMessage());
 		}
 		catch (BlueprintsEngineException blueprintsEngineException) {
 			_log.error(
 				blueprintsEngineException.getMessage(),
 				blueprintsEngineException);
 
-			responseJSONObject = JSONUtil.put(
-				JSONKeys.ERRORS, blueprintsEngineException.getMessage());
+			List<Message> errorMessages =
+				blueprintsEngineException.getMessages();
+
+			Stream<Message> stream = errorMessages.stream();
+
+			JSONArray errorsJSONArray = _jsonFactory.createJSONArray();
+
+			stream.forEach(
+				message -> {
+					_log.error(message);
+					errorsJSONArray.put(_jsonFactory.looseSerialize(message));
+				});
+
+			responseJSONObject = JSONUtil.put(JSONKeys.ERRORS, errorsJSONArray);
 		}
 		catch (PortalException portalException) {
 			_log.error(portalException.getMessage(), portalException);
@@ -183,6 +191,9 @@ public class PreviewBlueprintMVCResourceCommand extends BaseMVCResourceCommand {
 
 	@Reference
 	private SearchResponseJSONTranslator _blueprintsJSONResponseBuilder;
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Portal _portal;

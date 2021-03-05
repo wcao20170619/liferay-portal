@@ -27,19 +27,19 @@ public interface BlueprintsWebPortletPreferences {
 
 	public int getDidYouMeanHitsThreshold();
 
+	public int getKeywordIndexingHitsThreshold();
+
 	public int getMaxDidYouMeanSuggestions();
 
 	public int getMaxTypeaheadSuggestions();
-
-	public int getQueryIndexingHitsThreshold();
 
 	public String getTitleTypeaheadEntryClassNames();
 
 	public boolean isDidYouMeanEnabled();
 
-	public boolean isMisspellingsEnabled();
+	public boolean isKeywordIndexingEnabled();
 
-	public boolean isQueryIndexingEnabled();
+	public boolean isMisspellingsEnabled();
 
 	public boolean isTypeaheadEnabled();
 

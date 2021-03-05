@@ -14,13 +14,16 @@
 
 package com.liferay.portal.search.tuning.blueprints.engine.internal.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.tuning.blueprints.attributes.BlueprintsAttributes;
+import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterData;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterDataCreator;
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsSearchRequestContributorHelper;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 import com.liferay.portal.search.tuning.blueprints.model.Blueprint;
+import com.liferay.portal.search.tuning.blueprints.service.BlueprintService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,11 +38,11 @@ public class BlueprintsSearchRequestContributorHelperImpl
 	implements BlueprintsSearchRequestContributorHelper {
 
 	public void combine(
-		SearchRequestBuilder searchRequestBuilder, long blueprintId,
-		BlueprintsAttributes blueprintsAttributes, Messages messages) {
+			SearchRequestBuilder searchRequestBuilder, long blueprintId,
+			BlueprintsAttributes blueprintsAttributes, Messages messages)
+		throws BlueprintsEngineException, PortalException {
 
-		Blueprint blueprint = _blueprintsSearchRequestHelper.getBlueprint(
-			blueprintId);
+		Blueprint blueprint = _blueprintService.getBlueprint(blueprintId);
 
 		ParameterData parameterData = _parameterDataCreator.create(
 			blueprint, blueprintsAttributes, messages);
@@ -58,11 +61,17 @@ public class BlueprintsSearchRequestContributorHelperImpl
 
 		searchRequestBuilder.modelIndexerClassNames(
 			_blueprintsSearchRequestHelper.getModelIndexerClassNames(
-					blueprint, blueprintsAttributes.getCompanyId()));
-		
+				blueprint, blueprintsAttributes.getCompanyId()));
+
 		_blueprintsSearchRequestHelper.executeSearchRequestBodyContributors(
 			searchRequestBuilder, parameterData, blueprint, messages);
+
+		_blueprintsSearchRequestHelper.checkEngineErrors(
+			blueprint.getBlueprintId(), messages);
 	}
+
+	@Reference
+	private BlueprintService _blueprintService;
 
 	@Reference
 	private BlueprintsSearchRequestHelper _blueprintsSearchRequestHelper;

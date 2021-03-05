@@ -55,6 +55,13 @@ public class BlueprintsWebPortletPreferencesImpl
 	}
 
 	@Override
+	public int getKeywordIndexingHitsThreshold() {
+		return _portletPreferencesHelper.getInteger(
+			BlueprintsWebPortletPreferenceKeys.KEYWORD_INDEXING_HITS_THRESHOLD,
+			3);
+	}
+
+	@Override
 	public int getMaxDidYouMeanSuggestions() {
 		return _portletPreferencesHelper.getInteger(
 			BlueprintsWebPortletPreferenceKeys.
@@ -66,13 +73,6 @@ public class BlueprintsWebPortletPreferencesImpl
 	public int getMaxTypeaheadSuggestions() {
 		return _portletPreferencesHelper.getInteger(
 			BlueprintsWebPortletPreferenceKeys.MAX_TYPEAHEAD_SUGGESTIONS, 10);
-	}
-
-	@Override
-	public int getQueryIndexingHitsThreshold() {
-		return _portletPreferencesHelper.getInteger(
-			BlueprintsWebPortletPreferenceKeys.QUERY_INDEXING_HITS_THRESHOLD,
-			3);
 	}
 
 	@Override
@@ -96,15 +96,15 @@ public class BlueprintsWebPortletPreferencesImpl
 	}
 
 	@Override
-	public boolean isMisspellingsEnabled() {
+	public boolean isKeywordIndexingEnabled() {
 		return _portletPreferencesHelper.getBoolean(
-			BlueprintsWebPortletPreferenceKeys.MISSPELLINGS_ENABLED, true);
+			BlueprintsWebPortletPreferenceKeys.KEYWORD_INDEXING_ENABLED, true);
 	}
 
 	@Override
-	public boolean isQueryIndexingEnabled() {
+	public boolean isMisspellingsEnabled() {
 		return _portletPreferencesHelper.getBoolean(
-			BlueprintsWebPortletPreferenceKeys.QUERY_INDEXING_ENABLED, true);
+			BlueprintsWebPortletPreferenceKeys.MISSPELLINGS_ENABLED, true);
 	}
 
 	@Override

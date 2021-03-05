@@ -15,7 +15,6 @@
 package com.liferay.portal.search.tuning.blueprints.engine.internal.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
@@ -30,6 +29,7 @@ import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterDat
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsEngineHelper;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 import com.liferay.portal.search.tuning.blueprints.model.Blueprint;
+import com.liferay.portal.search.tuning.blueprints.service.BlueprintService;
 import com.liferay.portal.search.tuning.blueprints.util.BlueprintHelper;
 
 import java.util.Locale;
@@ -46,26 +46,11 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 
 	@Override
 	public SearchRequestBuilder getSearchRequestBuilder(
-		long blueprintId, BlueprintsAttributes blueprintsAttributes,
-		Messages messages) {
-
-		Blueprint blueprint = _blueprintsSearchRequestHelper.getBlueprint(
-			blueprintId);
-
-		ParameterData parameterData = _parameterDataCreator.create(
-			blueprint, blueprintsAttributes, messages);
-
-		return _getSearchRequestBuilder(
-			parameterData, blueprint, messages,
-			blueprintsAttributes.getCompanyId(),
-			blueprintsAttributes.getLocale());
-	}
-
-	@Override
-	public SearchResponse search(
-			Blueprint blueprint, BlueprintsAttributes blueprintsAttributes,
+			long blueprintId, BlueprintsAttributes blueprintsAttributes,
 			Messages messages)
-		throws BlueprintsEngineException, JSONException, PortalException {
+		throws BlueprintsEngineException, PortalException {
+
+		Blueprint blueprint = _blueprintService.getBlueprint(blueprintId);
 
 		ParameterData parameterData = _parameterDataCreator.create(
 			blueprint, blueprintsAttributes, messages);
@@ -74,6 +59,29 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 			parameterData, blueprint, messages,
 			blueprintsAttributes.getCompanyId(),
 			blueprintsAttributes.getLocale());
+
+		_blueprintsSearchRequestHelper.checkEngineErrors(
+			blueprint.getBlueprintId(), messages);
+
+		return searchRequestBuilder;
+	}
+
+	@Override
+	public SearchResponse search(
+			Blueprint blueprint, BlueprintsAttributes blueprintsAttributes,
+			Messages messages)
+		throws BlueprintsEngineException, PortalException {
+
+		ParameterData parameterData = _parameterDataCreator.create(
+			blueprint, blueprintsAttributes, messages);
+
+		SearchRequestBuilder searchRequestBuilder = _getSearchRequestBuilder(
+			parameterData, blueprint, messages,
+			blueprintsAttributes.getCompanyId(),
+			blueprintsAttributes.getLocale());
+
+		_blueprintsSearchRequestHelper.checkEngineErrors(
+			blueprint.getBlueprintId(), messages);
 
 		return _searchExecutor.execute(
 			searchRequestBuilder, parameterData, blueprint, messages);
@@ -83,10 +91,9 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 	public SearchResponse search(
 			long blueprintId, BlueprintsAttributes blueprintsAttributes,
 			Messages messages)
-		throws BlueprintsEngineException, JSONException, PortalException {
+		throws BlueprintsEngineException, PortalException {
 
-		Blueprint blueprint = _blueprintsSearchRequestHelper.getBlueprint(
-			blueprintId);
+		Blueprint blueprint = _blueprintService.getBlueprint(blueprintId);
 
 		ParameterData parameterData = _parameterDataCreator.create(
 			blueprint, blueprintsAttributes, messages);
@@ -95,6 +102,9 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 			parameterData, blueprint, messages,
 			blueprintsAttributes.getCompanyId(),
 			blueprintsAttributes.getLocale());
+
+		_blueprintsSearchRequestHelper.checkEngineErrors(
+			blueprint.getBlueprintId(), messages);
 
 		return _searchExecutor.execute(
 			searchRequestBuilder, parameterData, blueprint, messages);
@@ -146,8 +156,8 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 			).locale(
 				locale
 			).modelIndexerClassNames(
-					_blueprintsSearchRequestHelper.getModelIndexerClassNames(
-							blueprint, companyId)
+				_blueprintsSearchRequestHelper.getModelIndexerClassNames(
+					blueprint, companyId)
 			).size(
 				size
 			).from(
@@ -201,6 +211,9 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 
 	@Reference
 	private BlueprintHelper _blueprintHelper;
+
+	@Reference
+	private BlueprintService _blueprintService;
 
 	@Reference
 	private BlueprintsSearchRequestHelper _blueprintsSearchRequestHelper;

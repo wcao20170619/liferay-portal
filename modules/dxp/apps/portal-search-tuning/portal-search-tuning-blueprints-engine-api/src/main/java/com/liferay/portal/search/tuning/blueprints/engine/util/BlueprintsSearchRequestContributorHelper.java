@@ -14,8 +14,10 @@
 
 package com.liferay.portal.search.tuning.blueprints.engine.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.tuning.blueprints.attributes.BlueprintsAttributes;
+import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 
 /**
@@ -24,7 +26,8 @@ import com.liferay.portal.search.tuning.blueprints.message.Messages;
 public interface BlueprintsSearchRequestContributorHelper {
 
 	public void combine(
-		SearchRequestBuilder searchRequestBuilder, long blueprintId,
-		BlueprintsAttributes blueprintsAttributes, Messages messages);
+			SearchRequestBuilder searchRequestBuilder, long blueprintId,
+			BlueprintsAttributes blueprintsAttributes, Messages messages)
+		throws BlueprintsEngineException, PortalException;
 
 }

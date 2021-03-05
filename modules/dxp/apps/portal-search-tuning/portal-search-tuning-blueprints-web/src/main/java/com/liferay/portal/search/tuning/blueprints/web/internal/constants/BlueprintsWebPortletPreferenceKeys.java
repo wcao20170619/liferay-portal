@@ -24,6 +24,12 @@ public class BlueprintsWebPortletPreferenceKeys {
 	public static final String DID_YOU_MEAN_HITS_THRESHOLD =
 		"didYouMeanHitsThreshold";
 
+	public static final String KEYWORD_INDEXING_ENABLED =
+		"keywordIndexingEnabled";
+
+	public static final String KEYWORD_INDEXING_HITS_THRESHOLD =
+		"keywordIndexingHitsThreshold";
+
 	public static final String MAX_DID_YOU_MEAN_QUERY_SUGGESTIONS =
 		"maxDidYouMeanSuggestions";
 
@@ -31,11 +37,6 @@ public class BlueprintsWebPortletPreferenceKeys {
 		"maxTypeaheadSuggestions";
 
 	public static final String MISSPELLINGS_ENABLED = "misspellingsEnabled";
-
-	public static final String QUERY_INDEXING_ENABLED = "queryIndexingEnabled";
-
-	public static final String QUERY_INDEXING_HITS_THRESHOLD =
-		"queryIndexingHitsThreshold";
 
 	public static final String SEARCH_BLUEPRINT_ID = "searchBlueprintId";
 

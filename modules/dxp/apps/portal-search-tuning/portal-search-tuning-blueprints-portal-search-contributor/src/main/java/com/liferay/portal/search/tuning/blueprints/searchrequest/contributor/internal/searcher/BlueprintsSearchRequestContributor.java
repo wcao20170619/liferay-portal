@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.tuning.blueprints.searchrequest.contributor.internal.searcher;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -29,12 +30,16 @@ import com.liferay.portal.search.tuning.blueprints.attributes.BlueprintsAttribut
 import com.liferay.portal.search.tuning.blueprints.attributes.BlueprintsAttributesBuilderFactory;
 import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
 import com.liferay.portal.search.tuning.blueprints.engine.constants.SearchContextAttributeKeys;
+import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsSearchRequestContributorHelper;
+import com.liferay.portal.search.tuning.blueprints.message.Message;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 import com.liferay.portal.search.tuning.blueprints.service.BlueprintService;
 import com.liferay.portal.search.tuning.blueprints.util.BlueprintHelper;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -77,11 +82,30 @@ public class BlueprintsSearchRequestContributor
 		SearchRequestBuilder searchRequestBuilder =
 			_searchRequestBuilderFactory.builder(searchRequest);
 
-		_blueprintsSearchRequestContributorHelper.combine(
-			searchRequestBuilder, blueprintId,
-			getBlueprintsAttributes(searchRequest), messages);
+		try {
+			_blueprintsSearchRequestContributorHelper.combine(
+				searchRequestBuilder, blueprintId,
+				getBlueprintsAttributes(searchRequest), messages);
 
-		return searchRequestBuilder.build();
+			return searchRequestBuilder.build();
+		}
+		catch (BlueprintsEngineException blueprintsEngineException) {
+			_log.error(
+				blueprintsEngineException.getMessage(),
+				blueprintsEngineException);
+
+			List<Message> errorMessages =
+				blueprintsEngineException.getMessages();
+
+			Stream<Message> stream = errorMessages.stream();
+
+			stream.forEach(message -> _log.error(message));
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException.getMessage(), portalException);
+		}
+
+		return searchRequest;
 	}
 
 	protected void addCommerceAttributes(

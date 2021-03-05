@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.tuning.blueprints.message;
 
+import com.liferay.petra.string.StringBundler;
+
 import java.io.Serializable;
 
 /**
@@ -62,6 +64,31 @@ public class Message implements Serializable {
 
 	public Throwable getThrowable() {
 		return _throwable;
+	}
+
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler(17);
+
+		sb.append("Message [_className=");
+		sb.append(_className);
+		sb.append(", _localizationKey=");
+		sb.append(_localizationKey);
+		sb.append(", _msg=");
+		sb.append(_msg);
+		sb.append(", _rootObject=");
+		sb.append(_rootObject);
+		sb.append(", _rootProperty=");
+		sb.append(_rootProperty);
+		sb.append(", _rootValue=");
+		sb.append(_rootValue);
+		sb.append(", _severity=");
+		sb.append(_severity);
+		sb.append(", _throwable=");
+		sb.append(_throwable);
+		sb.append("]");
+
+		return sb.toString();
 	}
 
 	public static class Builder {

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.tuning.blueprints.engine.exception;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.search.tuning.blueprints.message.Message;
 
 import java.util.List;
@@ -21,9 +22,13 @@ import java.util.List;
 /**
  * @author Petteri Karttunen
  */
-public class BlueprintsEngineException extends RuntimeException {
+public class BlueprintsEngineException extends PortalException {
 
 	public BlueprintsEngineException() {
+	}
+
+	public BlueprintsEngineException(List<Message> messages) {
+		_messages = messages;
 	}
 
 	public BlueprintsEngineException(String msg) {

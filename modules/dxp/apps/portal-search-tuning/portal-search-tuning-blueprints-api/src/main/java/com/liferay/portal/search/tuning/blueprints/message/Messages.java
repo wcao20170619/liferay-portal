@@ -16,6 +16,7 @@ package com.liferay.portal.search.tuning.blueprints.message;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -32,7 +33,16 @@ public class Messages {
 	}
 
 	public List<Message> getMessagesBySeverity(Severity severity) {
-		return _messages;
+		Stream<Message> stream = _messages.stream();
+
+		return stream.filter(
+			message -> message.getSeverity(
+			).equals(
+				severity
+			)
+		).collect(
+			Collectors.toList()
+		);
 	}
 
 	public boolean hasErrors() {

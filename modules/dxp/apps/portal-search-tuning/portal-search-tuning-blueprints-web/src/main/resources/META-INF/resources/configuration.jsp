@@ -29,9 +29,9 @@ int maxTypeaheadSuggestions = GetterUtil.getInteger(preferences.getValue(Bluepri
 
 boolean misspellingsEnabled = GetterUtil.getBoolean(preferences.getValue(BlueprintsWebPortletPreferenceKeys.MISSPELLINGS_ENABLED, "true"));
 
-boolean queryIndexingEnabled = GetterUtil.getBoolean(preferences.getValue(BlueprintsWebPortletPreferenceKeys.QUERY_INDEXING_ENABLED, "true"));
+boolean keywordIndexingEnabled = GetterUtil.getBoolean(preferences.getValue(BlueprintsWebPortletPreferenceKeys.KEYWORD_INDEXING_ENABLED, "true"));
 
-int queryIndexingHitsThreshold = GetterUtil.getInteger(preferences.getValue(BlueprintsWebPortletPreferenceKeys.QUERY_INDEXING_HITS_THRESHOLD, "3"));
+int keywordIndexingHitsThreshold = GetterUtil.getInteger(preferences.getValue(BlueprintsWebPortletPreferenceKeys.KEYWORD_INDEXING_HITS_THRESHOLD, "3"));
 
 String titleTypeaheadEntryClassNames = preferences.getValue(BlueprintsWebPortletPreferenceKeys.TITLE_TYPEAHEAD_ENTRY_CLASS_NAMES, "com.liferay.journal.model.JournalArticle, com.liferay.document.library.kernel.model.DLFileEntry");
 
@@ -73,17 +73,17 @@ boolean typeaheadEnabled = GetterUtil.getBoolean(preferences.getValue(Blueprints
 				<aui:input helpMessage="did-you-mean-enabled-help" id="didYouMeanEnabled" label="enable-did-you-mean" name="preferences--didYouMeanEnabled--" type="checkbox" value="<%= didYouMeanEnabled %>" />
 
 				<div class="options-container <%= !didYouMeanEnabled ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />didYouMeanOptionsContainer">
-					<aui:input helpMessage="query-indexing-threshold-help" label="hits-threshold-for-showing-did-you-mean-suggestions" name="preferences--didYouMeanHitsThreshold--" size="10" type="text" value="<%= didYouMeanHitsThreshold %>" />
+					<aui:input helpMessage="keyword-indexing-threshold-help" label="hits-threshold-for-showing-did-you-mean-suggestions" name="preferences--didYouMeanHitsThreshold--" size="10" type="text" value="<%= didYouMeanHitsThreshold %>" />
 
 					<aui:input label="maximum-number-of-did-you-mean-suggestions" name="preferences--maxDidYouMeanSuggestions--" size="10" type="text" value="<%= maxDidYouMeanSuggestions %>" />
 				</div>
 
 				<hr />
 
-				<aui:input helpMessage="query-indexing-enabled-help" id="queryIndexingEnabled" label="enable-query-indexing" name="preferences--queryIndexingEnabled--" type="checkbox" value="<%= queryIndexingEnabled %>" />
+				<aui:input helpMessage="keywordindexing-enabled-help" id="keywordIndexingEnabled" label="enable-keyword-indexing" name="preferences--keywordIndexingEnabled--" type="checkbox" value="<%= keywordIndexingEnabled %>" />
 
-				<div class="options-container <%= !queryIndexingEnabled ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />queryIndexingOptionsContainer">
-					<aui:input label="hits-threshold-for-indexing-queries" name="preferences--queryIndexingHitsThreshold--" size="3" type="text" value="<%= queryIndexingHitsThreshold %>" />
+				<div class="options-container <%= !keywordIndexingEnabled ? "hide" : StringPool.BLANK %>" id="<portlet:namespace />keywordIndexingOptionsContainer">
+					<aui:input label="hits-threshold-for-indexing-keywords" name="preferences--keywordIndexingHitsThreshold--" size="3" type="text" value="<%= keywordIndexingHitsThreshold %>" />
 
 			</liferay-frontend:fieldset>
 		</liferay-frontend:fieldset-group>
@@ -102,8 +102,8 @@ boolean typeaheadEnabled = GetterUtil.getBoolean(preferences.getValue(Blueprints
 		'<portlet:namespace />didYouMeanOptionsContainer'
 	);
 	Liferay.Util.toggleBoxes(
-		'<portlet:namespace />queryIndexingEnabled',
-		'<portlet:namespace />queryIndexingOptionsContainer'
+		'<portlet:namespace />keywordIndexingEnabled',
+		'<portlet:namespace />keywordIndexingOptionsContainer'
 	);
 	Liferay.Util.toggleBoxes(
 		'<portlet:namespace />typeaheadEnabled',

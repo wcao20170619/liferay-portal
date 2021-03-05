@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.tuning.blueprints.engine.internal.util;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.tuning.blueprints.engine.component.ServiceComponentReference;
 import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
+import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.Parameter;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterData;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterDataCreator;
@@ -51,6 +53,25 @@ import org.osgi.service.component.annotations.ReferencePolicy;
  */
 @Component(immediate = true, service = BlueprintsSearchRequestHelper.class)
 public class BlueprintsSearchRequestHelper {
+
+	public void checkEngineErrors(long blueprintId, Messages messages)
+		throws BlueprintsEngineException {
+
+		if (messages.hasErrors()) {
+			List<Message> errors = messages.getMessagesBySeverity(
+				Severity.ERROR);
+
+			StringBundler sb = new StringBundler(5);
+
+			sb.append("There were ");
+			sb.append(errors.size());
+			sb.append(" error(s) in processing Blueprint ");
+			sb.append(blueprintId);
+			sb.append(". See messages for details.");
+
+			throw new BlueprintsEngineException(sb.toString(), errors);
+		}
+	}
 
 	public void executeSearchRequestBodyContributors(
 		SearchRequestBuilder searchRequestBuilder, ParameterData parameterData,
@@ -102,15 +123,6 @@ public class BlueprintsSearchRequestHelper {
 				_log.error(
 					illegalStateException.getMessage(), illegalStateException);
 			}
-		}
-	}
-
-	public Blueprint getBlueprint(long blueprintId) {
-		try {
-			return _blueprintService.getBlueprint(blueprintId);
-		}
-		catch (Exception exception) {
-			throw new RuntimeException(exception);
 		}
 	}
 

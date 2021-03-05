@@ -16,7 +16,6 @@ package com.liferay.portal.search.tuning.blueprints.web.internal.portlet.action;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -38,10 +37,11 @@ import com.liferay.portal.search.tuning.blueprints.attributes.BlueprintsAttribut
 import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
 import com.liferay.portal.search.tuning.blueprints.engine.exception.BlueprintsEngineException;
 import com.liferay.portal.search.tuning.blueprints.engine.util.BlueprintsEngineHelper;
+import com.liferay.portal.search.tuning.blueprints.keyword.index.util.KeywordIndexHelper;
+import com.liferay.portal.search.tuning.blueprints.message.Message;
 import com.liferay.portal.search.tuning.blueprints.message.Messages;
 import com.liferay.portal.search.tuning.blueprints.misspellings.processor.MisspellingsProcessor;
 import com.liferay.portal.search.tuning.blueprints.model.Blueprint;
-import com.liferay.portal.search.tuning.blueprints.query.index.util.QueryIndexHelper;
 import com.liferay.portal.search.tuning.blueprints.searchresponse.json.translator.SearchResponseJSONTranslator;
 import com.liferay.portal.search.tuning.blueprints.searchresponse.json.translator.constants.JSONKeys;
 import com.liferay.portal.search.tuning.blueprints.searchresponse.json.translator.constants.ResponseAttributeKeys;
@@ -114,24 +114,25 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 				blueprintsRequestAttributes, blueprintsWebPortletPreferences,
 				messages);
 
-			if (_shouldIndexQuery(
+			if (_shouldIndexKeywords(
 					blueprintsWebPortletPreferences,
 					searchResponse.getTotalHits())) {
 
-				_indexQuery(
+				_indexKeyword(
 					resourceRequest, blueprintsRequestAttributes.getKeywords());
 			}
-		}
-		catch (JSONException jsonException) {
-			_log.error(jsonException.getMessage(), jsonException);
-
-			responseJSONObject = JSONUtil.put(
-				JSONKeys.ERRORS, jsonException.getMessage());
 		}
 		catch (BlueprintsEngineException blueprintsEngineException) {
 			_log.error(
 				blueprintsEngineException.getMessage(),
 				blueprintsEngineException);
+
+			List<Message> errorMessages =
+				blueprintsEngineException.getMessages();
+
+			Stream<Message> stream = errorMessages.stream();
+
+			stream.forEach(message -> _log.error(message));
 
 			responseJSONObject = JSONUtil.put(
 				JSONKeys.ERRORS, blueprintsEngineException.getMessage());
@@ -272,11 +273,13 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			"content.Language", themeDisplay.getLocale(), getClass());
 	}
 
-	private void _indexQuery(ResourceRequest resourceRequest, String keywords) {
+	private void _indexKeyword(
+		ResourceRequest resourceRequest, String keywords) {
+
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_queryIndexHelper.indexKeywords(
+		_keywordIndexHelper.indexKeywords(
 			themeDisplay.getCompanyId(), themeDisplay.getScopeGroupId(),
 			themeDisplay.getLanguageId(), keywords);
 	}
@@ -327,13 +330,15 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		return false;
 	}
 
-	private boolean _shouldIndexQuery(
+	private boolean _shouldIndexKeywords(
 		BlueprintsWebPortletPreferences blueprintsWebPortletPreferences,
 		int hitCount) {
 
-		if (blueprintsWebPortletPreferences.isQueryIndexingEnabled() &&
-			(blueprintsWebPortletPreferences.getQueryIndexingHitsThreshold() <=
-				hitCount)) {
+		int threshold =
+			blueprintsWebPortletPreferences.getKeywordIndexingHitsThreshold();
+
+		if (blueprintsWebPortletPreferences.isKeywordIndexingEnabled() &&
+			(threshold <= hitCount)) {
 
 			return true;
 		}
@@ -360,14 +365,14 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	@Reference
 	private JSONFactory _jsonFactory;
 
+	@Reference
+	private KeywordIndexHelper _keywordIndexHelper;
+
 	@Reference(cardinality = ReferenceCardinality.OPTIONAL)
 	private volatile MisspellingsProcessor _misspellingsProcessor;
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private QueryIndexHelper _queryIndexHelper;
 
 	@Reference
 	private SearchResponseJSONTranslator _searchResponseJSONTranslator;
