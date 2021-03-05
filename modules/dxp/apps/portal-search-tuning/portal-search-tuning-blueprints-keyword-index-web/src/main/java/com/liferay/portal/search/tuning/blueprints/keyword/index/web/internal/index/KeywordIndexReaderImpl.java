@@ -53,7 +53,7 @@ public class KeywordIndexReaderImpl implements KeywordIndexReader {
 			return Optional.empty();
 		}
 
-		Query query = _buildQuery(companyId, groupId, keywords);
+		Query query = _buildQuery(groupId, keywords);
 
 		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
 
