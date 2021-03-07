@@ -27,7 +27,9 @@ import com.liferay.portal.search.tuning.blueprints.constants.json.keys.parameter
 import com.liferay.portal.search.tuning.blueprints.constants.json.keys.parameter.ParameterConfigurationKeys;
 import com.liferay.portal.search.tuning.blueprints.constants.json.keys.sort.SortConfigurationKeys;
 import com.liferay.portal.search.tuning.blueprints.engine.component.ServiceComponentReference;
+import com.liferay.portal.search.tuning.blueprints.engine.constants.ReservedParameterNames;
 import com.liferay.portal.search.tuning.blueprints.engine.internal.parameter.builder.ParameterBuilder;
+import com.liferay.portal.search.tuning.blueprints.engine.parameter.BooleanParameter;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.IntegerParameter;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.Parameter;
 import com.liferay.portal.search.tuning.blueprints.engine.parameter.ParameterData;
@@ -78,6 +80,8 @@ public class ParameterDataCreatorImpl implements ParameterDataCreator {
 
 		JSONObject parameterConfigurationJSONObject =
 			parameterConfigurationJSONObjectOptional.get();
+
+		_addExplainParameter(parameterDataBuilder, blueprintsAttributes);
 
 		_addKeywordParameter(
 			parameterDataBuilder, blueprint, blueprintsAttributes, messages);
@@ -308,6 +312,21 @@ public class ParameterDataCreatorImpl implements ParameterDataCreator {
 					parameterDataBuilder, blueprintsAttributes,
 					configurationJSONObject, messages);
 			}
+		}
+	}
+
+	private void _addExplainParameter(
+		ParameterDataBuilder parameterDataBuilder,
+		BlueprintsAttributes blueprintsAttributes) {
+
+		Optional<Object> optional = blueprintsAttributes.getAttributeOptional(
+			ReservedParameterNames.EXPLAIN.getKey());
+
+		if (optional.isPresent()) {
+			parameterDataBuilder.addParameter(
+				new BooleanParameter(
+					ReservedParameterNames.EXPLAIN.getKey(), "${explain}",
+					GetterUtil.getBoolean(optional.get())));
 		}
 	}
 

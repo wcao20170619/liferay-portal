@@ -198,15 +198,29 @@ public class BlueprintsEngineHelperImpl implements BlueprintsEngineHelper {
 	}
 
 	private boolean _isExplain(ParameterData parameterData) {
-		return GetterUtil.getBoolean(
-			parameterData.getByNameOptional(
-				ReservedParameterNames.EXPLAIN.getKey()));
+		Optional<Parameter> parameterOptional = parameterData.getByNameOptional(
+			ReservedParameterNames.EXPLAIN.getKey());
+
+		if (!parameterOptional.isPresent()) {
+			return false;
+		}
+
+		Parameter parameter = parameterOptional.get();
+
+		return GetterUtil.getBoolean(parameter.getValue());
 	}
 
 	private boolean _isIncludeResponseString(ParameterData parameterData) {
-		return GetterUtil.getBoolean(
-			parameterData.getByNameOptional(
-				ReservedParameterNames.INCLUDE_RESPONSE_STRING.getKey()));
+		Optional<Parameter> parameterOptional = parameterData.getByNameOptional(
+			ReservedParameterNames.INCLUDE_RESPONSE_STRING.getKey());
+
+		if (!parameterOptional.isPresent()) {
+			return false;
+		}
+
+		Parameter parameter = parameterOptional.get();
+
+		return GetterUtil.getBoolean(parameter.getValue());
 	}
 
 	@Reference
