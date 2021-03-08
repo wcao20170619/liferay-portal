@@ -40,6 +40,7 @@ import {
 	openErrorToast,
 	renameKeys,
 	replaceUIConfigurationValues,
+	sub,
 } from '../utils/utils';
 
 function EditElementForm({
@@ -175,6 +176,39 @@ function EditElementForm({
 		);
 	}
 
+	const _validateConfigKeys = (
+		elementTemplateJSON,
+		parseUIConfigurationJSON
+	) => {
+		const elementKeys = [
+			...elementTemplateJSON.matchAll(/\$\{config.\w+\}/g),
+		].map((item) => item[0].replace('${config.', '').replace('}', ''));
+
+		const uiConfigKeys = parseUIConfigurationJSON.map((item) => item.key);
+
+		const missingKeys = elementKeys.filter(
+			(item) => !uiConfigKeys.includes(item)
+		);
+
+		if (missingKeys.length > 0) {
+			throw sub(
+				Liferay.Language.get(
+					'the-following-configuration-key-is-missing-x'
+				),
+				[missingKeys.join(', ')]
+			);
+		}
+	};
+
+	const _validateJSON = (text, name) => {
+		try {
+			return JSON.parse(text);
+		}
+		catch {
+			throw sub(Liferay.Language.get('x-is-invalid'), [name]);
+		}
+	};
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
@@ -183,17 +217,23 @@ function EditElementForm({
 		const formData = new FormData(form.current);
 
 		try {
-			const parseElementTemplateJSON = JSON.parse(elementTemplateJSON);
+			const parseElementTemplateJSON = _validateJSON(
+				elementTemplateJSON,
+				Liferay.Language.get('element-template-json')
+			);
+			const parseUIConfigurationJSON = _validateJSON(
+				uiConfigurationJSON,
+				Liferay.Language.get('ui-configuration-json')
+			);
 
-			if (!isNotEmpty(parseElementTemplateJSON.title)) {
-				throw '';
-			}
+			_validateConfigKeys(elementTemplateJSON, parseUIConfigurationJSON);
 
 			if (
-				typeof parseElementTemplateJSON.title === 'object' &&
-				!isNotEmpty(parseElementTemplateJSON.title[defaultLocale])
+				!isNotEmpty(parseElementTemplateJSON.title) ||
+				(typeof parseElementTemplateJSON.title === 'object' &&
+					!isNotEmpty(parseElementTemplateJSON.title[defaultLocale]))
 			) {
-				throw '';
+				throw Liferay.Language.get('title-is-missing');
 			}
 
 			_appendEntryLocale(
@@ -211,13 +251,13 @@ function EditElementForm({
 				`${namespace}configuration`,
 				JSON.stringify({
 					elementTemplateJSON: parseElementTemplateJSON,
-					uiConfigurationJSON: JSON.parse(uiConfigurationJSON),
+					uiConfigurationJSON: parseUIConfigurationJSON,
 				})
 			);
 		}
-		catch {
+		catch (error) {
 			openErrorToast({
-				message: Liferay.Language.get('the-json-is-invalid'),
+				message: error,
 			});
 
 			setIsSubmitting(false);
