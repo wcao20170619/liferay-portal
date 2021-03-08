@@ -228,12 +228,15 @@ function EditElementForm({
 
 			_validateConfigKeys(elementTemplateJSON, parseUIConfigurationJSON);
 
+			if (!isNotEmpty(parseElementTemplateJSON.title)) {
+				throw Liferay.Language.get('error.title-empty');
+			}
+
 			if (
-				!isNotEmpty(parseElementTemplateJSON.title) ||
-				(typeof parseElementTemplateJSON.title === 'object' &&
-					!isNotEmpty(parseElementTemplateJSON.title[defaultLocale]))
+				typeof parseElementTemplateJSON.title === 'object' &&
+				!isNotEmpty(parseElementTemplateJSON.title[defaultLocale])
 			) {
-				throw Liferay.Language.get('title-is-missing');
+				throw Liferay.Language.get('error.default-locale-title-empty');
 			}
 
 			_appendEntryLocale(
