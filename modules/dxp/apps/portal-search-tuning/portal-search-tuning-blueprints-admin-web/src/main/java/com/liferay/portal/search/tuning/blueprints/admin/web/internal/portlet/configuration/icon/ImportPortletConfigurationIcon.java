@@ -77,7 +77,7 @@ public class ImportPortletConfigurationIcon
 
 			StringBundler sb = new StringBundler(6);
 
-			sb.append("Liferay.Util.openModal({height: '280px',");
+			sb.append("Liferay.Util.openModal({height: '320px',");
 			sb.append("size: 'md', title: '");
 			sb.append(getMessage(portletRequest));
 			sb.append("', url: '");

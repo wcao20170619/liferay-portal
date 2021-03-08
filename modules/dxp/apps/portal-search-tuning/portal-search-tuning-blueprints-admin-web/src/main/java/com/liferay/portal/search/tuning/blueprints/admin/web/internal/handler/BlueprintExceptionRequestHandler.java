@@ -16,6 +16,7 @@ package com.liferay.portal.search.tuning.blueprints.admin.web.internal.handler;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -47,12 +48,12 @@ public class BlueprintExceptionRequestHandler {
 		ActionRequest actionRequest, ActionResponse actionResponse,
 		PortalException portalException) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
 
 		if (portalException instanceof BlueprintValidationException) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 			BlueprintValidationException blueprintValidationException =
 				(BlueprintValidationException)portalException;
 
@@ -73,8 +74,15 @@ public class BlueprintExceptionRequestHandler {
 						_language.get(themeDisplay.getRequest(), errorMessage));
 				});
 		}
+		else if (portalException.getCause() instanceof JSONException) {
+			jsonArray.put(
+				_language.get(
+					themeDisplay.getRequest(), "unable-to-parse-json"));
+		}
 		else {
-			jsonArray.put(portalException.getMessage());
+			jsonArray.put(
+				_language.get(
+					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
 		}
 
 		JSONObject jsonObject = JSONUtil.put("error", jsonArray);
