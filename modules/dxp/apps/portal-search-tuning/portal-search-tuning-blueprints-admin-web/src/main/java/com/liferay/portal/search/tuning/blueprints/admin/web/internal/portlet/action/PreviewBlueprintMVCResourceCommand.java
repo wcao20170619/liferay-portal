@@ -16,6 +16,7 @@ package com.liferay.portal.search.tuning.blueprints.admin.web.internal.portlet.a
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -112,7 +113,15 @@ public class PreviewBlueprintMVCResourceCommand extends BaseMVCResourceCommand {
 			stream.forEach(
 				message -> {
 					_log.error(message);
-					errorsJSONArray.put(_jsonFactory.looseSerialize(message));
+
+					try {
+						errorsJSONArray.put(
+							_jsonFactory.createJSONObject(
+								_jsonFactory.looseSerialize(message)));
+					}
+					catch (JSONException jsonException) {
+						_log.error(jsonException.getMessage(), jsonException);
+					}
 				});
 
 			responseJSONObject = JSONUtil.put(JSONKeys.ERRORS, errorsJSONArray);
