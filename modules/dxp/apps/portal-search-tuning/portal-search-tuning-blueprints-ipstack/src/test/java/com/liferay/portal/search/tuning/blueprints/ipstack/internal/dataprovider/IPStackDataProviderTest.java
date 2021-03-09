@@ -78,7 +78,7 @@ public class IPStackDataProviderTest {
 	}
 
 	protected void assertMessages(int messageCount, Messages messages) {
-		List<Message> messageList = messages.getMessages();
+		List<Message> messageList = messages.getAllMessages();
 
 		Assert.assertEquals(
 			messageList.toString(), messageCount, messageList.size());

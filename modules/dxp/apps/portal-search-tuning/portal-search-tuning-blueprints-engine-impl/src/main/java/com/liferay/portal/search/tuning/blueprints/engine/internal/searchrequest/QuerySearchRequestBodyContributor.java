@@ -186,18 +186,21 @@ public class QuerySearchRequestBodyContributor
 		JSONArray configurationJSONArray, ParameterData parameterData,
 		Blueprint blueprint, Messages messages) {
 
+		Messages queryBuildingMessages = new Messages();
+
 		for (int i = 0; i < configurationJSONArray.length(); i++) {
 			JSONObject configurationJSONObject =
 				configurationJSONArray.getJSONObject(i);
 
+			messages.setElementId("queryElement-" + i);
+
 			if (!configurationJSONObject.getBoolean(
-					QueryConfigurationKeys.ENABLED.getJsonKey(), true)) {
+					QueryConfigurationKeys.ENABLED.getJsonKey(), true) ||
+				!_isConditionsTrue(
+					parameterData, queryBuildingMessages,
+					configurationJSONObject)) {
 
-				continue;
-			}
-
-			if (!_isConditionsTrue(
-					parameterData, messages, configurationJSONObject)) {
+				messages.unsetElementId();
 
 				continue;
 			}
@@ -242,6 +245,8 @@ public class QuerySearchRequestBodyContributor
 						_getRescoreWindoSize(clauseJSONObject));
 				}
 			}
+
+			messages.unsetElementId();
 		}
 	}
 

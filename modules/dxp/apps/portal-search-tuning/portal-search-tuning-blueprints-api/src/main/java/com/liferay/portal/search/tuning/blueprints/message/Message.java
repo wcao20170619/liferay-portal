@@ -25,6 +25,7 @@ public class Message implements Serializable {
 
 	public Message(Message message) {
 		_className = message._className;
+		_elementId = message._elementId;
 		_localizationKey = message._localizationKey;
 		_msg = message._msg;
 		_throwable = message._throwable;
@@ -36,6 +37,10 @@ public class Message implements Serializable {
 
 	public String getClassName() {
 		return _className;
+	}
+
+	public String getElementId() {
+		return _elementId;
 	}
 
 	public String getLocalizationKey() {
@@ -66,12 +71,18 @@ public class Message implements Serializable {
 		return _throwable;
 	}
 
+	public void setElementId(String elementId) {
+		_elementId = elementId;
+	}
+
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(17);
+		StringBundler sb = new StringBundler(19);
 
 		sb.append("Message [_className=");
 		sb.append(_className);
+		sb.append(", _elementId=");
+		sb.append(_elementId);
 		sb.append(", _localizationKey=");
 		sb.append(_localizationKey);
 		sb.append(", _msg=");
@@ -111,6 +122,12 @@ public class Message implements Serializable {
 			return this;
 		}
 
+		public Builder elementId(String elementId) {
+			_message._elementId = elementId;
+
+			return this;
+		}
+
 		public Builder localizationKey(String localizationKey) {
 			_message._localizationKey = localizationKey;
 
@@ -130,7 +147,7 @@ public class Message implements Serializable {
 		}
 
 		public Builder rootProperty(String rootProperty) {
-			_message._rootValue = rootProperty;
+			_message._rootProperty = rootProperty;
 
 			return this;
 		}
@@ -163,6 +180,7 @@ public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String _className;
+	private String _elementId;
 	private String _localizationKey;
 	private String _msg;
 	private Object _rootObject;

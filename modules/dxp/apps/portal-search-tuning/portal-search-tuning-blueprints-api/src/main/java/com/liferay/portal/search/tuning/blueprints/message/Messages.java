@@ -25,10 +25,12 @@ import java.util.stream.Stream;
 public class Messages {
 
 	public void addMessage(Message message) {
+		message.setElementId(_elementId);
+
 		_messages.add(message);
 	}
 
-	public List<Message> getMessages() {
+	public List<Message> getAllMessages() {
 		return _messages;
 	}
 
@@ -55,6 +57,15 @@ public class Messages {
 			));
 	}
 
+	public void setElementId(String elementId) {
+		_elementId = elementId;
+	}
+
+	public void unsetElementId() {
+		_elementId = null;
+	}
+
+	private String _elementId;
 	private final List<Message> _messages = new ArrayList<>();
 
 }
