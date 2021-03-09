@@ -55,7 +55,7 @@ const FrameworkListItem = ({
 };
 
 function QueryBuilder({
-	deleteElement,
+	onDeleteElement,
 	entityJSON,
 	frameworkConfig,
 	initialSelectedElements = [],
@@ -64,7 +64,7 @@ function QueryBuilder({
 	onToggleSidebar,
 	searchableAssetTypes,
 	selectedElements,
-	updateElement,
+	onUpdateElement,
 }) {
 	const {contextPath} = useContext(ThemeContext);
 	const [collapseAll, setCollapseAll] = useState(false);
@@ -102,7 +102,6 @@ function QueryBuilder({
 					return element.uiConfigurationJSON ? (
 						<Element
 							collapseAll={collapseAll}
-							deleteElement={deleteElement}
 							elementOutput={element.elementOutput}
 							elementTemplateJSON={element.elementTemplateJSON}
 							entityJSON={entityJSON}
@@ -114,20 +113,21 @@ function QueryBuilder({
 									: undefined
 							}
 							key={element.id}
+							onDeleteElement={onDeleteElement}
+							onUpdateElement={onUpdateElement}
 							uiConfigurationJSON={element.uiConfigurationJSON}
 							uiConfigurationValues={
 								element.uiConfigurationValues
 							}
-							updateElement={updateElement}
 						/>
 					) : (
 						<JSONElement
 							collapseAll={collapseAll}
-							deleteElement={deleteElement}
 							elementTemplateJSON={element.elementTemplateJSON}
 							id={element.id}
 							key={element.id}
-							updateElement={updateElement}
+							onDeleteElement={onDeleteElement}
+							onUpdateElement={onUpdateElement}
 						/>
 					);
 				})}
@@ -294,15 +294,15 @@ function QueryBuilder({
 }
 
 QueryBuilder.propTypes = {
-	deleteElement: PropTypes.func,
 	entityJSON: PropTypes.object,
 	frameworkConfig: PropTypes.object,
 	initialSelectedElements: PropTypes.arrayOf(PropTypes.object),
+	onDeleteElement: PropTypes.func,
 	onFrameworkConfigChange: PropTypes.func,
 	onToggleSidebar: PropTypes.func,
+	onUpdateElement: PropTypes.func,
 	searchableAssetTypes: PropTypes.arrayOf(PropTypes.string),
 	selectedElements: PropTypes.arrayOf(PropTypes.object),
-	updateElement: PropTypes.func,
 };
 
 export default React.memo(QueryBuilder);

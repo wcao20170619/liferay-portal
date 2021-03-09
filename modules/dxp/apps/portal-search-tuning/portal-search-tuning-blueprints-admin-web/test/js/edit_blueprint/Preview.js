@@ -30,12 +30,10 @@ const SEARCH_RESULTS = mockSearchResults();
 function renderPreview(props) {
 	return render(
 		<Preview
-			fetchResults={jest.fn()}
+			loading={false}
 			onClose={jest.fn()}
-			results={{
-				data: SEARCH_RESULTS,
-				loading: false,
-			}}
+			onFetchResults={jest.fn()}
+			results={SEARCH_RESULTS}
 			visible={true}
 			{...props}
 		/>
@@ -51,10 +49,8 @@ describe('Preview', () => {
 
 	it('renders the introduction', () => {
 		const {getByText} = renderPreview({
-			results: {
-				data: {},
-				loading: false,
-			},
+			loading: false,
+			results: {},
 		});
 
 		getByText(
@@ -64,10 +60,8 @@ describe('Preview', () => {
 
 	it('renders the loading icon', () => {
 		const {container} = renderPreview({
-			results: {
-				data: {},
-				loading: true,
-			},
+			loading: true,
+			results: {},
 		});
 
 		container.querySelector('.loading-animation');
@@ -106,11 +100,9 @@ describe('Preview', () => {
 		];
 
 		const {getByText} = renderPreview({
+			loading: false,
 			results: {
-				data: {
-					errors,
-				},
-				loading: false,
+				errors,
 			},
 		});
 

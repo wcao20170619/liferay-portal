@@ -118,8 +118,8 @@ function EditBlueprintForm({
 	);
 
 	const [previewInfo, setPreviewInfo] = useState(() => ({
-		data: {},
 		loading: false,
+		results: {},
 	}));
 
 	const _handleFetchPreviewSearch = (value, delta, page) => {
@@ -148,7 +148,8 @@ function EditBlueprintForm({
 		}
 		catch {
 			setPreviewInfo({
-				data: {
+				loading: false,
+				results: {
 					errors: [
 						{
 							msg: Liferay.Language.get('the-json-is-invalid'),
@@ -156,7 +157,6 @@ function EditBlueprintForm({
 						},
 					],
 				},
-				loading: false,
 			});
 
 			return;
@@ -173,14 +173,15 @@ function EditBlueprintForm({
 			.then((response) => response.json())
 			.then((responseContent) => {
 				setPreviewInfo({
-					data: responseContent,
 					loading: false,
+					results: responseContent,
 				});
 			})
 			.catch(() => {
 				setTimeout(() => {
 					setPreviewInfo({
-						data: {
+						loading: false,
+						results: {
 							errors: [
 								{
 									msg: Liferay.Language.get(
@@ -190,20 +191,19 @@ function EditBlueprintForm({
 								},
 							],
 						},
-						loading: false,
 					});
 				}, 1000);
 			});
 	};
 
-	const onAddElement = useCallback((element) => {
+	const _handleAddElement = useCallback((element) => {
 		setSelectedQueryElements((selectedElements) => [
 			convertToSelectedElement(element, elementIdCounter.current++),
 			...selectedElements,
 		]);
 	}, []);
 
-	const deleteElement = useCallback((id) => {
+	const _handleDeleteElement = useCallback((id) => {
 		setSelectedQueryElements((selectedElements) =>
 			selectedElements.filter((item) => item.id !== id)
 		);
@@ -213,11 +213,11 @@ function EditBlueprintForm({
 		});
 	}, []);
 
-	const handleFrameworkChange = (value) => {
+	const _handleFrameworkConfigChange = (value) => {
 		setFrameworkConfig({...frameworkConfig, ...value});
 	};
 
-	const handleSubmit = useCallback(
+	const _handleSubmit = useCallback(
 		(event) => {
 			event.preventDefault();
 
@@ -316,7 +316,7 @@ function EditBlueprintForm({
 		]
 	);
 
-	const updateQueryElement = useCallback((id, newElementValues) => {
+	const _handleUpdateQueryElement = useCallback((id, newElementValues) => {
 		setSelectedQueryElements((selectedQueryElements) => {
 			const index = selectedQueryElements.findIndex(
 				(item) => id == item.id
@@ -370,15 +370,16 @@ function EditBlueprintForm({
 				return (
 					<>
 						<Preview
-							fetchResults={_handleFetchPreviewSearch}
+							loading={previewInfo.loading}
 							onClose={() => setShowPreview(false)}
-							results={previewInfo}
+							onFetchResults={_handleFetchPreviewSearch}
+							results={previewInfo.results}
 							visible={showPreview}
 						/>
 
 						<Sidebar
 							elements={sidebarQueryElements.current}
-							onAddElement={onAddElement}
+							onAddElement={_handleAddElement}
 							onClose={() => setShowSidebar(false)}
 							visible={showSidebar}
 						/>
@@ -390,21 +391,23 @@ function EditBlueprintForm({
 							})}
 						>
 							<QueryBuilder
-								deleteElement={deleteElement}
 								entityJSON={entityJSON}
 								frameworkConfig={frameworkConfig}
 								indexFields={indexFields}
 								initialSelectedElements={
 									initialSelectedElementsId
 								}
-								onFrameworkConfigChange={handleFrameworkChange}
+								onDeleteElement={_handleDeleteElement}
+								onFrameworkConfigChange={
+									_handleFrameworkConfigChange
+								}
 								onToggleSidebar={() => {
 									setShowPreview(false);
 									setShowSidebar(!showSidebar);
 								}}
+								onUpdateElement={_handleUpdateQueryElement}
 								searchableAssetTypes={searchableAssetTypes}
 								selectedElements={selectedQueryElements}
-								updateElement={updateQueryElement}
 							/>
 						</div>
 					</>
@@ -420,7 +423,7 @@ function EditBlueprintForm({
 				isSubmitting={isSubmitting}
 				onCancel={redirectURL}
 				onChangeTab={(tab) => setTab(tab)}
-				onSubmit={handleSubmit}
+				onSubmit={_handleSubmit}
 				tab={tab}
 				tabs={TABS}
 			>
@@ -441,26 +444,27 @@ function EditBlueprintForm({
 					</ClayButton>
 				</ClayToolbar.Item>
 
-				{previewInfo.data.errors && !!previewInfo.data.errors.length && (
-					<ClayToolbar.Item>
-						<ClayButton
-							displayType="unstyled"
-							onClick={() => {
-								setShowSidebar(false);
-								setShowPreview(!showPreview);
-							}}
-						>
-							<ClayBadge
-								displayType="danger"
-								label={previewInfo.data.errors.length}
+				{previewInfo.results.errors &&
+					!!previewInfo.results.errors.length && (
+						<ClayToolbar.Item>
+							<ClayButton
+								displayType="unstyled"
 								onClick={() => {
 									setShowSidebar(false);
 									setShowPreview(!showPreview);
 								}}
-							/>
-						</ClayButton>
-					</ClayToolbar.Item>
-				)}
+							>
+								<ClayBadge
+									displayType="danger"
+									label={previewInfo.results.errors.length}
+									onClick={() => {
+										setShowSidebar(false);
+										setShowPreview(!showPreview);
+									}}
+								/>
+							</ClayButton>
+						</ClayToolbar.Item>
+					)}
 			</PageToolbar>
 
 			{_renderTabContent()}

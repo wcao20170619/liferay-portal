@@ -37,16 +37,16 @@ import TextInput from './TextInput';
 
 function Element({
 	collapseAll,
-	deleteElement,
 	elementOutput,
 	elementTemplateJSON,
 	entityJSON,
 	id,
 	indexFields = [],
 	initialUIConfigurationValues = {},
+	onDeleteElement,
+	onUpdateElement = () => {},
 	uiConfigurationJSON,
 	uiConfigurationValues,
-	updateElement = () => {},
 }) {
 	const {locale} = useContext(ThemeContext);
 	const [collapse, setCollapse] = useState(false);
@@ -61,11 +61,11 @@ function Element({
 	};
 
 	const _handleDelete = () => {
-		deleteElement(id);
+		onDeleteElement(id);
 	};
 
 	const _handleChange = (key, value) => {
-		updateElement(id, {
+		onUpdateElement(id, {
 			uiConfigurationValues: {
 				...uiConfigurationValues,
 				[key]: value,
@@ -76,7 +76,7 @@ function Element({
 	const _handleToggle = () => {
 		const enabled = !elementTemplateJSON.enabled;
 
-		updateElement(id, {
+		onUpdateElement(id, {
 			elementOutput: {
 				...elementOutput,
 				enabled,
@@ -261,7 +261,7 @@ function Element({
 						toggled={elementTemplateJSON.enabled}
 					/>
 
-					{(elementOutput || deleteElement) && (
+					{(elementOutput || onDeleteElement) && (
 						<ClayDropDown
 							active={active}
 							alignmentPosition={3}
@@ -310,7 +310,7 @@ function Element({
 									</PreviewModal>
 								)}
 
-								{deleteElement && (
+								{onDeleteElement && (
 									<ClayDropDown.Item onClick={_handleDelete}>
 										{Liferay.Language.get('remove')}
 									</ClayDropDown.Item>
@@ -392,16 +392,16 @@ function Element({
 
 Element.propTypes = {
 	collapseAll: PropTypes.bool,
-	deleteElement: PropTypes.func,
 	elementOutput: PropTypes.object,
 	elementTemplateJSON: PropTypes.object,
 	entityJSON: PropTypes.object,
 	id: PropTypes.number,
 	indexFields: PropTypes.arrayOf(PropTypes.object),
 	initialUIConfigurationValues: PropTypes.object,
+	onDeleteElement: PropTypes.func,
+	onUpdateElement: PropTypes.func,
 	uiConfigurationJSON: PropTypes.arrayOf(PropTypes.object),
 	uiConfigurationValues: PropTypes.object,
-	updateElement: PropTypes.func,
 };
 
 export default React.memo(Element);

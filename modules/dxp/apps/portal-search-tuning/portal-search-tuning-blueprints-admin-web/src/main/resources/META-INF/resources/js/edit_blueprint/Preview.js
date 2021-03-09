@@ -28,17 +28,17 @@ import PreviewModal from '../shared/PreviewModal';
 import SearchInput from '../shared/SearchInput';
 import {sub} from './../utils/utils';
 
-const RESULTS_DEFAULT_KEYS = ['type', 'description', 'date', 'userName'];
 const ERROR_OMIT_KEYS = ['msg', 'severity', 'localizationKey'];
+const RESULTS_DEFAULT_KEYS = ['type', 'description', 'date', 'userName'];
 
-function Preview({fetchResults, onClose, results, visible}) {
+function Preview({loading, onClose, onFetchResults, results, visible}) {
 	const [value, setValue] = useState('');
 	const [activePage, setActivePage] = useState(1);
 	const [activeDelta, setActiveDelta] = useState(10);
 
 	const _handleFetch = () => {
 		if (value) {
-			fetchResults(value, activeDelta, activePage);
+			onFetchResults(value, activeDelta, activePage);
 		}
 	};
 
@@ -48,7 +48,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 
 	const _renderErrors = () => (
 		<ClayList className="preview-error-list text-danger">
-			{results.data.errors.map((error, idx) => (
+			{results.errors.map((error, idx) => (
 				<ErrorListItem item={error} key={idx} />
 			))}
 		</ClayList>
@@ -57,7 +57,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 	const _renderHits = () => (
 		<div className="preview-results-list">
 			<ClayList>
-				{results.data.hits.map((result) => (
+				{results.hits.map((result) => (
 					<ResultListItem item={result} key={result.id} />
 				))}
 			</ClayList>
@@ -78,7 +78,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 					setActivePage(1);
 				}}
 				onPageChange={setActivePage}
-				totalItems={results.data.meta.totalHits}
+				totalItems={results.meta.totalHits}
 			/>
 		</div>
 	);
@@ -90,7 +90,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 					<span className="component-text text-truncate-inline">
 						<span className="text-truncate">
 							{sub(Liferay.Language.get('x-results'), [
-								results.data.meta.totalHits,
+								results.meta.totalHits,
 							])}
 						</span>
 					</span>
@@ -99,7 +99,7 @@ function Preview({fetchResults, onClose, results, visible}) {
 				<ClayManagementToolbar.Item>
 					<ClayButton
 						aria-label={Liferay.Language.get('refresh')}
-						disabled={!value || results.loading}
+						disabled={!value || loading}
 						displayType="secondary"
 						onClick={_handleFetch}
 						small
@@ -145,17 +145,16 @@ function Preview({fetchResults, onClose, results, visible}) {
 				</div>
 			</nav>
 
-			{results.data.meta &&
-				(!results.data.errors || !results.data.errors.length) && (
-					<ResultsManagementBar />
-				)}
+			{results.meta && (!results.errors || !results.errors.length) && (
+				<ResultsManagementBar />
+			)}
 
-			{!results.loading ? (
-				results.data.errors && results.data.errors.length ? (
+			{!loading ? (
+				results.errors && results.errors.length ? (
 					_renderErrors()
-				) : results.data.hits && results.data.hits.length ? (
+				) : results.hits && results.hits.length ? (
 					_renderHits()
-				) : results.data.meta ? (
+				) : results.meta ? (
 					<div className="empty-list-message">
 						<ClayEmptyState />
 					</div>
@@ -317,8 +316,9 @@ function ResultListItem({item}) {
 }
 
 Preview.propTypes = {
-	fetchResults: PropTypes.func,
+	loading: PropTypes.bool,
 	onClose: PropTypes.func,
+	onFetchResults: PropTypes.func,
 	results: PropTypes.object,
 	visible: PropTypes.bool,
 };

@@ -225,11 +225,11 @@ storiesOf('Components|Element', module)
 	.addDecorator(withContainer)
 	.add('Element', () => (
 		<Element
-			deleteElement={action('deleteElement')}
 			elementTemplateJSON={SELECTED_ELEMENTS[0].elementTemplateJSON}
+			onDeleteElement={action('onDeleteElement')}
+			onUpdateElement={action('onUpdateElement')}
 			uiConfigurationJSON={SELECTED_ELEMENTS[0].uiConfigurationJSON}
 			uiConfigurationValues={SELECTED_ELEMENTS[0].uiConfigurationValues}
-			updateElement={action('updateElement')}
 		/>
 	));
 
@@ -239,11 +239,11 @@ storiesOf('Components|Element', module)
 	.addDecorator(withContainer)
 	.add('JSONElement', () => (
 		<JSONElement
-			deleteElement={action('deleteElement')}
 			description={SELECTED_ELEMENTS[0].elementTemplateJSON.description}
 			disabled={false}
 			elementTemplateJSON={SELECTED_ELEMENTS[0].elementTemplateJSON}
 			icon={SELECTED_ELEMENTS[0].elementTemplateJSON.icon}
+			onDeleteElement={action('onDeleteElement')}
 			title={SELECTED_ELEMENTS[0].elementTemplateJSON.title}
 			updateJSON={() => {}}
 		/>
@@ -271,14 +271,14 @@ storiesOf('Components|QueryBuilder', module)
 	.addDecorator(withContainer)
 	.add('QueryBuilder', () => (
 		<QueryBuilder
-			deleteElement={action('buildElement')}
 			frameworkConfig={{
 				apply_indexer_clauses: true,
 				searchable_asset_types: SEARCHABLE_ASSET_TYPES,
 			}}
+			onDeleteElement={action('buildElement')}
+			onUpdateElement={action('onUpdateElement')}
 			searchableAssetTypes={SEARCHABLE_ASSET_TYPES}
 			selectedElements={SELECTED_ELEMENTS}
-			updateElement={action('updateElement')}
 		/>
 	));
 
@@ -316,7 +316,7 @@ storiesOf('Components|Preview', module)
 	.addDecorator(withBlueprintsClass)
 	.add('Preview', () => (
 		<Preview
-			fetchResults={action('fetchResults')}
+			onFetchResults={action('onFetchResults')}
 			results={{
 				data: mockSearchResults(),
 				loading: false,
@@ -326,7 +326,7 @@ storiesOf('Components|Preview', module)
 	))
 	.add('Error', () => (
 		<Preview
-			fetchResults={action('fetchResults')}
+			onFetchResults={action('onFetchResults')}
 			results={{
 				data: {
 					errors: [

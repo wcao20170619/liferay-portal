@@ -24,19 +24,19 @@ jest.mock(
 	)
 );
 
-const deleteElement = jest.fn();
-const updateElement = jest.fn();
+const onDeleteElement = jest.fn();
+const onUpdateElement = jest.fn();
 
 function renderElement(props) {
 	return render(
 		<JSONElement
 			collapseAll={false}
-			deleteElement={deleteElement}
 			description={SELECTED_ELEMENTS[0].elementTemplateJSON.description}
 			elementTemplateJSON={SELECTED_ELEMENTS[0].elementTemplateJSON}
 			id={SELECTED_ELEMENTS[0].elementTemplateJSON.id}
+			onDeleteElement={onDeleteElement}
+			onUpdateElement={onUpdateElement}
 			title={SELECTED_ELEMENTS[0].elementTemplateJSON.title}
-			updateElement={updateElement}
 			{...props}
 		/>
 	);
@@ -71,13 +71,13 @@ describe('Element', () => {
 		expect(container.querySelector('.configuration-editor')).toBeNull();
 	});
 
-	it('calls deleteElement when clicking on delete from dropdown', () => {
+	it('calls onDeleteElement when clicking on delete from dropdown', () => {
 		const {getByLabelText, getByText} = renderElement();
 
 		fireEvent.click(getByLabelText('dropdown'));
 
 		fireEvent.click(getByText('remove'));
 
-		expect(deleteElement).toHaveBeenCalled();
+		expect(onDeleteElement).toHaveBeenCalled();
 	});
 });

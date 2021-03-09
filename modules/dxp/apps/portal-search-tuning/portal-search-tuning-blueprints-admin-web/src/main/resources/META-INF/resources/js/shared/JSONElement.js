@@ -24,10 +24,10 @@ import ThemeContext from './ThemeContext';
 
 function JSONElement({
 	collapseAll,
-	deleteElement,
 	elementTemplateJSON,
 	id,
-	updateElement,
+	onDeleteElement,
+	onUpdateElement,
 }) {
 	const {locale} = useContext(ThemeContext);
 
@@ -43,7 +43,7 @@ function JSONElement({
 		try {
 			const parseJSON = JSON.parse(value);
 
-			updateElement(id, {
+			onUpdateElement(id, {
 				elementOutput: parseJSON,
 				elementTemplateJSON: parseJSON,
 			});
@@ -106,7 +106,7 @@ function JSONElement({
 							>
 								<ClayDropDown.ItemList>
 									<ClayDropDown.Item
-										onClick={() => deleteElement(id)}
+										onClick={() => onDeleteElement(id)}
 									>
 										{Liferay.Language.get('remove')}
 									</ClayDropDown.Item>
@@ -141,7 +141,7 @@ function JSONElement({
 			}, [
 				active,
 				collapse,
-				deleteElement,
+				onDeleteElement,
 				id,
 				elementTemplateJSON,
 				locale,
@@ -178,10 +178,10 @@ function JSONElement({
 
 JSONElement.propTypes = {
 	collapseAll: PropTypes.bool,
-	deleteElement: PropTypes.func,
 	elementTemplateJSON: PropTypes.object,
 	id: PropTypes.number,
-	updateElement: PropTypes.func,
+	onDeleteElement: PropTypes.func,
+	onUpdateElement: PropTypes.func,
 };
 
 export default React.memo(JSONElement);

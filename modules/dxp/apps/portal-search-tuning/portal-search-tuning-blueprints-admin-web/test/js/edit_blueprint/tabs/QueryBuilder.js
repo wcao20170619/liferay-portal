@@ -24,21 +24,21 @@ jest.mock(
 	)
 );
 
-const updateElement = jest.fn();
+const onUpdateElement = jest.fn();
 
 function renderBuilder(props) {
 	return render(
 		<QueryBuilder
-			deleteElement={jest.fn()}
 			frameworkConfig={{
 				apply_indexer_clauses: false,
 				searchable_asset_types: SEARCHABLE_ASSET_TYPES,
 			}}
 			initialSelectedElements={SELECTED_ELEMENTS}
+			onDeleteElement={jest.fn()}
 			onFrameworkConfigChange={jest.fn()}
+			onUpdateElement={onUpdateElement}
 			searchableAssetTypes={SEARCHABLE_ASSET_TYPES}
 			selectedElements={SELECTED_ELEMENTS}
-			updateElement={updateElement}
 			{...props}
 		/>
 	);
