@@ -23,7 +23,9 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchPermissionChecker;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.search.filter.TermsFilter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.search.internal.SearchPermissionCheckerImpl.SearchPermissionContext;
 import com.liferay.portal.search.permission.SearchPermissionFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchSettings;
 
@@ -64,7 +66,11 @@ public class PreFilterContributorHelperImpl
 					entryClassName, indexer, searchContext),
 				BooleanClauseOccur.SHOULD);
 		}
-
+		
+		if (searchContext.getAttribute("testMoveupRolesTermsFilter") != null)  {
+			_addRolesTermsFilter(preFilterBooleanFilter, searchContext);
+		}
+	
 		if (preFilterBooleanFilter.hasClauses()) {
 			booleanFilter.add(preFilterBooleanFilter, BooleanClauseOccur.MUST);
 		}
@@ -178,13 +184,42 @@ public class PreFilterContributorHelperImpl
 			Field.ENTRY_CLASS_NAME, entryClassName, BooleanClauseOccur.MUST);
 
 		_addPermissionFilter(booleanFilter, entryClassName, searchContext);
-
+		
 		_addIndexerProvidedPreFilters(booleanFilter, indexer, searchContext);
 
 		_addModelProvidedPreFilters(
 			booleanFilter, _getModelSearchSettings(indexer), searchContext);
 
 		return booleanFilter;
+	}
+
+	private void _addRolesTermsFilter(
+		BooleanFilter booleanFilter, SearchContext searchContext) {
+		if (searchContext.getUserId() == 0) {
+			return;
+		}
+		
+		SearchPermissionContext searchPermissionContext = null;
+		
+		try {
+			searchPermissionContext = 
+				(SearchPermissionContext)searchContext.getAttribute(
+					"searchPermissionContext");
+		} catch (Exception exception) {
+			return;
+		}
+				
+		TermsFilter rolesTermsFilter =
+			searchPermissionContext._rolesTermsFilter;
+		
+		if (!rolesTermsFilter.isEmpty()) {
+			BooleanFilter roleBooleanFilter = new BooleanFilter();
+			
+			roleBooleanFilter.add(rolesTermsFilter, BooleanClauseOccur.SHOULD);
+			
+			booleanFilter.add(roleBooleanFilter);
+		}
+		
 	}
 
 	private ModelSearchSettings _getModelSearchSettings(Indexer<?> indexer) {

@@ -501,17 +501,18 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 
 		searchContext.setAttribute(
 			"searchPermissionContext", searchPermissionContext);
-
+		
 		return _getPermissionFilter(
 			companyId, searchGroupIds, userId, permissionChecker,
 			_getPermissionName(searchContext, className),
-			searchPermissionContext);
+			searchPermissionContext, searchContext);
 	}
 
 	private BooleanFilter _getPermissionFilter(
 			long companyId, long[] groupIds, long userId,
 			PermissionChecker permissionChecker, String className,
-			SearchPermissionContext searchPermissionContext)
+			SearchPermissionContext searchPermissionContext,
+			SearchContext searchContext)
 		throws Exception {
 
 		List<UsersGroupIdRoles> usersGroupIdsRoles =
@@ -585,7 +586,11 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 
 		_add(booleanFilter, groupRolesTermsFilter);
 		_add(booleanFilter, groupsTermsFilter);
-		_add(booleanFilter, rolesTermsFilter);
+		
+		if (searchContext.getAttribute("testMoveupRolesTermsFilter") == null)  {
+			_add(booleanFilter, rolesTermsFilter);
+		}
+		//_add(booleanFilter, rolesTermsFilter);
 
 		for (SearchPermissionFilterContributor
 				searchPermissionFilterContributor :
@@ -621,7 +626,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 	private final Collection<SearchPermissionFilterContributor>
 		_searchPermissionFilterContributors = new CopyOnWriteArrayList<>();
 
-	private static class SearchPermissionContext implements Serializable {
+	public static class SearchPermissionContext implements Serializable {
 
 		public boolean containsGroupId(long groupId) {
 			for (UsersGroupIdRoles usersGroupIdRoles : _usersGroupIdsRoles) {
@@ -671,7 +676,7 @@ public class SearchPermissionCheckerImpl implements SearchPermissionChecker {
 			Field.GROUP_ROLE_ID);
 		private final long[] _regularRoleIds;
 		private final long[] _roleIds;
-		private final TermsFilter _rolesTermsFilter = new TermsFilter(
+		public final TermsFilter _rolesTermsFilter = new TermsFilter(
 			Field.ROLE_ID);
 		private final List<UsersGroupIdRoles> _usersGroupIdsRoles;
 
