@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
@@ -117,6 +118,7 @@ public class IndexerScoreDistortionTest {
 	@Test
 	public void testTitleIndexedInTriplicateDistortsScores() throws Exception {
 		Locale locale = LocaleUtil.US;
+
 		String title = "collision";
 
 		addBlogsEntry(title);
@@ -149,24 +151,43 @@ public class IndexerScoreDistortionTest {
 		Map<String, String> map = HashMapBuilder.put(
 			Field.ENTRY_CLASS_NAME,
 			getClassNamesAsString(
-
 				// Order is important (scores higher to lower)
-
-				BlogsEntry.class, WikiPage.class, MBMessage.class,
-				DLFileEntry.class, JournalArticle.class)
+				BlogsEntry.class, WikiPage.class, MBMessage.class)
 		).put(
-			Field.TITLE, "[collision, collision, , collision, ]"
+			Field.TITLE, "[collision, collision, ]"
 		).put(
 			Field.TITLE + "_en_US",
-			"[collision, collision, collision, , collision]"
+			"[collision, collision, collision]"
 		).put(
-			Field.TITLE + "_hu_HU", "[collision, collision, collision, , ]"
+			Field.TITLE + "_hu_HU", "[collision, collision, collision]"
 		).put(
-			Field.TITLE + "_ja_JP", "[collision, collision, collision, , ]"
+			Field.TITLE + "_ja_JP", "[collision, collision, collision]"
 		).build();
 
 		map.forEach(
 			(fieldName, values) -> DocumentsAssert.assertValues(
+				searchResponse.getRequestString(),
+				_getLimitedDocumentsString(3, searchResponse), fieldName,
+				values));
+
+		map = HashMapBuilder.put(
+			Field.ENTRY_CLASS_NAME,
+			getClassNamesAsString(
+				BlogsEntry.class, DLFileEntry.class, JournalArticle.class,
+				MBMessage.class, WikiPage.class)
+		).put(
+			Field.TITLE, "[, , collision, collision, collision]"
+		).put(
+			Field.TITLE + "_en_US",
+			"[, collision, collision, collision, collision]"
+		).put(
+			Field.TITLE + "_hu_HU", "[, , collision, collision, collision]"
+		).put(
+			Field.TITLE + "_ja_JP", "[, , collision, collision, collision]"
+		).build();
+
+		map.forEach(
+			(fieldName, values) -> DocumentsAssert.assertValuesIgnoreRelevance(
 				searchResponse.getRequestString(),
 				searchResponse.getDocumentsStream(), fieldName, values));
 	}
@@ -285,6 +306,14 @@ public class IndexerScoreDistortionTest {
 	private ServiceContext _createServiceContext() throws Exception {
 		return ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId(), _user.getUserId());
+	}
+
+	private Stream<Document> _getLimitedDocumentsString(
+		long maxSize, SearchResponse searchResponse) {
+
+		Stream<Document> documentsStream = searchResponse.getDocumentsStream();
+
+		return documentsStream.limit(maxSize);
 	}
 
 	@DeleteAfterTestRun
