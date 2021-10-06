@@ -122,7 +122,40 @@ public abstract class BaseSynonymsWebTestCase {
 		return Mockito.mock(IndexResponse.class);
 	}
 
+	protected void setUpLayoutIsTypeControlPanel(
+		Layout layout, boolean returnValue) {
+
+		Mockito.doReturn(
+			returnValue
+		).when(
+			layout
+		).isTypeControlPanel();
+	}
+
+	protected void setUpLayoutTypePortletHasPortletId(
+		LayoutTypePortlet layoutTypePortlet, boolean returnValue) {
+
+		Mockito.doReturn(
+			returnValue
+		).when(
+			layoutTypePortlet
+		).hasPortletId(
+			Mockito.anyString()
+		);
+	}
+
 	protected void setUpPortal(HttpServletRequest httpServletRequest) {
+		setUpHttpServletRequestAttribute(
+			httpServletRequest, WebKeys.THEME_DISPLAY,
+			Mockito.mock(ThemeDisplay.class));
+
+		setUpPortalGetCurrentURL();
+		setUpPortalGetHttpServletRequest(httpServletRequest);
+		setUpPortalGetLiferayPortletRequest();
+		setUpPortalGetOriginalServletRequest(httpServletRequest);
+	}
+
+	protected void setUpPortalGetCurrentURL() {
 		Mockito.doReturn(
 			"currentURL"
 		).when(
@@ -130,10 +163,10 @@ public abstract class BaseSynonymsWebTestCase {
 		).getCurrentURL(
 			Matchers.any(HttpServletRequest.class)
 		);
+	}
 
-		setUpHttpServletRequestAttribute(
-			httpServletRequest, WebKeys.THEME_DISPLAY,
-			Mockito.mock(ThemeDisplay.class));
+	protected void setUpPortalGetHttpServletRequest(
+		HttpServletRequest httpServletRequest) {
 
 		Mockito.doReturn(
 			httpServletRequest
@@ -142,6 +175,20 @@ public abstract class BaseSynonymsWebTestCase {
 		).getHttpServletRequest(
 			Matchers.any(PortletRequest.class)
 		);
+	}
+
+	protected void setUpPortalGetLiferayPortletRequest() {
+		Mockito.doReturn(
+			Mockito.mock(LiferayPortletRequest.class)
+		).when(
+			portal
+		).getLiferayPortletRequest(
+			Matchers.any(PortletRequest.class)
+		);
+	}
+
+	protected void setUpPortalGetOriginalServletRequest(
+		HttpServletRequest httpServletRequest) {
 
 		Mockito.doReturn(
 			httpServletRequest
@@ -149,14 +196,6 @@ public abstract class BaseSynonymsWebTestCase {
 			portal
 		).getOriginalServletRequest(
 			Matchers.any(HttpServletRequest.class)
-		);
-
-		Mockito.doReturn(
-			Mockito.mock(LiferayPortletRequest.class)
-		).when(
-			portal
-		).getLiferayPortletRequest(
-			Matchers.any(PortletRequest.class)
 		);
 	}
 
@@ -169,51 +208,35 @@ public abstract class BaseSynonymsWebTestCase {
 	protected void setUpPortletRequest(PortletRequest portletRequest) {
 		Layout layout = Mockito.mock(Layout.class);
 
-		Mockito.doReturn(
-			true
-		).when(
-			layout
-		).isTypeControlPanel();
+		setUpLayoutIsTypeControlPanel(layout, true);
 
 		ThemeDisplay themeDisplay = Mockito.mock(ThemeDisplay.class);
 
-		Mockito.doReturn(
-			layout
-		).when(
-			themeDisplay
-		).getLayout();
+		setUpThemeDisplayGetLayout(themeDisplay, layout);
 
 		LayoutTypePortlet layoutTypePortlet = Mockito.mock(
 			LayoutTypePortlet.class);
 
-		Mockito.doReturn(
-			true
-		).when(
-			layoutTypePortlet
-		).hasPortletId(
-			Mockito.anyString()
-		);
+		setUpLayoutTypePortletHasPortletId(layoutTypePortlet, true);
+
+		setUpThemeDisplayGetLayoutTypePortlet(themeDisplay, layoutTypePortlet);
+
+		setUpPortletRequestGetAttribute(
+			portletRequest, Mockito.mock(PortletConfig.class),
+			JavaConstants.JAVAX_PORTLET_CONFIG);
+		setUpPortletRequestGetAttribute(
+			portletRequest, themeDisplay, WebKeys.THEME_DISPLAY);
+	}
+
+	protected void setUpPortletRequestGetAttribute(
+		PortletRequest portletRequest, Object object, String keyValue) {
 
 		Mockito.doReturn(
-			layoutTypePortlet
-		).when(
-			themeDisplay
-		).getLayoutTypePortlet();
-
-		Mockito.doReturn(
-			themeDisplay
+			object
 		).when(
 			portletRequest
 		).getAttribute(
-			Matchers.eq(WebKeys.THEME_DISPLAY)
-		);
-
-		Mockito.doReturn(
-			Mockito.mock(PortletConfig.class)
-		).when(
-			portletRequest
-		).getAttribute(
-			Matchers.eq(JavaConstants.JAVAX_PORTLET_CONFIG)
+			Matchers.eq(keyValue)
 		);
 	}
 
@@ -240,16 +263,16 @@ public abstract class BaseSynonymsWebTestCase {
 		).toString();
 
 		Mockito.doReturn(
-			renderURL
-		).when(
-			mimeResponse
-		).createRenderURL();
-
-		Mockito.doReturn(
 			Mockito.mock(ActionURL.class)
 		).when(
 			mimeResponse
 		).createActionURL();
+
+		Mockito.doReturn(
+			renderURL
+		).when(
+			mimeResponse
+		).createRenderURL();
 
 		Mockito.doReturn(
 			"namespace-"
@@ -405,6 +428,26 @@ public abstract class BaseSynonymsWebTestCase {
 		).search(
 			Mockito.anyObject()
 		);
+	}
+
+	protected void setUpThemeDisplayGetLayout(
+		ThemeDisplay themeDisplay, Layout layout) {
+
+		Mockito.doReturn(
+			layout
+		).when(
+			themeDisplay
+		).getLayout();
+	}
+
+	protected void setUpThemeDisplayGetLayoutTypePortlet(
+		ThemeDisplay themeDisplay, LayoutTypePortlet layoutTypePortlet) {
+
+		Mockito.doReturn(
+			layoutTypePortlet
+		).when(
+			themeDisplay
+		).getLayoutTypePortlet();
 	}
 
 	@Mock
