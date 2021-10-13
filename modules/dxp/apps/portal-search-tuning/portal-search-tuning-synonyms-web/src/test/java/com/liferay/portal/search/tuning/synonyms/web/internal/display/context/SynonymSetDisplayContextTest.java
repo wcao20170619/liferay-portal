@@ -50,14 +50,13 @@ public class SynonymSetDisplayContextTest {
 		Assert.assertEquals(
 			"displayedSynonymSet",
 			_synonymSetDisplayContext.getDisplayedSynonymSet());
+		Assert.assertNotNull(_synonymSetDisplayContext.getDropdownItems());
 		Assert.assertEquals(
 			"editRenderURL", _synonymSetDisplayContext.getEditRenderURL());
 		Assert.assertEquals(
 			"synonyms", _synonymSetDisplayContext.getSynonymSet());
 		Assert.assertEquals(
 			"synonymSetId", _synonymSetDisplayContext.getSynonymSetId());
-
-		Assert.assertNotNull(_synonymSetDisplayContext.getDropdownItems());
 	}
 
 	private SynonymSetDisplayContext _synonymSetDisplayContext;

@@ -50,6 +50,7 @@ public class EditSynonymSetsDisplayContextTest {
 
 		Assert.assertEquals(
 			"backURL", _editSynonymSetsDisplayContext.getBackURL());
+		Assert.assertNotNull(_editSynonymSetsDisplayContext.getData());
 		Assert.assertEquals(
 			"formName", _editSynonymSetsDisplayContext.getFormName());
 		Assert.assertEquals(
@@ -61,8 +62,6 @@ public class EditSynonymSetsDisplayContextTest {
 			"redirect", _editSynonymSetsDisplayContext.getRedirect());
 		Assert.assertEquals(
 			"synonymSetId", _editSynonymSetsDisplayContext.getSynonymSetId());
-
-		Assert.assertNotNull(_editSynonymSetsDisplayContext.getData());
 	}
 
 	private EditSynonymSetsDisplayContext _editSynonymSetsDisplayContext;
