@@ -79,12 +79,10 @@ public class SynonymsDisplayBuilderTest extends BaseSynonymsWebTestCase {
 		SynonymsDisplayContext synonymsDisplayContext =
 			_synonymsDisplayBuilder.build();
 
-		Assert.assertEquals(1, synonymsDisplayContext.getItemsTotal());
-
-		Assert.assertFalse(synonymsDisplayContext.isDisabledManagementBar());
-
 		Assert.assertNotNull(synonymsDisplayContext.getCreationMenu());
+		Assert.assertEquals(1, synonymsDisplayContext.getItemsTotal());
 		Assert.assertNotNull(synonymsDisplayContext.getSearchContainer());
+		Assert.assertFalse(synonymsDisplayContext.isDisabledManagementBar());
 	}
 
 	@Test
