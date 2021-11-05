@@ -1,0 +1,24 @@
+{
+	"queryConfiguration": {
+		"applyIndexerClauses": false,
+		"queryEntries": [
+			{
+				"clauses": [
+					{
+						"context": "query",
+						"occur": "should",
+						"query": {
+							"terms": {
+								"boost": 100,
+								"groupId": "${user.group_ids}"
+							}
+						}
+					}
+				],
+				"condition": {
+				},
+				"enabled": true
+			}
+		]
+	}
+}
