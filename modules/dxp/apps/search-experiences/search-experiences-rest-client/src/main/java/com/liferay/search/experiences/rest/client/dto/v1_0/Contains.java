@@ -55,16 +55,16 @@ public class Contains implements Cloneable, Serializable {
 
 	protected String parameterName;
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
 	public void setValue(
-		UnsafeSupplier<Object, Exception> valueUnsafeSupplier) {
+		UnsafeSupplier<String, Exception> valueUnsafeSupplier) {
 
 		try {
 			value = valueUnsafeSupplier.get();
@@ -74,7 +74,7 @@ public class Contains implements Cloneable, Serializable {
 		}
 	}
 
-	protected Object value;
+	protected String value;
 
 	public Object[] getValues() {
 		return values;

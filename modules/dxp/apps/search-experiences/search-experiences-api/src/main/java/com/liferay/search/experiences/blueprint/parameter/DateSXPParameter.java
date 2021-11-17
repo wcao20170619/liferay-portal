@@ -59,6 +59,8 @@ public class DateSXPParameter extends BaseSXPParameter {
 
 		Function<Object, Integer> function = object -> _value.compareTo(
 			_parse(dateFormat, GetterUtil.getString(object)));
+//		Function<Object, Integer> function = object -> _value.compareTo(
+//			_parse(dateFormat, String.valueOf(object)));
 
 		if ((gt != null) && (function.apply(gt) <= 0)) {
 			return false;

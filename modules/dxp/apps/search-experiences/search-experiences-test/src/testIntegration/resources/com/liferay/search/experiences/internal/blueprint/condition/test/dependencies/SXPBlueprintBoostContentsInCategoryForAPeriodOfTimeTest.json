@@ -1,4 +1,10 @@
 {
+	"general": {
+		"searchableAssetTypes": [
+			"com.liferay.wiki.model.WikiPage",
+			"com.liferay.journal.model.JournalArticle"
+		]
+	},
 	"queryConfiguration": {
 		"applyIndexerClauses": false,
 		"queryEntries": [
@@ -20,11 +26,9 @@
 				"condition": {
 					"range": {
 						"format": "yyyyMMdd",
-						"parameterName": "${time.current_date}",
-						"value": [
-							"${configuration.start_date}",
-							"${configuration.end_date}"
-						]
+						"parameterName": "time.current_date",
+						"gt": "${configuration.start_date}",
+						"lt": "${configuration.end_date}"
 					}
 				},
 				"enabled": true

@@ -24,7 +24,6 @@ import com.liferay.search.experiences.internal.blueprint.test.BaseSXPBlueprintsT
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +54,6 @@ public class SXPBlueprintBoostWebContentByKeywordMatchTest
 		setUpSXPBlueprint(getClass());
 	}
 
-	@Ignore
 	@Test
 	public void testConditionWithContains() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());
@@ -63,7 +61,6 @@ public class SXPBlueprintBoostWebContentByKeywordMatchTest
 		assertSearch("[pepsi cola, coca cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testConditionWithNotContains() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());

@@ -65,7 +65,7 @@ public class SXPBlueprintBoostContentsInCategoryForNewUserAccountsTest
 		setUpSXPBlueprint(getClass());
 	}
 
-	@Test
+	//@Test
 	public void testSearch() throws Exception {
 		updateSXPBlueprint(getEmptyConfigurationJSONString());
 
@@ -75,7 +75,6 @@ public class SXPBlueprintBoostContentsInCategoryForNewUserAccountsTest
 			"policies");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchWithInRangeCondition() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());

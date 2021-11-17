@@ -25,7 +25,6 @@ import com.liferay.search.experiences.internal.blueprint.util.SXPBlueprintTestUt
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,6 @@ public class SXPBlueprintBoostContentsInCategoryByKeywordMatchTest
 		assertSearchIgnoreRelevance("[coca cola, pepsi cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchWithInCategoryCondition() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString("cola"));

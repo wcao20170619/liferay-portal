@@ -172,7 +172,7 @@ public class ContainsSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
-					contains.setValue((Object)jsonParserFieldValue);
+					contains.setValue((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "values")) {

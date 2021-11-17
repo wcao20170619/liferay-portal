@@ -50,7 +50,7 @@ components:
                         parameterName:
                             type: string
                         value:
-                            type: object
+                            type: string
                         values:
                             items:
                                 type: object

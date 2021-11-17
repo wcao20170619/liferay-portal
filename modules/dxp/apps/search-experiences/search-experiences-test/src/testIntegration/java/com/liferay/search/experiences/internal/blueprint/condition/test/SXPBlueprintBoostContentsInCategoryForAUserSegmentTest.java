@@ -32,7 +32,6 @@ import com.liferay.segments.test.util.SegmentsTestUtil;
 
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +77,6 @@ public class SXPBlueprintBoostContentsInCategoryForAUserSegmentTest
 		assertSearchIgnoreRelevance("[coca cola, pepsi cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchWithContainsCondition() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());

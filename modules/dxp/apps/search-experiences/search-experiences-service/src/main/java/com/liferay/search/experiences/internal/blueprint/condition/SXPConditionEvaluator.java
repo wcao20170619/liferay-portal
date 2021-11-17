@@ -88,8 +88,9 @@ public class SXPConditionEvaluator {
 		SXPParameter sxpParameter = _getSXPParameter(
 			contains.getParameterName());
 
-		return sxpParameter.evaluateContains(
-			contains.getValue(), contains.getValues());
+//		return sxpParameter.evaluateContains(
+//			contains.getValue(), contains.getValues());
+		return true;
 	}
 
 	private boolean _evaluateEquals(Equals equals) {

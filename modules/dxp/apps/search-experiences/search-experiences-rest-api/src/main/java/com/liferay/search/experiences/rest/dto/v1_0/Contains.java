@@ -86,18 +86,17 @@ public class Contains implements Serializable {
 	protected String parameterName;
 
 	@Schema
-	@Valid
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
 	@JsonIgnore
 	public void setValue(
-		UnsafeSupplier<Object, Exception> valueUnsafeSupplier) {
+		UnsafeSupplier<String, Exception> valueUnsafeSupplier) {
 
 		try {
 			value = valueUnsafeSupplier.get();
@@ -112,7 +111,7 @@ public class Contains implements Serializable {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Object value;
+	protected String value;
 
 	@Schema
 	@Valid
@@ -191,7 +190,11 @@ public class Contains implements Serializable {
 
 			sb.append("\"value\": ");
 
-			sb.append(String.valueOf(value));
+			sb.append("\"");
+
+			sb.append(_escape(value));
+
+			sb.append("\"");
 		}
 
 		if (values != null) {

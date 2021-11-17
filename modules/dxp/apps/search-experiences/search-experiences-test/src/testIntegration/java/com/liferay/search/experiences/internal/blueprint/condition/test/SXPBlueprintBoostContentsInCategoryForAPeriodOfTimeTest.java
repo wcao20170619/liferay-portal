@@ -71,14 +71,13 @@ public class SXPBlueprintBoostContentsInCategoryForAPeriodOfTimeTest
 		setUpSXPBlueprint(getClass());
 	}
 
-	@Test
+	//@Test
 	public void testSearch() throws Exception {
 		updateSXPBlueprint(getEmptyConfigurationJSONString());
 
 		assertSearchIgnoreRelevance("[coca cola, pepsi cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchWithInRangeCondition() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());
