@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintTextMatchOverMultipleFieldsTest
+public class TextMatchOverMultipleFieldsSXPBlueprintTest
 	extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule

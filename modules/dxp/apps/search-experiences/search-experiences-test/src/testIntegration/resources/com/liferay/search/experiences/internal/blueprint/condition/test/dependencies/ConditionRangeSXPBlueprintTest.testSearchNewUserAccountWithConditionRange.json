@@ -22,7 +22,7 @@
 						"format": "yyyyMMdd",
 						"gt": "${time.current_date|modifier=-30d,dateFormat=yyyyMMdd}",
 						"lt": "${time.current_date|modifier=+1d,dateFormat=yyyyMMdd}",
-						"parameterName": "${time.current_date}"
+						"parameterName": "time.current_date"
 					}
 				},
 				"enabled": true

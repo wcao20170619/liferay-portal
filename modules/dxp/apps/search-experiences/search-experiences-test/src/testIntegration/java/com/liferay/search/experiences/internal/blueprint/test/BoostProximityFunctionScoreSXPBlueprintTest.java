@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintBoostWithESFunctionScoreQueryTest
+public class BoostProximityFunctionScoreSXPBlueprintTest
 	extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
@@ -72,7 +72,28 @@ public class SXPBlueprintBoostWithESFunctionScoreQueryTest
 	}
 
 	@Test
-	public void testSearchWithPasteESQueryMust() throws Exception {
+	public void testSearchBoostProximity() throws Exception {
+		updateSXPBlueprint(_getConfigurationJSONString("64.01", "-117.42"));
+
+		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
+				SXPBlueprintTestUtil.getConfigurationTemporarySwapper(
+					"2345", "true", _IP_ADDRESS[1])) {
+
+			assertSearch("[branch sf, branch la]", "branch");
+		}
+
+		updateSXPBlueprint(_getConfigurationJSONString("24.03", "-107.44"));
+
+		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
+				SXPBlueprintTestUtil.getConfigurationTemporarySwapper(
+					"2345", "true", _IP_ADDRESS[0])) {
+
+			assertSearch("[branch la, branch sf]", "branch");
+		}
+	}
+
+	@Test
+	public void testSearchPasteESQueryMust() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString("64.01", "-117.42"));
 
 		try (ConfigurationTemporarySwapper configurationTemporarySwapper =
@@ -94,8 +115,8 @@ public class SXPBlueprintBoostWithESFunctionScoreQueryTest
 
 	private String _getConfigurationJSONString(String lat, String lon) {
 		String configurationJSONString = StringUtil.replace(
-			getConfigurationJSONString(getClass()), "${configuration.lat}",
-			lat);
+			getConfigurationJSONString(getClass(), testName.getMethodName()),
+			"${configuration.lat}", lat);
 
 		return StringUtil.replace(
 			configurationJSONString, "${configuration.lon}", lon);

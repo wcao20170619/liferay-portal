@@ -15,15 +15,11 @@
 package com.liferay.search.experiences.internal.blueprint.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.asset.kernel.model.AssetTag;
+import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -35,8 +31,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintBoostContentsOnMySitesTest
-	extends BaseSXPBlueprintsTestCase {
+public class BoostTagsMatchSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -49,39 +44,34 @@ public class SXPBlueprintBoostContentsOnMySitesTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		Group groupA = addGroup("SiteA");
-		Group groupB = addGroup("SiteB");
-
-		addJournalArticle(groupA.getGroupId(), "coca cola", "cola cola");
-		addJournalArticle(groupB.getGroupId(), "pepsi cola", "");
-
-		_groups.add(groupA);
-		_groups.add(groupB);
+		addJournalArticle(group.getGroupId(), "coca cola", "");
 
 		setUpSXPBlueprint(getClass());
 	}
 
 	@Test
-	public void testSearch() throws Exception {
-		updateSXPBlueprint(getEmptyConfigurationJSONString());
+	public void testKeywoardMatchWithAssetTagName() throws Exception {
+		AssetTag assetTag = AssetTagLocalServiceUtil.addTag(
+			user.getUserId(), group.getGroupId(), "cola", serviceContext);
 
-		assertSearchIgnoreRelevance("[coca cola, pepsi cola]", "cola");
-	}
+		serviceContext.setAssetTagNames(new String[] {assetTag.getName()});
 
-	@Test
-	public void testSearchWithBoostContentOnMySites() throws Exception {
-		Group groupB = _groups.get(1);
-
-		user = UserTestUtil.addUser(groupB.getGroupId());
-
-		serviceContext.setUserId(user.getUserId());
+		addJournalArticle(group.getGroupId(), "pepsi cola", "");
 
 		updateSXPBlueprint(getConfigurationJSONString(getClass()));
 
 		assertSearch("[pepsi cola, coca cola]", "cola");
 	}
 
-	@DeleteAfterTestRun
-	private final List<Group> _groups = new ArrayList<>();
+	@Test
+	public void testSearch() throws Exception {
+		serviceContext.setAssetTagNames(new String[0]);
+
+		addJournalArticle(group.getGroupId(), "pepsi cola", "");
+
+		updateSXPBlueprint(getEmptyConfigurationJSONString());
+
+		assertSearch("[coca cola, pepsi cola]", "cola");
+	}
 
 }

@@ -17,7 +17,9 @@ package com.liferay.search.experiences.internal.blueprint.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.test.util.AssetTestUtil;
+import com.liferay.journal.model.JournalFolder;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
@@ -31,8 +33,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintHideTaggedContentTest
-	extends BaseSXPBlueprintsTestCase {
+public class HideSearchSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -59,7 +60,7 @@ public class SXPBlueprintHideTaggedContentTest
 	}
 
 	@Test
-	public void testSearchHideTaggedContent() throws Exception {
+	public void testSearchHiddenTaggedContent() throws Exception {
 		addJournalArticle(group.getGroupId(), "do not hide me", "");
 
 		AssetTag assetTag = AssetTestUtil.addTag(group.getGroupId(), "hide");
@@ -68,9 +69,56 @@ public class SXPBlueprintHideTaggedContentTest
 
 		addJournalArticle(group.getGroupId(), "hide me", "");
 
-		updateSXPBlueprint(getConfigurationJSONString(getClass()));
+		updateSXPBlueprint(
+			getConfigurationJSONString(getClass(), testName.getMethodName()));
 
 		assertSearch("[do not hide me]", "hide me");
+	}
+
+	@Test
+	public void testSearchWithHideByExactTermMatch() throws Exception {
+		addJournalArticle(group.getGroupId(), "do not hide me", "");
+
+		JournalFolder journalFolder = addJournalFolder(group.getGroupId());
+
+		addJournalArticle(
+			group.getGroupId(), journalFolder.getFolderId(), "hide me", "");
+
+		updateSXPBlueprint(
+			StringUtil.replace(
+				getConfigurationJSONString(
+					getClass(), testName.getMethodName()),
+				"${configuration.value}",
+				String.valueOf(journalFolder.getFolderId())));
+
+		assertSearch("[do not hide me]", "hide me");
+	}
+
+	@Test
+	public void testSearchWithPasteESQueryMustNot() throws Exception {
+		addJournalArticle(group.getGroupId(), "Cafe Rio", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Cloud Cafe", "Orange County");
+		addJournalArticle(group.getGroupId(), "Denny's", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Starbucks Cafe", "Los Angeles");
+
+		updateSXPBlueprint(
+			_getConfigurationJSONString("los angeles", "must_not"));
+
+		assertSearchIgnoreRelevance("[cloud cafe]", "cafe");
+
+		updateSXPBlueprint(
+			_getConfigurationJSONString("orange county", "must_not"));
+
+		assertSearchIgnoreRelevance("[cafe rio, starbucks cafe]", "cafe");
+	}
+
+	private String _getConfigurationJSONString(String query, String occur) {
+		String configurationJSONString = StringUtil.replace(
+			getConfigurationJSONString(getClass(), testName.getMethodName()),
+			"${configuration.query}", query);
+
+		return StringUtil.replace(
+			configurationJSONString, "${configuration.occur}", occur);
 	}
 
 }

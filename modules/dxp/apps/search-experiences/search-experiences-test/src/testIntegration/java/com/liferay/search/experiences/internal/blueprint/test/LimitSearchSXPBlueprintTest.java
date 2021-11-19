@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
@@ -35,8 +36,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintLimitSearchToMySitesTest
-	extends BaseSXPBlueprintsTestCase {
+public class LimitSearchSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -49,16 +49,45 @@ public class SXPBlueprintLimitSearchToMySitesTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		_groups.add(addGroup("SiteA"));
-		_groups.add(addGroup("SiteB"));
-
 		setUpSXPBlueprint(getClass());
 	}
 
 	@Test
+	public void testSearch() throws Exception {
+		_addGroupJournalArticles();
+
+		updateSXPBlueprint(getEmptyConfigurationJSONString());
+
+		assertSearchIgnoreRelevance(
+			"[cola coca, cola pepsi, cola sprite]", "cola");
+	}
+
+	@Test
+	public void testSearchWithFilterByExactTermMatch() throws Exception {
+		Group groupA = addGroup("SiteA");
+		Group groupB = addGroup("SiteB");
+		Group groupC = addGroup("SiteC");
+
+		addJournalArticle(groupA.getGroupId(), "cola coca", "");
+		addJournalArticle(groupB.getGroupId(), "cola pepsi", "");
+		addJournalArticle(groupC.getGroupId(), "cola sprite", "");
+
+		_groups.add(groupA);
+		_groups.add(groupB);
+		_groups.add(groupC);
+
+		updateSXPBlueprint(_getConfigurationJSONString());
+
+		assertSearchIgnoreRelevance("[cola coca, cola pepsi]", "cola");
+	}
+
+	@Test
 	public void testSearchWithLimitSearchInOneGroup() throws Exception {
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
+		Group groupA = addGroup("SiteA");
+		Group groupB = addGroup("SiteB");
+
+		_groups.add(groupA);
+		_groups.add(groupB);
 
 		user = UserTestUtil.addUser(groupA.getGroupId());
 
@@ -74,8 +103,11 @@ public class SXPBlueprintLimitSearchToMySitesTest
 
 	@Test
 	public void testSearchWithLimitSearchInTwoGroups() throws Exception {
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
+		Group groupA = addGroup("SiteA");
+		Group groupB = addGroup("SiteB");
+
+		_groups.add(groupA);
+		_groups.add(groupB);
 
 		user = UserTestUtil.addUser(groupA.getGroupId(), groupB.getGroupId());
 
@@ -87,6 +119,42 @@ public class SXPBlueprintLimitSearchToMySitesTest
 		updateSXPBlueprint(getConfigurationJSONString(getClass()));
 
 		assertSearchIgnoreRelevance("[cola coca, cola pepsi]", "cola");
+	}
+
+	@Test
+	public void testSearchWithLimitSearchToTheseSites() throws Exception {
+		_addGroupJournalArticles();
+
+		updateSXPBlueprint(_getConfigurationJSONString());
+
+		assertSearchIgnoreRelevance("[cola coca, cola pepsi]", "cola");
+	}
+
+	private void _addGroupJournalArticles() throws Exception {
+		Group groupA = addGroup("SiteA");
+		Group groupB = addGroup("SiteB");
+		Group groupC = addGroup("SiteC");
+
+		addJournalArticle(groupA.getGroupId(), "cola coca", "");
+		addJournalArticle(groupB.getGroupId(), "cola pepsi", "");
+		addJournalArticle(groupC.getGroupId(), "cola sprite", "");
+
+		_groups.add(groupA);
+		_groups.add(groupB);
+		_groups.add(groupC);
+	}
+
+	private String _getConfigurationJSONString() {
+		Group groupA = _groups.get(0);
+		Group groupB = _groups.get(1);
+
+		String configurationJSON = StringUtil.replace(
+			getConfigurationJSONString(getClass(), testName.getMethodName()),
+			"${configuration.value1}", String.valueOf(groupA.getGroupId()));
+
+		return configurationJSON = StringUtil.replace(
+			configurationJSON, "${configuration.value2}",
+			String.valueOf(groupB.getGroupId()));
 	}
 
 	@DeleteAfterTestRun

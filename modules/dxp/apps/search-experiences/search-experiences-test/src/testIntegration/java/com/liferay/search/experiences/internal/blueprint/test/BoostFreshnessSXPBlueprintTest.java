@@ -15,15 +15,14 @@
 package com.liferay.search.experiences.internal.blueprint.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -35,8 +34,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintFilterByExactTermMatchTest
-	extends BaseSXPBlueprintsTestCase {
+public class BoostFreshnessSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -49,17 +47,11 @@ public class SXPBlueprintFilterByExactTermMatchTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		Group groupA = addGroup("SiteA");
-		Group groupB = addGroup("SiteB");
-		Group groupC = addGroup("SiteC");
+		addJournalArticle(group.getGroupId(), "coca cola", "cola cola");
 
-		addJournalArticle(groupA.getGroupId(), "cola coca", "");
-		addJournalArticle(groupB.getGroupId(), "cola pepsi", "");
-		addJournalArticle(groupC.getGroupId(), "cola sprite", "");
+		_createModifiedTimeInterval();
 
-		_groups.add(groupA);
-		_groups.add(groupB);
-		_groups.add(groupC);
+		addJournalArticle(group.getGroupId(), "pepsi cola", "");
 
 		setUpSXPBlueprint(getClass());
 	}
@@ -68,31 +60,24 @@ public class SXPBlueprintFilterByExactTermMatchTest
 	public void testSearch() throws Exception {
 		updateSXPBlueprint(getEmptyConfigurationJSONString());
 
-		assertSearchIgnoreRelevance(
-			"[cola coca, cola pepsi, cola sprite]", "cola");
+		assertSearch("[coca cola, pepsi cola]", "cola");
 	}
 
 	@Test
-	public void testSearchWithFilterByExactTermMatch() throws Exception {
+	public void testSearchWithBoostFreshness() throws Exception {
 		updateSXPBlueprint(_getConfigurationJSONString());
 
-		assertSearchIgnoreRelevance("[cola coca, cola pepsi]", "cola");
+		assertSearch("[pepsi cola, coca cola]", "cola");
+	}
+
+	private void _createModifiedTimeInterval() throws Exception {
+		TimeUnit.SECONDS.sleep(3);
 	}
 
 	private String _getConfigurationJSONString() {
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
-
-		String configurationJSON = StringUtil.replace(
-			getConfigurationJSONString(getClass()), "${configuration.value1}",
-			String.valueOf(groupA.getGroupId()));
-
-		return configurationJSON = StringUtil.replace(
-			configurationJSON, "${configuration.value2}",
-			String.valueOf(groupB.getGroupId()));
+		return StringUtil.replace(
+			getConfigurationJSONString(getClass()), "${time.current_date}",
+			DateUtil.getCurrentDate("yyyyMMddHHmmss", LocaleUtil.US));
 	}
-
-	@DeleteAfterTestRun
-	private final List<Group> _groups = new ArrayList<>();
 
 }

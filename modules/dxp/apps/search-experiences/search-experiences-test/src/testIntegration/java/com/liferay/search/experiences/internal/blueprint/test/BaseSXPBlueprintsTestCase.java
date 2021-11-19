@@ -229,6 +229,7 @@ public abstract class BaseSXPBlueprintsTestCase {
 				searchContext.setAttribute(
 					"search.experiences.blueprint.id",
 					_sxpBlueprint.getSXPBlueprintId());
+				searchContext.setTimeZone(user.getTimeZone());
 				searchContext.setUserId(user.getUserId());
 			}
 		).build();

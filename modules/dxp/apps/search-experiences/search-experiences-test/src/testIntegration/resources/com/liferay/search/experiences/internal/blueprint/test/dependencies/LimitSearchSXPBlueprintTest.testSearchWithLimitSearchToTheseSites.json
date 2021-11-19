@@ -16,8 +16,8 @@
 						"query": {
 							"terms": {
 								"scopeGroupId": [
-									"${configuration.scope_group_id_1}",
-									"${configuration.scope_group_id_2}"
+									"${configuration.value1}",
+									"${configuration.value2}"
 								]
 							}
 						}

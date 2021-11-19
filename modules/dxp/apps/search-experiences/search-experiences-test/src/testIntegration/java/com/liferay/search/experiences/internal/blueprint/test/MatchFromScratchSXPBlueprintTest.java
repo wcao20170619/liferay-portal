@@ -15,9 +15,8 @@
 package com.liferay.search.experiences.internal.blueprint.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.asset.kernel.model.AssetTag;
-import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
@@ -31,7 +30,8 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintBoostTagsMatchTest extends BaseSXPBlueprintsTestCase {
+public class MatchFromScratchSXPBlueprintTest
+	extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -44,34 +44,37 @@ public class SXPBlueprintBoostTagsMatchTest extends BaseSXPBlueprintsTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		addJournalArticle(group.getGroupId(), "coca cola", "");
+		addJournalArticle(group.getGroupId(), "Cafe Rio", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Cloud Cafe", "Orange County");
+		addJournalArticle(group.getGroupId(), "Denny's", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Starbucks Cafe", "Los Angeles");
 
 		setUpSXPBlueprint(getClass());
 	}
 
 	@Test
-	public void testKeywoardMatchWithAssetTagName() throws Exception {
-		AssetTag assetTag = AssetTagLocalServiceUtil.addTag(
-			user.getUserId(), group.getGroupId(), "cola", serviceContext);
+	public void testSearch() throws Exception {
+		updateSXPBlueprint(getEmptyConfigurationJSONString());
 
-		serviceContext.setAssetTagNames(new String[] {assetTag.getName()});
-
-		addJournalArticle(group.getGroupId(), "pepsi cola", "");
-
-		updateSXPBlueprint(getConfigurationJSONString(getClass()));
-
-		assertSearch("[pepsi cola, coca cola]", "cola");
+		assertSearchIgnoreRelevance(
+			"[cafe rio, cloud cafe, starbucks cafe]", "cafe");
 	}
 
 	@Test
-	public void testSearch() throws Exception {
-		serviceContext.setAssetTagNames(new String[0]);
+	public void testSearchWithMatchFromScratch() throws Exception {
+		updateSXPBlueprint(_getConfigurationJSONString("orange county"));
 
-		addJournalArticle(group.getGroupId(), "pepsi cola", "");
+		assertSearchIgnoreRelevance("[cloud cafe]", "cafe");
 
-		updateSXPBlueprint(getEmptyConfigurationJSONString());
+		updateSXPBlueprint(_getConfigurationJSONString("los angeles"));
 
-		assertSearch("[coca cola, pepsi cola]", "cola");
+		assertSearchIgnoreRelevance("[cafe rio, starbucks cafe]", "cafe");
+	}
+
+	private String _getConfigurationJSONString(String content) {
+		return StringUtil.replace(
+			getConfigurationJSONString(getClass()), "${configuration.query}",
+			content);
 	}
 
 }

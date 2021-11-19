@@ -15,15 +15,9 @@
 package com.liferay.search.experiences.internal.blueprint.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -35,7 +29,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintLimitSearchToTheseSitesTest
+public class DefaultBehaviorLuceneSyntaxSXPBlueprintTest
 	extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
@@ -49,51 +43,50 @@ public class SXPBlueprintLimitSearchToTheseSitesTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		Group groupA = addGroup("SiteA");
-		Group groupB = addGroup("SiteB");
-		Group groupC = addGroup("SiteC");
-
-		addJournalArticle(groupA.getGroupId(), "cola coca", "");
-		addJournalArticle(groupB.getGroupId(), "cola pepsi", "");
-		addJournalArticle(groupC.getGroupId(), "cola sprite", "");
-
-		_groups.add(groupA);
-		_groups.add(groupB);
-		_groups.add(groupC);
-
 		setUpSXPBlueprint(getClass());
 	}
 
 	@Test
 	public void testSearch() throws Exception {
+		addJournalArticle(group.getGroupId(), "Cafe Rio", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Cloud Cafe", "Orange County");
+
 		updateSXPBlueprint(getEmptyConfigurationJSONString());
 
-		assertSearchIgnoreRelevance(
-			"[cola coca, cola pepsi, cola sprite]", "cola");
+		assertSearchIgnoreRelevance("[cafe rio, cloud cafe]", "cafe");
 	}
 
 	@Test
-	public void testSearchWithLimitSearchToTheseSites() throws Exception {
-		updateSXPBlueprint(_getConfigurationJSONString());
+	public void testSearchWithDefaultBlueprint() throws Exception {
+		addJournalArticle(group.getGroupId(), "Cafe Rio", "Los Angeles");
+		addJournalArticle(group.getGroupId(), "Cloud Cafe", "Orange County");
 
-		assertSearchIgnoreRelevance("[cola coca, cola pepsi]", "cola");
+		updateSXPBlueprint(
+			getConfigurationJSONString(getClass(), testName.getMethodName()));
+
+		assertSearch("[cafe rio, cloud cafe]", "cafe");
 	}
 
-	private String _getConfigurationJSONString() {
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
+	@Test
+	public void testSearchWithLuceneSyntax() throws Exception {
+		addJournalArticle(group.getGroupId(), "Coca Cola", "");
+		addJournalArticle(group.getGroupId(), "Pepsi Cola", "");
 
-		String configurationJSONS = StringUtil.replace(
-			getConfigurationJSONString(getClass()),
-			"${configuration.scope_group_id_1}",
-			String.valueOf(groupA.getGroupId()));
+		updateSXPBlueprint(
+			getConfigurationJSONString(getClass(), testName.getMethodName()));
 
-		return StringUtil.replace(
-			configurationJSONS, "${configuration.scope_group_id_2}",
-			String.valueOf(groupB.getGroupId()));
+		assertSearch("[coca cola]", "cola +coca");
+		assertSearch("[pepsi cola]", "cola -coca");
 	}
 
-	@DeleteAfterTestRun
-	private final List<Group> _groups = new ArrayList<>();
+	@Test
+	public void testSearchWithoutLuceneSyntax() throws Exception {
+		addJournalArticle(group.getGroupId(), "Coca Cola", "");
+		addJournalArticle(group.getGroupId(), "Pepsi Cola", "");
+
+		updateSXPBlueprint(getEmptyConfigurationJSONString());
+
+		assertSearchIgnoreRelevance("[coca cola, pepsi cola]", "cola +coca");
+	}
 
 }

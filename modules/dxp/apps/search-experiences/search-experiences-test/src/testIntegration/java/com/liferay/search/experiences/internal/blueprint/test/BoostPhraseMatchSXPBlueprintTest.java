@@ -16,13 +16,8 @@ package com.liferay.search.experiences.internal.blueprint.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.util.DateUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -34,7 +29,8 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintBoostFreshnessTest extends BaseSXPBlueprintsTestCase {
+public class BoostPhraseMatchSXPBlueprintTest
+	extends BaseSXPBlueprintsTestCase {
 
 	@ClassRule
 	@Rule
@@ -47,37 +43,35 @@ public class SXPBlueprintBoostFreshnessTest extends BaseSXPBlueprintsTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		addJournalArticle(group.getGroupId(), "coca cola", "cola cola");
-
-		_createModifiedTimeInterval();
-
-		addJournalArticle(group.getGroupId(), "pepsi cola", "");
+		addJournalArticle(
+			group.getGroupId(), "This coca looks like a kind of drink",
+			"coca coca");
+		addJournalArticle(
+			group.getGroupId(), "This looks like a kind of coca drink", "");
 
 		setUpSXPBlueprint(getClass());
 	}
 
 	@Test
-	public void testSearch() throws Exception {
-		updateSXPBlueprint(getEmptyConfigurationJSONString());
+	public void testSearchWithMultiAllKeywordsMatch() throws Exception {
+		updateSXPBlueprint(
+			getConfigurationJSONString(getClass(), testName.getMethodName()));
 
-		assertSearch("[coca cola, pepsi cola]", "cola");
+		assertSearch(
+			"[this looks like a kind of coca drink, this coca looks like a " +
+				"kind of drink]",
+			"coca drink");
 	}
 
 	@Test
-	public void testSearchWithBoostFreshness() throws Exception {
-		updateSXPBlueprint(_getConfigurationJSONString());
+	public void testSearchWithMultiMatch() throws Exception {
+		updateSXPBlueprint(
+			getConfigurationJSONString(getClass(), testName.getMethodName()));
 
-		assertSearch("[pepsi cola, coca cola]", "cola");
-	}
-
-	private void _createModifiedTimeInterval() throws Exception {
-		TimeUnit.SECONDS.sleep(3);
-	}
-
-	private String _getConfigurationJSONString() {
-		return StringUtil.replace(
-			getConfigurationJSONString(getClass()), "${time.current_date}",
-			DateUtil.getCurrentDate("yyyyMMddHHmmss", LocaleUtil.US));
+		assertSearchIgnoreRelevance(
+			"[this coca looks like a kind of drink, this looks like a kind " +
+				"of coca drink]",
+			"coca drink");
 	}
 
 }

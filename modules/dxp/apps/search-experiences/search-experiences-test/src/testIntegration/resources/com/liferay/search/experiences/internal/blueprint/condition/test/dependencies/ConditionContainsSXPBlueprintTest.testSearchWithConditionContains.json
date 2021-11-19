@@ -1,4 +1,10 @@
 {
+	"general": {
+		"searchableAssetTypes": [
+			"com.liferay.wiki.model.WikiPage",
+			"com.liferay.journal.model.JournalArticle"
+		]
+	},
 	"queryConfiguration": {
 		"applyIndexerClauses": false,
 		"queryEntries": [
@@ -19,7 +25,7 @@
 				],
 				"condition": {
 					"contains": {
-						"parameterName": "${keywords}",
+						"parameterName": "keywords",
 						"value": "cola"
 					}
 				},
