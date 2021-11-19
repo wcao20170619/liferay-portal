@@ -56,7 +56,6 @@ public class ConditionRangeSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 		setUpSXPBlueprint(getClass());
 	}
 
-	@Ignore
 	@Test
 	public void testSearchAPeriodOfTimeWithConditionRange() throws Exception {
 		addJournalArticle(group.getGroupId(), "Coca Cola", "cola cola");
@@ -78,7 +77,6 @@ public class ConditionRangeSXPBlueprintTest extends BaseSXPBlueprintsTestCase {
 		assertSearch("[pepsi cola, coca cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchNewUserAccountWithConditionRange() throws Exception {
 		updateSXPBlueprint(

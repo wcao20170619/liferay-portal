@@ -20,8 +20,8 @@
 				"condition": {
 					"range": {
 						"format": "yyyyMMdd",
-						"gt": "${time.current_date|modifier=-30d,dateFormat=yyyyMMdd}",
-						"lt": "${time.current_date|modifier=+1d,dateFormat=yyyyMMdd}",
+						"gt": "${time.current_date|modifier=-30d,date_format=yyyyMMdd}",
+						"lt": "${time.current_date|modifier=+1d,date_format=yyyyMMdd}",
 						"parameterName": "time.current_date"
 					}
 				},

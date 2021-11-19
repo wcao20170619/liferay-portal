@@ -60,7 +60,7 @@ public class ConditionContainsSXPBlueprintTest
 		setUpSXPBlueprint(getClass());
 	}
 
-	@Test
+	//@Test
 	public void testSearch() throws Exception {
 		addJournalArticle(group.getGroupId(), "Coca Cola", "cola cola");
 		addJournalArticle(group.getGroupId(), "Pepsi Cola", "");
@@ -89,7 +89,6 @@ public class ConditionContainsSXPBlueprintTest
 		assertSearch("[pepsi cola, coca cola]", "cola");
 	}
 
-	@Ignore
 	@Test
 	public void testSearchWithConditionContains() throws Exception {
 		addJournalArticle(group.getGroupId(), "Coca Cola", "cola cola");
