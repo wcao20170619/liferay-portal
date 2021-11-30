@@ -1,0 +1,30 @@
+{
+	"queryConfiguration": {
+		"applyIndexerClauses": false,
+		"queryEntries": [
+			{
+				"clauses": [
+					{
+						"context": "query",
+						"occur": "must",
+						"query": {
+							"multi_match": {
+								"boost": 1,
+								"fields": [
+									"localized_title${context.language_id}^2",
+									"content${context.language_id}^1"
+								],
+								"operator": "${configuration.operator}",
+								"query": "${keywords}",
+								"type": "cross_fields"
+							}
+						}
+					}
+				],
+				"condition": {
+				},
+				"enabled": true
+			}
+		]
+	}
+}
