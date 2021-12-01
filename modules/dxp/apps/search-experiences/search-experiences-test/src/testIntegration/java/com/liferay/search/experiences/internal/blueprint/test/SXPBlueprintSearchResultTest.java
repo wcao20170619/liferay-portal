@@ -34,6 +34,7 @@ import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -86,8 +87,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -106,10 +109,18 @@ public class SXPBlueprintSearchResultTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		WorkflowThreadLocal.setEnabled(false);
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		WorkflowThreadLocal.setEnabled(true);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		WorkflowThreadLocal.setEnabled(false);
-
 		_group = GroupTestUtil.addGroup();
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
@@ -121,7 +132,7 @@ public class SXPBlueprintSearchResultTest {
 			_user.getUserId(), "{}",
 			Collections.singletonMap(LocaleUtil.US, ""), null,
 			Collections.singletonMap(
-				LocaleUtil.US, getClass().getName() + "-Blueprint"),
+				LocaleUtil.US, RandomTestUtil.randomString()),
 			_serviceContext);
 	}
 
@@ -270,7 +281,8 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testConditionRange() throws Exception {
-		_addAssetCatetory("Promoted", _group, _addGroupUser(_group, "Custmers"));
+		_addAssetCatetory(
+			"Promoted", _group, _addGroupUser(_group, "Custmers"));
 		_addJournalArticles(
 			new String[] {"Coca Cola", "Pepsi Cola"},
 			new String[] {"cola cola", ""});
@@ -681,9 +693,11 @@ public class SXPBlueprintSearchResultTest {
 
 	private void _addGroups() throws Exception {
 		Group groupA = GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, "SiteA", _serviceContext);
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			RandomTestUtil.randomString(), _serviceContext);
 		Group groupB = GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, "SiteB", _serviceContext);
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			RandomTestUtil.randomString(), _serviceContext);
 
 		_groups.add(groupA);
 		_groups.add(groupB);
@@ -703,9 +717,11 @@ public class SXPBlueprintSearchResultTest {
 		_serviceContext.setExpandoBridgeAttributes(
 			Collections.singletonMap(
 				expandoColumn,
-				StringBundler.concat(
-					"{\"latitude\":", latitude, ",\"longitude\":", longitude,
-					"}")));
+				JSONUtil.put(
+					"latitude", latitude
+				).put(
+					"longitude", longitude
+				).toString()));
 
 		_addJournalArticles(new String[] {title}, new String[] {""});
 	}
