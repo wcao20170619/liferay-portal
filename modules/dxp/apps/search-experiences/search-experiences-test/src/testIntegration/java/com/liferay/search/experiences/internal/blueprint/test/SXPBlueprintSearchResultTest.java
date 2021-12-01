@@ -53,7 +53,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -81,10 +81,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
@@ -862,14 +859,13 @@ public class SXPBlueprintSearchResultTest {
 		return new ConfigurationTemporarySwapper(
 			"com.liferay.search.experiences.internal.configuration." +
 				"IpstackConfiguration",
-			_toDictionary(
-				HashMapBuilder.put(
-					"apiKey", apiKey
-				).put(
-					"apiURL", apiURL
-				).put(
-					"enabled", enabled
-				).build()));
+			HashMapDictionaryBuilder.put(
+				"apiKey", (Object)apiKey
+			).put(
+				"apiURL", apiURL
+			).put(
+				"enabled", enabled
+			).build());
 	}
 
 	private Date _getNextDay() {
@@ -940,10 +936,6 @@ public class SXPBlueprintSearchResultTest {
 			_sxpBlueprint.getElementInstancesJSON(),
 			_sxpBlueprint.getTitleMap(), _serviceContext);
 		runnable.run();
-	}
-
-	private Dictionary<String, Object> _toDictionary(Map<String, String> map) {
-		return new HashMapDictionary<>(new HashMap<String, Object>(map));
 	}
 
 	private AssetCategory _assetCategory;
