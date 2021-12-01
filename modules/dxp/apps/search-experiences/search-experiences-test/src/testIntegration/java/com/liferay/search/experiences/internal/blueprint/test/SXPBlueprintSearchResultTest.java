@@ -110,10 +110,6 @@ public class SXPBlueprintSearchResultTest {
 	public void setUp() throws Exception {
 		WorkflowThreadLocal.setEnabled(false);
 
-		_assetCategory = null;
-		_assetCreatedTimeInterval = 0;
-		_assetTag = null;
-		_assetVocabulary = null;
 		_group = GroupTestUtil.addGroup();
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
