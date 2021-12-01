@@ -163,7 +163,7 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostFreshness() throws Exception {
-		_assetCreatedTimeInterval = 3;
+		_addJournalArticleSleep = 3;
 
 		_addJournalArticles(
 			new String[] {"coca cola", "pepsi cola"},
@@ -763,7 +763,7 @@ public class SXPBlueprintSearchResultTest {
 				new String[] {_assetTag.getName()});
 		}
 
-		TimeUnit.SECONDS.sleep(_assetCreatedTimeInterval);
+		TimeUnit.SECONDS.sleep(_addJournalArticleSleep);
 
 		if (_journalFolder != null) {
 			_journalArticles.add(
@@ -939,7 +939,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	private AssetCategory _assetCategory;
-	private int _assetCreatedTimeInterval;
+	private int _addJournalArticleSleep;
 	private AssetTag _assetTag;
 	private AssetVocabulary _assetVocabulary;
 
