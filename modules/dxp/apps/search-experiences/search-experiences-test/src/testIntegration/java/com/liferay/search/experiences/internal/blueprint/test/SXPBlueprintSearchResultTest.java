@@ -643,7 +643,7 @@ public class SXPBlueprintSearchResultTest {
 			_assetVocabulary.getVocabularyId(), _serviceContext);
 	}
 
-	private void _addExpandoColumn(long companyId, String... columns)
+	private void _addExpandoColumn(long companyId, String... names)
 		throws Exception {
 
 		ExpandoTable expandoTable = ExpandoTableLocalServiceUtil.fetchTable(
@@ -660,9 +660,9 @@ public class SXPBlueprintSearchResultTest {
 			_expandoTables.add(expandoTable);
 		}
 
-		for (String column : columns) {
+		for (String name : names) {
 			ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
-				expandoTable, column, ExpandoColumnConstants.GEOLOCATION);
+				expandoTable, name, ExpandoColumnConstants.GEOLOCATION);
 
 			_expandoColumns.add(expandoColumn);
 
