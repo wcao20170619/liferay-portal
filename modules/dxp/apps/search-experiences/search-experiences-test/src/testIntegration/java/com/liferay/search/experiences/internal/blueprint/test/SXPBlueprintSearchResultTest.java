@@ -199,7 +199,7 @@ public class SXPBlueprintSearchResultTest {
 				try (ConfigurationTemporarySwapper
 						configurationTemporarySwapper =
 							_getConfigurationTemporarySwapper(
-								"2345", "true", "64.225.32.7")) {
+								"2345", "64.225.32.7", "true")) {
 
 					_assertSearch("[branch sf, branch la]", "branch");
 				}
@@ -215,7 +215,7 @@ public class SXPBlueprintSearchResultTest {
 				try (ConfigurationTemporarySwapper
 						configurationTemporarySwapper =
 							_getConfigurationTemporarySwapper(
-								"2345", "true", "34.94.32.240")) {
+								"2345", "34.94.32.240", "true")) {
 
 					_assertSearch("[branch la, branch sf]", "branch");
 				}
@@ -856,7 +856,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	private ConfigurationTemporarySwapper _getConfigurationTemporarySwapper(
-			String apiKey, String enabled, String ip)
+			String apiKey, String apiURL, String enabled)
 		throws Exception {
 
 		return new ConfigurationTemporarySwapper(
@@ -866,7 +866,7 @@ public class SXPBlueprintSearchResultTest {
 				HashMapBuilder.put(
 					"apiKey", apiKey
 				).put(
-					"apiURL", ip
+					"apiURL", apiURL
 				).put(
 					"enabled", enabled
 				).build()));
