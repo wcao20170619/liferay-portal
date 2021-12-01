@@ -135,8 +135,9 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostContents() throws Exception {
-		_addGroups();
-		_addAssetCatetory("Important", _group, _user);
+		_addGroupAAndGroupB();
+
+		_addAssetCategory("Important", _user);
 		_addJournalArticles(
 			new String[] {"coca cola", "pepsi cola"},
 			new String[] {"cola cola", ""});
@@ -150,9 +151,7 @@ public class SXPBlueprintSearchResultTest {
 			"inCategory", new String[] {"${configuration.asset_category_ids}"},
 			new String[] {String.valueOf(_assetCategory.getCategoryId())});
 
-		Group group = _groups.get(1);
-
-		_user = UserTestUtil.addUser(group.getGroupId());
+		_user = UserTestUtil.addUser(_groupB.getGroupId());
 
 		_serviceContext.setUserId(_user.getUserId());
 
@@ -229,7 +228,7 @@ public class SXPBlueprintSearchResultTest {
 	public void testConditionContains() throws Exception {
 		_user = _addGroupUser(_group, "employee");
 
-		_addAssetCatetory("Promoted", _group, _user);
+		_addAssetCategory("Promoted", _user);
 
 		_addJournalArticles(
 			new String[] {"Coca Cola", "Pepsi Cola"},
@@ -278,8 +277,7 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testConditionRange() throws Exception {
-		_addAssetCatetory(
-			"Promoted", _group, _addGroupUser(_group, "Custmers"));
+		_addAssetCategory("Promoted", _addGroupUser(_group, "Customers"));
 		_addJournalArticles(
 			new String[] {"Coca Cola", "Pepsi Cola"},
 			new String[] {"cola cola", ""});
@@ -303,8 +301,8 @@ public class SXPBlueprintSearchResultTest {
 				DateUtil.getDate(_getNextDay(), "yyyyMMdd", LocaleUtil.US)
 			});
 
-		_addAssetCatetory(
-			"For New Recruits", _group, _addGroupUser(_group, "Employee"));
+		_addAssetCategory(
+			"For New Recruits", _addGroupUser(_group, "Employee"));
 		_addJournalArticles(
 			new String[] {
 				"Company policies for All Employees Recruits",
@@ -387,7 +385,8 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testLimitSearch() throws Exception {
-		_addGroups();
+		_addGroupAAndGroupB();
+
 		_addJournalArticles(
 			new String[] {"cola coca", "cola pepsi", "cola sprite"},
 			new String[] {"", "", ""});
@@ -397,20 +396,17 @@ public class SXPBlueprintSearchResultTest {
 				"[cola coca, cola pepsi, cola sprite]", "cola"),
 			null, null, null);
 
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
-
 		_test(
 			() -> _assertSearchIgnoreRelevance(
 				"[cola coca, cola pepsi]", "cola"),
 			"withFilterByExactTermMatch",
 			new String[] {"${configuration.value1}", "${configuration.value2}"},
 			new String[] {
-				String.valueOf(groupA.getGroupId()),
-				String.valueOf(groupB.getGroupId())
+				String.valueOf(_groupA.getGroupId()),
+				String.valueOf(_groupB.getGroupId())
 			});
 
-		_user = UserTestUtil.addUser(groupA.getGroupId());
+		_user = UserTestUtil.addUser(_groupA.getGroupId());
 
 		_serviceContext.setUserId(_user.getUserId());
 
@@ -423,8 +419,8 @@ public class SXPBlueprintSearchResultTest {
 			"withTheseSites",
 			new String[] {"${configuration.value1}", "${configuration.value2}"},
 			new String[] {
-				String.valueOf(groupA.getGroupId()),
-				String.valueOf(groupB.getGroupId())
+				String.valueOf(_groupA.getGroupId()),
+				String.valueOf(_groupB.getGroupId())
 			});
 	}
 
@@ -638,17 +634,17 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addAssetCatetory(String categoryTitle, Group group, User user)
+	private void _addAssetCategory(String categoryTitle, User user)
 		throws Exception {
 
 		if (_assetVocabulary == null) {
 			_assetVocabulary =
 				AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
-					group.getGroupId());
+					_group.getGroupId());
 		}
 
 		_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-			user.getUserId(), group.getGroupId(), categoryTitle,
+			user.getUserId(), _group.getGroupId(), categoryTitle,
 			_assetVocabulary.getVocabularyId(), _serviceContext);
 	}
 
@@ -688,16 +684,13 @@ public class SXPBlueprintSearchResultTest {
 		}
 	}
 
-	private void _addGroups() throws Exception {
-		Group groupA = GroupTestUtil.addGroup(
+	private void _addGroupAAndGroupB() throws Exception {
+		_groupA = GroupTestUtil.addGroup(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			RandomTestUtil.randomString(), _serviceContext);
-		Group groupB = GroupTestUtil.addGroup(
+		_groupB = GroupTestUtil.addGroup(
 			GroupConstants.DEFAULT_PARENT_GROUP_ID,
 			RandomTestUtil.randomString(), _serviceContext);
-
-		_groups.add(groupA);
-		_groups.add(groupB);
 	}
 
 	private User _addGroupUser(Group group, String roleName) throws Exception {
@@ -728,8 +721,8 @@ public class SXPBlueprintSearchResultTest {
 
 		Group group = _group;
 
-		if (_groups.size() > 0) {
-			group = _groups.get(0);
+		if (_groupA != null) {
+			group = _groupA;
 		}
 
 		_journalArticles.add(
@@ -749,8 +742,8 @@ public class SXPBlueprintSearchResultTest {
 			return;
 		}
 
-		if (_groups.size() > 1) {
-			group = _groups.get(1);
+		if (_groupB != null) {
+			group = _groupB;
 		}
 
 		if (_assetCategory != null) {
@@ -938,8 +931,8 @@ public class SXPBlueprintSearchResultTest {
 		runnable.run();
 	}
 
-	private AssetCategory _assetCategory;
 	private int _addJournalArticleSleep;
+	private AssetCategory _assetCategory;
 	private AssetTag _assetTag;
 	private AssetVocabulary _assetVocabulary;
 
@@ -951,6 +944,12 @@ public class SXPBlueprintSearchResultTest {
 
 	@DeleteAfterTestRun
 	private Group _group;
+
+	@DeleteAfterTestRun
+	private Group _groupA;
+
+	@DeleteAfterTestRun
+	private Group _groupB;
 
 	@DeleteAfterTestRun
 	private final List<Group> _groups = new ArrayList<>();
