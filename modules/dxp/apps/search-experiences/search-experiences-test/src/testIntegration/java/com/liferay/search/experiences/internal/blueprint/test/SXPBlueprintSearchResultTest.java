@@ -128,7 +128,7 @@ public class SXPBlueprintSearchResultTest {
 	@Test
 	public void testBoostContents() throws Exception {
 		_addGroups();
-		_addCatetory("Important", _group, _user);
+		_addAssetCatetory("Important", _group, _user);
 		_addJournalArticles(
 			new String[] {"coca cola", "pepsi cola"},
 			new String[] {"cola cola", ""});
@@ -221,7 +221,7 @@ public class SXPBlueprintSearchResultTest {
 	public void testConditionContains() throws Exception {
 		_user = _addGroupUser(_group, "employee");
 
-		_addCatetory("Promoted", _group, _user);
+		_addAssetCatetory("Promoted", _group, _user);
 
 		_addJournalArticles(
 			new String[] {"Coca Cola", "Pepsi Cola"},
@@ -270,7 +270,7 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testConditionRange() throws Exception {
-		_addCatetory("Promoted", _group, _addGroupUser(_group, "Custmers"));
+		_addAssetCatetory("Promoted", _group, _addGroupUser(_group, "Custmers"));
 		_addJournalArticles(
 			new String[] {"Coca Cola", "Pepsi Cola"},
 			new String[] {"cola cola", ""});
@@ -294,7 +294,7 @@ public class SXPBlueprintSearchResultTest {
 				DateUtil.getDate(_getNextDay(), "yyyyMMdd", LocaleUtil.US)
 			});
 
-		_addCatetory(
+		_addAssetCatetory(
 			"For New Recruits", _group, _addGroupUser(_group, "Employee"));
 		_addJournalArticles(
 			new String[] {
@@ -629,7 +629,7 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addCatetory(String categoryTitle, Group group, User user)
+	private void _addAssetCatetory(String categoryTitle, Group group, User user)
 		throws Exception {
 
 		if (_assetVocabulary == null) {
