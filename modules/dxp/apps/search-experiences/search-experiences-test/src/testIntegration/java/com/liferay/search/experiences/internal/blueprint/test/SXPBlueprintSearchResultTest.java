@@ -115,7 +115,6 @@ public class SXPBlueprintSearchResultTest {
 		_assetTag = null;
 		_assetVocabulary = null;
 		_group = GroupTestUtil.addGroup();
-		_journalArticles.clear();
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group, TestPropsValues.getUserId());
