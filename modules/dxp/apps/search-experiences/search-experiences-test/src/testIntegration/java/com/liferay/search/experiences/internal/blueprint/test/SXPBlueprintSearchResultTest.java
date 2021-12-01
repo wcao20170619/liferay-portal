@@ -162,21 +162,23 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostFreshness() throws Exception {
-		_addJournalArticleSleep = 3;
+		_setUp(
+			() -> {
+				_addJournalArticleSleep = 3;
+			},
+			new String[] {"coca cola", ""},
+			new String[] {"cola cola", "pepsi cola"});
 
-		_addJournalArticles(
-			new String[] {"coca cola", "pepsi cola"},
-			new String[] {"cola cola", ""});
-		_test(
-			() -> _assertSearchIgnoreRelevance(
-				"[coca cola, pepsi cola]", "cola"),
-			null, null, null);
 		_test(
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
 			"withFunctionScore", new String[] {"${time.current_date}"},
 			new String[] {
 				DateUtil.getCurrentDate("yyyyMMddHHmmss", LocaleUtil.US)
 			});
+		_test(
+			() -> _assertSearchIgnoreRelevance(
+				"[coca cola, pepsi cola]", "cola"),
+			null, null, null);
 	}
 
 	@Test
@@ -368,11 +370,12 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testKeywoardMatch() throws Exception {
-		_assetTag = AssetTagLocalServiceUtil.addTag(
-			_user.getUserId(), _group.getGroupId(), "cola", _serviceContext);
-
-		_addJournalArticles(
-			new String[] {"coca cola", "pepsi cola"}, new String[] {"", ""});
+		_setUp(
+			() -> {
+				_assetTag = AssetTagLocalServiceUtil.addTag(
+					_user.getUserId(), _group.getGroupId(), "cola", _serviceContext);
+			}
+			new String[] {"", ""}, new String[] {"coca cola", "pepsi cola"});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -385,11 +388,12 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testLimitSearch() throws Exception {
-		_addGroupAAndGroupB();
-
-		_addJournalArticles(
-			new String[] {"cola coca", "cola pepsi", "cola sprite"},
-			new String[] {"", "", ""});
+		_setUp(
+			() -> {
+				_addGroupAAndGroupB();
+			}
+			new String[] {"", "", ""},
+			new String[] {"cola coca", "cola pepsi", "cola sprite"});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -499,15 +503,16 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_bestFields() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"drink carbonated coca", "drink carbonated pepsi cola",
-				"fruit punch", "sprite"
-			},
+		_setUp(
 			new String[] {
 				"carbonated cola", "carbonated cola cola",
 				"non-carbonated cola", "carbonated cola cola"
+			},
+			new String[] {
+				"drink carbonated coca", "drink carbonated pepsi cola",
+				"fruit punch", "sprite"
 			});
+
 		_test(
 			() -> _assertSearch(
 				"[drink carbonated coca, drink carbonated pepsi cola, " +
@@ -519,9 +524,14 @@ public class SXPBlueprintSearchResultTest {
 			},
 			new String[] {"AUTO", "and"});
 
-		_addJournalArticles(
-			new String[] {"lorem ipsum dolor", "lorem ipsum sit", "nunquis"},
-			new String[] {"ipsum sit", "ipsum sit sit", "non-lorem ipsum sit"});
+		_setUp(
+			new String[] {
+				"ipsum sit", "ipsum sit sit", "non-lorem ipsum sit"
+			},
+			new String[] {
+				"lorem ipsum dolor", "lorem ipsum sit", "nunquis"
+			});
+
 		_test(
 			() -> _assertSearch(
 				"[lorem ipsum sit, lorem ipsum dolor, nunquis]",
@@ -535,13 +545,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_boolPrefix() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"lorem ipsum sit", "lorem ipsum dolor", "amet", "nunquis"
-			},
+		_setUp(
 			new String[] {
 				"ipsum sit sit", "ipsum sit", "ipsum sit sit",
 				"non-lorem ipsum sit"
+			},
+			new String[] {
+				"lorem ipsum sit", "lorem ipsum dolor", "amet", "nunquis"
 			});
 
 		_test(
@@ -559,11 +569,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_crossFields() throws Exception {
-		_addJournalArticles(
+		_setUp(
+			new String[] {
+				"foxtrot, golf", "hotel golf", "alpha", "beta"
+			},
 			new String[] {
 				"alpha beta", "alpha edison", "beta charlie", "edison india"
-			},
-			new String[] {"foxtrot, golf", "hotel golf", "alpha", "beta"});
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -579,13 +591,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_mostFields() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"amet", "lorem ipsum dolor", "lorem ipsum sit", "nunquis"
-			},
+		_setUp(
 			new String[] {
 				"ipsum sit sit", "ipsum sit", "ipsum sit sit",
 				"non-lorem ipsum sit"
+			},
+			new String[] {
+				"amet", "lorem ipsum dolor", "lorem ipsum sit", "nunquis"
 			});
 
 		_test(
@@ -602,15 +614,16 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_phase() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"listen something", "listen to birds", "listen to planes",
-				"silence"
-			},
+		_setUp(
 			new String[] {
 				"do not listen to birds", "listen listen to birds",
 				"listen to birds", "listen listen to birds"
+			},
+			new String[] {
+				"listen something", "listen to birds", "listen to planes",
+				"silence"
 			});
+
 		_test(
 			() -> _assertSearch("[listen to birds, silence]", "listen listen"),
 			"withKeywords", null, null);
@@ -618,16 +631,17 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_phasePrefix() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"clouds", "watch birds on the sky", "watch planes on the sky",
-				"watch trains"
-			},
+		_setUp(
 			new String[] {
 				"simple things are beautiful sometimes",
 				"simple things are beautiful", "simple things are not good",
 				"simple things are bad"
+			},
+			new String[] {
+				"clouds", "watch birds on the sky", "watch planes on the sky",
+				"watch trains"
 			});
+
 		_test(
 			() -> _assertSearch(
 				"[watch birds on the sky, clouds]", "simple things are beau"),
@@ -716,8 +730,19 @@ public class SXPBlueprintSearchResultTest {
 		_addJournalArticles(new String[] {title}, new String[] {""});
 	}
 
-	private void _addJournalArticles(String[] titles, String[] contents)
+	private void _setUp(
+			String[] journalArticleContents, String[] journalArticleTitles)
 		throws Exception {
+
+		_setUp(journalArticleContents, journalArticleTitles, () -> {});
+	}
+
+	private void _setUp(
+			String[] journalArticleContents, String[] journalArticleTitles,
+			Runnable runnable)
+		throws Exception {
+
+		runnable.run();
 
 		Group group = _group;
 
