@@ -34,6 +34,9 @@ import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -86,8 +89,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -106,16 +111,19 @@ public class SXPBlueprintSearchResultTest {
 			new LiferayIntegrationTestRule(),
 			PermissionCheckerMethodTestRule.INSTANCE);
 
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		WorkflowThreadLocal.setEnabled(false);
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		WorkflowThreadLocal.setEnabled(true);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		WorkflowThreadLocal.setEnabled(false);
-
-		_assetCategory = null;
-		_assetCreatedTimeInterval = 0;
-		_assetTag = null;
-		_assetVocabulary = null;
 		_group = GroupTestUtil.addGroup();
-		_journalArticles.clear();
 
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group, TestPropsValues.getUserId());
@@ -126,17 +134,19 @@ public class SXPBlueprintSearchResultTest {
 			_user.getUserId(), "{}",
 			Collections.singletonMap(LocaleUtil.US, ""), null,
 			Collections.singletonMap(
-				LocaleUtil.US, getClass().getName() + "-Blueprint"),
+				LocaleUtil.US, RandomTestUtil.randomString()),
 			_serviceContext);
 	}
 
 	@Test
 	public void testBoostContents() throws Exception {
-		_addGroups();
-		_addCatetory("Important", _group, _user);
-		_addJournalArticles(
+		_setUp(
+			new String[] {"cola cola", ""},
 			new String[] {"coca cola", "pepsi cola"},
-			new String[] {"cola cola", ""});
+			() -> {
+				_addGroupAAndGroupB();
+				_addCatetory("Important", _group, _user);
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -147,9 +157,7 @@ public class SXPBlueprintSearchResultTest {
 			"inCategory", new String[] {"${configuration.asset_category_ids}"},
 			new String[] {String.valueOf(_assetCategory.getCategoryId())});
 
-		Group group = _groups.get(1);
-
-		_user = UserTestUtil.addUser(group.getGroupId());
+		_user = UserTestUtil.addUser(_groupB.getGroupId());
 
 		_serviceContext.setUserId(_user.getUserId());
 
@@ -160,11 +168,11 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostFreshness() throws Exception {
-		_assetCreatedTimeInterval = 3;
-
-		_addJournalArticles(
+		_setUp(
+			new String[] {"cola cola", ""},
 			new String[] {"coca cola", "pepsi cola"},
-			new String[] {"cola cola", ""});
+			() -> _addJournalArticleSleep = 3);
+
 		_test(
 			() -> _assertSearchIgnoreRelevance(
 				"[coca cola, pepsi cola]", "cola"),
@@ -179,10 +187,11 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostProximity() throws Exception {
-		_addExpandoColumn(_group.getCompanyId(), "location");
-
-		_addJournalArticle("Branch SF", "location", 64.01, -117.42);
-		_addJournalArticle("Branch LA", "location", 24.03, -107.44);
+		_setUp(
+			new String[] {"location", "location"},
+			new String[] {"Branch SF", "Branch LA"},
+			new double[] {64.01, 24.03}, new double[] {-117.42, -107.44},
+			() -> _addExpandoColumn(_group.getCompanyId(), "location"));
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -224,44 +233,45 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testConditionContains() throws Exception {
-		_user = _addGroupUser(_group, "employee");
+		_setUp(
+			new String[] {"alpha alpha", ""},
+			new String[] {"beta alpha", "charlie alpha"},
+			() -> {
+				_user = _addGroupUser(_group, "employee");
 
-		_addCatetory("Promoted", _group, _user);
-
-		_addJournalArticles(
-			new String[] {"Coca Cola", "Pepsi Cola"},
-			new String[] {"cola cola", ""});
+				_addCatetory("Promoted", _group, _user);
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
-				"[coca cola, pepsi cola]", "cola"),
+				"[beta alpha, charlie alpha]", "alpha"),
 			null, null, null);
 		_test(
-			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
+			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"),
 			"withAssetCategory",
 			new String[] {
 				"${configuration.asset_category_id}",
 				"${configuration.keywords}"
 			},
 			new String[] {
-				String.valueOf(_assetCategory.getCategoryId()), "cola"
+				String.valueOf(_assetCategory.getCategoryId()), "alpha"
 			});
 
 		JournalArticle journalArticle = _journalArticles.get(1);
 
 		_test(
-			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
+			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"),
 			"withContains", new String[] {"${articleId}"},
 			new String[] {journalArticle.getArticleId()});
 		_test(
-			() -> _assertSearch("[coca cola, pepsi cola]", "cola"),
+			() -> _assertSearch("[beta alpha, charlie alpha]", "alpha"),
 			"withNotContains", new String[] {"${articleId}"},
 			new String[] {journalArticle.getArticleId()});
 
 		SegmentsEntry segmentsEntry = _addSegmentsEntry(_user);
 
 		_test(
-			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
+			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"),
 			"withSegmentsEntry",
 			new String[] {
 				"${configuration.asset_category_id}",
@@ -275,10 +285,11 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testConditionRange() throws Exception {
-		_addCatetory("Promoted", _group, _addGroupUser(_group, "Custmers"));
-		_addJournalArticles(
+		_setUp(
+			new String[] {"cola cola", ""},
 			new String[] {"Coca Cola", "Pepsi Cola"},
-			new String[] {"cola cola", ""});
+			() -> _addCatetory(
+				"Promoted", _group, _addGroupUser(_group, "Custmers")));
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -299,14 +310,14 @@ public class SXPBlueprintSearchResultTest {
 				DateUtil.getDate(_getNextDay(), "yyyyMMdd", LocaleUtil.US)
 			});
 
-		_addCatetory(
-			"For New Recruits", _group, _addGroupUser(_group, "Employee"));
-		_addJournalArticles(
+		_setUp(
+			new String[] {"policies policies", ""},
 			new String[] {
 				"Company policies for All Employees Recruits",
 				"Company Policies for New Recruits"
 			},
-			new String[] {"policies policies", ""});
+			() -> _addCatetory(
+				"For New Recruits", _group, _addGroupUser(_group, "Employee")));
 
 		_test(
 			() -> _assertSearch(
@@ -320,14 +331,22 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testHideSearch() throws Exception {
-		_assetTag = AssetTestUtil.addTag(_group.getGroupId(), "hide");
+		_setUp(
+			new String[] {"", ""}, new String[] {"do not hide me", "hide me"},
+			() -> {
+				try {
+					_assetTag = AssetTestUtil.addTag(
+						_group.getGroupId(), "hide");
 
-		_journalFolder = JournalFolderServiceUtil.addFolder(
-			_group.getGroupId(), 0, RandomTestUtil.randomString(),
-			StringPool.BLANK, _serviceContext);
-
-		_addJournalArticles(
-			new String[] {"do not hide me", "hide me"}, new String[] {"", ""});
+					_journalFolder = JournalFolderServiceUtil.addFolder(
+						_group.getGroupId(), 0, RandomTestUtil.randomString(),
+						StringPool.BLANK, _serviceContext);
+				}
+				catch (Exception exception) {
+					_log.error(
+						"Add asset tag and/or jounal folder error", exception);
+				}
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -343,12 +362,13 @@ public class SXPBlueprintSearchResultTest {
 
 		_assetTag = null;
 		_journalFolder = null;
-		_addJournalArticles(
-			new String[] {
-				"Cafe Rio", "Cloud Cafe", "Denny's", "Starbucks Cafe"
-			},
+
+		_setUp(
 			new String[] {
 				"Los Angeles", "Orange County", "Los Angeles", "Los Angeles"
+			},
+			new String[] {
+				"Cafe Rio", "Cloud Cafe", "Denny's", "Starbucks Cafe"
 			});
 
 		_test(
@@ -366,11 +386,18 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testKeywoardMatch() throws Exception {
-		_assetTag = AssetTagLocalServiceUtil.addTag(
-			_user.getUserId(), _group.getGroupId(), "cola", _serviceContext);
-
-		_addJournalArticles(
-			new String[] {"coca cola", "pepsi cola"}, new String[] {"", ""});
+		_setUp(
+			new String[] {"", ""}, new String[] {"coca cola", "pepsi cola"},
+			() -> {
+				try {
+					_assetTag = AssetTagLocalServiceUtil.addTag(
+						_user.getUserId(), _group.getGroupId(), "cola",
+						_serviceContext);
+				}
+				catch (Exception exception) {
+					_log.error("Add asset tag error", exception);
+				}
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -383,18 +410,15 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testLimitSearch() throws Exception {
-		_addGroups();
-		_addJournalArticles(
+		_setUp(
+			new String[] {"", "", ""},
 			new String[] {"cola coca", "cola pepsi", "cola sprite"},
-			new String[] {"", "", ""});
+			() -> _addGroupAAndGroupB());
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
 				"[cola coca, cola pepsi, cola sprite]", "cola"),
 			null, null, null);
-
-		Group groupA = _groups.get(0);
-		Group groupB = _groups.get(1);
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -402,11 +426,11 @@ public class SXPBlueprintSearchResultTest {
 			"withFilterByExactTermMatch",
 			new String[] {"${configuration.value1}", "${configuration.value2}"},
 			new String[] {
-				String.valueOf(groupA.getGroupId()),
-				String.valueOf(groupB.getGroupId())
+				String.valueOf(_groupA.getGroupId()),
+				String.valueOf(_groupB.getGroupId())
 			});
 
-		_user = UserTestUtil.addUser(groupA.getGroupId());
+		_user = UserTestUtil.addUser(_groupA.getGroupId());
 
 		_serviceContext.setUserId(_user.getUserId());
 
@@ -419,19 +443,19 @@ public class SXPBlueprintSearchResultTest {
 			"withTheseSites",
 			new String[] {"${configuration.value1}", "${configuration.value2}"},
 			new String[] {
-				String.valueOf(groupA.getGroupId()),
-				String.valueOf(groupB.getGroupId())
+				String.valueOf(_groupA.getGroupId()),
+				String.valueOf(_groupB.getGroupId())
 			});
 	}
 
 	@Test
 	public void testMatch() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"Cafe Rio", "Cloud Cafe", "Denny's", "Starbucks Cafe"
-			},
+		_setUp(
 			new String[] {
 				"Los Angeles", "Orange County", "Los Angeles", "Los Angeles"
+			},
+			new String[] {
+				"Cafe Rio", "Cloud Cafe", "Denny's", "Starbucks Cafe"
 			});
 
 		_test(
@@ -451,12 +475,12 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testPhraseMatch() throws Exception {
-		_addJournalArticles(
+		_setUp(
+			new String[] {"coca coca", ""},
 			new String[] {
 				"This coca looks like a kind of drink",
 				"This looks like a kind of coca drink"
-			},
-			new String[] {"coca coca", ""});
+			});
 
 		_test(
 			() -> _assertSearch(
@@ -474,9 +498,9 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testSearch() throws Exception {
-		_addJournalArticles(
-			new String[] {"Cafe Rio", "Cloud Cafe"},
-			new String[] {"Los Angeles", "Orange County"});
+		_setUp(
+			new String[] {"Los Angeles", "Orange County"},
+			new String[] {"Cafe Rio", "Cloud Cafe"});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -486,8 +510,7 @@ public class SXPBlueprintSearchResultTest {
 			() -> _assertSearch("[cafe rio, cloud cafe]", "cafe"),
 			"withDefaultBehavior", null, null);
 
-		_addJournalArticles(
-			new String[] {"Coca Cola", "Pepsi Cola"}, new String[] {"", ""});
+		_setUp(new String[] {"", ""}, new String[] {"Coca Cola", "Pepsi Cola"});
 
 		_test(
 			() -> _assertSearch("[coca cola]", "cola +coca"),
@@ -499,14 +522,14 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_bestFields() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"drink carbonated coca", "drink carbonated pepsi cola",
-				"fruit punch", "sprite"
-			},
+		_setUp(
 			new String[] {
 				"carbonated cola", "carbonated cola cola",
 				"non-carbonated cola", "carbonated cola cola"
+			},
+			new String[] {
+				"drink carbonated coca", "drink carbonated pepsi cola",
+				"fruit punch", "sprite"
 			});
 		_test(
 			() -> _assertSearch(
@@ -519,9 +542,9 @@ public class SXPBlueprintSearchResultTest {
 			},
 			new String[] {"AUTO", "and"});
 
-		_addJournalArticles(
-			new String[] {"lorem ipsum dolor", "lorem ipsum sit", "nunquis"},
-			new String[] {"ipsum sit", "ipsum sit sit", "non-lorem ipsum sit"});
+		_setUp(
+			new String[] {"ipsum sit", "ipsum sit sit", "non-lorem ipsum sit"},
+			new String[] {"lorem ipsum dolor", "lorem ipsum sit", "nunquis"});
 		_test(
 			() -> _assertSearch(
 				"[lorem ipsum sit, lorem ipsum dolor, nunquis]",
@@ -535,13 +558,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_boolPrefix() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"lorem ipsum sit", "lorem ipsum dolor", "amet", "nunquis"
-			},
+		_setUp(
 			new String[] {
 				"ipsum sit sit", "ipsum sit", "ipsum sit sit",
 				"non-lorem ipsum sit"
+			},
+			new String[] {
+				"lorem ipsum sit", "lorem ipsum dolor", "amet", "nunquis"
 			});
 
 		_test(
@@ -559,11 +582,11 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_crossFields() throws Exception {
-		_addJournalArticles(
+		_setUp(
+			new String[] {"foxtrot, golf", "hotel golf", "alpha", "beta"},
 			new String[] {
 				"alpha beta", "alpha edison", "beta charlie", "edison india"
-			},
-			new String[] {"foxtrot, golf", "hotel golf", "alpha", "beta"});
+			});
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -579,13 +602,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_mostFields() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"amet", "lorem ipsum dolor", "lorem ipsum sit", "nunquis"
-			},
+		_setUp(
 			new String[] {
 				"ipsum sit sit", "ipsum sit", "ipsum sit sit",
 				"non-lorem ipsum sit"
+			},
+			new String[] {
+				"amet", "lorem ipsum dolor", "lorem ipsum sit", "nunquis"
 			});
 
 		_test(
@@ -602,15 +625,16 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_phase() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"listen something", "listen to birds", "listen to planes",
-				"silence"
-			},
+		_setUp(
 			new String[] {
 				"do not listen to birds", "listen listen to birds",
 				"listen to birds", "listen listen to birds"
+			},
+			new String[] {
+				"listen something", "listen to birds", "listen to planes",
+				"silence"
 			});
+
 		_test(
 			() -> _assertSearch("[listen to birds, silence]", "listen listen"),
 			"withKeywords", null, null);
@@ -618,188 +642,107 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testTextMatchOverMultipleFields_phasePrefix() throws Exception {
-		_addJournalArticles(
-			new String[] {
-				"clouds", "watch birds on the sky", "watch planes on the sky",
-				"watch trains"
-			},
+		_setUp(
 			new String[] {
 				"simple things are beautiful sometimes",
 				"simple things are beautiful", "simple things are not good",
 				"simple things are bad"
+			},
+			new String[] {
+				"clouds", "watch birds on the sky", "watch planes on the sky",
+				"watch trains"
 			});
+
 		_test(
 			() -> _assertSearch(
 				"[watch birds on the sky, clouds]", "simple things are beau"),
 			"withKeywords", null, null);
 	}
 
-	private void _addCatetory(String categoryTitle, Group group, User user)
-		throws Exception {
+	private void _addCatetory(String categoryTitle, Group group, User user) {
+		try {
+			if (_assetVocabulary == null) {
+				_assetVocabulary =
+					AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
+						group.getGroupId());
+			}
 
-		if (_assetVocabulary == null) {
-			_assetVocabulary =
-				AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
-					group.getGroupId());
+			_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
+				user.getUserId(), group.getGroupId(), categoryTitle,
+				_assetVocabulary.getVocabularyId(), _serviceContext);
 		}
-
-		_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-			user.getUserId(), group.getGroupId(), categoryTitle,
-			_assetVocabulary.getVocabularyId(), _serviceContext);
+		catch (Exception exception) {
+			_log.error("Add asset category error", exception);
+		}
 	}
 
-	private void _addExpandoColumn(long companyId, String... columns)
-		throws Exception {
-
+	private void _addExpandoColumn(long companyId, String... columns) {
 		ExpandoTable expandoTable = ExpandoTableLocalServiceUtil.fetchTable(
 			companyId,
 			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
 			"CUSTOM_FIELDS");
 
-		if (expandoTable == null) {
-			expandoTable = ExpandoTableLocalServiceUtil.addTable(
-				companyId,
-				ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
-				"CUSTOM_FIELDS");
+		try {
+			if (expandoTable == null) {
+				expandoTable = ExpandoTableLocalServiceUtil.addTable(
+					companyId,
+					ClassNameLocalServiceUtil.getClassNameId(
+						JournalArticle.class),
+					"CUSTOM_FIELDS");
 
-			_expandoTables.add(expandoTable);
+				_expandoTables.add(expandoTable);
+			}
+
+			for (String column : columns) {
+				ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
+					expandoTable, column, ExpandoColumnConstants.GEOLOCATION);
+
+				_expandoColumns.add(expandoColumn);
+
+				UnicodeProperties unicodeProperties =
+					expandoColumn.getTypeSettingsProperties();
+
+				unicodeProperties.setProperty(
+					ExpandoColumnConstants.INDEX_TYPE,
+					String.valueOf(ExpandoColumnConstants.GEOLOCATION));
+
+				expandoColumn.setTypeSettingsProperties(unicodeProperties);
+
+				ExpandoColumnLocalServiceUtil.updateExpandoColumn(
+					expandoColumn);
+			}
 		}
-
-		for (String column : columns) {
-			ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
-				expandoTable, column, ExpandoColumnConstants.GEOLOCATION);
-
-			_expandoColumns.add(expandoColumn);
-
-			UnicodeProperties unicodeProperties =
-				expandoColumn.getTypeSettingsProperties();
-
-			unicodeProperties.setProperty(
-				ExpandoColumnConstants.INDEX_TYPE,
-				String.valueOf(ExpandoColumnConstants.GEOLOCATION));
-
-			expandoColumn.setTypeSettingsProperties(unicodeProperties);
-
-			ExpandoColumnLocalServiceUtil.updateExpandoColumn(expandoColumn);
+		catch (Exception exception) {
+			_log.error("Add expando column error", exception);
 		}
 	}
 
-	private void _addGroups() throws Exception {
-		Group groupA = GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, "SiteA", _serviceContext);
-		Group groupB = GroupTestUtil.addGroup(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, "SiteB", _serviceContext);
-
-		_groups.add(groupA);
-		_groups.add(groupB);
+	private void _addGroupAAndGroupB() {
+		try {
+			_groupA = GroupTestUtil.addGroup(
+				GroupConstants.DEFAULT_PARENT_GROUP_ID,
+				RandomTestUtil.randomString(), _serviceContext);
+			_groupB = GroupTestUtil.addGroup(
+				GroupConstants.DEFAULT_PARENT_GROUP_ID,
+				RandomTestUtil.randomString(), _serviceContext);
+		}
+		catch (Exception exception) {
+			_log.error("Add groupA and groupB error", exception);
+		}
 	}
 
-	private User _addGroupUser(Group group, String roleName) throws Exception {
-		Role role = RoleTestUtil.addRole(roleName, RoleConstants.TYPE_REGULAR);
+	private User _addGroupUser(Group group, String roleName) {
+		try {
+			Role role = RoleTestUtil.addRole(
+				roleName, RoleConstants.TYPE_REGULAR);
 
-		return UserTestUtil.addGroupUser(group, role.getName());
-	}
-
-	private void _addJournalArticle(
-			String title, String expandoColumn, double latitude,
-			double longitude)
-		throws Exception {
-
-		_serviceContext.setExpandoBridgeAttributes(
-			Collections.singletonMap(
-				expandoColumn,
-				StringBundler.concat(
-					"{\"latitude\":", latitude, ",\"longitude\":", longitude,
-					"}")));
-
-		_addJournalArticles(new String[] {title}, new String[] {""});
-	}
-
-	private void _addJournalArticles(String[] titles, String[] contents)
-		throws Exception {
-
-		Group group = _group;
-
-		if (_groups.size() > 0) {
-			group = _groups.get(0);
+			return UserTestUtil.addGroupUser(group, role.getName());
+		}
+		catch (Exception exception) {
+			_log.error("Add group user error", exception);
 		}
 
-		_journalArticles.add(
-			JournalTestUtil.addArticle(
-				group.getGroupId(), 0,
-				PortalUtil.getClassNameId(JournalArticle.class),
-				HashMapBuilder.put(
-					LocaleUtil.US, titles[0]
-				).build(),
-				null,
-				HashMapBuilder.put(
-					LocaleUtil.US, contents[0]
-				).build(),
-				LocaleUtil.getSiteDefault(), false, true, _serviceContext));
-
-		if (titles.length < 2) {
-			return;
-		}
-
-		if (_groups.size() > 1) {
-			group = _groups.get(1);
-		}
-
-		if (_assetCategory != null) {
-			_serviceContext.setAssetCategoryIds(
-				new long[] {_assetCategory.getCategoryId()});
-		}
-
-		if (_assetTag != null) {
-			_serviceContext.setAssetTagNames(
-				new String[] {_assetTag.getName()});
-		}
-
-		TimeUnit.SECONDS.sleep(_assetCreatedTimeInterval);
-
-		if (_journalFolder != null) {
-			_journalArticles.add(
-				JournalTestUtil.addArticle(
-					group.getGroupId(), _journalFolder.getFolderId(),
-					PortalUtil.getClassNameId(JournalArticle.class),
-					HashMapBuilder.put(
-						LocaleUtil.US, titles[1]
-					).build(),
-					null,
-					HashMapBuilder.put(
-						LocaleUtil.US, contents[1]
-					).build(),
-					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
-		}
-		else {
-			_journalArticles.add(
-				JournalTestUtil.addArticle(
-					group.getGroupId(), 0,
-					PortalUtil.getClassNameId(JournalArticle.class),
-					HashMapBuilder.put(
-						LocaleUtil.US, titles[1]
-					).build(),
-					null,
-					HashMapBuilder.put(
-						LocaleUtil.US, contents[1]
-					).build(),
-					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
-		}
-
-		for (int i = 2; (titles.length > 2) && (i < titles.length); i++) {
-			_journalArticles.add(
-				JournalTestUtil.addArticle(
-					_group.getGroupId(), 0,
-					PortalUtil.getClassNameId(JournalArticle.class),
-					HashMapBuilder.put(
-						LocaleUtil.US, titles[i]
-					).build(),
-					null,
-					HashMapBuilder.put(
-						LocaleUtil.US, contents[i]
-					).build(),
-					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
-		}
+		return null;
 	}
 
 	private SegmentsEntry _addSegmentsEntry(User user) throws Exception {
@@ -845,7 +788,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	private ConfigurationTemporarySwapper _getConfigurationTemporarySwapper(
-			String apiKey, String enabled, String ip)
+			String apiKey, String enabled, String apiURL)
 		throws Exception {
 
 		return new ConfigurationTemporarySwapper(
@@ -855,7 +798,7 @@ public class SXPBlueprintSearchResultTest {
 				HashMapBuilder.put(
 					"apiKey", apiKey
 				).put(
-					"apiURL", ip
+					"apiURL", apiURL
 				).put(
 					"enabled", enabled
 				).build()));
@@ -890,6 +833,131 @@ public class SXPBlueprintSearchResultTest {
 		).build();
 
 		return _searcher.search(searchRequest);
+	}
+
+	private void _setUp(
+			String[] journalArticleContents, String[] journalArticleTitles)
+		throws Exception {
+
+		_setUp(
+			journalArticleContents, journalArticleTitles,
+			() -> {
+			});
+	}
+
+	private void _setUp(
+			String[] expandoColumns, String[] journalArticleTitles,
+			double[] latitudes, double[] longitudes, Runnable runnable)
+		throws Exception {
+
+		runnable.run();
+
+		for (int i = 0; i < journalArticleTitles.length; i++) {
+			_serviceContext.setExpandoBridgeAttributes(
+				Collections.singletonMap(
+					expandoColumns[i],
+					JSONUtil.put(
+						"latitude", latitudes[i]
+					).put(
+						"longitude", longitudes[i]
+					).toString()));
+
+			_setUp(new String[] {""}, new String[] {journalArticleTitles[i]});
+		}
+	}
+
+	private void _setUp(
+			String[] journalArticleContents, String[] journalArticleTitles,
+			Runnable runnable)
+		throws Exception {
+
+		runnable.run();
+
+		Group group = _group;
+
+		if (_groupA != null) {
+			group = _groupA;
+		}
+
+		_journalArticles.add(
+			JournalTestUtil.addArticle(
+				group.getGroupId(), 0,
+				PortalUtil.getClassNameId(JournalArticle.class),
+				HashMapBuilder.put(
+					LocaleUtil.US, journalArticleTitles[0]
+				).build(),
+				null,
+				HashMapBuilder.put(
+					LocaleUtil.US, journalArticleContents[0]
+				).build(),
+				LocaleUtil.getSiteDefault(), false, true, _serviceContext));
+
+		if (journalArticleTitles.length < 2) {
+			return;
+		}
+
+		if (_groupB != null) {
+			group = _groupB;
+		}
+
+		if (_assetCategory != null) {
+			_serviceContext.setAssetCategoryIds(
+				new long[] {_assetCategory.getCategoryId()});
+		}
+
+		if (_assetTag != null) {
+			_serviceContext.setAssetTagNames(
+				new String[] {_assetTag.getName()});
+		}
+
+		TimeUnit.SECONDS.sleep(_addJournalArticleSleep);
+
+		if (_journalFolder != null) {
+			_journalArticles.add(
+				JournalTestUtil.addArticle(
+					group.getGroupId(), _journalFolder.getFolderId(),
+					PortalUtil.getClassNameId(JournalArticle.class),
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleTitles[1]
+					).build(),
+					null,
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleContents[1]
+					).build(),
+					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
+		}
+		else {
+			_journalArticles.add(
+				JournalTestUtil.addArticle(
+					group.getGroupId(), 0,
+					PortalUtil.getClassNameId(JournalArticle.class),
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleTitles[1]
+					).build(),
+					null,
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleContents[1]
+					).build(),
+					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
+		}
+
+		for (int i = 2;
+			 (journalArticleTitles.length > 2) &&
+			 (i < journalArticleTitles.length); i++) {
+
+			_journalArticles.add(
+				JournalTestUtil.addArticle(
+					_group.getGroupId(), 0,
+					PortalUtil.getClassNameId(JournalArticle.class),
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleTitles[i]
+					).build(),
+					null,
+					HashMapBuilder.put(
+						LocaleUtil.US, journalArticleContents[i]
+					).build(),
+					LocaleUtil.getSiteDefault(), false, true, _serviceContext));
+		}
 	}
 
 	private void _test(
@@ -935,8 +1003,11 @@ public class SXPBlueprintSearchResultTest {
 		return new HashMapDictionary<>(new HashMap<String, Object>(map));
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		SXPBlueprintSearchResultTest.class);
+
+	private int _addJournalArticleSleep;
 	private AssetCategory _assetCategory;
-	private int _assetCreatedTimeInterval;
 	private AssetTag _assetTag;
 	private AssetVocabulary _assetVocabulary;
 
@@ -950,7 +1021,10 @@ public class SXPBlueprintSearchResultTest {
 	private Group _group;
 
 	@DeleteAfterTestRun
-	private final List<Group> _groups = new ArrayList<>();
+	private Group _groupA;
+
+	@DeleteAfterTestRun
+	private Group _groupB;
 
 	private final List<JournalArticle> _journalArticles = new ArrayList<>();
 	private JournalFolder _journalFolder;

@@ -27,7 +27,7 @@
 					"not": {
 						"contains": {
 							"parameterName": "keywords",
-							"value": "cola"
+							"value": "alpha"
 						}
 					}
 				},
