@@ -145,7 +145,7 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"coca cola", "pepsi cola"},
 			() -> {
 				_addGroupAAndGroupB();
-				_addAssetCatetory("Important", _group, _user);
+				_addAssetCatetory("Important", _user);
 			});
 
 		_test(
@@ -239,7 +239,7 @@ public class SXPBlueprintSearchResultTest {
 			() -> {
 				_user = _addGroupUser(_group, "employee");
 
-				_addAssetCatetory("Promoted", _group, _user);
+				_addAssetCatetory("Promoted", _user);
 			});
 
 		_test(
@@ -289,7 +289,7 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"cola cola", ""},
 			new String[] {"Coca Cola", "Pepsi Cola"},
 			() -> _addAssetCatetory(
-				"Promoted", _group, _addGroupUser(_group, "Custmers")));
+				"Promoted", _addGroupUser(_group, "Custmers")));
 
 		_test(
 			() -> _assertSearchIgnoreRelevance(
@@ -317,7 +317,7 @@ public class SXPBlueprintSearchResultTest {
 				"Company Policies for New Recruits"
 			},
 			() -> _addAssetCatetory(
-				"For New Recruits", _group, _addGroupUser(_group, "Employee")));
+				"For New Recruits", _addGroupUser(_group, "Employee")));
 
 		_test(
 			() -> _assertSearch(
@@ -659,16 +659,16 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addAssetCatetory(String title, Group group, User user) {
+	private void _addAssetCatetory(String title, User user) {
 		try {
 			if (_assetVocabulary == null) {
 				_assetVocabulary =
 					AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
-						group.getGroupId());
+						_group.getGroupId());
 			}
 
 			_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-				user.getUserId(), group.getGroupId(), title,
+				user.getUserId(), _group.getGroupId(), title,
 				_assetVocabulary.getVocabularyId(), _serviceContext);
 		}
 		catch (Exception exception) {
