@@ -203,9 +203,6 @@ public class SXPBlueprintSearchResultTest {
 
 					_assertSearch("[branch sf, branch la]", "branch");
 				}
-				catch (Exception exception) {
-					Assert.fail();
-				}
 			},
 			"withFunctionScore",
 			new String[] {"${configuration.lat}", "${configuration.lon}"},
@@ -218,9 +215,6 @@ public class SXPBlueprintSearchResultTest {
 								"2345", "true", "34.94.32.240")) {
 
 					_assertSearch("[branch la, branch sf]", "branch");
-				}
-				catch (Exception exception) {
-					Assert.fail();
 				}
 			},
 			"withFunctionScore",
@@ -958,7 +952,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	private void _test(
-			Runnable runnable, String resourceName, String[] configurationNames,
+			UnsafeRunnable<Exception> unsafeRunnable, String resourceName, String[] configurationNames,
 			String[] configurationValues)
 		throws Exception {
 
@@ -993,7 +987,8 @@ public class SXPBlueprintSearchResultTest {
 			_sxpBlueprint.getDescriptionMap(),
 			_sxpBlueprint.getElementInstancesJSON(),
 			_sxpBlueprint.getTitleMap(), _serviceContext);
-		runnable.run();
+
+		unsafeRunnable.run();
 	}
 
 	private Dictionary<String, Object> _toDictionary(Map<String, String> map) {
