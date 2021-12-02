@@ -175,15 +175,15 @@ public class SXPBlueprintSearchResultTest {
 			() -> _addJournalArticleSleep = 3);
 
 		_test(
-			() -> _assertSearchIgnoreRelevance(
-				"[coca cola, pepsi cola]", "cola"),
-			null, null, null);
-		_test(
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
 			"withFunctionScore", new String[] {"${time.current_date}"},
 			new String[] {
 				DateUtil.getCurrentDate("yyyyMMddHHmmss", LocaleUtil.US)
 			});
+		_test(
+			() -> _assertSearchIgnoreRelevance(
+				"[coca cola, pepsi cola]", "cola"),
+			null, null, null);
 	}
 
 	@Test
@@ -194,10 +194,6 @@ public class SXPBlueprintSearchResultTest {
 			new double[] {64.01, 24.03}, new double[] {-117.42, -107.44},
 			() -> _addExpandoColumn(_group.getCompanyId(), "location"));
 
-		_test(
-			() -> _assertSearchIgnoreRelevance(
-				"[branch la, branch sf]", "branch"),
-			null, null, null);
 		_test(
 			() -> {
 				try (ConfigurationTemporarySwapper
@@ -230,6 +226,10 @@ public class SXPBlueprintSearchResultTest {
 			"withFunctionScore",
 			new String[] {"${configuration.lat}", "${configuration.lon}"},
 			new String[] {"24.03", "-107.44"});
+		_test(
+			() -> _assertSearchIgnoreRelevance(
+				"[branch la, branch sf]", "branch"),
+			null, null, null);
 	}
 
 	@Test
