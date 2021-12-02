@@ -659,7 +659,7 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addAssetCatetory(String categoryTitle, Group group, User user) {
+	private void _addAssetCatetory(String title, Group group, User user) {
 		try {
 			if (_assetVocabulary == null) {
 				_assetVocabulary =
@@ -668,7 +668,7 @@ public class SXPBlueprintSearchResultTest {
 			}
 
 			_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-				user.getUserId(), group.getGroupId(), categoryTitle,
+				user.getUserId(), group.getGroupId(), title,
 				_assetVocabulary.getVocabularyId(), _serviceContext);
 		}
 		catch (Exception exception) {
