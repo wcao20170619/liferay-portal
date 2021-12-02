@@ -36,8 +36,6 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Role;
@@ -91,7 +89,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -329,18 +326,11 @@ public class SXPBlueprintSearchResultTest {
 		_setUp(
 			new String[] {"", ""}, new String[] {"do not hide me", "hide me"},
 			() -> {
-				try {
-					_assetTag = AssetTestUtil.addTag(
-						_group.getGroupId(), "hide");
+				_assetTag = AssetTestUtil.addTag(_group.getGroupId(), "hide");
 
-					_journalFolder = JournalFolderServiceUtil.addFolder(
-						_group.getGroupId(), 0, RandomTestUtil.randomString(),
-						StringPool.BLANK, _serviceContext);
-				}
-				catch (Exception exception) {
-					_log.error(
-						"Add asset tag and/or jounal folder error", exception);
-				}
+				_journalFolder = JournalFolderServiceUtil.addFolder(
+					_group.getGroupId(), 0, RandomTestUtil.randomString(),
+					StringPool.BLANK, _serviceContext);
 			});
 
 		_test(
@@ -382,16 +372,10 @@ public class SXPBlueprintSearchResultTest {
 	public void testKeywoardMatch() throws Exception {
 		_setUp(
 			new String[] {"", ""}, new String[] {"coca cola", "pepsi cola"},
-			() -> {
-				try {
-					_assetTag = AssetTagLocalServiceUtil.addTag(
-						_user.getUserId(), _group.getGroupId(), "cola",
-						_serviceContext);
-				}
-				catch (Exception exception) {
-					_log.error("Add asset tag error", exception);
-				}
-			});
+			() ->
+				_assetTag = AssetTagLocalServiceUtil.addTag(
+					_user.getUserId(), _group.getGroupId(), "cola",
+					_serviceContext));
 
 		_test(
 			null, null, "withAssetTagName",
@@ -661,73 +645,55 @@ public class SXPBlueprintSearchResultTest {
 			_assetVocabulary.getVocabularyId(), _serviceContext);
 	}
 
-	private void _addExpandoColumn(long companyId, String... columns) {
+	private void _addExpandoColumn(long companyId, String... columnNames)
+		throws Exception {
+
 		ExpandoTable expandoTable = ExpandoTableLocalServiceUtil.fetchTable(
 			companyId,
 			ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
 			"CUSTOM_FIELDS");
 
-		try {
-			if (expandoTable == null) {
-				expandoTable = ExpandoTableLocalServiceUtil.addTable(
-					companyId,
-					ClassNameLocalServiceUtil.getClassNameId(
-						JournalArticle.class),
-					"CUSTOM_FIELDS");
+		if (expandoTable == null) {
+			expandoTable = ExpandoTableLocalServiceUtil.addTable(
+				companyId,
+				ClassNameLocalServiceUtil.getClassNameId(JournalArticle.class),
+				"CUSTOM_FIELDS");
 
-				_expandoTables.add(expandoTable);
-			}
-
-			for (String column : columns) {
-				ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
-					expandoTable, column, ExpandoColumnConstants.GEOLOCATION);
-
-				_expandoColumns.add(expandoColumn);
-
-				UnicodeProperties unicodeProperties =
-					expandoColumn.getTypeSettingsProperties();
-
-				unicodeProperties.setProperty(
-					ExpandoColumnConstants.INDEX_TYPE,
-					String.valueOf(ExpandoColumnConstants.GEOLOCATION));
-
-				expandoColumn.setTypeSettingsProperties(unicodeProperties);
-
-				ExpandoColumnLocalServiceUtil.updateExpandoColumn(
-					expandoColumn);
-			}
+			_expandoTables.add(expandoTable);
 		}
-		catch (Exception exception) {
-			_log.error("Add expando column error", exception);
+
+		for (String columnName : columnNames) {
+			ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
+				expandoTable, columnName, ExpandoColumnConstants.GEOLOCATION);
+
+			_expandoColumns.add(expandoColumn);
+
+			UnicodeProperties unicodeProperties =
+				expandoColumn.getTypeSettingsProperties();
+
+			unicodeProperties.setProperty(
+				ExpandoColumnConstants.INDEX_TYPE,
+				String.valueOf(ExpandoColumnConstants.GEOLOCATION));
+
+			expandoColumn.setTypeSettingsProperties(unicodeProperties);
+
+			ExpandoColumnLocalServiceUtil.updateExpandoColumn(expandoColumn);
 		}
 	}
 
-	private void _addGroupAAndGroupB() {
-		try {
-			_groupA = GroupTestUtil.addGroup(
-				GroupConstants.DEFAULT_PARENT_GROUP_ID,
-				RandomTestUtil.randomString(), _serviceContext);
-			_groupB = GroupTestUtil.addGroup(
-				GroupConstants.DEFAULT_PARENT_GROUP_ID,
-				RandomTestUtil.randomString(), _serviceContext);
-		}
-		catch (Exception exception) {
-			_log.error("Add groupA and groupB error", exception);
-		}
+	private void _addGroupAAndGroupB() throws Exception {
+		_groupA = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			RandomTestUtil.randomString(), _serviceContext);
+		_groupB = GroupTestUtil.addGroup(
+			GroupConstants.DEFAULT_PARENT_GROUP_ID,
+			RandomTestUtil.randomString(), _serviceContext);
 	}
 
-	private User _addGroupUser(Group group, String roleName) {
-		try {
-			Role role = RoleTestUtil.addRole(
-				roleName, RoleConstants.TYPE_REGULAR);
+	private User _addGroupUser(Group group, String roleName) throws Exception {
+		Role role = RoleTestUtil.addRole(roleName, RoleConstants.TYPE_REGULAR);
 
-			return UserTestUtil.addGroupUser(group, role.getName());
-		}
-		catch (Exception exception) {
-			_log.error("Add group user error", exception);
-		}
-
-		return null;
+		return UserTestUtil.addGroupUser(group, role.getName());
 	}
 
 	private SegmentsEntry _addSegmentsEntry(User user) throws Exception {
@@ -742,34 +708,26 @@ public class SXPBlueprintSearchResultTest {
 			User.class.getName());
 	}
 
-	private void _assertSearch(String expected, String keywords) {
-		try {
-			SearchResponse searchResponse = _getSearchResponse(keywords);
+	private void _assertSearch(String expected, String keywords)
+		throws Exception {
 
-			DocumentsAssert.assertValues(
-				searchResponse.getRequestString(),
-				searchResponse.getDocumentsStream(), "localized_title_en_US",
-				expected);
-		}
-		catch (Exception exception) {
-			Assert.fail();
-		}
+		SearchResponse searchResponse = _getSearchResponse(keywords);
+
+		DocumentsAssert.assertValues(
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), "localized_title_en_US",
+			expected);
 	}
 
-	private void _assertSearchIgnoreRelevance(
-		String expected, String keywords) {
+	private void _assertSearchIgnoreRelevance(String expected, String keywords)
+		throws Exception {
 
-		try {
-			SearchResponse searchResponse = _getSearchResponse(keywords);
+		SearchResponse searchResponse = _getSearchResponse(keywords);
 
-			DocumentsAssert.assertValuesIgnoreRelevance(
-				searchResponse.getRequestString(),
-				searchResponse.getDocumentsStream(), "localized_title_en_US",
-				expected);
-		}
-		catch (Exception exception) {
-			Assert.fail();
-		}
+		DocumentsAssert.assertValuesIgnoreRelevance(
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), "localized_title_en_US",
+			expected);
 	}
 
 	private ConfigurationTemporarySwapper _getConfigurationTemporarySwapper(
@@ -989,9 +947,6 @@ public class SXPBlueprintSearchResultTest {
 	private Dictionary<String, Object> _toDictionary(Map<String, String> map) {
 		return new HashMapDictionary<>(new HashMap<String, Object>(map));
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		SXPBlueprintSearchResultTest.class);
 
 	private int _addJournalArticleSleep;
 	private AssetCategory _assetCategory;
