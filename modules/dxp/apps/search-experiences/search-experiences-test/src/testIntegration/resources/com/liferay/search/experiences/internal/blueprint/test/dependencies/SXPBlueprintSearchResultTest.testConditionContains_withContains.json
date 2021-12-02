@@ -26,7 +26,7 @@
 				"condition": {
 					"contains": {
 						"parameterName": "keywords",
-						"value": "cola"
+						"value": "alpha"
 					}
 				},
 				"enabled": true
