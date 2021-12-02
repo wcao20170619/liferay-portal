@@ -156,9 +156,9 @@ public class SXPBlueprintSearchResultTest {
 			() -> _assertSearchIgnoreRelevance(
 				"[coca cola, pepsi cola]", "cola"));
 
-		_user = UserTestUtil.addUser(_groupB.getGroupId());
+		User user = UserTestUtil.addUser(_groupB.getGroupId());
 
-		_serviceContext.setUserId(_user.getUserId());
+		_serviceContext.setUserId(user.getUserId());
 
 		_test(
 			null, null, "onMySites",
@@ -228,11 +228,8 @@ public class SXPBlueprintSearchResultTest {
 		_setUp(
 			new String[] {"alpha alpha", ""},
 			new String[] {"beta alpha", "charlie alpha"},
-			() -> {
-				_user = _addGroupUser(_group, "employee");
-
-				_addAssetCatetory("Promoted", _user);
-			});
+			() -> _addAssetCatetory(
+				"Promoted", _addGroupUser(_group, "employee")));
 
 		_test(
 			new String[] {
@@ -771,7 +768,7 @@ public class SXPBlueprintSearchResultTest {
 					"search.experiences.blueprint.id",
 					_sxpBlueprint.getSXPBlueprintId());
 				_searchContext.setTimeZone(_user.getTimeZone());
-				_searchContext.setUserId(_user.getUserId());
+				_searchContext.setUserId(_serviceContext.getUserId());
 			}
 		).build();
 
