@@ -150,13 +150,13 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			() -> _assertSearchIgnoreRelevance(
-				"[coca cola, pepsi cola]", "cola"),
-			null, null, null);
-		_test(
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"),
 			"inCategory", new String[] {"${configuration.asset_category_ids}"},
 			new String[] {String.valueOf(_assetCategory.getCategoryId())});
+		_test(
+			() -> _assertSearchIgnoreRelevance(
+				"[coca cola, pepsi cola]", "cola"),
+			null, null, null);
 
 		_user = UserTestUtil.addUser(_groupB.getGroupId());
 
