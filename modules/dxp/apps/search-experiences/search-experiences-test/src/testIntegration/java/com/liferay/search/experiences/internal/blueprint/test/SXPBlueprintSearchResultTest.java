@@ -145,8 +145,8 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"cola cola", ""},
 			new String[] {"coca cola", "pepsi cola"},
 			() -> {
-				_addGroupAAndGroupB();
 				_addAssetCatetory("Important", _user);
+				_addGroupAAndGroupB();
 			});
 
 		_test(
