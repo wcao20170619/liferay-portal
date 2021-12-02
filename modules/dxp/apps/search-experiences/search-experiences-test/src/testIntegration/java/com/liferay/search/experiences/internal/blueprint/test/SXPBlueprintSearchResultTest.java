@@ -145,7 +145,7 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"coca cola", "pepsi cola"},
 			() -> {
 				_addGroupAAndGroupB();
-				_addCatetory("Important", _group, _user);
+				_addAssetCatetory("Important", _group, _user);
 			});
 
 		_test(
@@ -239,7 +239,7 @@ public class SXPBlueprintSearchResultTest {
 			() -> {
 				_user = _addGroupUser(_group, "employee");
 
-				_addCatetory("Promoted", _group, _user);
+				_addAssetCatetory("Promoted", _group, _user);
 			});
 
 		_test(
@@ -288,7 +288,7 @@ public class SXPBlueprintSearchResultTest {
 		_setUp(
 			new String[] {"cola cola", ""},
 			new String[] {"Coca Cola", "Pepsi Cola"},
-			() -> _addCatetory(
+			() -> _addAssetCatetory(
 				"Promoted", _group, _addGroupUser(_group, "Custmers")));
 
 		_test(
@@ -316,7 +316,7 @@ public class SXPBlueprintSearchResultTest {
 				"Company policies for All Employees Recruits",
 				"Company Policies for New Recruits"
 			},
-			() -> _addCatetory(
+			() -> _addAssetCatetory(
 				"For New Recruits", _group, _addGroupUser(_group, "Employee")));
 
 		_test(
@@ -659,7 +659,7 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addCatetory(String categoryTitle, Group group, User user) {
+	private void _addAssetCatetory(String categoryTitle, Group group, User user) {
 		try {
 			if (_assetVocabulary == null) {
 				_assetVocabulary =
