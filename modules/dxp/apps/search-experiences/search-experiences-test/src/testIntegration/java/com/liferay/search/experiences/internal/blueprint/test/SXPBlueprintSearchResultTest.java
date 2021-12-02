@@ -33,6 +33,7 @@ import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -659,21 +660,16 @@ public class SXPBlueprintSearchResultTest {
 			"withKeywords", null, null);
 	}
 
-	private void _addAssetCatetory(String title, User user) {
-		try {
-			if (_assetVocabulary == null) {
-				_assetVocabulary =
-					AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
-						_group.getGroupId());
-			}
+	private void _addAssetCatetory(String title, User user) throws Exception {
+		if (_assetVocabulary == null) {
+			_assetVocabulary =
+				AssetVocabularyLocalServiceUtil.addDefaultVocabulary(
+					_group.getGroupId());
+		}
 
-			_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
-				user.getUserId(), _group.getGroupId(), title,
-				_assetVocabulary.getVocabularyId(), _serviceContext);
-		}
-		catch (Exception exception) {
-			_log.error("Add asset category error", exception);
-		}
+		_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
+			user.getUserId(), _group.getGroupId(), title,
+			_assetVocabulary.getVocabularyId(), _serviceContext);
 	}
 
 	private void _addExpandoColumn(long companyId, String... columns) {
@@ -847,10 +843,11 @@ public class SXPBlueprintSearchResultTest {
 
 	private void _setUp(
 			String[] expandoColumns, String[] journalArticleTitles,
-			double[] latitudes, double[] longitudes, Runnable runnable)
+			double[] latitudes, double[] longitudes,
+			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
-		runnable.run();
+		unsafeRunnable.run();
 
 		for (int i = 0; i < journalArticleTitles.length; i++) {
 			_serviceContext.setExpandoBridgeAttributes(
@@ -868,10 +865,10 @@ public class SXPBlueprintSearchResultTest {
 
 	private void _setUp(
 			String[] journalArticleContents, String[] journalArticleTitles,
-			Runnable runnable)
+			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
-		runnable.run();
+		unsafeRunnable.run();
 
 		Group group = _group;
 
