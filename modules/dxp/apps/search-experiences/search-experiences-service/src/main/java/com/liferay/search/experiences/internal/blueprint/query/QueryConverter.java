@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
+import com.liferay.portal.search.query.TermsQuery;
 import com.liferay.search.experiences.internal.blueprint.exception.UnresolvedTemplateVariableException;
 
 import java.util.Iterator;
@@ -47,6 +48,9 @@ public class QueryConverter {
 
 		if (Objects.equals(type, "term")) {
 			return _toTermQuery(jsonObject.getJSONObject(type));
+		}
+		else if (Objects.equals(type, "terms")) {
+			return _toTermsQuery(jsonObject.getJSONObject(type));
 		}
 
 		return _queries.wrapper(_validate(JSONUtil.toString(jsonObject)));
@@ -77,6 +81,39 @@ public class QueryConverter {
 		}
 
 		return _queries.term(field, _validate(object));
+	}
+
+	private Query _toTermsQuery(JSONObject jsonObject) {
+		Iterator<String> iterator = jsonObject.keys();
+
+		TermsQuery termsQuery = null;
+
+		while (iterator.hasNext()) {
+			String field = iterator.next();
+
+			if (!Objects.equals(field, "boost")) {
+				termsQuery = _queries.terms(field);
+
+				Object[] fieldValues = JSONUtil.toObjectArray(
+					jsonObject.getJSONArray(field));
+
+				for (int i = 0;
+					 (fieldValues != null) && (i < fieldValues.length); i++) {
+
+					termsQuery.addValue(
+						_validate(
+							Objects.requireNonNull(
+								String.valueOf(fieldValues[i]),
+								"The field value is not set")));
+				}
+			}
+		}
+
+		if (jsonObject.get("boost") != null) {
+			termsQuery.setBoost((float)jsonObject.getDouble("boost"));
+		}
+
+		return termsQuery;
 	}
 
 	private <T> T _validate(T object) {
