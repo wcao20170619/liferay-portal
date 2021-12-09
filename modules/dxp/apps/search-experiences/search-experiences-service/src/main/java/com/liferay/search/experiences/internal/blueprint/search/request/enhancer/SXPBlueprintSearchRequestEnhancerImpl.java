@@ -54,6 +54,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.Field;
 import com.liferay.search.experiences.rest.dto.v1_0.FieldSet;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
+import com.liferay.search.experiences.rest.dto.v1_0.TypeOptions;
 import com.liferay.search.experiences.rest.dto.v1_0.UiConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.util.ConfigurationUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
@@ -183,6 +184,8 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 					return _unpack(
 						values.get(shortName),
 						_getFieldType(
+							shortName, elementDefinition.getUiConfiguration()),
+						_getFieldTypeOptionsUnitSuffix(
 							shortName, elementDefinition.getUiConfiguration()));
 				}),
 			searchRequestBuilder, sxpParameterData);
@@ -292,7 +295,23 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 		return null;
 	}
 
-	private Object _unpack(Object value, String type) {
+	private String _getFieldTypeOptionsUnitSuffix(
+		String name, UiConfiguration uiConfiguration) {
+
+		Field field = _getField(uiConfiguration.getFieldSets(), name);
+
+		if (field != null) {
+			TypeOptions typeOptions = field.getTypeOptions();
+
+			if (typeOptions != null) {
+				return typeOptions.getUnitSuffix();
+			}
+		}
+
+		return null;
+	}
+
+	private Object _unpack(Object value, String type, String unitSuffix) {
 		if ((value instanceof String) && Objects.equals(type, "json")) {
 			try {
 				return JSONFactoryUtil.createJSONObject((String)value);
@@ -300,6 +319,10 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 			catch (JSONException jsonException) {
 				return ReflectionUtil.throwException(jsonException);
 			}
+		}
+
+		if (unitSuffix != null) {
+			return value + unitSuffix;
 		}
 
 		return value;
