@@ -14,8 +14,13 @@
 
 package com.liferay.search.experiences.internal.blueprint.search.request.enhancer;
 
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoBuilders;
@@ -54,6 +59,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -166,10 +172,71 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 						return null;
 					}
 
+					JSONArray fieldSetsJSONArray = null;
+
+					RuntimeException runtimeException = new RuntimeException();
+
+					try {
+						JSONObject uiConfigurationJSONObject =
+							JSONFactoryUtil.createJSONObject(
+								String.valueOf(
+									elementDefinition.getUiConfiguration()));
+
+						fieldSetsJSONArray =
+							uiConfigurationJSONObject.getJSONArray("fieldSets");
+					}
+					catch (JSONException jsonException) {
+						runtimeException.addSuppressed(jsonException);
+					}
+
+					String fieldName = name.substring(prefix.length());
+					String fieldUnitSuffix = null;
+
+					for (int i = 0;
+						 (fieldSetsJSONArray != null) &&
+						 (i < fieldSetsJSONArray.length()); i++) {
+
+						JSONObject fieldSetsJSONObject =
+							fieldSetsJSONArray.getJSONObject(i);
+
+						JSONArray fieldsJSONArray =
+							fieldSetsJSONObject.getJSONArray("fields");
+
+						for (int j = 0;
+							 (fieldsJSONArray != null) &&
+							 (j < fieldsJSONArray.length()); j++) {
+
+							JSONObject fieldJSONObject =
+								fieldsJSONArray.getJSONObject(j);
+
+							if (Objects.equals(
+									fieldJSONObject.get("name"), fieldName)) {
+
+								JSONObject typeOptionsJSONObject =
+									fieldJSONObject.getJSONObject(
+										"typeOptions");
+
+								if (typeOptionsJSONObject != null) {
+									String unitSuffix =
+										typeOptionsJSONObject.getString(
+											"unitSuffix");
+
+									if (!Validator.isBlank(unitSuffix)) {
+										fieldUnitSuffix = unitSuffix;
+									}
+								}
+							}
+						}
+					}
+
 					Map<String, Object> values =
 						elementInstance.getUiConfigurationValues();
 
-					return values.get(name.substring(prefix.length()));
+					if (fieldUnitSuffix != null) {
+						return values.get(fieldName) + fieldUnitSuffix;
+					}
+
+					return values.get(fieldName);
 				}),
 			searchRequestBuilder, sxpParameterData);
 	}
