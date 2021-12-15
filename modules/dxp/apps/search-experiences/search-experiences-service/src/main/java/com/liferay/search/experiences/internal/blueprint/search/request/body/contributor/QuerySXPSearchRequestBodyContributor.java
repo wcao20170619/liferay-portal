@@ -14,10 +14,13 @@
 
 package com.liferay.search.experiences.internal.blueprint.search.request.body.contributor;
 
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilder;
 import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
@@ -38,6 +41,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.Rescore;
 
 import java.beans.ExceptionListener;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -122,6 +126,55 @@ public class QuerySXPSearchRequestBodyContributor
 			});
 	}
 
+	@SuppressWarnings("unchecked")
+	private JSONObject _processFieldLocaleAndBoost(JSONObject queryJSONObject) {
+		if (queryJSONObject == null) {
+			return queryJSONObject;
+		}
+
+		Iterator<String> iterator = queryJSONObject.keys();
+
+		if (!iterator.hasNext()) {
+			return queryJSONObject;
+		}
+
+		JSONObject valueJSONObject = queryJSONObject.getJSONObject(
+			iterator.next());
+
+		JSONArray fieldsJSONArray = valueJSONObject.getJSONArray("fields");
+
+		if (fieldsJSONArray == null) {
+			return queryJSONObject;
+		}
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		fieldsJSONArray.forEach(
+			fieldJSONObject -> {
+				JSONObject jsonObject = (JSONObject)fieldJSONObject;
+
+				String locale = jsonObject.getString("locale");
+
+				if (!Validator.isBlank(locale)) {
+					String field = jsonObject.getString("field") + locale;
+
+					String boost = jsonObject.getString("boost");
+
+					if (!Validator.isBlank(boost)) {
+						field += "^" + boost;
+					}
+
+					jsonArray.put(field);
+				}
+			});
+
+		if (jsonArray.length() > 0) {
+			valueJSONObject.put("fields", jsonArray);
+		}
+
+		return queryJSONObject;
+	}
+
 	private void _processQueryEntries(
 		ExceptionListener exceptionListener, QueryEntry[] queryEntries,
 		SearchRequestBuilder searchRequestBuilder,
@@ -198,7 +251,8 @@ public class QuerySXPSearchRequestBodyContributor
 		).parent(
 			clause.getParent()
 		).query(
-			_queryConverter.toQuery((JSONObject)clause.getQuery())
+			_queryConverter.toQuery(
+				_processFieldLocaleAndBoost((JSONObject)clause.getQuery()))
 		).type(
 			clause.getType()
 		).value(

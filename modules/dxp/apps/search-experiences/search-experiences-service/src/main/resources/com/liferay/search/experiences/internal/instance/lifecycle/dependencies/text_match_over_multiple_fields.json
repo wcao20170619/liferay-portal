@@ -19,7 +19,7 @@
 										"fuzziness": "${configuration.fuzziness}",
 										"minimum_should_match": "${configuration.minimum_should_match}",
 										"operator": "${configuration.operator}",
-										"query": "${configuration.keywords}",
+										"query": "${keywords}",
 										"slop": "${configuration.slop}",
 										"type": "${configuration.type}"
 									}
@@ -145,7 +145,7 @@
 							}
 						},
 						{
-							"defaultValue": "",
+							"defaultValue": "0",
 							"helpText": "Only use slop with the following match types: phrase, phrase prefix.",
 							"label": "Slop",
 							"name": "slop",
