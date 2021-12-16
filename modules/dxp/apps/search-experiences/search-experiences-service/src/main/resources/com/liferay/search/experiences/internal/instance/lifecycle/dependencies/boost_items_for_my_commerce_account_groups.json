@@ -7,10 +7,10 @@
 		"configuration": {
 			"parameterConfiguration": {
 				"parameters": {
-					"accountGroupIds": {
+					"commerceAccountGroupIds": {
 						"type": "LongArray"
 					},
-					"channelGroupId": {
+					"commerceChannelGroupId": {
 						"type": "Long"
 					}
 				}
@@ -25,7 +25,7 @@
 								"query": {
 									"terms": {
 										"boost": "${configuration.boost}",
-										"commerceAccountGroupIds": "${accountGroupIds}"
+										"commerceAccountGroupIds": "${commerceAccountGroupIds}"
 									}
 								}
 							}
