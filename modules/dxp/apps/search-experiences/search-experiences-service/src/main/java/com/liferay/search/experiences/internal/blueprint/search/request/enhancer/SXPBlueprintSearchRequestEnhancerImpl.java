@@ -342,6 +342,18 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 		return null;
 	}
 
+	private String _getUnitSuffix(Field field) {
+		if (field != null) {
+			TypeOptions typeOptions = field.getTypeOptions();
+
+			if (typeOptions != null) {
+				return typeOptions.getUnitSuffix();
+			}
+		}
+
+		return null;
+	}
+
 	private boolean _isNullable(Field field) {
 		if (field == null) {
 			return false;
@@ -424,6 +436,12 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 
 		if (_isNullable(field) && Validator.isNull(value)) {
 			return null;
+		}
+
+		String unitSuffix = _getUnitSuffix(field);
+
+		if (unitSuffix != null) {
+			return value + unitSuffix;
 		}
 
 		return value;
