@@ -446,6 +446,53 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 	}
 
 	@Test
+	public void testParameterValueWithUnitSuffix() throws Exception {
+		SXPBlueprint sxpBlueprint = SXPBlueprintUtil.toSXPBlueprint(_read());
+
+		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
+
+		List<ComplexQueryPart> complexQueryParts =
+			searchRequest.getComplexQueryParts();
+
+		ComplexQueryPart complexQueryPart1 = complexQueryParts.get(0);
+
+		Assert.assertEquals("must", complexQueryPart1.getOccur());
+
+		TermQuery termQuery1 = (TermQuery)complexQueryPart1.getQuery();
+
+		Assert.assertEquals("version", termQuery1.getField());
+		Assert.assertEquals("7.4", termQuery1.getValue());
+
+		ComplexQueryPart complexQueryPart2 = complexQueryParts.get(1);
+
+		Assert.assertEquals("should", complexQueryPart2.getOccur());
+
+		WrapperQuery wrapperQuery = (WrapperQuery)complexQueryPart2.getQuery();
+
+		Assert.assertEquals(
+			_formatJSON(
+				JSONUtil.put(
+					"function_score",
+					JSONUtil.put(
+						"boost", "100"
+					).put(
+						"gauss",
+						JSONUtil.put(
+							"modified",
+							JSONUtil.put(
+								"decay", "0.01"
+							).put(
+								"offset", "0d"
+							).put(
+								"origin", "20211209082600"
+							).put(
+								"scale", "9d"
+							))
+					))),
+			_formatJSON(new String(wrapperQuery.getSource())));
+	}
+
+	@Test
 	public void testQueryConfiguration() throws Exception {
 		SXPBlueprint sxpBlueprint = SXPBlueprintUtil.toSXPBlueprint(_read());
 
@@ -536,53 +583,6 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 		Assert.assertEquals(sorts.toString(), 9, sorts.size());
 
 		_assert(sxpBlueprint);
-	}
-
-	@Test
-	public void testTypeOptionsUnitSuffix() throws Exception {
-		SXPBlueprint sxpBlueprint = SXPBlueprintUtil.toSXPBlueprint(_read());
-
-		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
-
-		List<ComplexQueryPart> complexQueryParts =
-			searchRequest.getComplexQueryParts();
-
-		ComplexQueryPart complexQueryPart1 = complexQueryParts.get(0);
-
-		Assert.assertEquals("must", complexQueryPart1.getOccur());
-
-		TermQuery termQuery1 = (TermQuery)complexQueryPart1.getQuery();
-
-		Assert.assertEquals("version", termQuery1.getField());
-		Assert.assertEquals("7.4", termQuery1.getValue());
-
-		ComplexQueryPart complexQueryPart2 = complexQueryParts.get(1);
-
-		Assert.assertEquals("should", complexQueryPart2.getOccur());
-
-		WrapperQuery wrapperQuery = (WrapperQuery)complexQueryPart2.getQuery();
-
-		Assert.assertEquals(
-			_formatJSON(
-				JSONUtil.put(
-					"function_score",
-					JSONUtil.put(
-						"boost", "100"
-					).put(
-						"gauss",
-						JSONUtil.put(
-							"modified",
-							JSONUtil.put(
-								"decay", "0.01"
-							).put(
-								"offset", "0d"
-							).put(
-								"origin", "20211209082600"
-							).put(
-								"scale", "9d"
-							))
-					))),
-			_formatJSON(new String(wrapperQuery.getSource())));
 	}
 
 	private void _assert(SXPBlueprint sxpBlueprint) throws Exception {
