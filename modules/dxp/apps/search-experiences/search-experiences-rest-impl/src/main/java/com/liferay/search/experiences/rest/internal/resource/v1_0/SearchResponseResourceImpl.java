@@ -126,7 +126,7 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			runtimeException.addSuppressed(exception);
 		}
 
-		if (_hasErrors(runtimeException)) {
+		if (SXPBlueprintUtil.hasErrors(runtimeException)) {
 			throw runtimeException;
 		}
 
@@ -206,30 +206,6 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 		}
 
 		return null;
-	}
-
-	private boolean _hasErrors(Throwable throwable) {
-		Class<? extends Throwable> clazz = throwable.getClass();
-
-		String simpleName = clazz.getSimpleName();
-
-		if (simpleName.equals("InvalidElementInstanceException")) {
-			return false;
-		}
-
-		if ((throwable.getClass() == RuntimeException.class) &&
-			Validator.isBlank(throwable.getMessage())) {
-
-			for (Throwable curThrowable : throwable.getSuppressed()) {
-				if (_hasErrors(curThrowable)) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 
 	private Map<String, DocumentField> _toDocumentFields(

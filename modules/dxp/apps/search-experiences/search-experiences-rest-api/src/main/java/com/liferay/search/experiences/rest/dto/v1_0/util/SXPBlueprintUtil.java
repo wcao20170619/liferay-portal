@@ -15,6 +15,7 @@
 package com.liferay.search.experiences.rest.dto.v1_0.util;
 
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 
@@ -22,6 +23,30 @@ import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
  * @author Gabriel Albuquerque
  */
 public class SXPBlueprintUtil {
+
+	public static boolean hasErrors(Throwable throwable) {
+		Class<? extends Throwable> clazz = throwable.getClass();
+
+		String simpleName = clazz.getSimpleName();
+
+		if (simpleName.equals("InvalidElementInstanceException")) {
+			return false;
+		}
+
+		if ((throwable.getClass() == RuntimeException.class) &&
+			Validator.isBlank(throwable.getMessage())) {
+
+			for (Throwable curThrowable : throwable.getSuppressed()) {
+				if (hasErrors(curThrowable)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		return true;
+	}
 
 	public static SXPBlueprint toSXPBlueprint(String json) {
 		return unpack(SXPBlueprint.unsafeToDTO(json));
