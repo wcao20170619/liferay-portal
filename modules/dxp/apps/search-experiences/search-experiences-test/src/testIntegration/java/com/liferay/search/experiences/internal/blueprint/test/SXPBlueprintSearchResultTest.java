@@ -32,7 +32,6 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.function.UnsafeRunnable;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONUtil;
@@ -56,11 +55,10 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
+import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
@@ -70,8 +68,14 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
+import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
 import com.liferay.search.experiences.model.SXPBlueprint;
+import com.liferay.search.experiences.model.SXPElement;
+import com.liferay.search.experiences.rest.dto.v1_0.util.ConfigurationUtil;
+import com.liferay.search.experiences.rest.dto.v1_0.util.ElementInstanceUtil;
+import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
 import com.liferay.search.experiences.service.SXPBlueprintLocalService;
+import com.liferay.search.experiences.service.SXPElementLocalServiceUtil;
 import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.CriteriaSerializer;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
@@ -82,6 +86,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
@@ -108,6 +113,9 @@ public class SXPBlueprintSearchResultTest {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		WorkflowThreadLocal.setEnabled(false);
+
+		_sxpElements = SXPElementLocalServiceUtil.getSXPElements(
+			TestPropsValues.getCompanyId(), true);
 	}
 
 	@AfterClass
@@ -125,7 +133,8 @@ public class SXPBlueprintSearchResultTest {
 		_user = TestPropsValues.getUser();
 
 		_sxpBlueprint = _sxpBlueprintLocalService.addSXPBlueprint(
-			_user.getUserId(), "{}",
+			_user.getUserId(),
+			SXPBlueprintSearchResultTestUtil.queryConfigurationJSON,
 			Collections.singletonMap(LocaleUtil.US, ""), null, "",
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
@@ -143,12 +152,20 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {"${configuration.asset_category_ids}"},
-			new String[] {String.valueOf(_assetCategory.getCategoryId())},
-			"inCategory",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_ids",
+					new String[] {
+						String.valueOf(_assetCategory.getCategoryId())
+					}
+				).put(
+					"boost", Integer.valueOf(100)
+				).build()
+			},
+			new String[] {"Boost Contents in a Category"},
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[coca cola, pepsi cola]", "cola"));
 
@@ -157,7 +174,12 @@ public class SXPBlueprintSearchResultTest {
 		_serviceContext.setUserId(user.getUserId());
 
 		_test(
-			null, null, "onMySites",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(100)
+				).build()
+			},
+			new String[] {"Boost Contents on My Sites"},
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"));
 	}
 
@@ -169,14 +191,21 @@ public class SXPBlueprintSearchResultTest {
 			() -> _addJournalArticleSleep = 3);
 
 		_test(
-			new String[] {"${time.current_date}"},
-			new String[] {
-				DateUtil.getCurrentDate("yyyyMMddHHmmss", LocaleUtil.US)
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(100)
+				).put(
+					"decay", Double.valueOf(0.5)
+				).put(
+					"offset", "0s"
+				).put(
+					"scale", "2s"
+				).build()
 			},
-			"withFunctionScore",
+			new String[] {"Boost Freshness"},
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[coca cola, pepsi cola]", "cola"));
 	}
@@ -225,33 +254,65 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {"${configuration.lat}", "${configuration.lon}"},
-			new String[] {"24.03", "-107.44"}, "withFunctionScore",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(100)
+				).put(
+					"decay", Double.valueOf(0.3)
+				).put(
+					"field", "expando__custom_fields__location_geolocation"
+				).put(
+					"ipstack.latitude", "24.03"
+				).put(
+					"ipstack.longitude", "-107.44"
+				).put(
+					"offset", "0"
+				).put(
+					"scale", "100km"
+				).build()
+			},
+			new String[] {"Boost Proximity"},
 			() -> {
 				try (ConfigurationTemporarySwapper
 						configurationTemporarySwapper =
 							_getConfigurationTemporarySwapper(
 								"2345", "34.94.32.240", "true")) {
 
-					_assertSearch("[branch la, branch sf]", "branch");
+					_assertSearch("[Branch LA, Branch SF]", "branch");
 				}
 			});
 		_test(
-			new String[] {"${configuration.lat}", "${configuration.lon}"},
-			new String[] {"64.01", "-117.42"}, "withFunctionScore",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(100)
+				).put(
+					"decay", Double.valueOf(0.3)
+				).put(
+					"field", "expando__custom_fields__location_geolocation"
+				).put(
+					"ipstack.latitude", "64.01"
+				).put(
+					"ipstack.longitude", "-117.42"
+				).put(
+					"offset", "0"
+				).put(
+					"scale", "100km"
+				).build()
+			},
+			new String[] {"Boost Proximity"},
 			() -> {
 				try (ConfigurationTemporarySwapper
 						configurationTemporarySwapper =
 							_getConfigurationTemporarySwapper(
 								"2345", "64.225.32.7", "true")) {
 
-					_assertSearch("[branch sf, branch la]", "branch");
+					_assertSearch("[Branch SF, Branch LA]", "branch");
 				}
 			});
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
-				"[branch la, branch sf]", "branch"));
+				"[Branch LA, Branch SF]", "branch"));
 	}
 
 	@Test
@@ -263,43 +324,53 @@ public class SXPBlueprintSearchResultTest {
 				"Promoted", _addGroupUser(_group, "employee")));
 
 		_test(
-			new String[] {
-				"${configuration.asset_category_id}",
-				"${configuration.keywords}"
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", Integer.valueOf(100)
+				).put(
+					"keywords", "alpha"
+				).build()
 			},
-			new String[] {
-				String.valueOf(_assetCategory.getCategoryId()), "alpha"
-			},
-			"withAssetCategory",
+			new String[] {"Boost Contents in a Category by Keyword Match"},
 			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[beta alpha, charlie alpha]", "alpha"));
 
 		JournalArticle journalArticle = _journalArticles.get(1);
 
 		_test(
-			new String[] {"${articleId}"},
-			new String[] {journalArticle.getArticleId()}, "withContains",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"article_ids", new String[] {journalArticle.getArticleId()}
+				).put(
+					"boost", Integer.valueOf(100)
+				).put(
+					"values", "alpha"
+				).build()
+			},
+			new String[] {"Boost Web Contents by Keyword Match"},
 			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"));
-		_test(
-			new String[] {"${articleId}"},
-			new String[] {journalArticle.getArticleId()}, "withNotContains",
-			() -> _assertSearch("[beta alpha, charlie alpha]", "alpha"));
 
 		SegmentsEntry segmentsEntry = _addSegmentsEntry(_user);
 
 		_test(
-			new String[] {
-				"${configuration.asset_category_id}",
-				"${configuration.user_segment_ids}"
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", Integer.valueOf(1000)
+				).put(
+					"user_segment_ids",
+					Long.valueOf(segmentsEntry.getSegmentsEntryId())
+				).build()
 			},
-			new String[] {
-				String.valueOf(_assetCategory.getCategoryId()),
-				String.valueOf(segmentsEntry.getSegmentsEntryId())
-			},
-			"withSegmentsEntry",
+			new String[] {"Boost Contents in a Category for a User Segment"},
 			() -> _assertSearch("[charlie alpha, beta alpha]", "alpha"));
 	}
 
@@ -312,42 +383,55 @@ public class SXPBlueprintSearchResultTest {
 				"Promoted", _addGroupUser(_group, "Custmers")));
 
 		_test(
-			new String[] {
-				"${configuration.asset_category_id}",
-				"${configuration.start_date}", "${configuration.end_date}"
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", Integer.valueOf(1000)
+				).put(
+					"end_date",
+					DateUtil.getDate(
+						new Date(System.currentTimeMillis() + Time.DAY),
+						"yyyyMMdd", LocaleUtil.US)
+				).put(
+					"start_date",
+					DateUtil.getDate(
+						new Date(System.currentTimeMillis() - Time.DAY),
+						"yyyyMMdd", LocaleUtil.US)
+				).build()
 			},
-			new String[] {
-				String.valueOf(_assetCategory.getCategoryId()),
-				DateUtil.getDate(
-					new Date(System.currentTimeMillis() - Time.DAY), "yyyyMMdd",
-					LocaleUtil.US),
-				DateUtil.getDate(
-					new Date(System.currentTimeMillis() + Time.DAY), "yyyyMMdd",
-					LocaleUtil.US)
-			},
-			"withPeriodOfTime",
-			() -> _assertSearch("[pepsi cola, coca cola]", "cola"));
+			new String[] {"Boost Contents in a Category for a Period of Time"},
+			() -> _assertSearch("[Pepsi Cola, Coca Cola]", "cola"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
-				"[coca cola, pepsi cola]", "cola"));
+				"[Coca Cola, Pepsi Cola]", "cola"));
 
 		_setUp(
 			new String[] {"policies policies", ""},
 			new String[] {
-				"Company policies for All Employees Recruits",
+				"Company Policies for All Employees Recruits",
 				"Company Policies for New Recruits"
 			},
 			() -> _addAssetCategory(
 				"For New Recruits", _addGroupUser(_group, "Employee")));
 
 		_test(
-			new String[] {"${configuration.asset_category_id}"},
-			new String[] {String.valueOf(_assetCategory.getCategoryId())},
-			"withNewUserAccount",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", Integer.valueOf(1000)
+				).put(
+					"time_range", "30d"
+				).build()
+			},
+			new String[] {"Boost Contents in a Category for New User Accounts"},
 			() -> _assertSearch(
-				"[company policies for new recruits, company policies for " +
-					"all employees recruits]",
+				"[Company Policies for New Recruits, Company Policies for " +
+					"All Employees Recruits]",
 				"policies"));
 	}
 
@@ -363,15 +447,25 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			null, null, "taggedContent",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_tag", "hide"
+				).build()
+			},
+			new String[] {"Hide Tagged Contents"},
 			() -> _assertSearch("[do not hide me]", "hide me"));
 		_test(
-			new String[] {"${configuration.value}"},
-			new String[] {String.valueOf(_journalFolder.getFolderId())},
-			"byExactTermMatch",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"field", "folderId"
+				).put(
+					"value", String.valueOf(_journalFolder.getFolderId())
+				).build()
+			},
+			new String[] {"Hide by Exact Term Match"},
 			() -> _assertSearch("[do not hide me]", "hide me"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[do not hide me, hide me]", "hide me"));
 
@@ -387,14 +481,76 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {"${configuration.query}", "${configuration.occur}"},
-			new String[] {"los angeles", "must_not"}, "pasteESQueryMustNot",
-			() -> _assertSearchIgnoreRelevance("[cloud cafe]", "cafe"));
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must_not"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.getMatchQueryJSONObject(
+						200, "los angeles")
+				).build(),
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "AUTO"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "best_fields"
+				).build(),
+				null
+			},
+			new String[] {
+				"Paste Any Elasticsearch Query",
+				"Text Match Over Multiple Fields", "Hide Hidden Contents"
+			},
+			() -> _assertSearchIgnoreRelevance("[Cloud Cafe]", "cafe"));
 		_test(
-			new String[] {"${configuration.query}", "${configuration.occur}"},
-			new String[] {"orange county", "must_not"}, "pasteESQueryMustNot",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must_not"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.getMatchQueryJSONObject(
+						200, "orange county")
+				).build(),
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "AUTO"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "best_fields"
+				).build(),
+				null
+			},
+			new String[] {
+				"Paste Any Elasticsearch Query",
+				"Text Match Over Multiple Fields", "Hide Hidden Contents"
+			},
 			() -> _assertSearchIgnoreRelevance(
-				"[cafe rio, starbucks cafe]", "cafe"));
+				"[Cafe Rio, Starbucks Cafe]", "cafe"));
 	}
 
 	@Test
@@ -407,10 +563,15 @@ public class SXPBlueprintSearchResultTest {
 					_serviceContext));
 
 		_test(
-			null, null, "withAssetTagName",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(100)
+				).build()
+			},
+			new String[] {"Boost Tags Match"},
 			() -> _assertSearch("[pepsi cola, coca cola]", "cola"));
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[coca cola, pepsi cola]", "cola"));
 	}
@@ -423,33 +584,29 @@ public class SXPBlueprintSearchResultTest {
 			() -> _addGroupAAndGroupB());
 
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
 				"[cola coca, cola pepsi, cola sprite]", "cola"));
 		_test(
-			new String[] {"${configuration.value1}", "${configuration.value2}"},
-			new String[] {
-				String.valueOf(_groupA.getGroupId()),
-				String.valueOf(_groupB.getGroupId())
-			},
-			"withFilterByExactTermMatch",
+			null, new String[] {"Limit Search to My Contents"},
 			() -> _assertSearchIgnoreRelevance(
-				"[cola coca, cola pepsi]", "cola"));
+				"[cola coca, cola pepsi, cola sprite]", "cola"));
 
 		User user = UserTestUtil.addUser(_groupA.getGroupId());
 
 		_serviceContext.setUserId(user.getUserId());
 
 		_test(
-			null, null, "withInAGroup",
+			null, new String[] {"Limit Search to My Sites"},
 			() -> _assertSearchIgnoreRelevance("[cola coca]", "cola"));
 		_test(
-			new String[] {"${configuration.value1}", "${configuration.value2}"},
-			new String[] {
-				String.valueOf(_groupA.getGroupId()),
-				String.valueOf(_groupB.getGroupId())
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"scope_group_ids",
+					new Long[] {_groupA.getGroupId(), _groupB.getGroupId()}
+				).build()
 			},
-			"withTheseSites",
+			new String[] {"Limit Search to These Sites"},
 			() -> _assertSearchIgnoreRelevance(
 				"[cola coca, cola pepsi]", "cola"));
 	}
@@ -465,18 +622,34 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			null, null, null,
+			null, null,
 			() -> _assertSearchIgnoreRelevance(
-				"[cafe rio, cloud cafe, starbucks cafe]", "cafe"));
+				"[Cafe Rio, Cloud Cafe, Starbucks Cafe]", "cafe"));
 		_test(
-			new String[] {"${configuration.query}"},
-			new String[] {"los angeles"}, "fromScratch",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.getMatchQueryJSONObject(
+						200, "los angeles")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearchIgnoreRelevance(
-				"[cafe rio, starbucks cafe]", "cafe"));
+				"[Cafe Rio, Starbucks Cafe]", "cafe"));
 		_test(
-			new String[] {"${configuration.query}"},
-			new String[] {"orange county"}, "fromScratch",
-			() -> _assertSearchIgnoreRelevance("[cloud cafe]", "cafe"));
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.getMatchQueryJSONObject(
+						200, "orange county")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
+			() -> _assertSearchIgnoreRelevance("[Cloud Cafe]", "cafe"));
 	}
 
 	@Test
@@ -484,18 +657,61 @@ public class SXPBlueprintSearchResultTest {
 		_setUp(
 			new String[] {"coca coca", ""},
 			new String[] {
-				"This coca looks like a kind of drink",
-				"This looks like a kind of coca drink"
+				"this coca looks like a kind of drink",
+				"this looks like a kind of coca drink"
 			});
 
 		_test(
-			null, null, "withMultiAllKeywordsMatch",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							1,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, "or", "${keywords}", "most_fields")
+				).build(),
+				HashMapBuilder.<String, Object>put(
+					"boost", 100
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"type", "phrase"
+				).build()
+			},
+			new String[] {
+				"Paste Any Elasticsearch Query", "Boost All Keywords Match"
+			},
 			() -> _assertSearch(
 				"[this looks like a kind of coca drink, this coca looks like " +
 					"a kind of drink]",
 				"coca drink"));
 		_test(
-			null, null, "withMultiMatch",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							10,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, "or", "${keywords}", "most_fields")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearch(
 				"[this coca looks like a kind of drink, this looks like a " +
 					"kind of coca drink]",
@@ -509,21 +725,77 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"Cafe Rio", "Cloud Cafe"});
 
 		_test(
-			null, null, "withDefaultBehavior",
-			() -> _assertSearch("[cafe rio, cloud cafe]", "cafe"));
-		_test(
-			null, null, null,
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "should"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.getMatchQueryJSONObject(
+						200, "los angeles")
+				).build(),
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "AUTO"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "best_fields"
+				).build()
+			},
+			new String[] {
+				"Paste Any Elasticsearch Query",
+				"Text Match Over Multiple Fields"
+			},
 			() -> _assertSearchIgnoreRelevance(
-				"[cafe rio, cloud cafe]", "cafe"));
+				"[Cafe Rio, Cloud Cafe]", "cafe"));
+
+		_test(
+			null, null,
+			() -> _assertSearchIgnoreRelevance(
+				"[Cafe Rio, Cloud Cafe]", "cafe"));
 
 		_setUp(new String[] {"", ""}, new String[] {"Coca Cola", "Pepsi Cola"});
 
 		_test(
-			null, null, "withLuceneSyntax",
-			() -> _assertSearch("[coca cola]", "cola +coca"));
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", 1
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"operator", "and"
+				).build()
+			},
+			new String[] {"Search with the Lucene Syntax"},
+			() -> _assertSearch("[Coca Cola]", "cola +coca"));
+
 		_test(
-			null, null, "withLuceneSyntax",
-			() -> _assertSearch("[pepsi cola]", "cola -coca"));
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", 1
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"operator", "and"
+				).build()
+			},
+			new String[] {"Search with the Lucene Syntax"},
+			() -> _assertSearch("[Pepsi Cola]", "cola -coca"));
 	}
 
 	@Test
@@ -539,10 +811,28 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {
-				"${configuration.fuzziness}", "${configuration.operator}"
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "AUTO"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "and"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "best_fields"
+				).build()
 			},
-			new String[] {"AUTO", "and"}, "withOperator",
+			new String[] {"Text Match Over Multiple Fields"},
 			() -> _assertSearch(
 				"[drink carbonated coca, drink carbonated pepsi cola, " +
 					"sprite, fruit punch]",
@@ -553,10 +843,28 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {"lorem ipsum dolor", "lorem ipsum sit", "nunquis"});
 
 		_test(
-			new String[] {
-				"${configuration.fuzziness}", "${configuration.operator}"
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "0"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "best_fields"
+				).build()
 			},
-			new String[] {"0", "or"}, "withOperator",
+			new String[] {"Text Match Over Multiple Fields"},
 			() -> _assertSearch(
 				"[lorem ipsum sit, lorem ipsum dolor, nunquis]",
 				"ipsum sit sit"));
@@ -574,13 +882,54 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"and"},
-			"withOperator",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "0"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "and"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "bool_prefix"
+				).build()
+			},
+			new String[] {"Text Match Over Multiple Fields"},
 			() -> _assertSearchIgnoreRelevance(
 				"[lorem ipsum dolor]", "lorem dol"));
+
 		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"or"},
-			"withOperator",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "0"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "bool_prefix"
+				).build()
+			},
+			new String[] {"Text Match Over Multiple Fields"},
 			() -> _assertSearchIgnoreRelevance(
 				"[lorem ipsum dolor, lorem ipsum sit, nunquis]", "lorem dol"));
 	}
@@ -594,13 +943,42 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"and"},
-			"withOperator",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							1,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, "and", "${keywords}", "cross_fields")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearchIgnoreRelevance(
 				"[alpha beta, alpha edison]", "alpha golf"));
+
 		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"or"},
-			"withOperator",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							1,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, "or", "${keywords}", "cross_fields")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearchIgnoreRelevance(
 				"[alpha beta, alpha edison, beta charlie]", "alpha golf"));
 	}
@@ -615,16 +993,56 @@ public class SXPBlueprintSearchResultTest {
 			new String[] {
 				"amet", "lorem ipsum dolor", "lorem ipsum sit", "nunquis"
 			});
+		_test(
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "0"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "and"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "most_fields"
+				).build()
+			},
+			new String[] {"Text Match Over Multiple Fields"},
+			() -> _assertSearch("[lorem ipsum sit, nunquis]", "sit lorem"));
 
 		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"and"},
-			"withOperator",
-			() -> _assertSearch("[lorem ipsum sit, nunquis]", "sit lorem"));
-		_test(
-			new String[] {"${configuration.operator}"}, new String[] {"or"},
-			"withOperator",
-			() -> _assertSearch(
-				"[lorem ipsum sit, lorem ipsum dolor, amet, nunquis]",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", Integer.valueOf(1)
+				).put(
+					"fields",
+					"[\"localized_title_${context.language_id}^2\"," +
+						"\"content_${context.language_id}^1\"]"
+				).put(
+					"fuzziness", "0"
+				).put(
+					"keywords", "${keywords}"
+				).put(
+					"minimum_should_match", Integer.valueOf(0)
+				).put(
+					"operator", "or"
+				).put(
+					"slop", Integer.valueOf(0)
+				).put(
+					"type", "most_fields"
+				).build()
+			},
+			new String[] {"Text Match Over Multiple Fields"},
+			() -> _assertSearchIgnoreRelevance(
+				"[amet, lorem ipsum dolor, lorem ipsum sit, nunquis]",
 				"ipsum sit sit"));
 	}
 
@@ -641,7 +1059,22 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			null, null, "withKeywords",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							1,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, null, "${keywords}", "phrase")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearch("[listen to birds, silence]", "listen listen"));
 	}
 
@@ -659,7 +1092,22 @@ public class SXPBlueprintSearchResultTest {
 			});
 
 		_test(
-			null, null, "withKeywords",
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"occur", "must"
+				).put(
+					"query",
+					SXPBlueprintSearchResultTestUtil.
+						getMultiMatchQueryJSONObject(
+							1,
+							new String[] {
+								"localized_title_${context.language_id}^2",
+								"content_${context.language_id}^1"
+							},
+							null, null, "${keywords}", "phrase_prefix")
+				).build()
+			},
+			new String[] {"Paste Any Elasticsearch Query"},
 			() -> _assertSearch(
 				"[watch birds on the sky, clouds]", "simple things are beau"));
 	}
@@ -710,8 +1158,14 @@ public class SXPBlueprintSearchResultTest {
 
 		DocumentsAssert.assertValues(
 			searchResponse.getRequestString(),
-			searchResponse.getDocumentsStream(), "localized_title_en_US",
-			expected);
+			searchResponse.getDocumentsStream(), "title_en_US", expected);
+
+		searchResponse = _getSearchResponse(
+			keywords, _sxpBlueprint.getElementInstancesJSON());
+
+		DocumentsAssert.assertValues(
+			searchResponse.getRequestString(),
+			searchResponse.getDocumentsStream(), "title_en_US", expected);
 	}
 
 	private void _assertSearchIgnoreRelevance(String expected, String keywords)
@@ -721,8 +1175,16 @@ public class SXPBlueprintSearchResultTest {
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
 			searchResponse.getRequestString(),
-			searchResponse.getDocumentsStream(), "localized_title_en_US",
-			expected);
+			searchResponse.getDocumentsStream(), "title_en_US", expected);
+
+		if (!Objects.equals("{}", _sxpBlueprint.getElementInstancesJSON())) {
+			searchResponse = _getSearchResponse(
+				keywords, _sxpBlueprint.getElementInstancesJSON());
+
+			DocumentsAssert.assertValuesIgnoreRelevance(
+				searchResponse.getRequestString(),
+				searchResponse.getDocumentsStream(), "title_en_US", expected);
+		}
 	}
 
 	private ConfigurationTemporarySwapper _getConfigurationTemporarySwapper(
@@ -763,6 +1225,45 @@ public class SXPBlueprintSearchResultTest {
 						_searchContext.setUserId(_serviceContext.getUserId());
 					}
 				).build()));
+	}
+
+	private SearchResponse _getSearchResponse(
+			String keywords, String elementInstanceJSON)
+		throws Exception {
+
+		com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint sxpBlueprint =
+			new com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint() {
+				{
+					configuration = ConfigurationUtil.toConfiguration(
+						SXPBlueprintSearchResultTestUtil.
+							queryConfigurationJSON);
+					elementInstances = ElementInstanceUtil.toElementInstances(
+						elementInstanceJSON);
+				}
+			};
+		SearchRequestBuilder searchRequestBuilder =
+			_searchRequestBuilderFactory.builder(
+			).companyId(
+				TestPropsValues.getCompanyId()
+			).queryString(
+				keywords
+			).withSearchContext(
+				_searchContext -> {
+					_searchContext.setAttribute(
+						"scope_group_id", _group.getGroupId());
+					_searchContext.setAttribute(
+						"search.experiences.scope.group.id",
+						_group.getGroupId());
+					_searchContext.setTimeZone(_user.getTimeZone());
+					_searchContext.setUserId(_serviceContext.getUserId());
+				}
+			);
+
+		_sxpBlueprintSearchRequestEnhancer.enhance(
+			searchRequestBuilder,
+			String.valueOf(SXPBlueprintUtil.unpack(sxpBlueprint)));
+
+		return _searcher.search(searchRequestBuilder.build());
 	}
 
 	private void _setUp(
@@ -882,38 +1383,23 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	private void _test(
-			String[] configurationNames, String[] configurationValues,
-			String resourceName, UnsafeRunnable<Exception> unsafeRunnable)
+			Object[] configurationValuesArray, String[] sxpElementNames,
+			UnsafeRunnable<Exception> unsafeRunnable)
 		throws Exception {
 
-		String json = "{}";
+		String elementInstancesJSON = "{}";
 
-		if (!Validator.isBlank(resourceName)) {
-			Thread currentThread = Thread.currentThread();
-
-			Class<?> clazz = getClass();
-
-			StackTraceElement[] stackTraceElements =
-				currentThread.getStackTrace();
-
-			json = StringUtil.read(
-				clazz.getResourceAsStream(
-					StringBundler.concat(
-						"dependencies/", clazz.getSimpleName(),
-						StringPool.PERIOD,
-						stackTraceElements[2].getMethodName(), "_",
-						resourceName, ".json")));
+		if (sxpElementNames != null) {
+			elementInstancesJSON =
+				SXPBlueprintSearchResultTestUtil.getElementInstancesJSON(
+					configurationValuesArray, sxpElementNames, _sxpElements);
 		}
 
-		if (configurationNames != null) {
-			for (int i = 0; i < configurationNames.length; i++) {
-				json = StringUtil.replace(
-					json, configurationNames[i], configurationValues[i]);
-			}
-		}
+		_sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
 
 		_sxpBlueprintLocalService.updateSXPBlueprint(
-			_sxpBlueprint.getUserId(), _sxpBlueprint.getSXPBlueprintId(), json,
+			_sxpBlueprint.getUserId(), _sxpBlueprint.getSXPBlueprintId(),
+			_sxpBlueprint.getConfigurationJSON(),
 			_sxpBlueprint.getDescriptionMap(),
 			_sxpBlueprint.getElementInstancesJSON(),
 			_sxpBlueprint.getSchemaVersion(), _sxpBlueprint.getTitleMap(),
@@ -921,6 +1407,8 @@ public class SXPBlueprintSearchResultTest {
 
 		unsafeRunnable.run();
 	}
+
+	private static List<SXPElement> _sxpElements;
 
 	private int _addJournalArticleSleep;
 	private AssetCategory _assetCategory;
@@ -961,6 +1449,10 @@ public class SXPBlueprintSearchResultTest {
 
 	@Inject
 	private SXPBlueprintLocalService _sxpBlueprintLocalService;
+
+	@Inject
+	private SXPBlueprintSearchRequestEnhancer
+		_sxpBlueprintSearchRequestEnhancer;
 
 	private User _user;
 
