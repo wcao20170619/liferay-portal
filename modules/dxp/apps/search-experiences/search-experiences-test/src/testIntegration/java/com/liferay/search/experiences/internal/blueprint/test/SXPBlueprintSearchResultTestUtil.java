@@ -14,6 +14,8 @@
 
 package com.liferay.search.experiences.internal.blueprint.test;
 
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -52,8 +54,9 @@ public class SXPBlueprintSearchResultTestUtil {
 	).toString();
 
 	public static String getElementInstancesJSON(
-		Object[] configurationValuesArray, String[] sxpElementNames,
-		List<SXPElement> sxpElements) {
+			Object[] configurationValuesArray, String[] sxpElementNames,
+			List<SXPElement> sxpElements)
+		throws JSONException {
 
 		ElementInstance[] elementInstances =
 			new ElementInstance[sxpElementNames.length];
@@ -118,7 +121,9 @@ public class SXPBlueprintSearchResultTestUtil {
 			elementInstance.setSxpElement(
 				SXPElementUtil.toSXPElement(
 					JSONUtil.put(
-						"elementDefinition", elementDefinition.toString()
+						"elementDefinition",
+						JSONFactoryUtil.createJSONObject(
+							elementDefinition.toString())
 					).toString()));
 
 			Map<String, Object> uiConfigurationValues = new HashMap<>();
