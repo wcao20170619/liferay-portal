@@ -14,7 +14,6 @@
 
 package com.liferay.search.experiences.internal.blueprint.test;
 
-import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -43,10 +42,14 @@ import java.util.stream.Stream;
  */
 public class SXPBlueprintSearchResultTestUtil {
 
-	public static String queryConfigurationJSON = StringBundler.concat(
-		"{\"generalConfiguration\":{\"searchableAssetTypes\":[",
-		"\"com.liferay.journal.model.JournalArticle\"]},",
-		"\"queryConfiguration\":{\"applyIndexerClauses\":true}}");
+	public static final String QUERY_CONFIGURATION_JSON = JSONUtil.put(
+		"generalConfiguration",
+		JSONUtil.put(
+			"searchableAssetTypes",
+			JSONUtil.put("com.liferay.journal.model.JournalArticle"))
+	).put(
+		"queryConfiguration", JSONUtil.put("applyIndexerClauses", true)
+	).toString();
 
 	public static String getElementInstancesJSON(
 		Object[] configurationValuesArray, String[] sxpElementNames,
@@ -129,28 +132,26 @@ public class SXPBlueprintSearchResultTestUtil {
 
 				FieldSet[] fieldSets = uiConfiguration.getFieldSets();
 
-				if (ArrayUtil.isEmpty(fieldSets)) {
-					return null;
-				}
+				if (!ArrayUtil.isEmpty(fieldSets)) {
+					for (FieldSet fieldSet : fieldSets) {
+						Field[] fields = fieldSet.getFields();
 
-				for (FieldSet fieldSet : fieldSets) {
-					Field[] fields = fieldSet.getFields();
-
-					if (fields == null) {
-						continue;
-					}
-
-					for (Field field : fields) {
-						String fieldName = field.getName();
-
-						Object value = configurationValues.get(fieldName);
-
-						if (value == null) {
+						if (fields == null) {
 							continue;
 						}
 
-						uiConfigurationValues.put(
-							fieldName, UnpackUtil.unpack(value));
+						for (Field field : fields) {
+							String fieldName = field.getName();
+
+							Object value = configurationValues.get(fieldName);
+
+							if (value == null) {
+								continue;
+							}
+
+							uiConfigurationValues.put(
+								fieldName, UnpackUtil.unpack(value));
+						}
 					}
 				}
 			}

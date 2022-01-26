@@ -134,7 +134,7 @@ public class SXPBlueprintSearchResultTest {
 
 		_sxpBlueprint = _sxpBlueprintLocalService.addSXPBlueprint(
 			_user.getUserId(),
-			SXPBlueprintSearchResultTestUtil.queryConfigurationJSON,
+			SXPBlueprintSearchResultTestUtil.QUERY_CONFIGURATION_JSON,
 			Collections.singletonMap(LocaleUtil.US, ""), null, "",
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
@@ -1047,7 +1047,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	@Test
-	public void testTextMatchOverMultipleFields_phase() throws Exception {
+	public void testTextMatchOverMultipleFields_phrase() throws Exception {
 		_setUp(
 			new String[] {
 				"do not listen to birds", "listen listen to birds",
@@ -1079,7 +1079,9 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	@Test
-	public void testTextMatchOverMultipleFields_phasePrefix() throws Exception {
+	public void testTextMatchOverMultipleFields_phrasePrefix()
+		throws Exception {
+
 		_setUp(
 			new String[] {
 				"simple things are beautiful sometimes",
@@ -1236,7 +1238,7 @@ public class SXPBlueprintSearchResultTest {
 				{
 					configuration = ConfigurationUtil.toConfiguration(
 						SXPBlueprintSearchResultTestUtil.
-							queryConfigurationJSON);
+							QUERY_CONFIGURATION_JSON);
 					elementInstances = ElementInstanceUtil.toElementInstances(
 						elementInstanceJSON);
 				}
