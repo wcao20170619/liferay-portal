@@ -249,6 +249,10 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 					getAssetRendererFactoryByClassName(
 						GetterUtil.getString(entryClassNameField.getValue()));
 
+			if (assetRendererFactory == null) {
+				return null;
+			}
+
 			Field entryClassPKField = fields.get(
 				com.liferay.portal.kernel.search.Field.ENTRY_CLASS_PK);
 
