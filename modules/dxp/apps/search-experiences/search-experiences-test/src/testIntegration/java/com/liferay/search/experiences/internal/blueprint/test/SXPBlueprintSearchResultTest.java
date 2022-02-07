@@ -493,8 +493,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "AUTO"
 				).put(
@@ -528,8 +528,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "AUTO"
 				).put(
@@ -670,18 +670,16 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							1,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, "or", "${keywords}", "most_fields")
 				).build(),
 				HashMapBuilder.<String, Object>put(
 					"boost", 100
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"keywords", "${keywords}"
 				).put(
@@ -704,10 +702,8 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							10,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, "or", "${keywords}", "most_fields")
 				).build()
 			},
@@ -737,8 +733,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "AUTO"
 				).put(
@@ -773,8 +769,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", 1
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"operator", "and"
 				).build()
@@ -788,8 +784,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", 1
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"operator", "and"
 				).build()
@@ -816,8 +812,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "AUTO"
 				).put(
@@ -848,8 +844,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "0"
 				).put(
@@ -887,8 +883,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "0"
 				).put(
@@ -913,8 +909,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "0"
 				).put(
@@ -951,10 +947,8 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							1,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, "and", "${keywords}", "cross_fields")
 				).build()
 			},
@@ -971,10 +965,8 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							1,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, "or", "${keywords}", "cross_fields")
 				).build()
 			},
@@ -999,8 +991,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "0"
 				).put(
@@ -1024,8 +1016,8 @@ public class SXPBlueprintSearchResultTest {
 					"boost", Integer.valueOf(1)
 				).put(
 					"fields",
-					"[\"localized_title_${context.language_id}^2\"," +
-						"\"content_${context.language_id}^1\"]"
+					SXPBlueprintSearchResultTestUtil.
+						TITLE_CONTENT_LOCALE_DEFAULT_BOOST
 				).put(
 					"fuzziness", "0"
 				).put(
@@ -1067,10 +1059,8 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							1,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, null, "${keywords}", "phrase")
 				).build()
 			},
@@ -1102,10 +1092,8 @@ public class SXPBlueprintSearchResultTest {
 					SXPBlueprintSearchResultTestUtil.
 						getMultiMatchQueryJSONObject(
 							1,
-							new String[] {
-								"localized_title_${context.language_id}^2",
-								"content_${context.language_id}^1"
-							},
+							SXPBlueprintSearchResultTestUtil.
+								TITLE_CONTENT_LOCALE_DEFAULT_BOOST,
 							null, null, "${keywords}", "phrase_prefix")
 				).build()
 			},
