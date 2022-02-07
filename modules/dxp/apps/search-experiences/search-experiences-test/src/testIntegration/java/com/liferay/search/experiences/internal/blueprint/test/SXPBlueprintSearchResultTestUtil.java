@@ -52,6 +52,11 @@ public class SXPBlueprintSearchResultTestUtil {
 		"queryConfiguration", JSONUtil.put("applyIndexerClauses", true)
 	).toString();
 
+	public static final String[] TITLE_CONTENT_LOCALE_DEFAULT_BOOST = {
+		"localized_title_${context.language_id}^2",
+		"content_${context.language_id}^1"
+	};
+
 	public static String getElementInstancesJSON(
 			Object[] configurationValuesArray, String[] sxpElementNames,
 			List<SXPElement> sxpElements)
