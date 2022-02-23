@@ -20,18 +20,13 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.search.document.DocumentBuilderFactory;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
+import com.liferay.portal.search.document.Document;
+import com.liferay.portal.search.document.Field;
 import com.liferay.portal.search.hits.SearchHit;
-import com.liferay.portal.search.hits.SearchHitBuilder;
-import com.liferay.portal.search.hits.SearchHitBuilderFactory;
-import com.liferay.portal.search.hits.SearchHitsBuilder;
-import com.liferay.portal.search.hits.SearchHitsBuilderFactory;
-import com.liferay.portal.search.internal.document.DocumentBuilderFactoryImpl;
-import com.liferay.portal.search.internal.hits.SearchHitBuilderFactoryImpl;
-import com.liferay.portal.search.internal.hits.SearchHitsBuilderFactoryImpl;
-import com.liferay.portal.search.internal.legacy.searcher.SearchResponseBuilderFactoryImpl;
-import com.liferay.portal.search.internal.searcher.SearchRequestBuilderFactoryImpl;
-import com.liferay.portal.search.legacy.searcher.SearchResponseBuilderFactory;
+import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponseBuilder;
@@ -49,6 +44,8 @@ import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchHits;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchResponse;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,14 +55,18 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author André de Oliveira
+ * @author Wade Cao
  */
 public class SearchResponseResourceImplTest {
 
@@ -74,10 +75,102 @@ public class SearchResponseResourceImplTest {
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
+		_searchResponseResourceImpl = new SearchResponseResourceImpl();
+
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "contextCompany",
+			Mockito.mock(Company.class));
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "contextHttpServletRequest",
+			Mockito.mock(HttpServletRequest.class));
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "contextUser",
+			Mockito.mock(User.class));
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "_searcher", _searcher);
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "_searchRequestBuilderFactory",
+			_searchRequestBuilderFactory);
+		ReflectionTestUtil.setFieldValue(
+			_searchResponseResourceImpl, "_sxpBlueprintSearchRequestEnhancer",
+			_sxpBlueprintSearchRequestEnhancer);
+
+		SearchRequestBuilder searchRequestBuilder = Mockito.mock(
+			SearchRequestBuilder.class);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			_searchRequestBuilderFactory
+		).builder();
+
+		Mockito.doReturn(
+			Mockito.mock(
+				com.liferay.portal.search.searcher.SearchResponse.class)
+		).when(
+			_searcher
+		).search(
+			Mockito.any()
+		);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			searchRequestBuilder
+		).companyId(
+			Mockito.anyLong()
+		);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			searchRequestBuilder
+		).from(
+			Mockito.anyInt()
+		);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			searchRequestBuilder
+		).queryString(
+			Mockito.anyString()
+		);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			searchRequestBuilder
+		).size(
+			Mockito.anyInt()
+		);
+
+		Mockito.doReturn(
+			searchRequestBuilder
+		).when(
+			searchRequestBuilder
+		).withSearchContext(
+			Mockito.anyObject()
+		);
+
+		SearchResponseBuilder searchResponseBuilder = Mockito.mock(
+			SearchResponseBuilder.class);
+
+		Mockito.doReturn(
+			searchResponseBuilder
+		).when(
+			searchRequestBuilder
+		).withSearchContextGet(
+			Mockito.anyObject()
+		);
+	}
+
 	@Test
 	public void testSearchErrors() throws Exception {
-		_initSearcher();
-
 		RuntimeException runtimeException = new RuntimeException();
 
 		runtimeException.addSuppressed(InvalidQueryEntryException.at(0));
@@ -91,10 +184,7 @@ public class SearchResponseResourceImplTest {
 			Mockito.any(), Mockito.anyString()
 		);
 
-		SearchResponseResourceImpl searchResponseResourceImpl =
-			_createSearchResponseResourceImpl();
-
-		SearchResponse searchResponse = searchResponseResourceImpl.search(
+		SearchResponse searchResponse = _searchResponseResourceImpl.search(
 			Mockito.mock(Pagination.class), null, new SXPBlueprint());
 
 		Map[] errorMaps = searchResponse.getErrors();
@@ -125,8 +215,6 @@ public class SearchResponseResourceImplTest {
 
 	@Test
 	public void testSearchWarnings() throws Exception {
-		_initSearcher();
-
 		RuntimeException runtimeException = new RuntimeException();
 
 		Throwable throwable1 = InvalidElementInstanceException.at(1);
@@ -156,10 +244,7 @@ public class SearchResponseResourceImplTest {
 			Mockito.any(), Mockito.anyString()
 		);
 
-		SearchResponseResourceImpl searchResponseResourceImpl =
-			_createSearchResponseResourceImpl();
-
-		SearchResponse searchResponse = searchResponseResourceImpl.search(
+		SearchResponse searchResponse = _searchResponseResourceImpl.search(
 			Mockito.mock(Pagination.class), null, new SXPBlueprint());
 
 		Map[] errorMaps = searchResponse.getErrors();
@@ -236,13 +321,27 @@ public class SearchResponseResourceImplTest {
 
 	@Test
 	public void testToSearchResponse() throws Exception {
-		SearchRequestBuilder searchRequestBuilder =
-			_searchRequestBuilderFactory.builder();
+		com.liferay.portal.search.searcher.SearchResponse portalSearchResponse =
+			_createSearchResponse(
+				"{}", "{}",
+				_createSearchHits(
+					(float)RandomTestUtil.randomDouble(),
+					RandomTestUtil.randomLong(),
+					new SearchHit[] {
+						_createSearchHit(
+							RandomTestUtil.randomString(),
+							new HashMap<String, Field>(),
+							RandomTestUtil.randomString(),
+							(float)RandomTestUtil.randomDouble(),
+							RandomTestUtil.randomLong())
+					}));
 
-		SearchResponseBuilder searchResponseBuilder =
-			searchRequestBuilder.withSearchContextGet(
-				searchContext -> _searchResponseBuilderFactory.builder(
-					searchContext));
+		SearchResponse searchResponse =
+			_searchResponseResourceImpl.toSearchResponse(portalSearchResponse);
+
+		SearchHits searchHits = searchResponse.getSearchHits();
+
+		Assert.assertArrayEquals(new Hit[0], searchHits.getHits());
 
 		String requestString = JSONUtil.put(
 			"query", JSONUtil.put("term", JSONUtil.put("title", "Liferay"))
@@ -256,52 +355,36 @@ public class SearchResponseResourceImplTest {
 			"took", 5
 		).toString();
 
-		SearchHitBuilder searchHitBuilder =
-			_searchHitBuilderFactory.getSearchHitBuilder();
-		SearchHitsBuilder searchHitsBuilder =
-			_searchHitsBuilderFactory.getSearchHitsBuilder();
+		portalSearchResponse = _createSearchResponse(
+			requestString, responseString,
+			_createSearchHits(
+				(float)RandomTestUtil.randomDouble(),
+				RandomTestUtil.randomLong(),
+				new SearchHit[] {
+					_createSearchHit(
+						RandomTestUtil.randomString(),
+						TreeMapBuilder.put(
+							"field1st", _getField("field1st", "Lone Value")
+						).put(
+							"field2nd",
+							_getField("field2nd", 4, 8, 15, 16, 23, 42)
+						).build(),
+						RandomTestUtil.randomString(),
+						(float)RandomTestUtil.randomDouble(),
+						RandomTestUtil.randomLong())
+				}));
 
-		com.liferay.portal.search.searcher.SearchResponse portalSearchResponse =
-			searchResponseBuilder.searchHits(
-				searchHitsBuilder.addSearchHit(
-					searchHitBuilder.document(
-						_documentBuilderFactory.builder(
-						).setString(
-							"field1st", "Lone Value"
-						).setIntegers(
-							"field2nd", 4, 8, 15, 16, 23, 42
-						).build()
-					).explanation(
-						RandomTestUtil.randomString()
-					).score(
-						(float)RandomTestUtil.randomDouble()
-					).version(
-						RandomTestUtil.randomLong()
-					).build()
-				).maxScore(
-					Float.NaN
-				).totalHits(
-					RandomTestUtil.randomLong()
-				).build()
-			).request(
-				searchRequestBuilder.build()
-			).requestString(
-				requestString
-			).responseString(
-				responseString
-			).build();
-
-		SearchResponseResourceImpl searchResponseResourceImpl =
-			_createSearchResponseResourceImpl();
-
-		SearchResponse searchResponse =
-			searchResponseResourceImpl.toSearchResponse(portalSearchResponse);
+		searchResponse = _searchResponseResourceImpl.toSearchResponse(
+			portalSearchResponse);
 
 		com.liferay.portal.search.hits.SearchHits portalSearchHits =
 			portalSearchResponse.getSearchHits();
-		SearchHits searchHits = searchResponse.getSearchHits();
 
-		Assert.assertEquals(null, searchHits.getMaxScore());
+		searchHits = searchResponse.getSearchHits();
+
+		Assert.assertEquals(
+			Float.valueOf(portalSearchHits.getMaxScore()),
+			searchHits.getMaxScore());
 		Assert.assertEquals(
 			Long.valueOf(portalSearchHits.getTotalHits()),
 			searchHits.getTotalHits());
@@ -354,10 +437,7 @@ public class SearchResponseResourceImplTest {
 			Mockito.any()
 		);
 
-		SearchResponseResourceImpl searchResponseResourceImpl =
-			_createSearchResponseResourceImpl();
-
-		SearchResponse searchResponse = searchResponseResourceImpl.search(
+		SearchResponse searchResponse = _searchResponseResourceImpl.search(
 			Mockito.mock(Pagination.class), null, new SXPBlueprint());
 
 		Map[] errorMaps = searchResponse.getErrors();
@@ -404,64 +484,160 @@ public class SearchResponseResourceImplTest {
 			));
 	}
 
-	private SearchResponseResourceImpl _createSearchResponseResourceImpl() {
-		SearchResponseResourceImpl searchResponseResourceImpl =
-			new SearchResponseResourceImpl();
+	private SearchHit _createSearchHit(
+		String explanation, Map<String, Field> fields, String id, float score,
+		long version) {
 
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "contextCompany",
-			Mockito.mock(Company.class));
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "contextHttpServletRequest",
-			Mockito.mock(HttpServletRequest.class));
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "contextUser",
-			Mockito.mock(User.class));
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "_searcher", _searcher);
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "_searchRequestBuilderFactory",
-			_searchRequestBuilderFactory);
-		ReflectionTestUtil.setFieldValue(
-			searchResponseResourceImpl, "_sxpBlueprintSearchRequestEnhancer",
-			_sxpBlueprintSearchRequestEnhancer);
+		if (MapUtil.isEmpty(fields)) {
+			return null;
+		}
 
-		return searchResponseResourceImpl;
-	}
-
-	private void _initSearcher() {
-		SearchRequestBuilder searchRequestBuilder =
-			_searchRequestBuilderFactory.builder();
-
-		SearchResponseBuilder searchResponseBuilder =
-			searchRequestBuilder.withSearchContextGet(
-				searchContext -> _searchResponseBuilderFactory.builder(
-					searchContext));
-
-		searchResponseBuilder.request(searchRequestBuilder.build());
+		Document document = Mockito.mock(Document.class);
 
 		Mockito.doReturn(
-			searchResponseBuilder.build()
+			fields
 		).when(
-			_searcher
-		).search(
-			Mockito.any()
-		);
+			document
+		).getFields();
+
+		SearchHit searchHit = Mockito.mock(SearchHit.class);
+
+		Mockito.doReturn(
+			document
+		).when(
+			searchHit
+		).getDocument();
+
+		Mockito.doReturn(
+			explanation
+		).when(
+			searchHit
+		).getExplanation();
+
+		Mockito.doReturn(
+			id
+		).when(
+			searchHit
+		).getId();
+
+		Mockito.doReturn(
+			score
+		).when(
+			searchHit
+		).getScore();
+
+		Mockito.doReturn(
+			version
+		).when(
+			searchHit
+		).getVersion();
+
+		return searchHit;
 	}
 
-	private final DocumentBuilderFactory _documentBuilderFactory =
-		new DocumentBuilderFactoryImpl();
-	private final Searcher _searcher = Mockito.mock(Searcher.class);
-	private final SearchHitBuilderFactory _searchHitBuilderFactory =
-		new SearchHitBuilderFactoryImpl();
-	private final SearchHitsBuilderFactory _searchHitsBuilderFactory =
-		new SearchHitsBuilderFactoryImpl();
-	private final SearchRequestBuilderFactory _searchRequestBuilderFactory =
-		new SearchRequestBuilderFactoryImpl();
-	private final SearchResponseBuilderFactory _searchResponseBuilderFactory =
-		new SearchResponseBuilderFactoryImpl();
-	private final SXPBlueprintSearchRequestEnhancer
-		_sxpBlueprintSearchRequestEnhancer = Mockito.mock(
-			SXPBlueprintSearchRequestEnhancer.class);
+	private com.liferay.portal.search.hits.SearchHits _createSearchHits(
+		float maxScore, long totalHits, SearchHit[] searchHitArray) {
+
+		com.liferay.portal.search.hits.SearchHits searchHits = Mockito.mock(
+			com.liferay.portal.search.hits.SearchHits.class);
+
+		if (searchHitArray[0] == null) {
+			return searchHits;
+		}
+
+		Mockito.doReturn(
+			maxScore
+		).when(
+			searchHits
+		).getMaxScore();
+
+		Mockito.doReturn(
+			Arrays.asList(searchHitArray)
+		).when(
+			searchHits
+		).getSearchHits();
+
+		Mockito.doReturn(
+			totalHits
+		).when(
+			searchHits
+		).getTotalHits();
+
+		return searchHits;
+	}
+
+	private com.liferay.portal.search.searcher.SearchResponse
+		_createSearchResponse(
+			String requestString, String reponseString,
+			com.liferay.portal.search.hits.SearchHits searchHits) {
+
+		com.liferay.portal.search.searcher.SearchResponse searchResponse =
+			Mockito.mock(
+				com.liferay.portal.search.searcher.SearchResponse.class);
+
+		Mockito.doReturn(
+			Mockito.mock(SearchRequest.class)
+		).when(
+			searchResponse
+		).getRequest();
+
+		Mockito.doReturn(
+			requestString
+		).when(
+			searchResponse
+		).getRequestString();
+
+		Mockito.doReturn(
+			reponseString
+		).when(
+			searchResponse
+		).getResponseString();
+
+		Mockito.doReturn(
+			searchHits
+		).when(
+			searchResponse
+		).getSearchHits();
+
+		Mockito.doReturn(
+			LocaleUtil.US
+		).when(
+			searchResponse
+		).withSearchContextGet(
+			Mockito.anyObject()
+		);
+
+		return searchResponse;
+	}
+
+	private Field _getField(String name, Object... object) {
+		return new Field() {
+
+			public String getName() {
+				return name;
+			}
+
+			public Object getValue() {
+				return object;
+			}
+
+			public List<Object> getValues() {
+				return Arrays.asList(object);
+			}
+
+		};
+	}
+
+	@Mock
+	private Searcher _searcher;
+
+	@Mock
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
+
+	private SearchResponseResourceImpl _searchResponseResourceImpl;
+
+	@Mock
+	private SXPBlueprintSearchRequestEnhancer
+		_sxpBlueprintSearchRequestEnhancer;
 
 }
