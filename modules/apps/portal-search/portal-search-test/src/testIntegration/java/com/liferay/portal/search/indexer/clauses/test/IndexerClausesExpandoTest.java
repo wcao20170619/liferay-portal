@@ -16,52 +16,50 @@ package com.liferay.portal.search.indexer.clauses.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.blogs.model.BlogsEntry;
-import com.liferay.blogs.service.BlogsEntryLocalService;
-import com.liferay.blogs.test.util.search.BlogsEntryBlueprint.BlogsEntryBlueprintBuilder;
-import com.liferay.blogs.test.util.search.BlogsEntrySearchFixture;
+import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
+import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
-import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
-import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.expando.kernel.service.ExpandoColumnLocalServiceUtil;
+import com.liferay.expando.kernel.service.ExpandoTableLocalServiceUtil;
+import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalService;
-import com.liferay.journal.test.util.search.JournalArticleBlueprintBuilder;
-import com.liferay.journal.test.util.search.JournalArticleContent;
-import com.liferay.journal.test.util.search.JournalArticleSearchFixture;
-import com.liferay.journal.test.util.search.JournalArticleTitle;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.model.MBMessage;
-import com.liferay.message.boards.service.MBMessageLocalService;
+import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
+import com.liferay.petra.function.UnsafeRunnable;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BaseIndexer;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
+import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.test.util.DocumentsAssert;
-import com.liferay.portal.search.test.util.ExpandoTableSearchFixture;
-import com.liferay.portal.search.test.util.SearchTestRule;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.users.admin.test.util.search.GroupBlueprint;
-import com.liferay.users.admin.test.util.search.GroupSearchFixture;
+import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.junit.Assert;
@@ -73,6 +71,7 @@ import org.junit.runner.RunWith;
 
 /**
  * @author André de Oliveira
+ * @author Wade Cao
  */
 @RunWith(Arquillian.class)
 public class IndexerClausesExpandoTest {
@@ -86,171 +85,79 @@ public class IndexerClausesExpandoTest {
 
 	@Before
 	public void setUp() throws Exception {
-		BlogsEntrySearchFixture blogsEntrySearchFixture =
-			new BlogsEntrySearchFixture(blogsEntryLocalService);
-
-		ExpandoTableSearchFixture expandoTableSearchFixture =
-			new ExpandoTableSearchFixture(
-				classNameLocalService, expandoColumnLocalService,
-				expandoTableLocalService);
-
-		GroupSearchFixture groupSearchFixture = new GroupSearchFixture();
-
-		JournalArticleSearchFixture journalArticleSearchFixture =
-			new JournalArticleSearchFixture(journalArticleLocalService);
-
-		_blogsEntries = blogsEntrySearchFixture.getBlogsEntries();
-		_blogsEntrySearchFixture = blogsEntrySearchFixture;
-		_expandoColumns = expandoTableSearchFixture.getExpandoColumns();
-		_expandoTables = expandoTableSearchFixture.getExpandoTables();
-		_expandoTableSearchFixture = expandoTableSearchFixture;
-		_group = groupSearchFixture.addGroup(new GroupBlueprint());
-		_groups = groupSearchFixture.getGroups();
-		_journalArticles = journalArticleSearchFixture.getJournalArticles();
-		_journalArticleSearchFixture = journalArticleSearchFixture;
-		_user = TestPropsValues.getUser();
+		_group = GroupTestUtil.addGroup();
 	}
 
 	@Test
 	public void testBaseIndexer() throws Exception {
-		Assert.assertTrue(journalArticleIndexer instanceof BaseIndexer);
+		_setUp(
+			HashMapBuilder.<Class<?>, String[]>put(
+				JournalArticle.class,
+				new String[] {"Gamma Article", "Omega Article"}
+			).build());
 
-		addExpandoColumn(JournalArticle.class);
+		_test(
+			new Class<?>[] {JournalArticle.class}, "gamma",
+			() -> {
+				Assert.assertTrue(
+					_journalArticleIndexer instanceof BaseIndexer);
 
-		addJournalArticle("Gamma Article");
-		addJournalArticle("Omega Article");
-
-		Consumer<SearchRequestBuilder> consumer =
-			searchRequestBuilder -> searchRequestBuilder.modelIndexerClasses(
-				JournalArticle.class
-			).queryString(
-				"gamma"
-			);
-
-		assertSearch("[Gamma Article]", consumer);
-
-		assertSearch(
-			"[Gamma Article, Omega Article]", withoutIndexerClauses(),
-			consumer);
+				_assertSearch("[Gamma Article]", _consumer);
+				_assertSearch(
+					"[Gamma Article, Omega Article]", _withoutIndexerClauses(),
+					_consumer);
+			});
 	}
 
 	@Test
 	public void testDefaultIndexer() throws Exception {
-		Assert.assertEquals(
-			"class com.liferay.portal.search.internal.indexer.DefaultIndexer",
-			String.valueOf(blogsEntryIndexer.getClass()));
+		_setUp(
+			HashMapBuilder.<Class<?>, String[]>put(
+				BlogsEntry.class, new String[] {"Gamma Blog", "Omega Blog"}
+			).build());
 
-		addExpandoColumn(BlogsEntry.class);
+		_test(
+			new Class<?>[] {BlogsEntry.class}, "gamma",
+			() -> {
+				Assert.assertEquals(
+					"class com.liferay.portal.search.internal.indexer." +
+						"DefaultIndexer",
+					String.valueOf(_blogsEntryIndexer.getClass()));
 
-		addBlogsEntry("Gamma Blog");
-		addBlogsEntry("Omega Blog");
-
-		Consumer<SearchRequestBuilder> consumer =
-			searchRequestBuilder -> searchRequestBuilder.modelIndexerClasses(
-				BlogsEntry.class
-			).queryString(
-				"gamma"
-			);
-
-		assertSearch("[Gamma Blog]", consumer);
-
-		assertSearch(
-			"[Gamma Blog, Omega Blog]", withoutIndexerClauses(), consumer);
+				_assertSearch("[Gamma Blog]", _consumer);
+				_assertSearch(
+					"[Gamma Blog, Omega Blog]", _withoutIndexerClauses(),
+					_consumer);
+			});
 	}
 
 	@Test
 	public void testFacetedSearcher() throws Exception {
-		addExpandoColumn(BlogsEntry.class);
-		addExpandoColumn(JournalArticle.class);
-		addExpandoColumn(MBMessage.class);
-
-		addBlogsEntry("Gamma Blog");
-		addBlogsEntry("Omega Blog");
-		addJournalArticle("Gamma Article");
-		addJournalArticle("Omega Article");
-		addMessage("Gamma Message");
-		addMessage("Omega Message");
-
-		Consumer<SearchRequestBuilder> consumer =
-			searchRequestBuilder -> searchRequestBuilder.modelIndexerClasses(
-				BlogsEntry.class, JournalArticle.class
-			).queryString(
-				"gamma"
-			);
-
-		assertSearch("[Gamma Article, Gamma Blog]", consumer);
-
-		assertSearch(
-			"[Gamma Article, Gamma Blog, Omega Article, Omega Blog]",
-			withoutIndexerClauses(), consumer);
-	}
-
-	@Rule
-	public SearchTestRule searchTestRule = new SearchTestRule();
-
-	protected BlogsEntry addBlogsEntry(String title) throws Exception {
-		return _blogsEntrySearchFixture.addBlogsEntry(
-			BlogsEntryBlueprintBuilder.builder(
-			).content(
-				RandomTestUtil.randomString()
-			).groupId(
-				_group.getGroupId()
-			).serviceContext(
-				createServiceContext(title)
-			).title(
-				RandomTestUtil.randomString()
-			).userId(
-				_user.getUserId()
+		_setUp(
+			HashMapBuilder.<Class<?>, String[]>put(
+				BlogsEntry.class, new String[] {"Gamma Blog", "Omega Blog"}
+			).put(
+				JournalArticle.class,
+				new String[] {"Gamma Article", "Omega Article"}
+			).put(
+				MBMessage.class, new String[] {"Gamma Message", "Omega Message"}
 			).build());
+
+		_test(
+			new Class<?>[] {BlogsEntry.class, JournalArticle.class}, "gamma",
+			() -> {
+				_assertSearch("[Gamma Article, Gamma Blog]", _consumer);
+				_assertSearch(
+					"[Gamma Article, Gamma Blog, Omega Article, Omega Blog]",
+					_withoutIndexerClauses(), _consumer);
+			});
 	}
 
-	protected void addExpandoColumn(Class<?> clazz) throws Exception {
-		_expandoTableSearchFixture.addExpandoColumn(
-			clazz, ExpandoColumnConstants.INDEX_TYPE_KEYWORD, _EXPANDO_COLUMN);
-	}
-
-	protected JournalArticle addJournalArticle(String expandoValue) {
-		return _journalArticleSearchFixture.addArticle(
-			JournalArticleBlueprintBuilder.builder(
-			).expandoBridgeAttributes(
-				Collections.singletonMap(_EXPANDO_COLUMN, expandoValue)
-			).groupId(
-				_group.getGroupId()
-			).journalArticleContent(
-				new JournalArticleContent() {
-					{
-						put(LocaleUtil.US, RandomTestUtil.randomString());
-
-						setDefaultLocale(LocaleUtil.US);
-						setName("content");
-					}
-				}
-			).journalArticleTitle(
-				new JournalArticleTitle() {
-					{
-						put(LocaleUtil.US, RandomTestUtil.randomString());
-					}
-				}
-			).userId(
-				_user.getUserId()
-			).build());
-	}
-
-	protected MBMessage addMessage(String expandoValue) throws Exception {
-		return mbMessageLocalService.addMessage(
-			null, _user.getUserId(), RandomTestUtil.randomString(),
-			_group.getGroupId(), MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID,
-			0L, MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID,
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			MBMessageConstants.DEFAULT_FORMAT, null, false, 0.0, false,
-			createServiceContext(expandoValue));
-	}
-
-	protected void assertSearch(
+	private void _assertSearch(
 		String expected, Consumer<SearchRequestBuilder>... consumers) {
 
-		SearchResponse searchResponse = searcher.search(
-			searchRequestBuilderFactory.builder(
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilderFactory.builder(
 			).companyId(
 				_group.getCompanyId()
 			).fields(
@@ -267,77 +174,135 @@ public class IndexerClausesExpandoTest {
 			"expando__keyword__custom_fields__" + _EXPANDO_COLUMN, expected);
 	}
 
-	protected ServiceContext createServiceContext(String expandoValue)
-		throws Exception {
+	private void _setUp(Map<Class<?>, String[]> map) throws Exception {
+		for (Map.Entry<Class<?>, String[]> entry : map.entrySet()) {
+			Class<?> clazz = entry.getKey();
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+			ExpandoTable expandoTable = ExpandoTableLocalServiceUtil.fetchTable(
+				_group.getCompanyId(),
+				ClassNameLocalServiceUtil.getClassNameId(clazz),
+				"CUSTOM_FIELDS");
 
-		serviceContext.setExpandoBridgeAttributes(
-			Collections.singletonMap(_EXPANDO_COLUMN, expandoValue));
+			if (expandoTable == null) {
+				expandoTable = ExpandoTableLocalServiceUtil.addTable(
+					_group.getCompanyId(),
+					ClassNameLocalServiceUtil.getClassNameId(clazz),
+					"CUSTOM_FIELDS");
 
-		return serviceContext;
+				_expandoTables.add(expandoTable);
+			}
+
+			ExpandoColumn expandoColumn = ExpandoTestUtil.addColumn(
+				expandoTable, _EXPANDO_COLUMN, ExpandoColumnConstants.STRING);
+
+			_expandoColumns.add(expandoColumn);
+
+			UnicodeProperties unicodeProperties =
+				expandoColumn.getTypeSettingsProperties();
+
+			unicodeProperties.setProperty(
+				ExpandoColumnConstants.INDEX_TYPE,
+				String.valueOf(ExpandoColumnConstants.INDEX_TYPE_KEYWORD));
+
+			expandoColumn.setTypeSettingsProperties(unicodeProperties);
+
+			ExpandoColumnLocalServiceUtil.updateExpandoColumn(expandoColumn);
+
+			String[] expandoValues = entry.getValue();
+
+			for (String expandoValue : expandoValues) {
+				ServiceContext serviceContext =
+					ServiceContextTestUtil.getServiceContext(
+						_group.getGroupId());
+
+				serviceContext.setExpandoBridgeAttributes(
+					Collections.singletonMap(_EXPANDO_COLUMN, expandoValue));
+
+				if (clazz.equals(BlogsEntry.class)) {
+					_blogsEntries.add(
+						BlogsEntryLocalServiceUtil.addEntry(
+							TestPropsValues.getUserId(),
+							RandomTestUtil.randomString(),
+							RandomTestUtil.randomString(), serviceContext));
+				}
+				else if (clazz.equals(JournalArticle.class)) {
+					JournalArticleLocalServiceUtil.addArticle(
+						null, TestPropsValues.getUserId(), _group.getGroupId(),
+						JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+						HashMapBuilder.put(
+							LocaleUtil.US, RandomTestUtil.randomString()
+						).build(),
+						HashMapBuilder.put(
+							LocaleUtil.US, RandomTestUtil.randomString()
+						).build(),
+						DDMStructureTestUtil.getSampleStructuredContent(
+							"content", Collections.emptyList(),
+							LocaleUtil.toLanguageId(LocaleUtil.US)),
+						"BASIC-WEB-CONTENT", "BASIC-WEB-CONTENT",
+						serviceContext);
+				}
+				else if (clazz.equals(MBMessage.class)) {
+					MBMessageLocalServiceUtil.addMessage(
+						null, TestPropsValues.getUserId(),
+						RandomTestUtil.randomString(), _group.getGroupId(),
+						MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, 0L,
+						MBMessageConstants.DEFAULT_PARENT_MESSAGE_ID,
+						RandomTestUtil.randomString(),
+						RandomTestUtil.randomString(),
+						MBMessageConstants.DEFAULT_FORMAT, null, false, 0.0,
+						false, serviceContext);
+				}
+			}
+		}
 	}
 
-	protected Consumer<SearchRequestBuilder> withoutIndexerClauses() {
+	private void _test(
+			Class<?>[] classes, String queryString,
+			UnsafeRunnable<Exception> unsafeRunnable)
+		throws Exception {
+
+		_consumer =
+			searchRequestBuilder -> searchRequestBuilder.modelIndexerClasses(
+				classes
+			).queryString(
+				queryString
+			);
+
+		unsafeRunnable.run();
+	}
+
+	private Consumer<SearchRequestBuilder> _withoutIndexerClauses() {
 		return searchRequestBuilder -> searchRequestBuilder.withSearchContext(
 			searchContext -> searchContext.setAttribute(
 				"search.full.query.suppress.indexer.provided.clauses", true));
 	}
 
-	@Inject(filter = "indexer.class.name=com.liferay.blogs.model.BlogsEntry")
-	protected Indexer<BlogsEntry> blogsEntryIndexer;
-
-	@Inject
-	protected BlogsEntryLocalService blogsEntryLocalService;
-
-	@Inject
-	protected ClassNameLocalService classNameLocalService;
-
-	@Inject
-	protected ExpandoColumnLocalService expandoColumnLocalService;
-
-	@Inject
-	protected ExpandoTableLocalService expandoTableLocalService;
-
-	@Inject(filter = "component.name=*.JournalArticleIndexer")
-	protected Indexer<JournalArticle> journalArticleIndexer;
-
-	@Inject
-	protected JournalArticleLocalService journalArticleLocalService;
-
-	@Inject
-	protected MBMessageLocalService mbMessageLocalService;
-
-	@Inject
-	protected Searcher searcher;
-
-	@Inject
-	protected SearchRequestBuilderFactory searchRequestBuilderFactory;
-
 	private static final String _EXPANDO_COLUMN = "expandoColumn";
 
 	@DeleteAfterTestRun
-	private List<BlogsEntry> _blogsEntries;
+	private List<BlogsEntry> _blogsEntries = new ArrayList<>();
 
-	private BlogsEntrySearchFixture _blogsEntrySearchFixture;
+	@Inject(filter = "indexer.class.name=com.liferay.blogs.model.BlogsEntry")
+	private Indexer<BlogsEntry> _blogsEntryIndexer;
+
+	private Consumer<SearchRequestBuilder> _consumer;
 
 	@DeleteAfterTestRun
-	private List<ExpandoColumn> _expandoColumns;
+	private List<ExpandoColumn> _expandoColumns = new ArrayList<>();
 
 	@DeleteAfterTestRun
-	private List<ExpandoTable> _expandoTables;
+	private List<ExpandoTable> _expandoTables = new ArrayList<>();
 
-	private ExpandoTableSearchFixture _expandoTableSearchFixture;
+	@DeleteAfterTestRun
 	private Group _group;
 
-	@DeleteAfterTestRun
-	private List<Group> _groups;
+	@Inject(filter = "component.name=*.JournalArticleIndexer")
+	private Indexer<JournalArticle> _journalArticleIndexer;
 
-	@DeleteAfterTestRun
-	private List<JournalArticle> _journalArticles;
+	@Inject
+	private Searcher _searcher;
 
-	private JournalArticleSearchFixture _journalArticleSearchFixture;
-	private User _user;
+	@Inject
+	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 }
