@@ -21,8 +21,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
  */
 public interface ModelVisibilityContributor {
 
-	public boolean isVisible(long classPK, int status);
-
 	public default boolean isVisible(int entryStatus, int queryStatus) {
 		if (((queryStatus != WorkflowConstants.STATUS_ANY) &&
 			 (entryStatus == queryStatus)) ||
@@ -33,5 +31,7 @@ public interface ModelVisibilityContributor {
 
 		return false;
 	}
+
+	public boolean isVisible(long classPK, int status);
 
 }
