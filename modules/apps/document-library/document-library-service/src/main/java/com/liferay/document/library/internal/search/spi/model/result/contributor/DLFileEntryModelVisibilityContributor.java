@@ -20,7 +20,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.result.contributor.ModelVisibilityContributor;
 
 import org.osgi.service.component.annotations.Component;
@@ -45,17 +44,6 @@ public class DLFileEntryModelVisibilityContributor
 		}
 
 		return isVisible(fileVersion.getStatus(), status);
-	}
-
-	protected boolean isVisible(int entryStatus, int queryStatus) {
-		if (((queryStatus != WorkflowConstants.STATUS_ANY) &&
-			 (entryStatus == queryStatus)) ||
-			(entryStatus != WorkflowConstants.STATUS_IN_TRASH)) {
-
-			return true;
-		}
-
-		return false;
 	}
 
 	@Reference
