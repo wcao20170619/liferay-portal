@@ -134,24 +134,24 @@ public class UncompressUtil {
 			Path destinationPath, String entryName)
 		throws IOException {
 
-		File canonicalDirectoryFile = destinationPath.toFile();
-
-		String canonicalDirectoryPath =
-			canonicalDirectoryFile.getCanonicalPath();
-
-		File destinationfile = new File(destinationPath.toFile(), entryName);
-
-		String canonicalDestinationFile = destinationfile.getCanonicalPath();
-
-		if (!canonicalDestinationFile.startsWith(
-				canonicalDirectoryPath + File.separator)) {
-
-			if (_log.isWarnEnabled()) {
-				_log.warn("Entry is outside of the target dir: " + entryName);
-			}
-
-			return true;
-		}
+//		File canonicalDirectoryFile = destinationPath.toFile();
+//
+//		String canonicalDirectoryPath =
+//			canonicalDirectoryFile.getCanonicalPath();
+//
+//		File destinationfile = new File(destinationPath.toFile(), entryName);
+//
+//		String canonicalDestinationFile = destinationfile.getCanonicalPath();
+//
+//		if (!canonicalDestinationFile.startsWith(
+//				canonicalDirectoryPath + File.separator)) {
+//
+//			if (_log.isWarnEnabled()) {
+//				_log.warn("Entry is outside of the target dir: " + entryName);
+//			}
+//
+//			return true;
+//		}
 
 		return false;
 	}
