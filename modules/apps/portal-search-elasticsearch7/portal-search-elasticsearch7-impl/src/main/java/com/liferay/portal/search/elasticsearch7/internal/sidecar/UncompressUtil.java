@@ -62,6 +62,13 @@ public class UncompressUtil {
 						tarArchiveInputStream.getNextTarEntry()) != null) {
 
 				if (tarArchiveInputStream.canReadEntryData(tarArchiveEntry)) {
+					if (_isZipSlipVulnerable(
+							destinationDirectoryPath,
+							tarArchiveEntry.getName())) {
+
+						continue;
+					}
+
 					if (rootArchiveName.equals(StringPool.BLANK)) {
 						rootArchiveName = tarArchiveEntry.getName();
 					}
@@ -102,6 +109,12 @@ public class UncompressUtil {
 			ZipEntry zipEntry;
 
 			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+				if (_isZipSlipVulnerable(
+						destinationDirectoryPath, zipEntry.getName())) {
+
+					continue;
+				}
+
 				Path path = destinationDirectoryPath.resolve(
 					zipEntry.getName());
 
@@ -115,6 +128,32 @@ public class UncompressUtil {
 				_setFilePermission(path);
 			}
 		}
+	}
+
+	private static boolean _isZipSlipVulnerable(
+			Path destinationPath, String entryName)
+		throws IOException {
+
+		File canonicalDirectoryFile = destinationPath.toFile();
+
+		String canonicalDirectoryPath =
+			canonicalDirectoryFile.getCanonicalPath();
+
+		File destinationfile = new File(destinationPath.toFile(), entryName);
+
+		String canonicalDestinationFile = destinationfile.getCanonicalPath();
+
+		if (!canonicalDestinationFile.startsWith(
+				canonicalDirectoryPath + File.separator)) {
+
+			if (_log.isWarnEnabled()) {
+				_log.warn("Entry is outside of the target dir: " + entryName);
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static void _setFilePermission(Path path) throws IOException {
