@@ -34,7 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * @author Wade Cao
+ * @author Wade Cao, Joshua Cords
  */
 public class UncompressUtilTest {
 
@@ -46,10 +46,16 @@ public class UncompressUtilTest {
 	@Before
 	public void setUp() throws IOException {
 		_tempDir = Files.createTempDirectory("temp_dir");
+
+		_evilFileTargetDir = _tempDir.resolve(
+			"../../../../../../../../../../../../../../../../../../../../.." +
+				"/../../../../../../../../../../../../../../../../../../.." +
+					"/tmp/evil.txt");
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		PathUtil.deleteDir(_evilFileTargetDir);
 		PathUtil.deleteDir(_tempDir);
 	}
 
@@ -88,13 +94,13 @@ public class UncompressUtilTest {
 		UncompressUtil.unzip(_getResourcePath("test_slip.zip"), _tempDir);
 
 		_assertExists("good.txt");
-		_assertDoesNotExist("tmp/evil.txt");
+		_assertDoesNotExist();
 	}
 
-	private void _assertDoesNotExist(String name) {
-		Path fullPath = _tempDir.resolve(name);
-
-		Assert.assertFalse(Files.exists(fullPath));
+	private void _assertDoesNotExist() {
+		Assert.assertFalse(
+			"File should not unzip outside of " + _tempDir,
+			Files.exists(_evilFileTargetDir));
 	}
 
 	private void _assertExists(String name) {
@@ -133,6 +139,7 @@ public class UncompressUtilTest {
 		return path.resolve(fileName);
 	}
 
+	private Path _evilFileTargetDir;
 	private Path _tempDir;
 
 }
