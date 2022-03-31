@@ -66,6 +66,10 @@ public class TestHttp {
 		return shortenURL(sb.toString());
 	}
 
+	public static String decodePath(String path) {
+		return decodeURL(path);
+	}
+
 	public static String decodeURL(String url) {
 		if (Validator.isNull(url)) {
 			return url;
@@ -82,6 +86,14 @@ public class TestHttp {
 
 	public static Http getInstance() {
 		Http http = Mockito.mock(Http.class);
+
+		Mockito.doAnswer(
+			invocationOnMock -> decodePath(_getArg(invocationOnMock))
+		).when(
+			http
+		).decodePath(
+			Mockito.anyString()
+		);
 
 		Mockito.doAnswer(
 			invocationOnMock -> decodeURL(_getArg(invocationOnMock))
