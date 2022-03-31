@@ -854,7 +854,6 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 		return new SimilarResultsContributorsRegistryImpl() {
 			{
-				//setHttp(_http);
 				setSimilarResultsContributorsHolder(
 					similarResultsContributorsHolderImpl);
 			}
