@@ -15,6 +15,7 @@
 package com.liferay.portal.search.similar.results.web.internal.contributor.wiki;
 
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.search.model.uid.UIDFactory;
 import com.liferay.portal.search.similar.results.web.internal.helper.HttpHelper;
 import com.liferay.portal.search.similar.results.web.internal.util.SearchStringUtil;
@@ -42,12 +43,13 @@ public class WikiSimilarResultsContributor
 		String[] parameters = _httpHelper.getFriendlyURLParameters(
 			routeHelper.getURLString());
 
-		SearchStringUtil.requireEquals("wiki", parameters[0]);
+		SearchStringUtil.requireEquals(
+			"wiki", URLCodec.decodeURL(parameters[0]));
 
 		routeBuilder.addAttribute(
-			"nodeName", parameters[1]
+			"nodeName", URLCodec.decodeURL(parameters[1])
 		).addAttribute(
-			"title", parameters[2]
+			"title", URLCodec.decodeURL(parameters[2])
 		);
 	}
 
