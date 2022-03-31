@@ -32,7 +32,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.search.model.uid.UIDFactory;
 import com.liferay.portal.search.similar.results.web.internal.contributor.asset.publisher.AssetPublisherSimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.internal.contributor.blogs.BlogsSimilarResultsContributor;
@@ -44,7 +44,6 @@ import com.liferay.portal.search.similar.results.web.internal.contributor.url.pa
 import com.liferay.portal.search.similar.results.web.internal.contributor.url.parameters.EntryIdSimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.internal.contributor.url.parameters.UIDSimilarResultsContributor;
 import com.liferay.portal.search.similar.results.web.internal.contributor.wiki.WikiDisplaySimilarResultsContributor;
-import com.liferay.portal.search.similar.results.web.internal.helper.HttpHelper;
 import com.liferay.portal.search.similar.results.web.internal.helper.HttpHelperImpl;
 import com.liferay.portal.search.similar.results.web.internal.portlet.shared.search.Criteria;
 import com.liferay.portal.search.similar.results.web.internal.portlet.shared.search.CriteriaBuilderImpl;
@@ -53,6 +52,7 @@ import com.liferay.portal.search.similar.results.web.spi.contributor.SimilarResu
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.CriteriaHelper;
 import com.liferay.portal.search.similar.results.web.spi.contributor.helper.DestinationHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+import com.liferay.portal.util.PortalImpl;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiNodeLocalService;
@@ -88,13 +88,13 @@ public class SimilarResultsUidsAndDestinationsTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 
-		_http = TestHttp.getInstance();
+		_httpHelperImpl = new HttpHelperImpl();
 
-		_httpHelper = new HttpHelperImpl() {
-			{
-				setHttp(_http);
-			}
-		};
+		_httpHelperImpl.setHttp(TestHttp.getInstance());
+
+		PortalUtil portalUtil = new PortalUtil();
+
+		portalUtil.setPortal(new PortalImpl());
 
 		_similarResultsContributorsRegistry =
 			_createSimilarResultsContributorsRegistry();
@@ -695,7 +695,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 		String urlString, SimilarResultsRoute similarResultsRoute) {
 
 		DestinationBuilderImpl destinationBuilderImpl =
-			new DestinationBuilderImpl(urlString, _http);
+			new DestinationBuilderImpl(urlString, TestHttp.getInstance());
 
 		SimilarResultsContributor similarResultsContributor =
 			similarResultsRoute.getContributor();
@@ -736,7 +736,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new AssetPublisherSimilarResultsContributor() {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 				setUIDFactory(_uidFactory);
 			}
 		};
@@ -746,7 +747,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new BlogsSimilarResultsContributor() {
 			{
 				setBlogsEntryLocalService(_blogsEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 				setUIDFactory(_uidFactory);
 			}
 		};
@@ -757,7 +759,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 		return new ClassNameClassPKSimilarResultsContributor() {
 			{
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -768,7 +771,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new ClassNameIdClassPKSimilarResultsContributor() {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -779,7 +783,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new ClassUUIDSimilarResultsContributor() {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -792,7 +797,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 				setAssetEntryLocalService(_assetEntryLocalService);
 				setDLFileEntryLocalService(_dlFileEntryLocalService);
 				setDLFolderLocalService(_dlFolderLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -803,7 +809,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new EntryIdSimilarResultsContributor() {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -816,7 +823,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 				setAssetEntryLocalService(_assetEntryLocalService);
 				setMbCategoryLocalService(_mbCategoryLocalService);
 				setMbMessageLocalService(_mbMessageLocalService);
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -846,7 +854,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 
 		return new SimilarResultsContributorsRegistryImpl() {
 			{
-				setHttp(_http);
+				//setHttp(_http);
 				setSimilarResultsContributorsHolder(
 					similarResultsContributorsHolderImpl);
 			}
@@ -856,7 +864,8 @@ public class SimilarResultsUidsAndDestinationsTest {
 	private SimilarResultsContributor _createUIDSimilarResultsContributor() {
 		return new UIDSimilarResultsContributor() {
 			{
-				setHttpHelper(_httpHelper);
+				setHttp(TestHttp.getInstance());
+				setHttpHelper(_httpHelperImpl);
 			}
 		};
 	}
@@ -865,7 +874,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 		return new WikiDisplaySimilarResultsContributor() {
 			{
 				setAssetEntryLocalService(_assetEntryLocalService);
-				setHttpHelper(_httpHelper);
+				setHttpHelper(_httpHelperImpl);
 				setUIDFactory(_uidFactory);
 				setWikiNodeLocalService(_wikiNodeLocalService);
 				setWikiPageLocalService(_wikiPageLocalService);
@@ -1046,8 +1055,7 @@ public class SimilarResultsUidsAndDestinationsTest {
 	private DLFolderLocalService _dlFolderLocalService;
 
 	private long _groupId;
-	private Http _http;
-	private HttpHelper _httpHelper;
+	private HttpHelperImpl _httpHelperImpl;
 
 	@Mock
 	private MBCategoryLocalService _mbCategoryLocalService;
