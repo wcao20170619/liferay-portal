@@ -23,6 +23,7 @@ import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.search.model.uid.UIDFactory;
 import com.liferay.portal.search.similar.results.web.internal.builder.AssetTypeUtil;
 import com.liferay.portal.search.similar.results.web.internal.helper.HttpHelper;
@@ -54,7 +55,7 @@ public class AssetPublisherSimilarResultsContributor
 	public void detectRoute(
 		RouteBuilder routeBuilder, RouteHelper routeHelper) {
 
-		String urlString = routeHelper.getURLString();
+		String urlString = _http.decodePath(routeHelper.getURLString());
 
 		String[] parameters = _httpHelper.getFriendlyURLParameters(urlString);
 
@@ -124,6 +125,11 @@ public class AssetPublisherSimilarResultsContributor
 	}
 
 	@Reference(unbind = "-")
+	protected void setHttp(Http http) {
+		_http = http;
+	}
+
+	@Reference(unbind = "-")
 	protected void setHttpHelper(HttpHelper httpHelper) {
 		_httpHelper = httpHelper;
 	}
@@ -189,6 +195,7 @@ public class AssetPublisherSimilarResultsContributor
 
 	private AssetEntryLocalService _assetEntryLocalService;
 	private BlogsEntryLocalService _blogsEntryLocalService;
+	private Http _http;
 	private HttpHelper _httpHelper;
 	private UIDFactory _uidFactory;
 	private WikiPageLocalService _wikiPageLocalService;
