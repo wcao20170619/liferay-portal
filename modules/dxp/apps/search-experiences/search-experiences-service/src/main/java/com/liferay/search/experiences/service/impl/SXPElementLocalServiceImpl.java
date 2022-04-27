@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
@@ -59,6 +61,20 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		return addSXPElement(
+			userId, descriptionMap, elementDefinitionJSON, null, readOnly,
+			schemaVersion, titleMap, type, serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public SXPElement addSXPElement(
+			long userId, Map<Locale, String> descriptionMap,
+			String elementDefinitionJSON, String key, boolean readOnly,
+			String schemaVersion, Map<Locale, String> titleMap, int type,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		_validate(elementDefinitionJSON, titleMap, type, serviceContext);
 
 		SXPElement sxpElement = createSXPElement(
@@ -73,10 +89,15 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 		sxpElement.setDescriptionMap(descriptionMap);
 		sxpElement.setElementDefinitionJSON(elementDefinitionJSON);
 		sxpElement.setHidden(false);
+		sxpElement.setKey(_getKey(key));
 		sxpElement.setReadOnly(readOnly);
 		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
 		sxpElement.setType(type);
+		sxpElement.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 		sxpElement.setStatus(WorkflowConstants.STATUS_APPROVED);
 
 		sxpElement = sxpElementPersistence.update(sxpElement);
@@ -152,6 +173,20 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 			Map<Locale, String> titleMap, ServiceContext serviceContext)
 		throws PortalException {
 
+		return updateSXPElement(
+			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
+			null, schemaVersion, titleMap, serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public SXPElement updateSXPElement(
+			long userId, long sxpElementId, Map<Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean hidden, String key,
+			String schemaVersion, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		SXPElement sxpElement = getSXPElement(sxpElementId);
 
 		_validate(
@@ -161,10 +196,26 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 		sxpElement.setDescriptionMap(descriptionMap);
 		sxpElement.setElementDefinitionJSON(elementDefinitionJSON);
 		sxpElement.setHidden(hidden);
+		sxpElement.setKey(_getKey(key));
 		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
+		sxpElement.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 
 		return updateSXPElement(sxpElement);
+	}
+
+	private String _getKey(String key) {
+		if (Validator.isNull(key)) {
+			key = String.valueOf(counterLocalService.increment());
+		}
+		else {
+			key = StringUtil.toUpperCase(key.trim());
+		}
+
+		return key;
 	}
 
 	private void _validate(
