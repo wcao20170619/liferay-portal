@@ -50,6 +50,20 @@ public class SXPElementLocalServiceWrapper
 			schemaVersion, titleMap, type, serviceContext);
 	}
 
+	@Override
+	public com.liferay.search.experiences.model.SXPElement addSXPElement(
+			long userId, java.util.Map<java.util.Locale, String> descriptionMap,
+			String elementDefinitionJSON, String key, boolean readOnly,
+			String schemaVersion,
+			java.util.Map<java.util.Locale, String> titleMap, int type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _sxpElementLocalService.addSXPElement(
+			userId, descriptionMap, elementDefinitionJSON, key, readOnly,
+			schemaVersion, titleMap, type, serviceContext);
+	}
+
 	/**
 	 * Adds the sxp element to the database. Also notifies the appropriate model listeners.
 	 *
@@ -404,6 +418,21 @@ public class SXPElementLocalServiceWrapper
 		return _sxpElementLocalService.updateSXPElement(
 			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
 			schemaVersion, titleMap, serviceContext);
+	}
+
+	@Override
+	public com.liferay.search.experiences.model.SXPElement updateSXPElement(
+			long userId, long sxpElementId,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean hidden, String key,
+			String schemaVersion,
+			java.util.Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _sxpElementLocalService.updateSXPElement(
+			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
+			key, schemaVersion, titleMap, serviceContext);
 	}
 
 	/**

@@ -51,6 +51,20 @@ public class SXPBlueprintLocalServiceWrapper
 			schemaVersion, titleMap, serviceContext);
 	}
 
+	@Override
+	public com.liferay.search.experiences.model.SXPBlueprint addSXPBlueprint(
+			long userId, String configurationJSON,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String elementInstancesJSON, String key, String schemaVersion,
+			java.util.Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _sxpBlueprintLocalService.addSXPBlueprint(
+			userId, configurationJSON, descriptionMap, elementInstancesJSON,
+			key, schemaVersion, titleMap, serviceContext);
+	}
+
 	/**
 	 * Adds the sxp blueprint to the database. Also notifies the appropriate model listeners.
 	 *
@@ -404,6 +418,20 @@ public class SXPBlueprintLocalServiceWrapper
 		return _sxpBlueprintLocalService.updateSXPBlueprint(
 			userId, sxpBlueprintId, configurationJSON, descriptionMap,
 			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+	}
+
+	@Override
+	public com.liferay.search.experiences.model.SXPBlueprint updateSXPBlueprint(
+			long userId, long sxpBlueprintId, String configurationJSON,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			String elementInstancesJSON, String key, String schemaVersion,
+			java.util.Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _sxpBlueprintLocalService.updateSXPBlueprint(
+			userId, sxpBlueprintId, configurationJSON, descriptionMap,
+			elementInstancesJSON, key, schemaVersion, titleMap, serviceContext);
 	}
 
 	/**
