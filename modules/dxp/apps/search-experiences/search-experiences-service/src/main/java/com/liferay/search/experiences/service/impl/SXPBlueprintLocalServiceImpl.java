@@ -33,6 +33,7 @@ import com.liferay.search.experiences.exception.SXPBlueprintConfigurationJSONExc
 import com.liferay.search.experiences.exception.SXPBlueprintTitleException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.base.SXPBlueprintLocalServiceBaseImpl;
+import com.liferay.search.experiences.service.impl.util.KeyUtil;
 import com.liferay.search.experiences.validator.SXPBlueprintValidator;
 
 import java.util.List;
@@ -63,6 +64,20 @@ public class SXPBlueprintLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		return addSXPBlueprint(
+			userId, configurationJSON, descriptionMap, elementInstancesJSON,
+			null, schemaVersion, titleMap, serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public SXPBlueprint addSXPBlueprint(
+			long userId, String configurationJSON,
+			Map<Locale, String> descriptionMap, String elementInstancesJSON,
+			String key, String schemaVersion, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		_validate(configurationJSON, titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.create(
@@ -77,8 +92,13 @@ public class SXPBlueprintLocalServiceImpl
 		sxpBlueprint.setConfigurationJSON(configurationJSON);
 		sxpBlueprint.setDescriptionMap(descriptionMap);
 		sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
-		sxpBlueprint.setSchemaVersion(schemaVersion);
+		sxpBlueprint.setKey(KeyUtil.getKey(counterLocalService, key));
 		sxpBlueprint.setTitleMap(titleMap);
+		sxpBlueprint.setSchemaVersion(schemaVersion);
+		sxpBlueprint.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpBlueprint.getVersion(), 0.9F) + 0.1));
 		sxpBlueprint.setStatus(WorkflowConstants.STATUS_DRAFT);
 		sxpBlueprint.setStatusByUserId(user.getUserId());
 		sxpBlueprint.setStatusDate(serviceContext.getModifiedDate(null));
@@ -174,6 +194,21 @@ public class SXPBlueprintLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		return updateSXPBlueprint(
+			userId, sxpBlueprintId, configurationJSON, descriptionMap,
+			elementInstancesJSON, null, schemaVersion, titleMap,
+			serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public SXPBlueprint updateSXPBlueprint(
+			long userId, long sxpBlueprintId, String configurationJSON,
+			Map<Locale, String> descriptionMap, String elementInstancesJSON,
+			String key, String schemaVersion, Map<Locale, String> titleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
 		_validate(configurationJSON, titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.findByPrimaryKey(
@@ -182,7 +217,12 @@ public class SXPBlueprintLocalServiceImpl
 		sxpBlueprint.setConfigurationJSON(configurationJSON);
 		sxpBlueprint.setDescriptionMap(descriptionMap);
 		sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
+		sxpBlueprint.setKey(KeyUtil.getKey(counterLocalService, key));
 		sxpBlueprint.setTitleMap(titleMap);
+		sxpBlueprint.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpBlueprint.getVersion(), 0.9F) + 0.1));
 
 		return updateSXPBlueprint(sxpBlueprint);
 	}
