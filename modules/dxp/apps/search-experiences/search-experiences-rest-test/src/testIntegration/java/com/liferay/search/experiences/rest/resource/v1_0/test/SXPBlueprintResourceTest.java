@@ -126,9 +126,11 @@ public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
 
 		sxpBlueprint.setCreateDate(postSXPBlueprint.getCreateDate());
 		sxpBlueprint.setId(postSXPBlueprint.getId());
+		sxpBlueprint.setKey(postSXPBlueprint.getKey());
 		sxpBlueprint.setModifiedDate(postSXPBlueprint.getModifiedDate());
 		sxpBlueprint.setSchemaVersion(postSXPBlueprint.getSchemaVersion());
 		sxpBlueprint.setUserName(postSXPBlueprint.getUserName());
+		sxpBlueprint.setVersion(postSXPBlueprint.getVersion());
 
 		Assert.assertEquals(
 			sxpBlueprint.toString(), postSXPBlueprint.toString());
