@@ -188,9 +188,11 @@ public abstract class BaseSXPElementResourceTestCase {
 		SXPElement sxpElement = randomSXPElement();
 
 		sxpElement.setDescription(regex);
+		sxpElement.setKey(regex);
 		sxpElement.setSchemaVersion(regex);
 		sxpElement.setTitle(regex);
 		sxpElement.setUserName(regex);
+		sxpElement.setVersion(regex);
 
 		String json = SXPElementSerDes.toJSON(sxpElement);
 
@@ -199,9 +201,11 @@ public abstract class BaseSXPElementResourceTestCase {
 		sxpElement = SXPElementSerDes.toDTO(json);
 
 		Assert.assertEquals(regex, sxpElement.getDescription());
+		Assert.assertEquals(regex, sxpElement.getKey());
 		Assert.assertEquals(regex, sxpElement.getSchemaVersion());
 		Assert.assertEquals(regex, sxpElement.getTitle());
 		Assert.assertEquals(regex, sxpElement.getUserName());
+		Assert.assertEquals(regex, sxpElement.getVersion());
 	}
 
 	@Test
@@ -837,6 +841,14 @@ public abstract class BaseSXPElementResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("key", additionalAssertFieldName)) {
+				if (sxpElement.getKey() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
 				if (sxpElement.getModifiedDate() == null) {
 					valid = false;
@@ -887,6 +899,14 @@ public abstract class BaseSXPElementResourceTestCase {
 
 			if (Objects.equals("userName", additionalAssertFieldName)) {
 				if (sxpElement.getUserName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("version", additionalAssertFieldName)) {
+				if (sxpElement.getVersion() == null) {
 					valid = false;
 				}
 
@@ -1061,6 +1081,16 @@ public abstract class BaseSXPElementResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("key", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getKey(), sxpElement2.getKey())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("modifiedDate", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpElement1.getModifiedDate(),
@@ -1127,6 +1157,16 @@ public abstract class BaseSXPElementResourceTestCase {
 			if (Objects.equals("userName", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						sxpElement1.getUserName(), sxpElement2.getUserName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("version", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						sxpElement1.getVersion(), sxpElement2.getVersion())) {
 
 					return false;
 				}
@@ -1295,6 +1335,14 @@ public abstract class BaseSXPElementResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("key")) {
+			sb.append("'");
+			sb.append(String.valueOf(sxpElement.getKey()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("modifiedDate")) {
 			if (operator.equals("between")) {
 				sb = new StringBundler();
@@ -1367,6 +1415,14 @@ public abstract class BaseSXPElementResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("version")) {
+			sb.append("'");
+			sb.append(String.valueOf(sxpElement.getVersion()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
@@ -1416,6 +1472,7 @@ public abstract class BaseSXPElementResourceTestCase {
 					RandomTestUtil.randomString());
 				hidden = RandomTestUtil.randomBoolean();
 				id = RandomTestUtil.randomLong();
+				key = StringUtil.toLowerCase(RandomTestUtil.randomString());
 				modifiedDate = RandomTestUtil.nextDate();
 				readOnly = RandomTestUtil.randomBoolean();
 				schemaVersion = StringUtil.toLowerCase(
@@ -1424,6 +1481,7 @@ public abstract class BaseSXPElementResourceTestCase {
 				type = RandomTestUtil.randomInt();
 				userName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
+				version = StringUtil.toLowerCase(RandomTestUtil.randomString());
 			}
 		};
 	}
