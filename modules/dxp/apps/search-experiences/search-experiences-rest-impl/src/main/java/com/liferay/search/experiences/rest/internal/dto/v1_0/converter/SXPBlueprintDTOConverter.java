@@ -76,6 +76,7 @@ public class SXPBlueprintDTOConverter
 				elementInstances = _toElementInstances(
 					sxpBlueprint.getElementInstancesJSON());
 				id = sxpBlueprint.getSXPBlueprintId();
+				key = sxpBlueprint.getKey();
 				modifiedDate = sxpBlueprint.getModifiedDate();
 				schemaVersion = sxpBlueprint.getSchemaVersion();
 				title = sxpBlueprint.getTitle(dtoConverterContext.getLocale());
@@ -83,6 +84,7 @@ public class SXPBlueprintDTOConverter
 					dtoConverterContext.isAcceptAllLanguages(),
 					sxpBlueprint.getTitleMap());
 				userName = sxpBlueprint.getUserName();
+				version = sxpBlueprint.getVersion();
 			}
 		};
 	}
@@ -102,12 +104,14 @@ public class SXPBlueprintDTOConverter
 				elementInstances = _toElementInstances(
 					sxpBlueprint.getElementInstancesJSON());
 				id = sxpBlueprint.getSXPBlueprintId();
+				key = sxpBlueprint.getKey();
 				modifiedDate = sxpBlueprint.getModifiedDate();
 				schemaVersion = sxpBlueprint.getSchemaVersion();
 				title = sxpBlueprint.getTitle();
 				title_i18n = LocalizedMapUtil.getI18nMap(
 					true, sxpBlueprint.getTitleMap());
 				userName = sxpBlueprint.getUserName();
+				version = sxpBlueprint.getVersion();
 			}
 		};
 	}
