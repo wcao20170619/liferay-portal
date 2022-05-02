@@ -122,7 +122,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "key": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "SXPElement")}
@@ -139,7 +139,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/batch' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/batch' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "key": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -311,7 +311,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/{sxpElementId}' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/{sxpElementId}' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "key": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___, "version": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
