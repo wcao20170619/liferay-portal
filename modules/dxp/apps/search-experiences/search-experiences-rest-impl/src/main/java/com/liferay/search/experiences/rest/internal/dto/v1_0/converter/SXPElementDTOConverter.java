@@ -71,6 +71,7 @@ public class SXPElementDTOConverter
 				elementDefinition = _toElementDefinition(
 					sxpElement.getElementDefinitionJSON());
 				id = sxpElement.getSXPElementId();
+				key = sxpElement.getKey();
 				modifiedDate = sxpElement.getModifiedDate();
 				readOnly = sxpElement.getReadOnly();
 				schemaVersion = sxpElement.getSchemaVersion();
@@ -79,6 +80,7 @@ public class SXPElementDTOConverter
 					true, sxpElement.getTitleMap());
 				type = sxpElement.getType();
 				userName = sxpElement.getUserName();
+				version = sxpElement.getVersion();
 			}
 		};
 	}
