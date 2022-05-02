@@ -14,11 +14,15 @@
 
 package com.liferay.search.experiences.internal.upgrade;
 
+import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+import com.liferay.search.experiences.internal.upgrade.v1_1_0.SXPBlueprintKeyVersionUpgradeProcess;
 import com.liferay.search.experiences.internal.upgrade.v1_1_0.SXPBlueprintUpgradeProcess;
+import com.liferay.search.experiences.internal.upgrade.v1_1_0.SXPElementKeyVersionUpgradeProcess;
 import com.liferay.search.experiences.internal.upgrade.v1_1_0.SXPElementUpgradeProcess;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Petteri Karttunen
@@ -32,7 +36,12 @@ public class SXPUpgradeStepRegistrator implements UpgradeStepRegistrator {
 	public void register(Registry registry) {
 		registry.register(
 			"1.0.0", "1.1.0", new SXPElementUpgradeProcess(),
-			new SXPBlueprintUpgradeProcess());
+			new SXPBlueprintUpgradeProcess(),
+			new SXPElementKeyVersionUpgradeProcess(_counterLocalService),
+			new SXPBlueprintKeyVersionUpgradeProcess(_counterLocalService));
 	}
+
+	@Reference
+	private CounterLocalService _counterLocalService;
 
 }
