@@ -376,6 +376,8 @@ components:
                 id:
                     format: int64
                     type: integer
+                key:
+                    type: string
                 modifiedDate:
                     format: date
                     type: string
@@ -388,6 +390,8 @@ components:
                         type: string
                     type: object
                 userName:
+                    type: string
+                version:
                     type: string
             type: object
         SXPElement:
@@ -415,6 +419,8 @@ components:
                 id:
                     format: int64
                     type: integer
+                key:
+                    type: string
                 modifiedDate:
                     format: date
                     type: string
@@ -431,6 +437,8 @@ components:
                 type:
                     type: integer
                 userName:
+                    type: string
+                version:
                     type: string
             type: object
         SXPParameterContributorDefinition:
