@@ -58,6 +58,19 @@ public class SXPElementLocalServiceUtil {
 			schemaVersion, titleMap, type, serviceContext);
 	}
 
+	public static SXPElement addSXPElement(
+			long userId, Map<java.util.Locale, String> descriptionMap,
+			String elementDefinitionJSON, String key, boolean readOnly,
+			String schemaVersion, Map<java.util.Locale, String> titleMap,
+			int type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addSXPElement(
+			userId, descriptionMap, elementDefinitionJSON, key, readOnly,
+			schemaVersion, titleMap, type, serviceContext);
+	}
+
 	/**
 	 * Adds the sxp element to the database. Also notifies the appropriate model listeners.
 	 *
@@ -359,6 +372,19 @@ public class SXPElementLocalServiceUtil {
 		return getService().updateSXPElement(
 			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
 			schemaVersion, titleMap, serviceContext);
+	}
+
+	public static SXPElement updateSXPElement(
+			long userId, long sxpElementId,
+			Map<java.util.Locale, String> descriptionMap,
+			String elementDefinitionJSON, boolean hidden, String key,
+			String schemaVersion, Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().updateSXPElement(
+			userId, sxpElementId, descriptionMap, elementDefinitionJSON, hidden,
+			key, schemaVersion, titleMap, serviceContext);
 	}
 
 	/**

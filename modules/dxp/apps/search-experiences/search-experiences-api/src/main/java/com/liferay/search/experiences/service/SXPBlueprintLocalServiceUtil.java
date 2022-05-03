@@ -58,6 +58,19 @@ public class SXPBlueprintLocalServiceUtil {
 			schemaVersion, titleMap, serviceContext);
 	}
 
+	public static SXPBlueprint addSXPBlueprint(
+			long userId, String configurationJSON,
+			Map<java.util.Locale, String> descriptionMap,
+			String elementInstancesJSON, String key, String schemaVersion,
+			Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().addSXPBlueprint(
+			userId, configurationJSON, descriptionMap, elementInstancesJSON,
+			key, schemaVersion, titleMap, serviceContext);
+	}
+
 	/**
 	 * Adds the sxp blueprint to the database. Also notifies the appropriate model listeners.
 	 *
@@ -360,6 +373,19 @@ public class SXPBlueprintLocalServiceUtil {
 		return getService().updateSXPBlueprint(
 			userId, sxpBlueprintId, configurationJSON, descriptionMap,
 			elementInstancesJSON, schemaVersion, titleMap, serviceContext);
+	}
+
+	public static SXPBlueprint updateSXPBlueprint(
+			long userId, long sxpBlueprintId, String configurationJSON,
+			Map<java.util.Locale, String> descriptionMap,
+			String elementInstancesJSON, String key, String schemaVersion,
+			Map<java.util.Locale, String> titleMap,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().updateSXPBlueprint(
+			userId, sxpBlueprintId, configurationJSON, descriptionMap,
+			elementInstancesJSON, key, schemaVersion, titleMap, serviceContext);
 	}
 
 	/**
