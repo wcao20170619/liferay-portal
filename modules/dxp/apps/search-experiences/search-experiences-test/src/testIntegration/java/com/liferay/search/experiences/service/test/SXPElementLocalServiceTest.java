@@ -12,7 +12,7 @@
  *
  */
 
-package com.liferay.search.experiences.service.impl.test;
+package com.liferay.search.experiences.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.portal.kernel.model.Group;
@@ -26,8 +26,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.search.experiences.model.SXPBlueprint;
-import com.liferay.search.experiences.service.SXPBlueprintLocalService;
+import com.liferay.search.experiences.model.SXPElement;
+import com.liferay.search.experiences.service.SXPElementLocalService;
 
 import java.util.Collections;
 
@@ -42,7 +42,7 @@ import org.junit.runner.RunWith;
  * @author Wade Cao
  */
 @RunWith(Arquillian.class)
-public class SXPBlueprintLocalServiceImplTest {
+public class SXPElementLocalServiceTest {
 
 	@ClassRule
 	@Rule
@@ -55,60 +55,60 @@ public class SXPBlueprintLocalServiceImplTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		_sxpBlueprint = _sxpBlueprintLocalService.addSXPBlueprint(
-			TestPropsValues.getUserId(), "{}",
-			Collections.singletonMap(LocaleUtil.US, ""), null, "",
+		_sxpElement = _sxpElementLocalService.addSXPElement(
+			TestPropsValues.getUserId(),
+			Collections.singletonMap(LocaleUtil.US, ""), "{}", false,
+			RandomTestUtil.randomString(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
+			0,
 			ServiceContextTestUtil.getServiceContext(
 				_group, TestPropsValues.getUserId()));
 	}
 
 	@Test
-	public void testAddSXPBlueprintWithKeyVersion() throws Exception {
-		Assert.assertEquals("1.0", _sxpBlueprint.getVersion());
+	public void testAddSXPElementWithKeyVersion() throws Exception {
+		Assert.assertEquals("1.0", _sxpElement.getVersion());
 
-		Assert.assertNotNull(_sxpBlueprint.getKey());
+		Assert.assertNotNull(_sxpElement.getKey());
 	}
 
 	@Test
-	public void testUpdateSXPBlueprintWithKeyVersion() throws Exception {
-		String key = _sxpBlueprint.getKey();
+	public void testUpdateSXPElementWithKeyVersion() throws Exception {
+		String key = _sxpElement.getKey();
 
-		_sxpBlueprint = _sxpBlueprintLocalService.updateSXPBlueprint(
-			_sxpBlueprint.getUserId(), _sxpBlueprint.getSXPBlueprintId(),
-			_sxpBlueprint.getConfigurationJSON(),
-			_sxpBlueprint.getDescriptionMap(),
-			_sxpBlueprint.getElementInstancesJSON(),
-			_sxpBlueprint.getSchemaVersion(), _sxpBlueprint.getTitleMap(),
+		_sxpElement = _sxpElementLocalService.updateSXPElement(
+			_sxpElement.getUserId(), _sxpElement.getSXPElementId(),
+			_sxpElement.getDescriptionMap(),
+			_sxpElement.getElementDefinitionJSON(), _sxpElement.isHidden(),
+			_sxpElement.getSchemaVersion(), _sxpElement.getTitleMap(),
 			ServiceContextTestUtil.getServiceContext(
 				_group, TestPropsValues.getUserId()));
 
-		Assert.assertEquals("1.1", _sxpBlueprint.getVersion());
+		Assert.assertEquals("1.1", _sxpElement.getVersion());
 
-		Assert.assertNotEquals(key, _sxpBlueprint.getKey());
+		Assert.assertNotEquals(key, _sxpElement.getKey());
 
-		_sxpBlueprint = _sxpBlueprintLocalService.updateSXPBlueprint(
-			_sxpBlueprint.getUserId(), _sxpBlueprint.getSXPBlueprintId(),
-			_sxpBlueprint.getConfigurationJSON(),
-			_sxpBlueprint.getDescriptionMap(),
-			_sxpBlueprint.getElementInstancesJSON(),
-			_sxpBlueprint.getSchemaVersion(), _sxpBlueprint.getTitleMap(),
+		_sxpElement = _sxpElementLocalService.updateSXPElement(
+			_sxpElement.getUserId(), _sxpElement.getSXPElementId(),
+			_sxpElement.getDescriptionMap(),
+			_sxpElement.getElementDefinitionJSON(), _sxpElement.isHidden(),
+			_sxpElement.getSchemaVersion(), _sxpElement.getTitleMap(),
 			ServiceContextTestUtil.getServiceContext(
 				_group, TestPropsValues.getUserId()));
 
-		Assert.assertEquals("1.2", _sxpBlueprint.getVersion());
+		Assert.assertEquals("1.2", _sxpElement.getVersion());
 
-		Assert.assertNotEquals(key, _sxpBlueprint.getKey());
+		Assert.assertNotEquals(key, _sxpElement.getKey());
 	}
 
 	@DeleteAfterTestRun
 	private Group _group;
 
 	@DeleteAfterTestRun
-	private SXPBlueprint _sxpBlueprint;
+	private SXPElement _sxpElement;
 
 	@Inject
-	private SXPBlueprintLocalService _sxpBlueprintLocalService;
+	private SXPElementLocalService _sxpElementLocalService;
 
 }
