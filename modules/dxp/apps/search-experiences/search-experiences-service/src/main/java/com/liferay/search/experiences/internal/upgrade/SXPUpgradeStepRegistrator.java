@@ -33,9 +33,15 @@ public class SXPUpgradeStepRegistrator implements UpgradeStepRegistrator {
 	@Override
 	public void register(Registry registry) {
 		registry.register(
-			"1.0.0", "1.1.0",
-			new SXPElementUpgradeProcess(_counterLocalService),
-			new SXPBlueprintUpgradeProcess(_counterLocalService));
+			"1.0.0", "1.1.0", new SXPElementUpgradeProcess(),
+			new SXPBlueprintUpgradeProcess());
+
+		registry.register(
+			"1.1.0", "1.2.0",
+			new com.liferay.search.experiences.internal.upgrade.v1_2_0.
+				SXPElementUpgradeProcess(_counterLocalService),
+			new com.liferay.search.experiences.internal.upgrade.v1_2_0.
+				SXPBlueprintUpgradeProcess(_counterLocalService));
 	}
 
 	@Reference
