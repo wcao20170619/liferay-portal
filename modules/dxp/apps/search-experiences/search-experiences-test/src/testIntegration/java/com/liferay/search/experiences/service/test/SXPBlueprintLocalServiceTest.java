@@ -72,6 +72,18 @@ public class SXPBlueprintLocalServiceTest {
 	}
 
 	@Test
+	public void testGetSXPBlueprintByKey() throws Exception {
+		Assert.assertEquals(
+			_sxpBlueprint,
+			_sxpBlueprintLocalService.getSXPBlueprintByKey(
+				_sxpBlueprint.getKey()));
+
+		Assert.assertNull(
+			_sxpBlueprintLocalService.getSXPBlueprintByKey(
+				RandomTestUtil.randomString()));
+	}
+
+	@Test
 	public void testUpdateSXPBlueprintWithKeyVersion() throws Exception {
 		String key = _sxpBlueprint.getKey();
 
