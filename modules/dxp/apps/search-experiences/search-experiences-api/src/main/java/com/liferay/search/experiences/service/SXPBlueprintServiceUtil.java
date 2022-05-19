@@ -72,6 +72,12 @@ public class SXPBlueprintServiceUtil {
 		return getService().getSXPBlueprint(sxpBlueprintId);
 	}
 
+	public static SXPBlueprint getSXPBlueprintByKey(String key)
+		throws PortalException {
+
+		return getService().getSXPBlueprintByKey(key);
+	}
+
 	public static SXPBlueprint updateSXPBlueprint(
 			long sxpBlueprintId, String configurationJSON,
 			Map<java.util.Locale, String> descriptionMap,

@@ -140,6 +140,11 @@ public class SXPBlueprintLocalServiceImpl
 	}
 
 	@Override
+	public SXPBlueprint getSXPBlueprintByKey(String key) {
+		return sxpBlueprintPersistence.fetchByKey(key);
+	}
+
+	@Override
 	public int getSXPBlueprintsCount(long companyId) {
 		return sxpBlueprintPersistence.countByCompanyId(companyId);
 	}
