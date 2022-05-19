@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.search.experiences.exception.SXPBlueprintConfigurationJSONException;
+import com.liferay.search.experiences.exception.SXPBlueprintDuplicateSXPBlueprintKeyException;
 import com.liferay.search.experiences.exception.SXPBlueprintTitleException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.base.SXPBlueprintLocalServiceBaseImpl;
@@ -65,7 +66,22 @@ public class SXPBlueprintLocalServiceImpl
 
 		_validate(configurationJSON, titleMap, serviceContext);
 
-		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.create(
+		String key = String.valueOf(counterLocalService.increment());
+
+		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.fetchByKey(key);
+
+		if (sxpBlueprint != null) {
+			SXPBlueprintDuplicateSXPBlueprintKeyException
+				sxpBlueprintDuplicateSXPBlueprintKeyException =
+					new SXPBlueprintDuplicateSXPBlueprintKeyException();
+
+			sxpBlueprintDuplicateSXPBlueprintKeyException.setSXPBlueprintKey(
+				sxpBlueprint.getKey());
+
+			throw sxpBlueprintDuplicateSXPBlueprintKeyException;
+		}
+
+		sxpBlueprint = sxpBlueprintPersistence.create(
 			counterLocalService.increment());
 
 		User user = _userLocalService.getUser(userId);
@@ -77,7 +93,7 @@ public class SXPBlueprintLocalServiceImpl
 		sxpBlueprint.setConfigurationJSON(configurationJSON);
 		sxpBlueprint.setDescriptionMap(descriptionMap);
 		sxpBlueprint.setElementInstancesJSON(elementInstancesJSON);
-		sxpBlueprint.setKey(String.valueOf(counterLocalService.increment()));
+		sxpBlueprint.setKey(key);
 		sxpBlueprint.setSchemaVersion(schemaVersion);
 		sxpBlueprint.setTitleMap(titleMap);
 		sxpBlueprint.setVersion(
