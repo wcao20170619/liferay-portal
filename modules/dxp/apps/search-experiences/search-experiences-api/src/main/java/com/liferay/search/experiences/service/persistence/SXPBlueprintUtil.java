@@ -887,6 +887,64 @@ public class SXPBlueprintUtil {
 	}
 
 	/**
+	 * Returns the sxp blueprint where key = &#63; or throws a <code>NoSuchSXPBlueprintException</code> if it could not be found.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint
+	 * @throws NoSuchSXPBlueprintException if a matching sxp blueprint could not be found
+	 */
+	public static SXPBlueprint findByKey(String key)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPBlueprintException {
+
+		return getPersistence().findByKey(key);
+	}
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	public static SXPBlueprint fetchByKey(String key) {
+		return getPersistence().fetchByKey(key);
+	}
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param key the key
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	public static SXPBlueprint fetchByKey(String key, boolean useFinderCache) {
+		return getPersistence().fetchByKey(key, useFinderCache);
+	}
+
+	/**
+	 * Removes the sxp blueprint where key = &#63; from the database.
+	 *
+	 * @param key the key
+	 * @return the sxp blueprint that was removed
+	 */
+	public static SXPBlueprint removeByKey(String key)
+		throws com.liferay.search.experiences.exception.
+			NoSuchSXPBlueprintException {
+
+		return getPersistence().removeByKey(key);
+	}
+
+	/**
+	 * Returns the number of sxp blueprints where key = &#63;.
+	 *
+	 * @param key the key
+	 * @return the number of matching sxp blueprints
+	 */
+	public static int countByKey(String key) {
+		return getPersistence().countByKey(key);
+	}
+
+	/**
 	 * Caches the sxp blueprint in the entity cache if it is enabled.
 	 *
 	 * @param sxpBlueprint the sxp blueprint

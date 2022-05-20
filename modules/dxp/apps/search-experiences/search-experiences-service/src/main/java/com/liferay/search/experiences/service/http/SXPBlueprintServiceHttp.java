@@ -177,6 +177,45 @@ public class SXPBlueprintServiceHttp {
 	}
 
 	public static com.liferay.search.experiences.model.SXPBlueprint
+			getSXPBlueprintByKey(HttpPrincipal httpPrincipal, String key)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				SXPBlueprintServiceUtil.class, "getSXPBlueprintByKey",
+				_getSXPBlueprintByKeyParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey, key);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.search.experiences.model.SXPBlueprint)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.search.experiences.model.SXPBlueprint
 			updateSXPBlueprint(
 				HttpPrincipal httpPrincipal, long sxpBlueprintId,
 				String configurationJSON,
@@ -189,7 +228,7 @@ public class SXPBlueprintServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SXPBlueprintServiceUtil.class, "updateSXPBlueprint",
-				_updateSXPBlueprintParameterTypes3);
+				_updateSXPBlueprintParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, sxpBlueprintId, configurationJSON, descriptionMap,
@@ -236,7 +275,9 @@ public class SXPBlueprintServiceHttp {
 		new Class[] {long.class};
 	private static final Class<?>[] _getSXPBlueprintParameterTypes2 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateSXPBlueprintParameterTypes3 =
+	private static final Class<?>[] _getSXPBlueprintByKeyParameterTypes3 =
+		new Class[] {String.class};
+	private static final Class<?>[] _updateSXPBlueprintParameterTypes4 =
 		new Class[] {
 			long.class, String.class, java.util.Map.class, String.class,
 			String.class, java.util.Map.class,
