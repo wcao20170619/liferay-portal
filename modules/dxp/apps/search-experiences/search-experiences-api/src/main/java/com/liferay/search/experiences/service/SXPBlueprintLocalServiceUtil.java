@@ -297,6 +297,10 @@ public class SXPBlueprintLocalServiceUtil {
 		return getService().getSXPBlueprint(sxpBlueprintId);
 	}
 
+	public static SXPBlueprint getSXPBlueprintByKey(String key) {
+		return getService().getSXPBlueprintByKey(key);
+	}
+
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *

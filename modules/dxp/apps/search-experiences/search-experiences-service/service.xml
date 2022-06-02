@@ -36,6 +36,9 @@
 		<finder name="CompanyId" return-type="Collection">
 			<finder-column name="companyId" />
 		</finder>
+		<finder name="Key" return-type="SXPBlueprint" unique="true">
+			<finder-column name="key" />
+		</finder>
 	</entity>
 	<entity local-service="true" name="SXPElement" remote-service="true" uuid="true">
 
@@ -85,6 +88,7 @@
 	</entity>
 	<exceptions>
 		<exception>SXPBlueprintConfigurationJSON</exception>
+		<exception>SXPBlueprintDuplicateSXPBlueprintKey</exception>
 		<exception>SXPBlueprintTitle</exception>
 		<exception>SXPElementElementDefinitionJSON</exception>
 		<exception>SXPElementReadOnly</exception>

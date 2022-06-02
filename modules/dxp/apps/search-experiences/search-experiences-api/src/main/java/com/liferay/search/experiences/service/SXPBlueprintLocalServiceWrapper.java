@@ -332,6 +332,13 @@ public class SXPBlueprintLocalServiceWrapper
 		return _sxpBlueprintLocalService.getSXPBlueprint(sxpBlueprintId);
 	}
 
+	@Override
+	public com.liferay.search.experiences.model.SXPBlueprint
+		getSXPBlueprintByKey(String key) {
+
+		return _sxpBlueprintLocalService.getSXPBlueprintByKey(key);
+	}
+
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *
