@@ -138,6 +138,20 @@ public class SXPElementSerDes {
 			sb.append(sxpElement.getId());
 		}
 
+		if (sxpElement.getKey() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"key\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(sxpElement.getKey()));
+
+			sb.append("\"");
+		}
+
 		if (sxpElement.getModifiedDate() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -225,6 +239,20 @@ public class SXPElementSerDes {
 			sb.append("\"");
 		}
 
+		if (sxpElement.getVersion() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"version\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(sxpElement.getVersion()));
+
+			sb.append("\"");
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -301,6 +329,13 @@ public class SXPElementSerDes {
 			map.put("id", String.valueOf(sxpElement.getId()));
 		}
 
+		if (sxpElement.getKey() == null) {
+			map.put("key", null);
+		}
+		else {
+			map.put("key", String.valueOf(sxpElement.getKey()));
+		}
+
 		if (sxpElement.getModifiedDate() == null) {
 			map.put("modifiedDate", null);
 		}
@@ -351,6 +386,13 @@ public class SXPElementSerDes {
 		}
 		else {
 			map.put("userName", String.valueOf(sxpElement.getUserName()));
+		}
+
+		if (sxpElement.getVersion() == null) {
+			map.put("version", null);
+		}
+		else {
+			map.put("version", String.valueOf(sxpElement.getVersion()));
 		}
 
 		return map;
@@ -417,6 +459,11 @@ public class SXPElementSerDes {
 						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "key")) {
+				if (jsonParserFieldValue != null) {
+					sxpElement.setKey((String)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "modifiedDate")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setModifiedDate(
@@ -454,6 +501,11 @@ public class SXPElementSerDes {
 			else if (Objects.equals(jsonParserFieldName, "userName")) {
 				if (jsonParserFieldValue != null) {
 					sxpElement.setUserName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "version")) {
+				if (jsonParserFieldValue != null) {
+					sxpElement.setVersion((String)jsonParserFieldValue);
 				}
 			}
 		}
