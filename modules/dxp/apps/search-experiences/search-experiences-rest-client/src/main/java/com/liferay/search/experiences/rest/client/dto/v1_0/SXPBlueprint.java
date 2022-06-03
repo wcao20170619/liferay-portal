@@ -184,6 +184,25 @@ public class SXPBlueprint implements Cloneable, Serializable {
 
 	protected Long id;
 
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public void setKey(UnsafeSupplier<String, Exception> keyUnsafeSupplier) {
+		try {
+			key = keyUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String key;
+
 	public Date getModifiedDate() {
 		return modifiedDate;
 	}
@@ -289,6 +308,27 @@ public class SXPBlueprint implements Cloneable, Serializable {
 	}
 
 	protected String userName;
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public void setVersion(
+		UnsafeSupplier<String, Exception> versionUnsafeSupplier) {
+
+		try {
+			version = versionUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String version;
 
 	@Override
 	public SXPBlueprint clone() throws CloneNotSupportedException {
