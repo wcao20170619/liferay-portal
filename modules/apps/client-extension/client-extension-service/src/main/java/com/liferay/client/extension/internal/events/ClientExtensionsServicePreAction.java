@@ -90,7 +90,7 @@ public class ClientExtensionsServicePreAction extends Action {
 		}
 
 		return _cetManager.getCET(
-			companyId, clientExtensionEntryRel.getCETPrimaryKey());
+			companyId, clientExtensionEntryRel.getCETExternalReferenceCode());
 	}
 
 	private CETThemeCSS _getCETThemeCSS(Layout layout) {

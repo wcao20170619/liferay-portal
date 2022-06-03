@@ -27,7 +27,7 @@ LayoutSet selLayoutSet = layoutsAdminDisplayContext.getSelLayoutSet();
 		<b><liferay-ui:message key="favicon-name" />:</b> <span id="<portlet:namespace />faviconFileEntryTitle"><%= layoutsAdminDisplayContext.getFaviconTitle() %></span>
 	</p>
 
-	<aui:input name="faviconCETPrimaryKey" type="hidden" />
+	<aui:input name="faviconCETExternalReferenceCode" type="hidden" />
 	<aui:input name="faviconFileEntryId" type="hidden" value="<%= selLayoutSet.getFaviconFileEntryId() %>" />
 
 	<aui:button name="selectFaviconButton" value="change-favicon" />
@@ -44,8 +44,8 @@ LayoutSet selLayoutSet = layoutsAdminDisplayContext.getSelLayoutSet();
 
 			Liferay.Util.openSelectionModal({
 				onSelect: function (selectedItem) {
-					const faviconCETPrimaryKey = document.getElementById(
-						'<portlet:namespace />faviconCETPrimaryKey'
+					const faviconCETExternalReferenceCode = document.getElementById(
+						'<portlet:namespace />faviconCETExternalReferenceCode'
 					);
 
 					const faviconFileEntryId = document.getElementById(
@@ -59,7 +59,7 @@ LayoutSet selLayoutSet = layoutsAdminDisplayContext.getSelLayoutSet();
 					);
 
 					if (
-						faviconCETPrimaryKey &&
+						faviconCETExternalReferenceCode &&
 						faviconFileEntryId &&
 						faviconFileEntryImage &&
 						faviconFileEntryTitle &&
@@ -72,8 +72,8 @@ LayoutSet selLayoutSet = layoutsAdminDisplayContext.getSelLayoutSet();
 							selectedItem.returnType ===
 							'<%= CETItemSelectorReturnType.class.getName() %>'
 						) {
-							faviconCETPrimaryKey.value =
-								itemValue.cetPrimaryKey;
+							faviconCETExternalReferenceCode.value =
+								itemValue.cetExternalReferenceCode;
 						}
 						else {
 							faviconFileEntryId.value = itemValue.fileEntryId;

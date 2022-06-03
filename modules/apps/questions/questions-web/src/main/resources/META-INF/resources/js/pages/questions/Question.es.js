@@ -162,6 +162,17 @@ export default withRouter(
 			fetchMessages();
 		}, [fetchMessages]);
 
+		const questionVisited = context.questionsVisited.includes(question.id);
+
+		useEffect(() => {
+			if (question.id && !questionVisited) {
+				context.setQuestionsVisited([
+					...context.questionsVisited,
+					question.id,
+				]);
+			}
+		}, [context, question, questionVisited]);
+
 		const [createAnswer] = useMutation(createAnswerQuery);
 		const [subscribe] = useMutation(subscribeQuery);
 

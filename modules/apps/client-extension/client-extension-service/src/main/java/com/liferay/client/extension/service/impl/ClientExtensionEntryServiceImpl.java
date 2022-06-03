@@ -70,6 +70,40 @@ public class ClientExtensionEntryServiceImpl
 	}
 
 	@Override
+	public ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		ClientExtensionEntry clientExtensionEntry =
+			clientExtensionEntryPersistence.findByC_ERC(
+				companyId, externalReferenceCode);
+
+		return deleteClientExtensionEntry(
+			clientExtensionEntry.getClientExtensionEntryId());
+	}
+
+	@Override
+	public ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		ClientExtensionEntry clientExtensionEntry =
+			clientExtensionEntryPersistence.fetchByC_ERC(
+				companyId, externalReferenceCode);
+
+		if (clientExtensionEntry != null) {
+			_clientExtensionEntryModelResourcePermission.check(
+				getPermissionChecker(),
+				clientExtensionEntry.getClientExtensionEntryId(),
+				ActionKeys.VIEW);
+		}
+
+		return clientExtensionEntry;
+	}
+
+	@Override
 	public ClientExtensionEntry getClientExtensionEntry(
 			long clientExtensionEntryId)
 		throws PortalException {

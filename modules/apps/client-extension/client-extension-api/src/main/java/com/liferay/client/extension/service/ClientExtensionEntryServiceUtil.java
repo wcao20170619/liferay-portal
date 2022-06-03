@@ -56,6 +56,24 @@ public class ClientExtensionEntryServiceUtil {
 		return getService().deleteClientExtensionEntry(clientExtensionEntryId);
 	}
 
+	public static ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().deleteClientExtensionEntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
+	public static ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException {
+
+		return getService().fetchClientExtensionEntryByExternalReferenceCode(
+			companyId, externalReferenceCode);
+	}
+
 	public static ClientExtensionEntry getClientExtensionEntry(
 			long clientExtensionEntryId)
 		throws PortalException {

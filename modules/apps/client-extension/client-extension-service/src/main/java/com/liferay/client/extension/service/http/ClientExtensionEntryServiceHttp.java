@@ -142,6 +142,94 @@ public class ClientExtensionEntryServiceHttp {
 	}
 
 	public static com.liferay.client.extension.model.ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				HttpPrincipal httpPrincipal, long companyId,
+				String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ClientExtensionEntryServiceUtil.class,
+				"deleteClientExtensionEntryByExternalReferenceCode",
+				_deleteClientExtensionEntryByExternalReferenceCodeParameterTypes2);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, externalReferenceCode);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.client.extension.model.ClientExtensionEntry)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.client.extension.model.ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				HttpPrincipal httpPrincipal, long companyId,
+				String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				ClientExtensionEntryServiceUtil.class,
+				"fetchClientExtensionEntryByExternalReferenceCode",
+				_fetchClientExtensionEntryByExternalReferenceCodeParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, companyId, externalReferenceCode);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.client.extension.model.ClientExtensionEntry)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.client.extension.model.ClientExtensionEntry
 			getClientExtensionEntry(
 				HttpPrincipal httpPrincipal, long clientExtensionEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -150,7 +238,7 @@ public class ClientExtensionEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				ClientExtensionEntryServiceUtil.class,
 				"getClientExtensionEntry",
-				_getClientExtensionEntryParameterTypes2);
+				_getClientExtensionEntryParameterTypes4);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, clientExtensionEntryId);
@@ -196,7 +284,7 @@ public class ClientExtensionEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				ClientExtensionEntryServiceUtil.class,
 				"updateClientExtensionEntry",
-				_updateClientExtensionEntryParameterTypes3);
+				_updateClientExtensionEntryParameterTypes5);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, clientExtensionEntryId, description, nameMap,
@@ -241,9 +329,15 @@ public class ClientExtensionEntryServiceHttp {
 		};
 	private static final Class<?>[] _deleteClientExtensionEntryParameterTypes1 =
 		new Class[] {long.class};
-	private static final Class<?>[] _getClientExtensionEntryParameterTypes2 =
+	private static final Class<?>[]
+		_deleteClientExtensionEntryByExternalReferenceCodeParameterTypes2 =
+			new Class[] {long.class, String.class};
+	private static final Class<?>[]
+		_fetchClientExtensionEntryByExternalReferenceCodeParameterTypes3 =
+			new Class[] {long.class, String.class};
+	private static final Class<?>[] _getClientExtensionEntryParameterTypes4 =
 		new Class[] {long.class};
-	private static final Class<?>[] _updateClientExtensionEntryParameterTypes3 =
+	private static final Class<?>[] _updateClientExtensionEntryParameterTypes5 =
 		new Class[] {
 			long.class, String.class, java.util.Map.class, String.class,
 			String.class, String.class

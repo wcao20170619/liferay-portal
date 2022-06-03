@@ -535,6 +535,16 @@
 		<td>//*[contains(@class,'form-control')]//option[contains(text(),'${key_optionName}')]</td>
 		<td></td>
 	</tr>
+	<tr>
+		<td>OBJECT_VALIDATIONS_TAB</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(), 'Validations')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>VIEW_SELECTED_TAB_ON_OBJECT</td>
+		<td>//*[contains(@class,'nav-link active link-unstyled')]//span[contains(@class,'navbar-text-truncate') and (contains(text(),'${key_selectedTab}'))]</td>
+		<td></td>
+	</tr>
 </tbody>
 </table>
 </body>

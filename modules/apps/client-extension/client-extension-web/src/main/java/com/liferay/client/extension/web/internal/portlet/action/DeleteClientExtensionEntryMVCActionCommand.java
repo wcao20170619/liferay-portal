@@ -19,6 +19,7 @@ import com.liferay.client.extension.web.internal.constants.ClientExtensionAdminP
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
 import javax.portlet.ActionRequest;
@@ -46,11 +47,12 @@ public class DeleteClientExtensionEntryMVCActionCommand
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		long clientExtensionEntryId = ParamUtil.getLong(
-			actionRequest, "clientExtensionEntryId");
+		String externalReferenceCode = ParamUtil.getString(
+			actionRequest, "externalReferenceCode");
 
-		_clientExtensionEntryService.deleteClientExtensionEntry(
-			clientExtensionEntryId);
+		_clientExtensionEntryService.
+			deleteClientExtensionEntryByExternalReferenceCode(
+				_portal.getCompanyId(actionRequest), externalReferenceCode);
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 
@@ -61,5 +63,8 @@ public class DeleteClientExtensionEntryMVCActionCommand
 
 	@Reference
 	private ClientExtensionEntryService _clientExtensionEntryService;
+
+	@Reference
+	private Portal _portal;
 
 }

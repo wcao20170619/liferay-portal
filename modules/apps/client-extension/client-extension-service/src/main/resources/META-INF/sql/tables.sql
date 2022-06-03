@@ -32,6 +32,6 @@ create table ClientExtensionEntryRel (
 	modifiedDate DATE null,
 	classNameId LONG,
 	classPK LONG,
-	cetPrimaryKey VARCHAR(75) null,
+	cetExternalReferenceCode VARCHAR(75) null,
 	type_ VARCHAR(75) null
 );

@@ -51,12 +51,12 @@ public class CETThemeJSImpl extends BaseCETImpl implements CETThemeJS {
 
 	public CETThemeJSImpl(
 		String baseURL, long companyId, String description, String name,
-		String primaryKey, Properties properties, String sourceCodeURL,
-		String typeSettings) {
+		String externalReferenceCode, Properties properties,
+		String sourceCodeURL, String typeSettings) {
 
 		super(
-			baseURL, companyId, description, name, primaryKey, properties,
-			sourceCodeURL, typeSettings);
+			baseURL, companyId, description, externalReferenceCode, name,
+			properties, sourceCodeURL, typeSettings);
 	}
 
 	@Override

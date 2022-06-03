@@ -100,9 +100,7 @@ public class PortalInstanceLifecycleListenerImpl
 				_processCountryRegions(country);
 			}
 			catch (Exception exception) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(exception);
-				}
+				_log.error(exception);
 			}
 		}
 	}
@@ -166,9 +164,7 @@ public class PortalInstanceLifecycleListenerImpl
 					}
 				}
 				catch (PortalException portalException) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(portalException);
-					}
+					_log.error(portalException);
 				}
 			}
 		}

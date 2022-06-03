@@ -150,7 +150,7 @@ public class ClientExtensionEntryRelPersistenceTest {
 
 		newClientExtensionEntryRel.setClassPK(RandomTestUtil.nextLong());
 
-		newClientExtensionEntryRel.setCETPrimaryKey(
+		newClientExtensionEntryRel.setCETExternalReferenceCode(
 			RandomTestUtil.randomString());
 
 		newClientExtensionEntryRel.setType(RandomTestUtil.randomString());
@@ -199,8 +199,8 @@ public class ClientExtensionEntryRelPersistenceTest {
 			existingClientExtensionEntryRel.getClassPK(),
 			newClientExtensionEntryRel.getClassPK());
 		Assert.assertEquals(
-			existingClientExtensionEntryRel.getCETPrimaryKey(),
-			newClientExtensionEntryRel.getCETPrimaryKey());
+			existingClientExtensionEntryRel.getCETExternalReferenceCode(),
+			newClientExtensionEntryRel.getCETExternalReferenceCode());
 		Assert.assertEquals(
 			existingClientExtensionEntryRel.getType(),
 			newClientExtensionEntryRel.getType());
@@ -285,7 +285,7 @@ public class ClientExtensionEntryRelPersistenceTest {
 			"externalReferenceCode", true, "clientExtensionEntryRelId", true,
 			"companyId", true, "userId", true, "userName", true, "createDate",
 			true, "modifiedDate", true, "classNameId", true, "classPK", true,
-			"cetPrimaryKey", true, "type", true);
+			"cetExternalReferenceCode", true, "type", true);
 	}
 
 	@Test
@@ -622,7 +622,8 @@ public class ClientExtensionEntryRelPersistenceTest {
 
 		clientExtensionEntryRel.setClassPK(RandomTestUtil.nextLong());
 
-		clientExtensionEntryRel.setCETPrimaryKey(RandomTestUtil.randomString());
+		clientExtensionEntryRel.setCETExternalReferenceCode(
+			RandomTestUtil.randomString());
 
 		clientExtensionEntryRel.setType(RandomTestUtil.randomString());
 

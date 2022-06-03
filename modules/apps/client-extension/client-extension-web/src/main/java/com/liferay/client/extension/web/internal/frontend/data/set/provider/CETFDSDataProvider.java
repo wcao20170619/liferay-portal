@@ -20,6 +20,7 @@ import com.liferay.client.extension.web.internal.frontend.data.set.model.CETFDSE
 import com.liferay.frontend.data.set.provider.FDSDataProvider;
 import com.liferay.frontend.data.set.provider.search.FDSKeywords;
 import com.liferay.frontend.data.set.provider.search.FDSPagination;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -45,8 +46,9 @@ public class CETFDSDataProvider implements FDSDataProvider<CETFDSEntry> {
 
 	@Override
 	public List<CETFDSEntry> getItems(
-		FDSKeywords fdsKeywords, FDSPagination fdsPagination,
-		HttpServletRequest httpServletRequest, Sort sort) {
+			FDSKeywords fdsKeywords, FDSPagination fdsPagination,
+			HttpServletRequest httpServletRequest, Sort sort)
+		throws PortalException {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
@@ -63,7 +65,8 @@ public class CETFDSDataProvider implements FDSDataProvider<CETFDSEntry> {
 
 	@Override
 	public int getItemsCount(
-		FDSKeywords fdsKeywords, HttpServletRequest httpServletRequest) {
+			FDSKeywords fdsKeywords, HttpServletRequest httpServletRequest)
+		throws PortalException {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(

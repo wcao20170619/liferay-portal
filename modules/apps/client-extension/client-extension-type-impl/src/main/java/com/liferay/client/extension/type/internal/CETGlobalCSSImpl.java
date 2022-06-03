@@ -50,13 +50,13 @@ public class CETGlobalCSSImpl extends BaseCETImpl implements CETGlobalCSS {
 	}
 
 	public CETGlobalCSSImpl(
-		String baseURL, long companyId, String description, String name,
-		String primaryKey, Properties properties, String sourceCodeURL,
-		String typeSettings) {
+		String baseURL, long companyId, String description,
+		String externalReferenceCode, String name, Properties properties,
+		String sourceCodeURL, String typeSettings) {
 
 		super(
-			baseURL, companyId, description, name, primaryKey, properties,
-			sourceCodeURL, typeSettings);
+			baseURL, companyId, description, externalReferenceCode, name,
+			properties, sourceCodeURL, typeSettings);
 	}
 
 	@Override

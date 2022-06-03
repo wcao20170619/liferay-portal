@@ -61,7 +61,7 @@ definition {
 
 	macro assertColumnNotPresent {
 		AssertElementNotPresent(
-			key_columnName = "${colunmName}",
+			key_columnName = "${columnName}",
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT");
 	}
 
@@ -79,13 +79,13 @@ definition {
 
 	macro assertColumnPresent {
 		AssertElementPresent(
-			key_columnName = "${colunmName}",
+			key_columnName = "${columnName}",
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT");
 	}
 
 	macro assertColumnPresentOnDefaultSort {
 		AssertElementPresent(
-			key_columnName = "${colunmName}",
+			key_columnName = "${columnName}",
 			locator1 = "ObjectCustomViews#DEFAULT_SORT_SEARCH_RESULT");
 
 		AssertTextEquals(
@@ -232,12 +232,26 @@ definition {
 			locator1 = "Button#TAB_SUBMIT_BTN");
 	}
 
+	macro searchColumnsOnModalDefaultSort {
+		Click(locator1 = "ObjectCustomViews#SELECT_COLUMN_ON_DEFAULT_SORT");
+
+		Type(
+			locator1 = "ObjectPortlet#COLUMN_SEARCH_FIELD",
+			value1 = "${columnName}");
+
+		Click(locator1 = "ObjectCustomViews#VIEW_DROPDOWN_MENU_ON_MODAL_DEFAULT_SORT");
+
+		AssertElementPresent(
+			key_columnName = "${columnName}",
+			locator1 = "ObjectCustomViews#VIEW_FIELDS_ON_DROPDOWN_ITEM");
+	}
+
 	macro searchOnAddColumnModal {
 		Click(locator1 = "ObjectCustomViews#ADD_COLUMNS_SEARCH_BAR");
 
 		Type(
 			locator1 = "ObjectCustomViews#ADD_COLUMNS_SEARCH_BAR",
-			value1 = "${colunmName}");
+			value1 = "${columnName}");
 	}
 
 	macro searchOnDefaultSort {
@@ -245,7 +259,7 @@ definition {
 
 		Type(
 			locator1 = "ObjectCustomViews#DEFAULT_SORT_SEARCH_BAR",
-			value1 = "${colunmName}");
+			value1 = "${columnName}");
 	}
 
 	macro searchOnViewBuilder {
@@ -253,7 +267,7 @@ definition {
 
 		Type(
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_BAR",
-			value1 = "${colunmName}");
+			value1 = "${columnName}");
 	}
 
 	macro selectAnyPermissions {
@@ -331,11 +345,25 @@ definition {
 		}
 	}
 
+	macro viewColumnOrderOnDefaultSort {
+		AssertElementPresent(
+			key_columnName1 = "${columnName}",
+			key_position = "${position}",
+			locator1 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION_ON_DEFAULT_SORT");
+	}
+
 	macro viewColumnsOrder {
 		AssertElementPresent(
-			key_columnName = "${colunmName}",
+			key_columnName = "${columnName}",
 			key_position = "${position}",
 			locator1 = "ObjectCustomViews#VIEW_COLUMN_ENTRIES");
+	}
+
+	macro viewFieldsEntryByPosition {
+		AssertElementPresent(
+			key_entryName = "${entryName}",
+			key_position = "${position}",
+			locator1 = "ObjectCustomViews#VIEW_FIELDS_ENTRY_BY_POSITION");
 	}
 
 	macro viewFieldsNameByPosition {
@@ -364,7 +392,7 @@ definition {
 
 	macro viewOrdersOfTheColumns {
 		AssertVisible(
-			key_colunmName1 = "${colunmName}",
+			key_columnName1 = "${columnName}",
 			key_position = "${position}",
 			locator1 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION");
 	}

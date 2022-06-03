@@ -83,8 +83,7 @@ public class CETFDSActionProvider implements FDSActionProvider {
 			).setActionName(
 				"/client_extension_admin/delete_client_extension_entry"
 			).setParameter(
-				"clientExtensionEntryId",
-				cetFDSEntry.getClientExtensionEntryId()
+				"externalReferenceCode", cetFDSEntry.getExternalReferenceCode()
 			).buildString());
 		dropdownItem.setIcon("times-circle");
 		dropdownItem.setLabel(_getMessage(httpServletRequest, "delete"));
@@ -99,7 +98,7 @@ public class CETFDSActionProvider implements FDSActionProvider {
 		).setMVCRenderCommandName(
 			"/client_extension_admin/edit_client_extension_entry"
 		).setParameter(
-			"clientExtensionEntryId", cetFDSEntry.getClientExtensionEntryId()
+			"externalReferenceCode", cetFDSEntry.getExternalReferenceCode()
 		).buildPortletURL();
 
 		String currentURL = ParamUtil.getString(

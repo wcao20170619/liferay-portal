@@ -62,6 +62,17 @@ public interface ClientExtensionEntryService extends BaseService {
 			long clientExtensionEntryId)
 		throws PortalException;
 
+	public ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ClientExtensionEntry getClientExtensionEntry(
 			long clientExtensionEntryId)

@@ -31,9 +31,9 @@ public interface CET {
 
 	public String getDescription();
 
-	public String getName(Locale locale);
+	public String getExternalReferenceCode();
 
-	public String getPrimaryKey();
+	public String getName(Locale locale);
 
 	public Properties getProperties();
 

@@ -66,7 +66,7 @@ definition {
 		ObjectCustomViews.saveColumnsModal();
 
 		for (var columnOption : list "Author,Creation Date") {
-			ObjectCustomViews.assertColumnPresent(colunmName = "${columnOption}");
+			ObjectCustomViews.assertColumnPresent(columnName = "${columnOption}");
 		}
 	}
 
@@ -112,12 +112,71 @@ definition {
 	}
 
 	@description = "LPS-147792 - Verify it is possible to add any translation for any Column Label"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAddTranslationToColumnLabel {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 152069",
+			objectName = "CustomObject152069",
+			pluralLabelName = "Custom Objects 152069");
 
-		// TODO LPS-152069 CanAddTranslationToColumnLabel pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject152069");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject152069");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 152069");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Field");
+
+		ObjectAdmin.changeLabelLanguage(newLanguage = "pt_BR");
+
+		CreateObject.editLabel(labelName = "Campo Customizado");
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.markViewAsDefault();
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		ObjectCustomViews.addColumnsViaUI(columnOption = "Custom Field");
+
+		ObjectCustomViews.goToDefaultSortTab();
+
+		ObjectCustomViews.addDefaultSort(
+			columnOption = "Custom Field",
+			sortOption = "Ascending");
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		MyAccount.configureDisplaySettingsLanguage(languageName = "português (Brasil)");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject152069",
+			value = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject152069");
+
+		ObjectPortlet.assertColumnLabelEntries(columnLabelName = "Campo Customizado");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to cancel the addition of a column for the View"
@@ -236,7 +295,7 @@ definition {
 			sortOption = "Ascending");
 
 		ObjectCustomViews.assertColumnPresentOnDefaultSort(
-			colunmName = "Author",
+			columnName = "Author",
 			sortingLabel = "Ascending");
 	}
 
@@ -291,7 +350,7 @@ definition {
 
 		ObjectCustomViews.saveColumnsModal();
 
-		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnPresent(columnName = "Author");
 
 		LexiconEntry.gotoAdd();
 
@@ -301,7 +360,7 @@ definition {
 
 		ObjectCustomViews.saveColumnsModal();
 
-		ObjectCustomViews.assertColumnNotPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnNotPresent(columnName = "Author");
 
 		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
@@ -340,7 +399,7 @@ definition {
 
 		ObjectCustomViews.deleteSpecificColumn(columnName = "Author");
 
-		ObjectCustomViews.assertColumnNotPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnNotPresent(columnName = "Author");
 
 		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
@@ -424,11 +483,11 @@ definition {
 
 		ObjectCustomViews.goToViewsBuilderTab();
 
-		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnPresent(columnName = "Author");
 
 		ObjectCustomViews.deleteSpecificColumn(columnName = "Author");
 
-		ObjectCustomViews.assertColumnNotPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnNotPresent(columnName = "Author");
 
 		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
@@ -491,35 +550,35 @@ definition {
 		ObjectCustomViews.saveColumnsModal();
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Author",
+			columnName = "Author",
 			position = "1");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Creation Date",
+			columnName = "Creation Date",
 			position = "2");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Modified Date",
+			columnName = "Modified Date",
 			position = "3");
 
 		DragAndDrop.javaScriptDragAndDropToUp(
 			key_columnName = "Creation Date",
-			key_colunmName1 = "Author",
+			key_columnName1 = "Author",
 			key_position = "1",
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT",
 			locator2 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION",
 			value1 = "");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Creation Date",
+			columnName = "Creation Date",
 			position = "1");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Author",
+			columnName = "Author",
 			position = "2");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Modified Date",
+			columnName = "Modified Date",
 			position = "3");
 	}
 
@@ -642,12 +701,61 @@ definition {
 	}
 
 	@description = "LPS-144472 - Verify it is possible to prioritize columns to Default Sort"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanPrioritizeColumns {
+		var listColumns = "Author,Creation Date";
 
-		// TODO LPS-152061 CanPrioritizeColumns pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 152061",
+			objectName = "CustomObject152061",
+			pluralLabelName = "Custom Objects 152061");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 152061");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		for (var columnName : list "${listColumns}") {
+			ObjectCustomViews.addColumnsViaUI(columnOption = "${columnName}");
+		}
+
+		ObjectCustomViews.goToDefaultSortTab();
+
+		for (var columnName : list "${listColumns}") {
+			ObjectCustomViews.addDefaultSort(
+				columnOption = "${columnName}",
+				sortOption = "Ascending");
+		}
+
+		ObjectCustomViews.viewColumnOrderOnDefaultSort(
+			columnName = "Author",
+			position = "1");
+
+		ObjectCustomViews.viewColumnOrderOnDefaultSort(
+			columnName = "Creation Date",
+			position = "2");
+
+		DragAndDrop.javaScriptDragAndDropToUp(
+			key_columnName = "Creation Date",
+			key_columnName1 = "Author",
+			locator1 = "ObjectCustomViews#DEFAULT_SORT_SEARCH_RESULT",
+			locator2 = "ObjectCustomViews#CHANGE_POSITION_DEFAULT_SORT_SEARCH_RESULT",
+			value1 = "");
+
+		ObjectCustomViews.viewColumnOrderOnDefaultSort(
+			columnName = "Creation Date",
+			position = "1");
+
+		ObjectCustomViews.viewColumnOrderOnDefaultSort(
+			columnName = "Author",
+			position = "2");
 	}
 
 	@description = "LPS-147792 - Verify it is possible to rename a column label"
@@ -692,11 +800,11 @@ definition {
 
 		ObjectCustomViews.saveColumnsModal();
 
-		ObjectCustomViews.searchOnViewBuilder(colunmName = "Author");
+		ObjectCustomViews.searchOnViewBuilder(columnName = "Author");
 
-		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnPresent(columnName = "Author");
 
-		ObjectCustomViews.assertColumnNotPresent(colunmName = "Creation Date");
+		ObjectCustomViews.assertColumnNotPresent(columnName = "Creation Date");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a column on the Add Columns modal"
@@ -721,7 +829,7 @@ definition {
 
 		LexiconEntry.gotoAdd();
 
-		ObjectCustomViews.searchOnAddColumnModal(colunmName = "Author");
+		ObjectCustomViews.searchOnAddColumnModal(columnName = "Author");
 
 		ObjectCustomViews.assertColumnVisibleOnAddColumnModal(columnOption = "Author");
 
@@ -729,12 +837,32 @@ definition {
 	}
 
 	@description = "LPS-144472 - Verify it is possible to search columns to a New Default Sort modal"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSearchColumnOnNewDefaultSortModal {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 152063",
+			objectName = "CustomObject152063",
+			pluralLabelName = "Custom Objects 152063");
 
-		// TODO LPS-152063 CanSearchColumnOnNewDefaultSortModal pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 152063");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		ObjectCustomViews.addColumnsViaUI(columnOption = "Author");
+
+		ObjectCustomViews.goToDefaultSortTab();
+
+		ObjectCustomViews.addNewDefaultSort();
+
+		ObjectCustomViews.searchColumnsOnModalDefaultSort(columnName = "Author");
 	}
 
 	@description = "LPS-144472 - Verify it is possible to search columns to Default Sort"
@@ -772,10 +900,10 @@ definition {
 		}
 
 		for (var columnName : list "Author,Creation Date,Modified Date,Workflow Status,ID") {
-			ObjectCustomViews.searchOnDefaultSort(colunmName = "${columnName}");
+			ObjectCustomViews.searchOnDefaultSort(columnName = "${columnName}");
 
 			ObjectCustomViews.assertColumnPresentOnDefaultSort(
-				colunmName = "${columnName}",
+				columnName = "${columnName}",
 				sortingLabel = "Ascending");
 		}
 	}
@@ -861,12 +989,65 @@ definition {
 	}
 
 	@description = "LPS-144472 - Verify it is possible to see the entries with default return"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanSeeEntriesWithDefaultReturn {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 152065",
+			objectName = "CustomObject152065",
+			pluralLabelName = "Custom Objects 152065");
 
-		// TODO LPS-152065 CanSeeEntriesWithDefaultReturn pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject152065");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject152065");
+
+		for (var letter : list "A,Z,B") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject152065",
+				value = "Entry ${letter}");
+		}
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 152065");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		ObjectCustomViews.addColumnsViaUI(columnOption = "Custom Field");
+
+		ObjectCustomViews.goToDefaultSortTab();
+
+		ObjectCustomViews.addDefaultSort(
+			columnOption = "Custom Field",
+			sortOption = "Ascending");
+
+		Button.clickSave();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject152065");
+
+		ObjectCustomViews.viewFieldsEntryByPosition(
+			entryName = "Entry A",
+			position = "1");
+
+		ObjectCustomViews.viewFieldsEntryByPosition(
+			entryName = "Entry Z",
+			position = "2");
+
+		ObjectCustomViews.viewFieldsEntryByPosition(
+			entryName = "Entry B",
+			position = "3");
 	}
 
 	@description = "LPS-147792 - Verify that the new column name will be displayed on the entries list"
@@ -1127,7 +1308,7 @@ definition {
 
 		ObjectCustomViews.saveColumnsModal();
 
-		ObjectCustomViews.assertColumnPresent(colunmName = "Author");
+		ObjectCustomViews.assertColumnPresent(columnName = "Author");
 
 		Button.clickSave();
 
@@ -1536,7 +1717,7 @@ definition {
 
 		DragAndDrop.javaScriptDragAndDropToUp(
 			key_columnName = "Creation Date",
-			key_colunmName1 = "Author",
+			key_columnName1 = "Author",
 			key_position = "1",
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT",
 			locator2 = "ObjectCustomViews#VIEW_LIST_COLUMNS_BY_POSITION",
@@ -1558,15 +1739,15 @@ definition {
 		WaitForPageLoad();
 
 		ObjectCustomViews.viewColumnsOrder(
-			colunmName = "Creation Date",
+			columnName = "Creation Date",
 			position = "1");
 
 		ObjectCustomViews.viewColumnsOrder(
-			colunmName = "Author",
+			columnName = "Author",
 			position = "2");
 
 		ObjectCustomViews.viewColumnsOrder(
-			colunmName = "ID",
+			columnName = "ID",
 			position = "3");
 	}
 
@@ -1614,23 +1795,23 @@ definition {
 		ObjectCustomViews.goToViewsBuilderTab();
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Author",
+			columnName = "Author",
 			position = "1");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Creation Date",
+			columnName = "Creation Date",
 			position = "2");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Modified Date",
+			columnName = "Modified Date",
 			position = "3");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Workflow Status",
+			columnName = "Workflow Status",
 			position = "4");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "ID",
+			columnName = "ID",
 			position = "5");
 	}
 
@@ -1693,11 +1874,11 @@ definition {
 		ObjectCustomViews.goToViewsBuilderTab();
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Custom Field A",
+			columnName = "Custom Field A",
 			position = "1");
 
 		ObjectCustomViews.viewOrdersOfTheColumns(
-			colunmName = "Custom Field B",
+			columnName = "Custom Field B",
 			position = "2");
 	}
 
@@ -1872,7 +2053,7 @@ definition {
 
 		ObjectCustomViews.saveColumnsModal();
 
-		ObjectCustomViews.searchOnViewBuilder(colunmName = "Teste");
+		ObjectCustomViews.searchOnViewBuilder(columnName = "Teste");
 
 		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No Results Found");
 

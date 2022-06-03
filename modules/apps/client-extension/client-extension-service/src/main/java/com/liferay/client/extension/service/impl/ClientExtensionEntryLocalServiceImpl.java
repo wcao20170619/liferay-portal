@@ -19,7 +19,6 @@ import com.liferay.client.extension.model.ClientExtensionEntry;
 import com.liferay.client.extension.service.base.ClientExtensionEntryLocalServiceBaseImpl;
 import com.liferay.client.extension.type.deployer.CETDeployer;
 import com.liferay.client.extension.type.factory.CETFactory;
-import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.client.extension.type.validator.CETValidator;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.aop.AopService;
@@ -86,10 +85,12 @@ public class ClientExtensionEntryLocalServiceImpl
 			String sourceCodeURL, String type, String typeSettings)
 		throws PortalException {
 
-		long clientExtensionEntryId = counterLocalService.increment();
+		ClientExtensionEntry clientExtensionEntry =
+			clientExtensionEntryPersistence.create(
+				counterLocalService.increment());
 
 		if (Validator.isBlank(externalReferenceCode)) {
-			externalReferenceCode = String.valueOf(clientExtensionEntryId);
+			externalReferenceCode = clientExtensionEntry.getUuid();
 		}
 
 		User user = _userLocalService.getUser(userId);
@@ -98,9 +99,6 @@ public class ClientExtensionEntryLocalServiceImpl
 			user.getCompanyId(), externalReferenceCode);
 
 		_cetValidator.validate(typeSettings, type);
-
-		ClientExtensionEntry clientExtensionEntry =
-			clientExtensionEntryPersistence.create(clientExtensionEntryId);
 
 		clientExtensionEntry.setExternalReferenceCode(externalReferenceCode);
 		clientExtensionEntry.setCompanyId(user.getCompanyId());
@@ -190,11 +188,17 @@ public class ClientExtensionEntryLocalServiceImpl
 
 		undeployClientExtensionEntry(clientExtensionEntry);
 
-		_cetManager.addCET(clientExtensionEntry);
-
 		_serviceRegistrationsMaps.put(
 			clientExtensionEntry.getClientExtensionEntryId(),
 			_cetDeployer.deploy(_cetFactory.cet(clientExtensionEntry)));
+	}
+
+	@Override
+	public List<ClientExtensionEntry> getClientExtensionEntries(
+		long companyId, int start, int end) {
+
+		return clientExtensionEntryPersistence.findByCompanyId(
+			companyId, start, end);
 	}
 
 	@Override
@@ -203,6 +207,11 @@ public class ClientExtensionEntryLocalServiceImpl
 
 		return clientExtensionEntryPersistence.findByC_T(
 			companyId, type, start, end);
+	}
+
+	@Override
+	public int getClientExtensionEntriesCount(long companyId) {
+		return clientExtensionEntryPersistence.countByCompanyId(companyId);
 	}
 
 	@Override
@@ -273,8 +282,6 @@ public class ClientExtensionEntryLocalServiceImpl
 	@Override
 	public void undeployClientExtensionEntry(
 		ClientExtensionEntry clientExtensionEntry) {
-
-		_cetManager.deleteCET(clientExtensionEntry);
 
 		List<ServiceRegistration<?>> serviceRegistrations =
 			_serviceRegistrationsMaps.remove(
@@ -482,9 +489,6 @@ public class ClientExtensionEntryLocalServiceImpl
 
 	@Reference
 	private CETFactory _cetFactory;
-
-	@Reference
-	private CETManager _cetManager;
 
 	@Reference
 	private CETValidator _cetValidator;

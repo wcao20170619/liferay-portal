@@ -32,8 +32,8 @@ public class CETFDSEntry {
 		_locale = locale;
 	}
 
-	public String getClientExtensionEntryId() {
-		return _cet.getPrimaryKey();
+	public String getExternalReferenceCode() {
+		return _cet.getExternalReferenceCode();
 	}
 
 	public String getName() {

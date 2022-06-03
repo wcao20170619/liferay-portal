@@ -33,7 +33,7 @@ renderResponse.setTitle(editClientExtensionEntryDisplayContext.getTitle());
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getCmd() %>" />
 	<aui:input name="redirect" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getRedirect() %>" />
-	<aui:input name="clientExtensionEntryId" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getClientExtensionEntryId() %>" />
+	<aui:input name="externalReferenceCode" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getExternalReferenceCode() %>" />
 
 	<liferay-ui:error exception="<%= ClientExtensionEntryCustomElementCSSURLsException.class %>" message="please-enter-valid-css-urls" />
 	<liferay-ui:error exception="<%= ClientExtensionEntryCustomElementHTMLElementNameException.class %>" message="please-enter-a-valid-html-element-name" />

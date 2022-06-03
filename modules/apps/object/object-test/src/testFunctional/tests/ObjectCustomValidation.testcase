@@ -50,12 +50,29 @@ definition {
 	}
 
 	@description = "LPS-144474 - Verify that, when adding validations using Groovy, the validation is not active by default"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotActiveByDefaultWhenAddValidationsGroovy {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153551",
+			objectName = "CustomObject153551",
+			pluralLabelName = "Custom Objects 153551");
 
-		// TODO LPS-153551 CannotActiveByDefaultWhenAddValidationsGroovy pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153551");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		Refresh();
+
+		ObjectCustomValidation.assertValidationPresent(
+			validationActive = "No",
+			validationName = "Custom Validation",
+			validationType = "Groovy");
 	}
 
 	@description = "LPS-144474 - Verify that, when editing an entry in an Object, the user only is able to update the entry successfully if it passes for all validations from that Object"
@@ -68,39 +85,200 @@ definition {
 	}
 
 	@description = "LPS-144474 - Verify that the user, when modeling an Object, is able to add validations using Groovy"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUserAddValidationsGroovy {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153550",
+			objectName = "CustomObject153550",
+			pluralLabelName = "Custom Objects 153550");
 
-		// TODO LPS-153550 CanUserAddValidationsGroovy pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject153550");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153550");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153550");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.activeValidation();
+
+		ObjectCustomValidation.gotoConditionsTab();
+
+		ObjectCustomValidation.insertGroovyScript(groovyScript = "invalidFields = (customField == 'Decline Entry')");
+
+		ObjectCustomValidation.addErrorMessage(errorMessage = "Error: This entry is not possible.");
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		for (var entryTitle : list "Entry Test,Decline Entry") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customField",
+				objectName = "CustomObject153550",
+				value = "${entryTitle}");
+		}
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153550");
+
+		ObjectPortlet.viewEntry(entry = "Entry Test");
+
+		ObjectPortlet.assertEntryNotPresent(entry = "Decline Entry");
 	}
 
 	@description = "LPS-144474 - Verify that, when managing an Object validation, the user is able to define if that validation is active or not"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUserDefineValidationActiveOrInactive {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153552",
+			objectName = "CustomObject153552",
+			pluralLabelName = "Custom Objects 153552");
 
-		// TODO LPS-153552 CanUserDefineValidationActiveOrInactive pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Integer",
+			fieldLabelName = "Custom Field",
+			fieldName = "customField",
+			fieldType = "Integer",
+			isRequired = "false",
+			objectName = "CustomObject153552");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153552");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153552");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.activeValidation();
+
+		ObjectCustomValidation.gotoConditionsTab();
+
+		ObjectCustomValidation.insertGroovyScript(groovyScript = "invalidFields = (customField < 18)");
+
+		ObjectCustomValidation.addErrorMessage(errorMessage = "Error: This entry is not possible.");
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectCustomValidation.assertValidationPresent(
+			validationActive = "Yes",
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customField",
+			objectName = "CustomObject153552",
+			value = "10");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153552");
+
+		ObjectPortlet.assertEntryNotPresent(entry = "10");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153552");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.desactiveValidation();
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectCustomValidation.assertValidationPresent(
+			validationActive = "No",
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customField",
+			objectName = "CustomObject153552",
+			value = "10");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153552");
+
+		ObjectPortlet.viewEntry(entry = "10");
 	}
 
 	@description = "LPS-144474 - Verify that, when managing an Object validation, the user can see Basic Info tab"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUserSeeBasicInfoTab {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153553",
+			objectName = "CustomObject153553",
+			pluralLabelName = "Custom Objects 153553");
 
-		// TODO LPS-153553 CanUserSeeBasicInfoTab pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153553");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.viewActiveTabOnCustomValidation(activeTab = "Basic Info");
+
+		for (var cardsName : list "Basic Info,Trigger Event") {
+			ObjectCustomValidation.viewCardsOnCustomValidation(cardName = "${cardsName}");
+		}
 	}
 
 	@description = "LPS-144474 - Verify that, when managing an Object validation, the user can see Conditions tab"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanUserSeeConditionsTab {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153554",
+			objectName = "CustomObject153554",
+			pluralLabelName = "Custom Objects 153554");
 
-		// TODO LPS-153554 CanUserSeeConditionsTab pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153554");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.gotoConditionsTab();
+
+		ObjectCustomValidation.viewActiveTabOnCustomValidation(activeTab = "Conditions");
+
+		for (var cardsName : list "Groovy,Error Message") {
+			ObjectCustomValidation.viewCardsOnCustomValidation(cardName = "${cardsName}");
+		}
 	}
 
 	@description = "LPS-144474 - Verify that, when there is no Validations added, the empty state view is displayed"
@@ -109,15 +287,6 @@ definition {
 	test CanViewDefaultViewWhenEmptyValidation {
 
 		// TODO LPS-153547 CanViewDefaultViewWhenEmptyValidation pending implementation
-
-	}
-
-	@description = "LPS-144474 - Verify that, when managing an Object validation, the Error Message field is required"
-	@ignore = "Test Stub"
-	@priority = "4"
-	test CanViewErrorMessageWhenFieldIsRequired {
-
-		// TODO LPS-153555 CanViewErrorMessageWhenFieldIsRequired pending implementation
 
 	}
 
@@ -131,12 +300,54 @@ definition {
 	}
 
 	@description = "LPS-144474 - Verify that, when adding a new entry in the Object, if it do not passes all validations from that Object, an alert is displayed in the lower left corner of the screen"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewMessageErrorWhenDontPassesForAllValidations {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153546",
+			objectName = "CustomObject153546",
+			pluralLabelName = "Custom Objects 153546");
 
-		// TODO LPS-153557 CanViewMessageErrorWhenDontPassesForAllValidations pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldBusinessType = "Text",
+			fieldLabelName = "Custom Field",
+			fieldName = "customField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject153546");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153546");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153546");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.activeValidation();
+
+		ObjectCustomValidation.gotoConditionsTab();
+
+		ObjectCustomValidation.insertGroovyScript(groovyScript = "invalidFields = (customField == &quot;Invalid Entry&quot;)");
+
+		ObjectCustomValidation.addErrorMessage(errorMessage = "This entry is not possible.");
+
+		Button.clickSave();
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153546");
+
+		ObjectAdmin.addObjectStringFieldEntryViaUI(entryValue = "Invalid Entry");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR",
+			value1 = "This entry is not possible.");
 	}
 
 	@description = "LPS-144474 - Verify that the message 'There was an unexpected error in fields validation. Please contact support' is displayed when the goovy sintax is incorrect"
@@ -149,22 +360,84 @@ definition {
 	}
 
 	@description = "LPS-144474 - Verify that the Validation tab is available"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewValidationTab {
 		property portal.acceptance = "true";
 
-		// TODO LPS-153546 CanViewValidationTab pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153546",
+			objectName = "CustomObject153546",
+			pluralLabelName = "Custom Objects 153546");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153546");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectAdmin.viewSelectedTabOnObject(selectedTab = "Validations");
+	}
+
+	@description = "LPS-144474 - Verify that, when managing an Object validation, the Error Message field is required"
+	@priority = "4"
+	test ErrorMessageFieldIsRequired {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153555",
+			objectName = "CustomObject153555",
+			pluralLabelName = "Custom Objects 153555");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153555");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.gotoConditionsTab();
+
+		ObjectCustomValidation.insertGroovyScript(groovyScript = "invalidFields = (customField == &quot;Invalid Entry&quot;)");
+
+		Button.clickSave();
+
+		ObjectAdmin.assertRequiredErrorPresent();
 	}
 
 	@description = "LPS-144474 - Verify that, when adding a New Validation, the Label field is required"
-	@ignore = "Test Stub"
 	@priority = "4"
-	test LabelFieldIsRequiredWhenThereIsValidation {
+	test LabelFieldIsRequiredOnValidation {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153548",
+			objectName = "CustomObject153548",
+			pluralLabelName = "Custom Objects 153548");
 
-		// TODO LPS-153548 LabelFieldIsRequiredWhenThereIsValidation pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 153548");
+
+		ObjectAdmin.goToValidationsTab();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "",
+			validationType = "Groovy");
+
+		ObjectAdmin.assertRequiredErrorPresent();
+
+		ObjectCustomValidation.addObjectValidation(
+			validationName = "Custom Validation",
+			validationType = "Groovy");
+
+		ObjectCustomValidation.gotoCustomValidation(validationName = "Custom Validation");
+
+		ObjectCustomValidation.editLabelOnCustomValidation(editValidationName = "");
+
+		Button.clickSave();
+
+		ObjectAdmin.assertRequiredErrorPresent();
 	}
 
 }

@@ -315,6 +315,12 @@ public class ClientExtensionEntryLocalServiceUtil {
 	}
 
 	public static List<ClientExtensionEntry> getClientExtensionEntries(
+		long companyId, int start, int end) {
+
+		return getService().getClientExtensionEntries(companyId, start, end);
+	}
+
+	public static List<ClientExtensionEntry> getClientExtensionEntries(
 		long companyId, String type, int start, int end) {
 
 		return getService().getClientExtensionEntries(
@@ -328,6 +334,10 @@ public class ClientExtensionEntryLocalServiceUtil {
 	 */
 	public static int getClientExtensionEntriesCount() {
 		return getService().getClientExtensionEntriesCount();
+	}
+
+	public static int getClientExtensionEntriesCount(long companyId) {
+		return getService().getClientExtensionEntriesCount(companyId);
 	}
 
 	public static int getClientExtensionEntriesCount(

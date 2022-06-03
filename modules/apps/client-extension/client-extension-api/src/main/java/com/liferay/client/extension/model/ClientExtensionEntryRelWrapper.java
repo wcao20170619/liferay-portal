@@ -57,7 +57,8 @@ public class ClientExtensionEntryRelWrapper
 		attributes.put("modifiedDate", getModifiedDate());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
-		attributes.put("cetPrimaryKey", getCETPrimaryKey());
+		attributes.put(
+			"cetExternalReferenceCode", getCETExternalReferenceCode());
 		attributes.put("type", getType());
 
 		return attributes;
@@ -133,10 +134,11 @@ public class ClientExtensionEntryRelWrapper
 			setClassPK(classPK);
 		}
 
-		String cetPrimaryKey = (String)attributes.get("cetPrimaryKey");
+		String cetExternalReferenceCode = (String)attributes.get(
+			"cetExternalReferenceCode");
 
-		if (cetPrimaryKey != null) {
-			setCETPrimaryKey(cetPrimaryKey);
+		if (cetExternalReferenceCode != null) {
+			setCETExternalReferenceCode(cetExternalReferenceCode);
 		}
 
 		String type = (String)attributes.get("type");
@@ -152,13 +154,13 @@ public class ClientExtensionEntryRelWrapper
 	}
 
 	/**
-	 * Returns the cet primary key of this client extension entry rel.
+	 * Returns the cet external reference code of this client extension entry rel.
 	 *
-	 * @return the cet primary key of this client extension entry rel
+	 * @return the cet external reference code of this client extension entry rel
 	 */
 	@Override
-	public String getCETPrimaryKey() {
-		return model.getCETPrimaryKey();
+	public String getCETExternalReferenceCode() {
+		return model.getCETExternalReferenceCode();
 	}
 
 	/**
@@ -347,13 +349,13 @@ public class ClientExtensionEntryRelWrapper
 	}
 
 	/**
-	 * Sets the cet primary key of this client extension entry rel.
+	 * Sets the cet external reference code of this client extension entry rel.
 	 *
-	 * @param cetPrimaryKey the cet primary key of this client extension entry rel
+	 * @param cetExternalReferenceCode the cet external reference code of this client extension entry rel
 	 */
 	@Override
-	public void setCETPrimaryKey(String cetPrimaryKey) {
-		model.setCETPrimaryKey(cetPrimaryKey);
+	public void setCETExternalReferenceCode(String cetExternalReferenceCode) {
+		model.setCETExternalReferenceCode(cetExternalReferenceCode);
 	}
 
 	@Override

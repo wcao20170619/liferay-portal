@@ -102,8 +102,8 @@ public class ClientExtensionEntryRelCacheModel
 		sb.append(classNameId);
 		sb.append(", classPK=");
 		sb.append(classPK);
-		sb.append(", cetPrimaryKey=");
-		sb.append(cetPrimaryKey);
+		sb.append(", cetExternalReferenceCode=");
+		sb.append(cetExternalReferenceCode);
 		sb.append(", type=");
 		sb.append(type);
 		sb.append("}");
@@ -162,11 +162,12 @@ public class ClientExtensionEntryRelCacheModel
 		clientExtensionEntryRelImpl.setClassNameId(classNameId);
 		clientExtensionEntryRelImpl.setClassPK(classPK);
 
-		if (cetPrimaryKey == null) {
-			clientExtensionEntryRelImpl.setCETPrimaryKey("");
+		if (cetExternalReferenceCode == null) {
+			clientExtensionEntryRelImpl.setCETExternalReferenceCode("");
 		}
 		else {
-			clientExtensionEntryRelImpl.setCETPrimaryKey(cetPrimaryKey);
+			clientExtensionEntryRelImpl.setCETExternalReferenceCode(
+				cetExternalReferenceCode);
 		}
 
 		if (type == null) {
@@ -199,7 +200,7 @@ public class ClientExtensionEntryRelCacheModel
 		classNameId = objectInput.readLong();
 
 		classPK = objectInput.readLong();
-		cetPrimaryKey = objectInput.readUTF();
+		cetExternalReferenceCode = objectInput.readUTF();
 		type = objectInput.readUTF();
 	}
 
@@ -241,11 +242,11 @@ public class ClientExtensionEntryRelCacheModel
 
 		objectOutput.writeLong(classPK);
 
-		if (cetPrimaryKey == null) {
+		if (cetExternalReferenceCode == null) {
 			objectOutput.writeUTF("");
 		}
 		else {
-			objectOutput.writeUTF(cetPrimaryKey);
+			objectOutput.writeUTF(cetExternalReferenceCode);
 		}
 
 		if (type == null) {
@@ -267,7 +268,7 @@ public class ClientExtensionEntryRelCacheModel
 	public long modifiedDate;
 	public long classNameId;
 	public long classPK;
-	public String cetPrimaryKey;
+	public String cetExternalReferenceCode;
 	public String type;
 
 }

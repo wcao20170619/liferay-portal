@@ -286,6 +286,10 @@ public interface ClientExtensionEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ClientExtensionEntry> getClientExtensionEntries(
+		long companyId, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ClientExtensionEntry> getClientExtensionEntries(
 		long companyId, String type, int start, int end);
 
 	/**
@@ -295,6 +299,9 @@ public interface ClientExtensionEntryLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getClientExtensionEntriesCount();
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getClientExtensionEntriesCount(long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getClientExtensionEntriesCount(long companyId, String type);

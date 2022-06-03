@@ -365,6 +365,15 @@ public class ClientExtensionEntryLocalServiceWrapper
 	@Override
 	public java.util.List
 		<com.liferay.client.extension.model.ClientExtensionEntry>
+			getClientExtensionEntries(long companyId, int start, int end) {
+
+		return _clientExtensionEntryLocalService.getClientExtensionEntries(
+			companyId, start, end);
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.client.extension.model.ClientExtensionEntry>
 			getClientExtensionEntries(
 				long companyId, String type, int start, int end) {
 
@@ -381,6 +390,12 @@ public class ClientExtensionEntryLocalServiceWrapper
 	public int getClientExtensionEntriesCount() {
 		return _clientExtensionEntryLocalService.
 			getClientExtensionEntriesCount();
+	}
+
+	@Override
+	public int getClientExtensionEntriesCount(long companyId) {
+		return _clientExtensionEntryLocalService.getClientExtensionEntriesCount(
+			companyId);
 	}
 
 	@Override

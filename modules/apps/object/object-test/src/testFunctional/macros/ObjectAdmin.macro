@@ -806,7 +806,9 @@ definition {
 			}
 		}
 
-		Click(locator1 = "ObjectAction#TAB_ACTION_BUILDER");
+		Click(
+			key_tabName = "Action Builder",
+			locator1 = "ObjectAction#TAB_GENERIC");
 
 		if (isSet(whenAction)) {
 			Click(locator1 = "ObjectAction#SELECT_TRIGGER");
@@ -931,6 +933,10 @@ definition {
 		Navigator.gotoNavItem(navItem = "Define Permissions");
 
 		ObjectAdmin.searchInDefinePermissions(search = "Custom Objects");
+	}
+
+	macro goToValidationsTab {
+		Click(locator1 = "ObjectAdmin#OBJECT_VALIDATIONS_TAB");
 	}
 
 	macro markLayoutAsDefault {
@@ -1128,6 +1134,14 @@ definition {
 		AssertElementPresent(
 			key_optionName = "${optionName}",
 			locator1 = "ObjectAdmin#VIEW_PICKLIST_OPTIONS");
+	}
+
+	macro viewSelectedTabOnObject {
+		Refresh();
+
+		AssertElementPresent(
+			key_selectedTab = "${selectedTab}",
+			locator1 = "ObjectAdmin#VIEW_SELECTED_TAB_ON_OBJECT");
 	}
 
 	macro viewSystemObject {

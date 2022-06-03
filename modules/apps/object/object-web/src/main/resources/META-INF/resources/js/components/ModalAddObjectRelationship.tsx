@@ -36,6 +36,7 @@ const headers = new Headers({
 
 const ModalAddObjectRelationship: React.FC<IProps> = ({
 	apiURL,
+	ffManyToManyRelationshipCustomAndSystemObjects,
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	observer,
@@ -64,6 +65,9 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 
 	const filteredObjectRelationshipTypes = objectRelationshipTypes.filter(
 		({value}) => {
+			if (ffManyToManyRelationshipCustomAndSystemObjects) {
+				return value === 'oneToMany' || value === 'manyToMany';
+			}
 			if (system) {
 				return value === 'oneToMany';
 			}
@@ -163,9 +167,41 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 				})
 			);
 
+			if (ffManyToManyRelationshipCustomAndSystemObjects) {
+				let manyToManyObjectDefinitions = objectDefinitions.filter(
+					(objectDefinition) =>
+						objectDefinition.id !== Number(objectDefinitionId)
+				);
+
+				if (
+					ffManyToManyRelationshipCustomAndSystemObjects &&
+					currentObjectDefinition.system
+				) {
+					manyToManyObjectDefinitions = objectDefinitions.filter(
+						(objectDefinition) => !objectDefinition.system
+					);
+				}
+
+				setManyToManyObjectDefinitions(manyToManyObjectDefinitions);
+
+				if (currentObjectDefinition.system) {
+					const customObjectDefinitions = objectDefinitions.filter(
+						({system}: TObjectDefinition) => !system
+					);
+
+					setObjectDefinitions(customObjectDefinitions);
+
+					return;
+				}
+
+				setObjectDefinitions(objectDefinitions);
+
+				return;
+			}
+
 			const manyToManyObjectDefinitions = objectDefinitions.filter(
-				(objectDefinition) =>
-					objectDefinition.id !== Number(objectDefinitionId)
+				({id, system}: TObjectDefinition) =>
+					!system && id !== Number(objectDefinitionId)
 			);
 
 			setManyToManyObjectDefinitions(manyToManyObjectDefinitions);
@@ -179,12 +215,11 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 
 				return;
 			}
-
 			setObjectDefinitions(objectDefinitions);
 		};
 
 		makeRequest();
-	}, [objectDefinitionId]);
+	}, [objectDefinitionId, ffManyToManyRelationshipCustomAndSystemObjects]);
 
 	return (
 		<ClayModal observer={observer}>
@@ -275,6 +310,8 @@ const ModalAddObjectRelationship: React.FC<IProps> = ({
 
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
+	ffManyToManyRelationshipCustomAndSystemObjects: boolean;
+	ffOneToManyRelationshipCustomAndNativeObjects: boolean;
 	ffOneToOneRelationshipConfigurationEnabled: boolean;
 	objectDefinitionId: number;
 	observer: any;
@@ -300,6 +337,8 @@ type TInitialValues = {
 
 const ModalWithProvider: React.FC<IProps> = ({
 	apiURL,
+	ffManyToManyRelationshipCustomAndSystemObjects,
+	ffOneToManyRelationshipCustomAndNativeObjects,
 	ffOneToOneRelationshipConfigurationEnabled,
 	objectDefinitionId,
 	system,
@@ -322,6 +361,12 @@ const ModalWithProvider: React.FC<IProps> = ({
 			{visibleModal && (
 				<ModalAddObjectRelationship
 					apiURL={apiURL}
+					ffManyToManyRelationshipCustomAndSystemObjects={
+						ffManyToManyRelationshipCustomAndSystemObjects
+					}
+					ffOneToManyRelationshipCustomAndNativeObjects={
+						ffOneToManyRelationshipCustomAndNativeObjects
+					}
 					ffOneToOneRelationshipConfigurationEnabled={
 						ffOneToOneRelationshipConfigurationEnabled
 					}

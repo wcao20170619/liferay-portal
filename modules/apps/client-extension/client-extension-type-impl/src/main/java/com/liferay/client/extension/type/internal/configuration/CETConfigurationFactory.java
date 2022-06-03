@@ -55,9 +55,10 @@ public class CETConfigurationFactory {
 
 		_cet = _cetManager.addCET(
 			cetConfiguration.baseURL(), _getCompanyId(properties),
-			cetConfiguration.description(), cetConfiguration.name(),
-			_getPrimaryKey(properties), _loadProperties(cetConfiguration),
-			cetConfiguration.sourceCodeURL(), cetConfiguration.type(),
+			cetConfiguration.description(),
+			_getExternalReferenceCode(properties), cetConfiguration.name(),
+			_loadProperties(cetConfiguration), cetConfiguration.sourceCodeURL(),
+			cetConfiguration.type(),
 			StringUtil.merge(
 				cetConfiguration.typeSettings(), StringPool.NEW_LINE));
 	}
@@ -89,7 +90,7 @@ public class CETConfigurationFactory {
 		return company.getCompanyId();
 	}
 
-	private String _getPrimaryKey(Map<String, Object> properties) {
+	private String _getExternalReferenceCode(Map<String, Object> properties) {
 		String pid = GetterUtil.getString(
 			properties.get(Constants.SERVICE_PID));
 

@@ -62,6 +62,28 @@ public class ClientExtensionEntryServiceWrapper
 
 	@Override
 	public com.liferay.client.extension.model.ClientExtensionEntry
+			deleteClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _clientExtensionEntryService.
+			deleteClientExtensionEntryByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	@Override
+	public com.liferay.client.extension.model.ClientExtensionEntry
+			fetchClientExtensionEntryByExternalReferenceCode(
+				long companyId, String externalReferenceCode)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _clientExtensionEntryService.
+			fetchClientExtensionEntryByExternalReferenceCode(
+				companyId, externalReferenceCode);
+	}
+
+	@Override
+	public com.liferay.client.extension.model.ClientExtensionEntry
 			getClientExtensionEntry(long clientExtensionEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

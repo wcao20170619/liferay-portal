@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
 
@@ -43,8 +44,8 @@ public abstract class BaseCETImpl implements CET {
 		if (clientExtensionEntry != null) {
 			_companyId = clientExtensionEntry.getCompanyId();
 			_description = clientExtensionEntry.getDescription();
-			_primaryKey = String.valueOf(
-				clientExtensionEntry.getClientExtensionEntryId());
+			_externalReferenceCode =
+				clientExtensionEntry.getExternalReferenceCode();
 
 			try {
 				_properties = PropertiesUtil.load(
@@ -66,17 +67,17 @@ public abstract class BaseCETImpl implements CET {
 	}
 
 	public BaseCETImpl(
-		String baseURL, long companyId, String description, String name,
-		String primaryKey, Properties properties, String sourceCodeURL,
-		String typeSettings) {
+		String baseURL, long companyId, String description,
+		String externalReferenceCode, String name, Properties properties,
+		String sourceCodeURL, String typeSettings) {
 
 		this(typeSettings);
 
 		_baseURL = baseURL;
 		_companyId = companyId;
 		_description = description;
+		_externalReferenceCode = externalReferenceCode;
 		_name = name;
-		_primaryKey = primaryKey;
 		_properties = properties;
 		_sourceCodeURL = sourceCodeURL;
 
@@ -99,17 +100,17 @@ public abstract class BaseCETImpl implements CET {
 	}
 
 	@Override
+	public String getExternalReferenceCode() {
+		return _externalReferenceCode;
+	}
+
+	@Override
 	public String getName(Locale locale) {
 		if (_clientExtensionEntry != null) {
 			return _clientExtensionEntry.getName(locale);
 		}
 
 		return _name;
-	}
-
-	@Override
-	public String getPrimaryKey() {
-		return _primaryKey;
 	}
 
 	@Override
@@ -151,12 +152,12 @@ public abstract class BaseCETImpl implements CET {
 	private ClientExtensionEntry _clientExtensionEntry;
 	private long _companyId;
 	private String _description = StringPool.BLANK;
+	private String _externalReferenceCode = StringPool.BLANK;
 	private String _name = StringPool.BLANK;
-	private String _primaryKey = StringPool.BLANK;
 	private Properties _properties;
 	private boolean _readOnly;
 	private String _sourceCodeURL = StringPool.BLANK;
-	private int _status;
+	private int _status = WorkflowConstants.STATUS_APPROVED;
 	private final UnicodeProperties _typeSettingsUnicodeProperties;
 
 }

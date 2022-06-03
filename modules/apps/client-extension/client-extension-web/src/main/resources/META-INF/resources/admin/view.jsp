@@ -21,11 +21,11 @@ ClientExtensionAdminDisplayContext clientExtensionAdminDisplayContext = (ClientE
 %>
 
 <frontend-data-set:classic-display
-	actionParameterName="clientExtensionEntryId"
+	actionParameterName="externalReferenceCode"
 	creationMenu="<%= clientExtensionAdminDisplayContext.getCreationMenu() %>"
 	dataProviderKey="<%= ClientExtensionAdminFDSNames.CLIENT_EXTENSION_TYPES %>"
 	id="<%= ClientExtensionAdminFDSNames.CLIENT_EXTENSION_TYPES %>"
 	itemsPerPage="<%= 10 %>"
-	selectedItemsKey="clientExtensionEntryId"
+	selectedItemsKey="externalReferenceCode"
 	style="fluid"
 />

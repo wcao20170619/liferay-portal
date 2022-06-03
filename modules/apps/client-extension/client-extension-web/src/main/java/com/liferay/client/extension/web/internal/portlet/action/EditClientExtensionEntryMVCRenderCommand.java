@@ -23,6 +23,8 @@ import com.liferay.client.extension.web.internal.display.context.EditClientExten
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -55,7 +57,7 @@ public class EditClientExtensionEntryMVCRenderCommand
 				ClientExtensionAdminWebKeys.
 					EDIT_CLIENT_EXTENSION_ENTRY_DISPLAY_CONTEXT,
 				new EditClientExtensionEntryDisplayContext(
-					_cetFactory, _getClientExtensionEntry(renderRequest),
+					_cetFactory, _fetchClientExtensionEntry(renderRequest),
 					renderRequest));
 
 			return "/admin/edit_client_extension_entry.jsp";
@@ -65,19 +67,20 @@ public class EditClientExtensionEntryMVCRenderCommand
 		}
 	}
 
-	private ClientExtensionEntry _getClientExtensionEntry(
+	private ClientExtensionEntry _fetchClientExtensionEntry(
 			RenderRequest renderRequest)
 		throws PortalException {
 
-		long clientExtensionEntryId = ParamUtil.getLong(
-			renderRequest, "clientExtensionEntryId");
+		String externalReferenceCode = ParamUtil.getString(
+			renderRequest, "externalReferenceCode");
 
-		if (clientExtensionEntryId != 0) {
-			return _clientExtensionEntryService.getClientExtensionEntry(
-				clientExtensionEntryId);
+		if (Validator.isNull(externalReferenceCode)) {
+			return null;
 		}
 
-		return null;
+		return _clientExtensionEntryService.
+			fetchClientExtensionEntryByExternalReferenceCode(
+				_portal.getCompanyId(renderRequest), externalReferenceCode);
 	}
 
 	@Reference
@@ -85,5 +88,8 @@ public class EditClientExtensionEntryMVCRenderCommand
 
 	@Reference
 	private ClientExtensionEntryService _clientExtensionEntryService;
+
+	@Reference
+	private Portal _portal;
 
 }

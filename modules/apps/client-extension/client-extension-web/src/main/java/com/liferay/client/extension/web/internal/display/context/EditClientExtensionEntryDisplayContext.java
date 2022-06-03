@@ -67,11 +67,6 @@ public class EditClientExtensionEntryDisplayContext {
 		_portletRequest = portletRequest;
 	}
 
-	public long getClientExtensionEntryId() {
-		return BeanParamUtil.getLong(
-			_clientExtensionEntry, _portletRequest, "clientExtensionEntryId");
-	}
-
 	public String getCmd() {
 		if (_clientExtensionEntry == null) {
 			return Constants.ADD;
@@ -133,6 +128,11 @@ public class EditClientExtensionEntryDisplayContext {
 	public String getDescription() {
 		return BeanParamUtil.getString(
 			_clientExtensionEntry, _portletRequest, "description");
+	}
+
+	public String getExternalReferenceCode() {
+		return BeanParamUtil.getString(
+			_clientExtensionEntry, _portletRequest, "externalReferenceCode");
 	}
 
 	public String getFriendlyURLMapping() {

@@ -474,6 +474,214 @@ public interface ClientExtensionEntryPersistence
 	public int filterCountByUuid_C(String uuid, long companyId);
 
 	/**
+	 * Returns all the client extension entries where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the matching client extension entries
+	 */
+	public java.util.List<ClientExtensionEntry> findByCompanyId(long companyId);
+
+	/**
+	 * Returns a range of all the client extension entries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ClientExtensionEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of client extension entries
+	 * @param end the upper bound of the range of client extension entries (not inclusive)
+	 * @return the range of matching client extension entries
+	 */
+	public java.util.List<ClientExtensionEntry> findByCompanyId(
+		long companyId, int start, int end);
+
+	/**
+	 * Returns an ordered range of all the client extension entries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ClientExtensionEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of client extension entries
+	 * @param end the upper bound of the range of client extension entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching client extension entries
+	 */
+	public java.util.List<ClientExtensionEntry> findByCompanyId(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<ClientExtensionEntry>
+			orderByComparator);
+
+	/**
+	 * Returns an ordered range of all the client extension entries where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ClientExtensionEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of client extension entries
+	 * @param end the upper bound of the range of client extension entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching client extension entries
+	 */
+	public java.util.List<ClientExtensionEntry> findByCompanyId(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<ClientExtensionEntry>
+			orderByComparator,
+		boolean useFinderCache);
+
+	/**
+	 * Returns the first client extension entry in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching client extension entry
+	 * @throws NoSuchClientExtensionEntryException if a matching client extension entry could not be found
+	 */
+	public ClientExtensionEntry findByCompanyId_First(
+			long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<ClientExtensionEntry> orderByComparator)
+		throws NoSuchClientExtensionEntryException;
+
+	/**
+	 * Returns the first client extension entry in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching client extension entry, or <code>null</code> if a matching client extension entry could not be found
+	 */
+	public ClientExtensionEntry fetchByCompanyId_First(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator<ClientExtensionEntry>
+			orderByComparator);
+
+	/**
+	 * Returns the last client extension entry in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching client extension entry
+	 * @throws NoSuchClientExtensionEntryException if a matching client extension entry could not be found
+	 */
+	public ClientExtensionEntry findByCompanyId_Last(
+			long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<ClientExtensionEntry> orderByComparator)
+		throws NoSuchClientExtensionEntryException;
+
+	/**
+	 * Returns the last client extension entry in the ordered set where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching client extension entry, or <code>null</code> if a matching client extension entry could not be found
+	 */
+	public ClientExtensionEntry fetchByCompanyId_Last(
+		long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator<ClientExtensionEntry>
+			orderByComparator);
+
+	/**
+	 * Returns the client extension entries before and after the current client extension entry in the ordered set where companyId = &#63;.
+	 *
+	 * @param clientExtensionEntryId the primary key of the current client extension entry
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next client extension entry
+	 * @throws NoSuchClientExtensionEntryException if a client extension entry with the primary key could not be found
+	 */
+	public ClientExtensionEntry[] findByCompanyId_PrevAndNext(
+			long clientExtensionEntryId, long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<ClientExtensionEntry> orderByComparator)
+		throws NoSuchClientExtensionEntryException;
+
+	/**
+	 * Returns all the client extension entries that the user has permission to view where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the matching client extension entries that the user has permission to view
+	 */
+	public java.util.List<ClientExtensionEntry> filterFindByCompanyId(
+		long companyId);
+
+	/**
+	 * Returns a range of all the client extension entries that the user has permission to view where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ClientExtensionEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of client extension entries
+	 * @param end the upper bound of the range of client extension entries (not inclusive)
+	 * @return the range of matching client extension entries that the user has permission to view
+	 */
+	public java.util.List<ClientExtensionEntry> filterFindByCompanyId(
+		long companyId, int start, int end);
+
+	/**
+	 * Returns an ordered range of all the client extension entries that the user has permissions to view where companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>ClientExtensionEntryModelImpl</code>.
+	 * </p>
+	 *
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of client extension entries
+	 * @param end the upper bound of the range of client extension entries (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching client extension entries that the user has permission to view
+	 */
+	public java.util.List<ClientExtensionEntry> filterFindByCompanyId(
+		long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<ClientExtensionEntry>
+			orderByComparator);
+
+	/**
+	 * Returns the client extension entries before and after the current client extension entry in the ordered set of client extension entries that the user has permission to view where companyId = &#63;.
+	 *
+	 * @param clientExtensionEntryId the primary key of the current client extension entry
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next client extension entry
+	 * @throws NoSuchClientExtensionEntryException if a client extension entry with the primary key could not be found
+	 */
+	public ClientExtensionEntry[] filterFindByCompanyId_PrevAndNext(
+			long clientExtensionEntryId, long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<ClientExtensionEntry> orderByComparator)
+		throws NoSuchClientExtensionEntryException;
+
+	/**
+	 * Removes all the client extension entries where companyId = &#63; from the database.
+	 *
+	 * @param companyId the company ID
+	 */
+	public void removeByCompanyId(long companyId);
+
+	/**
+	 * Returns the number of client extension entries where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the number of matching client extension entries
+	 */
+	public int countByCompanyId(long companyId);
+
+	/**
+	 * Returns the number of client extension entries that the user has permission to view where companyId = &#63;.
+	 *
+	 * @param companyId the company ID
+	 * @return the number of matching client extension entries that the user has permission to view
+	 */
+	public int filterCountByCompanyId(long companyId);
+
+	/**
 	 * Returns all the client extension entries where companyId = &#63; and type = &#63;.
 	 *
 	 * @param companyId the company ID

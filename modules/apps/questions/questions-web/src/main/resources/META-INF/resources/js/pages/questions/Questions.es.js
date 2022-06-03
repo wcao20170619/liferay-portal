@@ -608,6 +608,7 @@ export default withRouter(
 							>
 								{(question) => (
 									<QuestionRow
+										context={context}
 										currentSection={sectionTitle}
 										key={question.id}
 										question={question}

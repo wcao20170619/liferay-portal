@@ -24,14 +24,16 @@ export default function ThemeCSSReplacementSelector({
 	themeCSSExtensionName,
 }) {
 	const [extensionName, setExtensionName] = useState(themeCSSExtensionName);
-	const [cetPrimaryKey, setCETPrimaryKey] = useState('');
+	const [cetExternalReferenceCode, setCETExternalReferenceCode] = useState(
+		''
+	);
 
 	const onClick = () => {
 		openSelectionModal({
 			onSelect: (selectedItem) => {
 				const item = JSON.parse(selectedItem.value);
 
-				setCETPrimaryKey(item.cetPrimaryKey);
+				setCETExternalReferenceCode(item.cetExternalReferenceCode);
 				setExtensionName(item.name);
 			},
 			selectEventName: selectThemeCSSClientExtensionEventName,
@@ -43,9 +45,9 @@ export default function ThemeCSSReplacementSelector({
 	return (
 		<>
 			<ClayInput
-				name={`${portletNamespace}themeCSSCETPrimaryKey`}
+				name={`${portletNamespace}themeCSSCETExternalReferenceCode`}
 				type="hidden"
-				value={cetPrimaryKey}
+				value={cetExternalReferenceCode}
 			/>
 			<ClayForm.Group>
 				<label
@@ -83,7 +85,7 @@ export default function ThemeCSSReplacementSelector({
 									displayType="secondary"
 									onClick={() => {
 										setExtensionName('');
-										setCETPrimaryKey('');
+										setCETExternalReferenceCode('');
 									}}
 									small
 									symbol="trash"
