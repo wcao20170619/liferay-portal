@@ -680,6 +680,50 @@ public interface SXPBlueprintPersistence extends BasePersistence<SXPBlueprint> {
 	public int filterCountByCompanyId(long companyId);
 
 	/**
+	 * Returns the sxp blueprint where key = &#63; or throws a <code>NoSuchSXPBlueprintException</code> if it could not be found.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint
+	 * @throws NoSuchSXPBlueprintException if a matching sxp blueprint could not be found
+	 */
+	public SXPBlueprint findByKey(String key)
+		throws NoSuchSXPBlueprintException;
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	public SXPBlueprint fetchByKey(String key);
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param key the key
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	public SXPBlueprint fetchByKey(String key, boolean useFinderCache);
+
+	/**
+	 * Removes the sxp blueprint where key = &#63; from the database.
+	 *
+	 * @param key the key
+	 * @return the sxp blueprint that was removed
+	 */
+	public SXPBlueprint removeByKey(String key)
+		throws NoSuchSXPBlueprintException;
+
+	/**
+	 * Returns the number of sxp blueprints where key = &#63;.
+	 *
+	 * @param key the key
+	 * @return the number of matching sxp blueprints
+	 */
+	public int countByKey(String key);
+
+	/**
 	 * Caches the sxp blueprint in the entity cache if it is enabled.
 	 *
 	 * @param sxpBlueprint the sxp blueprint

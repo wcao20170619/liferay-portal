@@ -268,6 +268,9 @@ public interface SXPBlueprintLocalService
 	public SXPBlueprint getSXPBlueprint(long sxpBlueprintId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public SXPBlueprint getSXPBlueprintByKey(String key);
+
 	/**
 	 * Returns the sxp blueprint with the matching UUID and company.
 	 *

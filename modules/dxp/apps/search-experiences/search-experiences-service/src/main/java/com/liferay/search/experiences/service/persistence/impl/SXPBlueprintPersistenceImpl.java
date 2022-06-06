@@ -2955,6 +2955,230 @@ public class SXPBlueprintPersistenceImpl
 	private static final String _FINDER_COLUMN_COMPANYID_COMPANYID_2 =
 		"sxpBlueprint.companyId = ?";
 
+	private FinderPath _finderPathFetchByKey;
+	private FinderPath _finderPathCountByKey;
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or throws a <code>NoSuchSXPBlueprintException</code> if it could not be found.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint
+	 * @throws NoSuchSXPBlueprintException if a matching sxp blueprint could not be found
+	 */
+	@Override
+	public SXPBlueprint findByKey(String key)
+		throws NoSuchSXPBlueprintException {
+
+		SXPBlueprint sxpBlueprint = fetchByKey(key);
+
+		if (sxpBlueprint == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("key=");
+			sb.append(key);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchSXPBlueprintException(sb.toString());
+		}
+
+		return sxpBlueprint;
+	}
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param key the key
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	@Override
+	public SXPBlueprint fetchByKey(String key) {
+		return fetchByKey(key, true);
+	}
+
+	/**
+	 * Returns the sxp blueprint where key = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param key the key
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching sxp blueprint, or <code>null</code> if a matching sxp blueprint could not be found
+	 */
+	@Override
+	public SXPBlueprint fetchByKey(String key, boolean useFinderCache) {
+		key = Objects.toString(key, "");
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {key};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = finderCache.getResult(_finderPathFetchByKey, finderArgs);
+		}
+
+		if (result instanceof SXPBlueprint) {
+			SXPBlueprint sxpBlueprint = (SXPBlueprint)result;
+
+			if (!Objects.equals(key, sxpBlueprint.getKey())) {
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_SELECT_SXPBLUEPRINT_WHERE);
+
+			boolean bindKey = false;
+
+			if (key.isEmpty()) {
+				sb.append(_FINDER_COLUMN_KEY_KEY_3);
+			}
+			else {
+				bindKey = true;
+
+				sb.append(_FINDER_COLUMN_KEY_KEY_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				if (bindKey) {
+					queryPos.add(key);
+				}
+
+				List<SXPBlueprint> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByKey, finderArgs, list);
+					}
+				}
+				else {
+					SXPBlueprint sxpBlueprint = list.get(0);
+
+					result = sxpBlueprint;
+
+					cacheResult(sxpBlueprint);
+				}
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (SXPBlueprint)result;
+		}
+	}
+
+	/**
+	 * Removes the sxp blueprint where key = &#63; from the database.
+	 *
+	 * @param key the key
+	 * @return the sxp blueprint that was removed
+	 */
+	@Override
+	public SXPBlueprint removeByKey(String key)
+		throws NoSuchSXPBlueprintException {
+
+		SXPBlueprint sxpBlueprint = findByKey(key);
+
+		return remove(sxpBlueprint);
+	}
+
+	/**
+	 * Returns the number of sxp blueprints where key = &#63;.
+	 *
+	 * @param key the key
+	 * @return the number of matching sxp blueprints
+	 */
+	@Override
+	public int countByKey(String key) {
+		key = Objects.toString(key, "");
+
+		FinderPath finderPath = _finderPathCountByKey;
+
+		Object[] finderArgs = new Object[] {key};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(2);
+
+			sb.append(_SQL_COUNT_SXPBLUEPRINT_WHERE);
+
+			boolean bindKey = false;
+
+			if (key.isEmpty()) {
+				sb.append(_FINDER_COLUMN_KEY_KEY_3);
+			}
+			else {
+				bindKey = true;
+
+				sb.append(_FINDER_COLUMN_KEY_KEY_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				if (bindKey) {
+					queryPos.add(key);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_KEY_KEY_2 =
+		"sxpBlueprint.key = ?";
+
+	private static final String _FINDER_COLUMN_KEY_KEY_3 =
+		"(sxpBlueprint.key IS NULL OR sxpBlueprint.key = '')";
+
 	public SXPBlueprintPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -2980,6 +3204,10 @@ public class SXPBlueprintPersistenceImpl
 	public void cacheResult(SXPBlueprint sxpBlueprint) {
 		entityCache.putResult(
 			SXPBlueprintImpl.class, sxpBlueprint.getPrimaryKey(), sxpBlueprint);
+
+		finderCache.putResult(
+			_finderPathFetchByKey, new Object[] {sxpBlueprint.getKey()},
+			sxpBlueprint);
 	}
 
 	private int _valueObjectFinderCacheListThreshold;
@@ -3048,6 +3276,16 @@ public class SXPBlueprintPersistenceImpl
 		for (Serializable primaryKey : primaryKeys) {
 			entityCache.removeResult(SXPBlueprintImpl.class, primaryKey);
 		}
+	}
+
+	protected void cacheUniqueFindersCache(
+		SXPBlueprintModelImpl sxpBlueprintModelImpl) {
+
+		Object[] args = new Object[] {sxpBlueprintModelImpl.getKey()};
+
+		finderCache.putResult(_finderPathCountByKey, args, Long.valueOf(1));
+		finderCache.putResult(
+			_finderPathFetchByKey, args, sxpBlueprintModelImpl);
 	}
 
 	/**
@@ -3258,6 +3496,8 @@ public class SXPBlueprintPersistenceImpl
 
 		entityCache.putResult(
 			SXPBlueprintImpl.class, sxpBlueprintModelImpl, false, true);
+
+		cacheUniqueFindersCache(sxpBlueprintModelImpl);
 
 		if (isNew) {
 			sxpBlueprint.setNew(false);
@@ -3595,6 +3835,15 @@ public class SXPBlueprintPersistenceImpl
 		_finderPathCountByCompanyId = new FinderPath(
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
+			false);
+
+		_finderPathFetchByKey = new FinderPath(
+			FINDER_CLASS_NAME_ENTITY, "fetchByKey",
+			new String[] {String.class.getName()}, new String[] {"key_"}, true);
+
+		_finderPathCountByKey = new FinderPath(
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByKey",
+			new String[] {String.class.getName()}, new String[] {"key_"},
 			false);
 
 		_setSXPBlueprintUtilPersistence(this);
