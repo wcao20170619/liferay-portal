@@ -166,7 +166,7 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	@Test
-	public void testBoostAssetType() throws Exception {
+	public void testBoostAssetType() throws Exception { 
 		_updateConfigurationJSON(
 			"generalConfiguration",
 			JSONUtil.put(
