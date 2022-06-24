@@ -77,6 +77,10 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
 		sxpElement.setType(type);
+		sxpElement.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 		sxpElement.setStatus(WorkflowConstants.STATUS_APPROVED);
 
 		sxpElement = sxpElementPersistence.update(sxpElement);
@@ -163,6 +167,10 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 		sxpElement.setHidden(hidden);
 		sxpElement.setSchemaVersion(schemaVersion);
 		sxpElement.setTitleMap(titleMap);
+		sxpElement.setVersion(
+			String.format(
+				"%.1f",
+				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 
 		return updateSXPElement(sxpElement);
 	}
