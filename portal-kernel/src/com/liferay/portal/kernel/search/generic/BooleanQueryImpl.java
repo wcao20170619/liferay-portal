@@ -123,13 +123,9 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 	public Collection<Query> addNumericRangeTerm(
 		String field, int startValue, int endValue) {
 
-		List<Query> queries = new ArrayList<>();
+		List<Query> queries = new ArrayList<>(1);
 
-		for (int i = startValue; i <= endValue; i++) {
-			Query query = addExactTerm(field, i);
-
-			queries.add(query);
-		}
+		queries.add(addRangeTerm(field, startValue, endValue));
 
 		return queries;
 	}
@@ -146,13 +142,9 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 	public Collection<Query> addNumericRangeTerm(
 		String field, long startValue, long endValue) {
 
-		List<Query> queries = new ArrayList<>();
+		List<Query> queries = new ArrayList<>(1);
 
-		for (long i = startValue; i <= endValue; i++) {
-			Query query = addExactTerm(field, i);
-
-			queries.add(query);
-		}
+		queries.add(addRangeTerm(field, startValue, endValue));
 
 		return queries;
 	}
@@ -171,11 +163,7 @@ public class BooleanQueryImpl extends BaseBooleanQueryImpl {
 
 		List<Query> queries = new ArrayList<>();
 
-		for (short i = startValue; i <= endValue; i++) {
-			Query query = addExactTerm(field, i);
-
-			queries.add(query);
-		}
+		queries.add(addRangeTerm(field, startValue, endValue));
 
 		return queries;
 	}
