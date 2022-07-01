@@ -17,15 +17,20 @@ package com.liferay.search.experiences.internal.upgrade.v1_3_0;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.model.impl.SXPElementImpl;
 import com.liferay.search.experiences.rest.dto.v1_0.ElementDefinition;
 import com.liferay.search.experiences.rest.dto.v1_0.ElementInstance;
 import com.liferay.search.experiences.rest.dto.v1_0.util.ElementInstanceUtil;
+import com.liferay.search.experiences.service.SXPBlueprintLocalService;
+import com.liferay.search.experiences.service.SXPElementLocalService;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,11 +46,21 @@ import java.util.Objects;
  */
 public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 
+	public SXPBlueprintUpgradeProcess(
+		SXPBlueprintLocalService sxpBlueprintLocalService,
+		SXPElementLocalService sxpElementLocalService) {
+
+		_sxpBlueprintLocalService = sxpBlueprintLocalService;
+		_sxpElementLocalService = sxpElementLocalService;
+	}
+
 	@Override
 	protected void doUpgrade() throws Exception {
 		_upgradeSXPElement();
 
 		_upgradeSXPBlueprint();
+
+		_reindex();
 	}
 
 	private String _getElementInstancesJSON(
@@ -109,6 +124,36 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 		}
 
 		return Arrays.toString(elementInstances);
+	}
+
+	private void _reindex() throws Exception {
+		Indexer<SXPBlueprint> sxpBlueprintIndexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(SXPBlueprint.class);
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select sxpBlueprintId from SXPBlueprint");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				sxpBlueprintIndexer.reindex(
+					_sxpBlueprintLocalService.getSXPBlueprint(
+						resultSet.getLong("sxpBlueprintId")));
+			}
+		}
+
+		Indexer<SXPElement> sxpElementIndexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(SXPElement.class);
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select sxpElementId from SXPElement");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				sxpElementIndexer.reindex(
+					_sxpElementLocalService.getSXPElement(
+						resultSet.getLong("sxpElementId")));
+			}
+		}
 	}
 
 	private String _renameDescription(String currentDescription) {
@@ -299,5 +344,8 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 			}
 		}
 	}
+
+	private final SXPBlueprintLocalService _sxpBlueprintLocalService;
+	private final SXPElementLocalService _sxpElementLocalService;
 
 }
