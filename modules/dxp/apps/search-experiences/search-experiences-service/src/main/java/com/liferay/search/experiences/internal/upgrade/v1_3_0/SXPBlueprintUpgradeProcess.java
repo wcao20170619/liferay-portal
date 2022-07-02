@@ -17,11 +17,15 @@ package com.liferay.search.experiences.internal.upgrade.v1_3_0;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.model.SXPElement;
+import com.liferay.search.experiences.model.impl.SXPBlueprintImpl;
 import com.liferay.search.experiences.model.impl.SXPElementImpl;
 import com.liferay.search.experiences.rest.dto.v1_0.ElementDefinition;
 import com.liferay.search.experiences.rest.dto.v1_0.ElementInstance;
@@ -46,6 +50,8 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 		_upgradeSXPElement();
 
 		_upgradeSXPBlueprint();
+
+		_reindex();
 	}
 
 	private String _getElementInstancesJSON(
@@ -109,6 +115,91 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 		}
 
 		return Arrays.toString(elementInstances);
+	}
+
+	private void _reindex() throws Exception {
+		Indexer<SXPBlueprint> sxpBlueprintIndexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(SXPBlueprint.class);
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select * from SXPBlueprint");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				SXPBlueprintImpl sxpBlueprintImpl = new SXPBlueprintImpl();
+
+				sxpBlueprintImpl.setConfigurationJSON(
+					resultSet.getString("configurationJSON"));
+				sxpBlueprintImpl.setCompanyId(resultSet.getLong("companyId"));
+				sxpBlueprintImpl.setCreateDate(resultSet.getDate("createDate"));
+				sxpBlueprintImpl.setDescription(
+					resultSet.getString("description"));
+				sxpBlueprintImpl.setElementInstancesJSON(
+					resultSet.getString("elementInstancesJSON"));
+				sxpBlueprintImpl.setExternalReferenceCode(
+					resultSet.getString("externalReferenceCode"));
+				sxpBlueprintImpl.setModifiedDate(
+					resultSet.getDate("modifiedDate"));
+				sxpBlueprintImpl.setMvccVersion(
+					resultSet.getLong("mvccVersion"));
+				sxpBlueprintImpl.setSXPBlueprintId(
+					resultSet.getLong("sxpBlueprintId"));
+				sxpBlueprintImpl.setSchemaVersion(
+					resultSet.getString("schemaVersion"));
+				sxpBlueprintImpl.setStatus(resultSet.getInt("status"));
+				sxpBlueprintImpl.setStatusByUserId(
+					resultSet.getLong("statusByUserId"));
+				sxpBlueprintImpl.setStatusByUserName(
+					resultSet.getString("statusByUserName"));
+				sxpBlueprintImpl.setStatusDate(resultSet.getDate("statusDate"));
+				sxpBlueprintImpl.setTitle(resultSet.getString("title"));
+				sxpBlueprintImpl.setUserId(resultSet.getLong("userId"));
+				sxpBlueprintImpl.setUserName(resultSet.getString("userName"));
+				sxpBlueprintImpl.setUuid(resultSet.getString("uuid_"));
+				sxpBlueprintImpl.setVersion(resultSet.getString("version"));
+
+				sxpBlueprintIndexer.reindex(sxpBlueprintImpl);
+			}
+		}
+
+		Indexer<SXPElement> sxpElementIndexer =
+			IndexerRegistryUtil.nullSafeGetIndexer(SXPElement.class);
+
+		try (PreparedStatement preparedStatement = connection.prepareStatement(
+				"select * from SXPElement");
+			ResultSet resultSet = preparedStatement.executeQuery()) {
+
+			while (resultSet.next()) {
+				SXPElementImpl sxpElementImpl = new SXPElementImpl();
+
+				sxpElementImpl.setCompanyId(resultSet.getLong("companyId"));
+				sxpElementImpl.setCreateDate(resultSet.getDate("createDate"));
+				sxpElementImpl.setDescription(
+					resultSet.getString("description"));
+				sxpElementImpl.setElementDefinitionJSON(
+					resultSet.getString("elementDefinitionJSON"));
+				sxpElementImpl.setExternalReferenceCode(
+					resultSet.getString("externalReferenceCode"));
+				sxpElementImpl.setHidden(resultSet.getBoolean("hidden_"));
+				sxpElementImpl.setModifiedDate(
+					resultSet.getDate("modifiedDate"));
+				sxpElementImpl.setMvccVersion(resultSet.getLong("mvccVersion"));
+				sxpElementImpl.setReadOnly(resultSet.getBoolean("readOnly"));
+				sxpElementImpl.setSXPElementId(
+					resultSet.getLong("sxpElementId"));
+				sxpElementImpl.setSchemaVersion(
+					resultSet.getString("schemaVersion"));
+				sxpElementImpl.setStatus(resultSet.getInt("status"));
+				sxpElementImpl.setTitle(resultSet.getString("title"));
+				sxpElementImpl.setType(resultSet.getInt("type_"));
+				sxpElementImpl.setUserId(resultSet.getLong("userId"));
+				sxpElementImpl.setUserName(resultSet.getString("userName"));
+				sxpElementImpl.setUuid(resultSet.getString("uuid_"));
+				sxpElementImpl.setVersion(resultSet.getString("version"));
+
+				sxpElementIndexer.reindex(sxpElementImpl);
+			}
+		}
 	}
 
 	private String _renameDescription(String currentDescription) {
