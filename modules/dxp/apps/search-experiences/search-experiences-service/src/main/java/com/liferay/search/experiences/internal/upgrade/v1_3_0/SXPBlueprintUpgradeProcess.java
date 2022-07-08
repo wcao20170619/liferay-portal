@@ -136,7 +136,7 @@ public class SXPBlueprintUpgradeProcess extends UpgradeProcess {
 		return StringUtil.replace(
 			elementDefinitionJSON,
 			new String[] {
-				"Create Date: From", "Creat Date: To", "Morning (4am - 12am)"
+				"Create Date: From", "Create Date: To", "Morning (4am - 12am)"
 			},
 			new String[] {"Date: From", "Date: To", "Morning (4am - 12pm)"});
 	}
