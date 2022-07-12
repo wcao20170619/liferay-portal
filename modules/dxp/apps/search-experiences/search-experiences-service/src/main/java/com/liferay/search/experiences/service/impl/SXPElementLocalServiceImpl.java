@@ -14,6 +14,8 @@
 
 package com.liferay.search.experiences.service.impl;
 
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -26,6 +28,8 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.search.experiences.exception.SXPElementElementDefinitionJSONException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
@@ -82,6 +86,17 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 				"%.1f",
 				GetterUtil.getFloat(sxpElement.getVersion(), 0.9F) + 0.1));
 		sxpElement.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+		if (readOnly) {
+			String titleUpperCase = StringUtil.toUpperCase(
+				StringUtil.replace(
+					sxpElement.getTitle(LocaleUtil.US), CharPool.SPACE,
+					StringPool.UNDERLINE));
+
+			sxpElement.setExternalReferenceCode(
+				titleUpperCase + StringPool.UNDERLINE +
+					sxpElement.getSXPElementId());
+		}
 
 		sxpElement = sxpElementPersistence.update(sxpElement);
 
