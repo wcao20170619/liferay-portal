@@ -69,11 +69,11 @@ public class SXPElementLocalServiceTest {
 
 	@Test
 	public void testAddSXPElement() throws Exception {
-		Assert.assertEquals("1.0", _sxpElement.getVersion());
 		Assert.assertNotNull(_sxpElement.getExternalReferenceCode());
+		Assert.assertEquals("1.0", _sxpElement.getVersion());
 
 		SXPElement sxpElement = _addSXPElement(
-			true, RandomTestUtil.randomString(75), TestPropsValues.getUserId());
+			true, RandomTestUtil.randomString(), TestPropsValues.getUserId());
 
 		try {
 			_addSXPElement(
@@ -110,6 +110,11 @@ public class SXPElementLocalServiceTest {
 
 	@Test
 	public void testUpdateSXPElement() throws Exception {
+
+		// 1 company with 2 identical ERCs
+
+		// 2 companies with the same ERC
+
 		Company company = CompanyTestUtil.addCompany();
 
 		User user = UserTestUtil.addCompanyAdminUser(company);
