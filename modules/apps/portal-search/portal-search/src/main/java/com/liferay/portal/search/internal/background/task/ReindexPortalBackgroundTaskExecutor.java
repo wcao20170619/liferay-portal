@@ -53,6 +53,10 @@ public class ReindexPortalBackgroundTaskExecutor
 				ReindexBackgroundTaskConstants.PORTAL_START, companyId,
 				companyIds);
 
+			if (_log.isInfoEnabled()) {
+				_log.info("Reindexing started [companyId=" + companyId + "]");
+			}
+
 			try {
 				SearchEngineInitializer searchEngineInitializer =
 					new SearchEngineInitializer(
@@ -67,6 +71,10 @@ public class ReindexPortalBackgroundTaskExecutor
 				ReindexStatusMessageSenderUtil.sendStatusMessage(
 					ReindexBackgroundTaskConstants.PORTAL_END, companyId,
 					companyIds);
+
+				if (_log.isInfoEnabled()) {
+					_log.info("Reindexing ended [companyId=" + companyId + "]");
+				}
 			}
 		}
 	}
