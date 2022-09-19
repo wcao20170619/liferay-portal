@@ -276,7 +276,10 @@ public abstract class BaseSpellCheckIndexWriter
 		for (String dictionaryFileName : dictionaryFileNames) {
 			if (_log.isInfoEnabled()) {
 				_log.info(
-					"Start indexing dictionary for " + dictionaryFileName);
+					StringBundler.concat(
+						"Started indexing dictionary [companyId=",
+						searchContext.getCompanyId(), ", ", dictionaryFileName,
+						"]"));
 			}
 
 			URL url = getResource(dictionaryFileName);
@@ -297,7 +300,10 @@ public abstract class BaseSpellCheckIndexWriter
 
 			if (_log.isInfoEnabled()) {
 				_log.info(
-					"Finished indexing dictionary for " + dictionaryFileName);
+					StringBundler.concat(
+						"Finished indexing dictionary [companyId=",
+						searchContext.getCompanyId(), ", ", dictionaryFileName,
+						"]"));
 			}
 		}
 	}
