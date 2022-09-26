@@ -26,12 +26,12 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext;
+import com.liferay.portal.search.web.internal.facet.display.context.FacetDisplayContext;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -255,19 +255,19 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 
 		if (_order.equals("count:asc")) {
 			assetCategoriesSearchFacetTermDisplayContexts.sort(
-				_COMPARATOR_FREQUENCY_ASC);
+				FacetDisplayContext.COMPARATOR_FREQUENCY_ASC);
 		}
 		else if (_order.equals("count:desc")) {
 			assetCategoriesSearchFacetTermDisplayContexts.sort(
-				_COMPARATOR_FREQUENCY_DESC);
+				FacetDisplayContext.COMPARATOR_FREQUENCY_DESC);
 		}
 		else if (_order.equals("key:asc")) {
 			assetCategoriesSearchFacetTermDisplayContexts.sort(
-				_COMPARATOR_TERM_ASC);
+				FacetDisplayContext.COMPARATOR_TERM_ASC);
 		}
 		else if (_order.equals("key:desc")) {
 			assetCategoriesSearchFacetTermDisplayContexts.sort(
-				_COMPARATOR_TERM_DESC);
+				FacetDisplayContext.COMPARATOR_TERM_DESC);
 		}
 
 		return assetCategoriesSearchFacetTermDisplayContexts;
@@ -337,12 +337,6 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 		}
 
 		return false;
-	}
-
-	private static int _compareDisplayNames(
-		String displayName1, String displayName2) {
-
-		return displayName1.compareTo(displayName2);
 	}
 
 	private List<Tuple> _collectBuckets(FacetCollector facetCollector) {
@@ -431,109 +425,6 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 			Collectors.toList()
 		);
 	}
-
-	private static final Comparator
-		<AssetCategoriesSearchFacetTermDisplayContext>
-			_COMPARATOR_FREQUENCY_ASC =
-				new Comparator<AssetCategoriesSearchFacetTermDisplayContext>() {
-
-					public int compare(
-						AssetCategoriesSearchFacetTermDisplayContext
-							displayContext1,
-						AssetCategoriesSearchFacetTermDisplayContext
-							displayContext2) {
-
-						int result =
-							displayContext1.getFrequency() -
-								displayContext2.getFrequency();
-
-						if (result == 0) {
-							return _compareDisplayNames(
-								displayContext1.getDisplayName(),
-								displayContext2.getDisplayName());
-						}
-
-						return result;
-					}
-
-				};
-
-	private static final Comparator
-		<AssetCategoriesSearchFacetTermDisplayContext>
-			_COMPARATOR_FREQUENCY_DESC =
-				new Comparator<AssetCategoriesSearchFacetTermDisplayContext>() {
-
-					@Override
-					public int compare(
-						AssetCategoriesSearchFacetTermDisplayContext
-							displayContext1,
-						AssetCategoriesSearchFacetTermDisplayContext
-							displayContext2) {
-
-						int result =
-							displayContext2.getFrequency() -
-								displayContext1.getFrequency();
-
-						if (result == 0) {
-							return _compareDisplayNames(
-								displayContext1.getDisplayName(),
-								displayContext2.getDisplayName());
-						}
-
-						return result;
-					}
-
-				};
-
-	private static final Comparator
-		<AssetCategoriesSearchFacetTermDisplayContext> _COMPARATOR_TERM_ASC =
-			new Comparator<AssetCategoriesSearchFacetTermDisplayContext>() {
-
-				@Override
-				public int compare(
-					AssetCategoriesSearchFacetTermDisplayContext
-						displayContext1,
-					AssetCategoriesSearchFacetTermDisplayContext
-						displayContext2) {
-
-					int result = _compareDisplayNames(
-						displayContext1.getDisplayName(),
-						displayContext2.getDisplayName());
-
-					if (result == 0) {
-						return displayContext2.getFrequency() -
-							displayContext1.getFrequency();
-					}
-
-					return result;
-				}
-
-			};
-
-	private static final Comparator
-		<AssetCategoriesSearchFacetTermDisplayContext> _COMPARATOR_TERM_DESC =
-			new Comparator<AssetCategoriesSearchFacetTermDisplayContext>() {
-
-				@Override
-				public int compare(
-					AssetCategoriesSearchFacetTermDisplayContext
-						displayContext1,
-					AssetCategoriesSearchFacetTermDisplayContext
-						displayContext2) {
-
-					int result = _compareDisplayNames(
-						displayContext2.getDisplayName(),
-						displayContext1.getDisplayName());
-
-					if (result == 0) {
-						return displayContext2.getFrequency() -
-							displayContext1.getFrequency();
-					}
-
-					return result;
-				}
-
-			};
 
 	private AssetCategoryLocalService _assetCategoryLocalService;
 	private AssetCategoryPermissionChecker _assetCategoryPermissionChecker;
