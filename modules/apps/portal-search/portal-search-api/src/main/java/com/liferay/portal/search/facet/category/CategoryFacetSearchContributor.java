@@ -39,6 +39,8 @@ public interface CategoryFacetSearchContributor {
 
 		public CategoryFacetBuilder maxTerms(int maxTerms);
 
+		public CategoryFacetBuilder order(String order);
+
 		public CategoryFacetBuilder selectedCategoryIds(
 			long... selectedCategoryIds);
 

@@ -56,6 +56,8 @@ public class CategoryFacetPortletSharedSearchContributor
 				categoryFacetPortletPreferences.getFrequencyThreshold()
 			).maxTerms(
 				categoryFacetPortletPreferences.getMaxTerms()
+			).order(
+				categoryFacetPortletPreferences.getOrder()
 			).selectedCategoryIds(
 				_toLongArray(
 					portletSharedSearchSettings.getParameterValues(

@@ -14,24 +14,24 @@
 
 package com.liferay.portal.search.web.internal.facet.display.context;
 
-import java.io.Serializable;
-
 import java.util.Locale;
 
 /**
  * @author Lino Alves
  */
 public class AssetCategoriesSearchFacetTermDisplayContext
-	implements Serializable {
+	extends FacetDisplayContext {
 
 	public long getAssetCategoryId() {
 		return _assetCategoryId;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return _displayName;
 	}
 
+	@Override
 	public int getFrequency() {
 		return _frequency;
 	}

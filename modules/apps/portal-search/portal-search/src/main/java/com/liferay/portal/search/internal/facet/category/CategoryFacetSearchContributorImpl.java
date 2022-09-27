@@ -98,6 +98,13 @@ public class CategoryFacetSearchContributorImpl
 		}
 
 		@Override
+		public CategoryFacetBuilder order(String order) {
+			_order = order;
+
+			return this;
+		}
+
+		@Override
 		public CategoryFacetBuilder selectedCategoryIds(
 			long... selectedCategoryIds) {
 
@@ -111,7 +118,7 @@ public class CategoryFacetSearchContributorImpl
 
 			facetConfiguration.setFieldName(facet.getFieldName());
 			facetConfiguration.setLabel("any-category");
-			facetConfiguration.setOrder("OrderHitsDesc");
+			facetConfiguration.setOrder("_order");
 			facetConfiguration.setStatic(false);
 			facetConfiguration.setWeight(1.6);
 
@@ -121,6 +128,8 @@ public class CategoryFacetSearchContributorImpl
 				"frequencyThreshold", _frequencyThreshold
 			).put(
 				"maxTerms", _maxTerms
+			).put(
+				"order", _order
 			);
 
 			return facetConfiguration;
@@ -129,6 +138,7 @@ public class CategoryFacetSearchContributorImpl
 		private String _aggregationName;
 		private int _frequencyThreshold;
 		private int _maxTerms;
+		private String _order;
 		private final SearchContext _searchContext;
 		private long[] _selectedCategoryIds;
 

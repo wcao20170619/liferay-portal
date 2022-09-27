@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext;
+import com.liferay.portal.search.web.internal.facet.display.context.FacetDisplayContext;
 
 import java.io.Serializable;
 
@@ -120,6 +121,10 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 
 	public void setMaxTerms(int maxTerms) {
 		_maxTerms = maxTerms;
+	}
+
+	public void setOrder(String order) {
+		_order = order;
 	}
 
 	public void setPaginationStartParameterName(
@@ -246,6 +251,23 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 				buildTermDisplayContext(
 					assetCategory, frequency,
 					isSelected(assetCategory.getCategoryId()), popularity));
+		}
+
+		if (_order.equals("count:asc")) {
+			assetCategoriesSearchFacetTermDisplayContexts.sort(
+				FacetDisplayContext.COMPARATOR_FREQUENCY_ASC);
+		}
+		else if (_order.equals("count:desc")) {
+			assetCategoriesSearchFacetTermDisplayContexts.sort(
+				FacetDisplayContext.COMPARATOR_FREQUENCY_DESC);
+		}
+		else if (_order.equals("key:asc")) {
+			assetCategoriesSearchFacetTermDisplayContexts.sort(
+				FacetDisplayContext.COMPARATOR_TERM_ASC);
+		}
+		else if (_order.equals("key:desc")) {
+			assetCategoriesSearchFacetTermDisplayContexts.sort(
+				FacetDisplayContext.COMPARATOR_TERM_DESC);
 		}
 
 		return assetCategoriesSearchFacetTermDisplayContexts;
@@ -414,6 +436,7 @@ public class AssetCategoriesSearchFacetDisplayContextBuilder
 	private int _frequencyThreshold;
 	private Locale _locale;
 	private int _maxTerms;
+	private String _order;
 	private String _paginationStartParameterName;
 	private String _parameterName;
 	private Portal _portal;
