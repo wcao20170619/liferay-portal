@@ -31,6 +31,7 @@ import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.highlight.FieldConfigBuilderFactory;
 import com.liferay.portal.search.highlight.HighlightBuilderFactory;
+import com.liferay.portal.search.index.IndexInformation;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.rescore.RescoreBuilderFactory;
 import com.liferay.portal.search.script.Scripts;
@@ -53,6 +54,7 @@ import com.liferay.search.experiences.internal.blueprint.search.request.body.con
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.AggsSXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.GeneralSXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.HighlightSXPSearchRequestBodyContributor;
+import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.IndexSXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.QuerySXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.SXPSearchRequestBodyContributor;
 import com.liferay.search.experiences.internal.blueprint.search.request.body.contributor.SortSXPSearchRequestBodyContributor;
@@ -127,6 +129,7 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 				scriptConverter, _significanceHeuristics, _sorts),
 			new GeneralSXPSearchRequestBodyContributor(),
 			new HighlightSXPSearchRequestBodyContributor(highlightConverter),
+			new IndexSXPSearchRequestBodyContributor(_indexInformation),
 			new QuerySXPSearchRequestBodyContributor(
 				_complexQueryPartBuilderFactory, queryConverter,
 				_rescoreBuilderFactory),
@@ -505,6 +508,9 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 
 	@Reference
 	private HighlightBuilderFactory _highlightBuilderFactory;
+
+	@Reference
+	private IndexInformation _indexInformation;
 
 	@Reference
 	private Queries _queries;

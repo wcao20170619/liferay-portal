@@ -20,6 +20,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.AggregationConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.Clause;
 import com.liferay.search.experiences.rest.dto.v1_0.Condition;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
+import com.liferay.search.experiences.rest.dto.v1_0.IndexConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.QueryConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.Rescore;
 import com.liferay.search.experiences.rest.dto.v1_0.SortConfiguration;
@@ -48,6 +49,13 @@ public class ConfigurationUtil {
 		if (aggregationConfiguration != null) {
 			aggregationConfiguration.setAggs(
 				UnpackUtil.unpack(aggregationConfiguration.getAggs()));
+		}
+
+		IndexConfiguration indexConfiguration =
+			configuration.getIndexConfiguration();
+
+		if (indexConfiguration != null) {
+			indexConfiguration.setIndexName(indexConfiguration.getIndexName());
 		}
 
 		QueryConfiguration queryConfiguration =
