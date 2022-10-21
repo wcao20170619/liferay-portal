@@ -157,6 +157,8 @@ components:
                     type: object
                 indexConfiguration:
                     properties:
+                        external:
+                            type: boolean
                         indexName:
                             type: string
                     type: object
@@ -461,6 +463,8 @@ components:
             type: object
         SearchIndex:
             properties:
+                external:
+                    type: boolean
                 name:
                     type: string
         SearchRequest:
