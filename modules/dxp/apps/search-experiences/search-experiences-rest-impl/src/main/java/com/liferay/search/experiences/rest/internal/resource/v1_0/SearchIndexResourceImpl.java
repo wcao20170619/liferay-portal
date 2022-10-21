@@ -14,8 +14,11 @@
 
 package com.liferay.search.experiences.rest.internal.resource.v1_0;
 
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.search.index.IndexInformation;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexRequest;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexResponse;
+import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchIndex;
 import com.liferay.search.experiences.rest.resource.v1_0.SearchIndexResource;
@@ -40,22 +43,21 @@ public class SearchIndexResourceImpl extends BaseSearchIndexResourceImpl {
 	public List<SearchIndex> getSearchIndexes() {
 		List<SearchIndex> searchIndexes = new ArrayList<>();
 
-		String companyIndexName = _indexInformation.getCompanyIndexName(
-			contextCompany.getCompanyId());
+		String prefix =
+			_indexNameBuilder.getIndexName(contextCompany.getCompanyId()) +
+				StringPool.DASH;
 
-		for (String indexName :
-				ArrayUtil.remove(
-					_indexInformation.getIndexNames(), companyIndexName)) {
+		GetIndexIndexRequest getIndexIndexRequest = new GetIndexIndexRequest(
+			prefix + StringPool.STAR);
 
-			if (!indexName.startsWith(companyIndexName)) {
-				continue;
-			}
+		GetIndexIndexResponse getIndexIndexResponse =
+			_searchEngineAdapter.execute(getIndexIndexRequest);
 
+		for (String indexName : getIndexIndexResponse.getIndexNames()) {
 			searchIndexes.add(
 				new SearchIndex() {
 					{
-						name = indexName.substring(
-							companyIndexName.length() + 1);
+						name = _removePrefix(indexName, prefix);
 					}
 				});
 		}
@@ -68,7 +70,14 @@ public class SearchIndexResourceImpl extends BaseSearchIndexResourceImpl {
 		return Page.of(getSearchIndexes());
 	}
 
+	private String _removePrefix(String indexName, String prefix) {
+		return indexName.substring(prefix.length());
+	}
+
 	@Reference
-	private IndexInformation _indexInformation;
+	private IndexNameBuilder _indexNameBuilder;
+
+	@Reference
+	private SearchEngineAdapter _searchEngineAdapter;
 
 }
