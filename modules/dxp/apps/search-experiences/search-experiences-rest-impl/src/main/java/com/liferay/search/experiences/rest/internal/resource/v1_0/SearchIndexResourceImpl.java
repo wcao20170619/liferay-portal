@@ -57,6 +57,7 @@ public class SearchIndexResourceImpl extends BaseSearchIndexResourceImpl {
 			searchIndexes.add(
 				new SearchIndex() {
 					{
+						external = false;
 						name = _removePrefix(indexName, prefix);
 					}
 				});
