@@ -16,7 +16,10 @@ package com.liferay.search.experiences.rest.internal.resource.v1_0;
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
-import com.liferay.portal.search.index.IndexInformation;
+import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexRequest;
+import com.liferay.portal.search.engine.adapter.index.GetIndexIndexResponse;
+import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchIndex;
 
@@ -47,19 +50,20 @@ public class SearchIndexResourceImplTest {
 		_searchIndexResourceImpl.setContextCompany(_contextCompany);
 
 		ReflectionTestUtil.setFieldValue(
-			_searchIndexResourceImpl, "_indexInformation", _indexInformation);
+			_searchIndexResourceImpl, "_indexNameBuilder", _indexNameBuilder);
+		ReflectionTestUtil.setFieldValue(
+			_searchIndexResourceImpl, "_searchEngineAdapter",
+			_searchEngineAdapter);
 	}
 
 	@Test
 	public void testGetSearchIndexes() {
 		_setUpContextCompany(12345);
-		_setUpIndexInformation(
-			"prod-12345",
+		_setUpIndexNameBuilder("prod-12345");
+		_setUpSearchEngineAdapter(
 			new String[] {
-				"liferay-12345-search-tuning-xyz", "prod-0", "prod-12345",
 				"prod-12345-search-tuning-rankings",
-				"prod-12345-search-tuning-synonyms",
-				"prod-54321-search-tuning-xyz"
+				"prod-12345-search-tuning-synonyms"
 			});
 
 		List<SearchIndex> searchIndexes =
@@ -84,27 +88,40 @@ public class SearchIndexResourceImplTest {
 		).getCompanyId();
 	}
 
-	private void _setUpIndexInformation(
-		String companyIndexName, String[] indexNames) {
-
+	private void _setUpIndexNameBuilder(String companyIndexName) {
 		Mockito.doReturn(
 			companyIndexName
 		).when(
-			_indexInformation
-		).getCompanyIndexName(
+			_indexNameBuilder
+		).getIndexName(
 			Mockito.anyLong()
 		);
+	}
+
+	private void _setUpSearchEngineAdapter(String[] indexNames) {
+		GetIndexIndexResponse getIndexIndexResponse = Mockito.mock(
+			GetIndexIndexResponse.class);
 
 		Mockito.doReturn(
 			indexNames
 		).when(
-			_indexInformation
+			getIndexIndexResponse
 		).getIndexNames();
+
+		Mockito.doReturn(
+			getIndexIndexResponse
+		).when(
+			_searchEngineAdapter
+		).execute(
+			Mockito.any(GetIndexIndexRequest.class)
+		);
 	}
 
 	private final Company _contextCompany = Mockito.mock(Company.class);
-	private final IndexInformation _indexInformation = Mockito.mock(
-		IndexInformation.class);
+	private final IndexNameBuilder _indexNameBuilder = Mockito.mock(
+		IndexNameBuilder.class);
+	private final SearchEngineAdapter _searchEngineAdapter = Mockito.mock(
+		SearchEngineAdapter.class);
 	private SearchIndexResourceImpl _searchIndexResourceImpl;
 
 }
