@@ -17,6 +17,7 @@ package com.liferay.search.experiences.internal.blueprint.search.request.enhance
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -31,9 +32,11 @@ import com.liferay.portal.search.filter.ComplexQueryPartBuilderFactory;
 import com.liferay.portal.search.geolocation.GeoBuilders;
 import com.liferay.portal.search.highlight.FieldConfigBuilderFactory;
 import com.liferay.portal.search.highlight.HighlightBuilderFactory;
+import com.liferay.portal.search.index.IndexNameBuilder;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.rescore.RescoreBuilderFactory;
 import com.liferay.portal.search.script.Scripts;
+import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.significance.SignificanceHeuristics;
 import com.liferay.portal.search.sort.Sorts;
@@ -62,6 +65,7 @@ import com.liferay.search.experiences.rest.dto.v1_0.ElementDefinition;
 import com.liferay.search.experiences.rest.dto.v1_0.ElementInstance;
 import com.liferay.search.experiences.rest.dto.v1_0.Field;
 import com.liferay.search.experiences.rest.dto.v1_0.FieldSet;
+import com.liferay.search.experiences.rest.dto.v1_0.IndexConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
 import com.liferay.search.experiences.rest.dto.v1_0.TypeOptions;
@@ -193,6 +197,19 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 		}
 
 		Configuration configuration = sxpBlueprint.getConfiguration();
+
+		IndexConfiguration indexConfiguration =
+			configuration.getIndexConfiguration();
+
+		String indexName = indexConfiguration.getIndexName();
+
+		if (!indexConfiguration.getExternal()) {
+			indexName =
+				//_indexNameBuilder.getIndexName(companyId) + StringPool.DASH +
+					indexName;
+		}
+
+		searchRequestBuilder.indexes(indexName);
 
 		if (configuration != null) {
 			MapUtil.isNotEmptyForEach(
@@ -487,6 +504,9 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 
 		return value;
 	}
+
+	@Reference
+	private IndexNameBuilder _indexNameBuilder;
 
 	@Reference
 	private Aggregations _aggregations;
