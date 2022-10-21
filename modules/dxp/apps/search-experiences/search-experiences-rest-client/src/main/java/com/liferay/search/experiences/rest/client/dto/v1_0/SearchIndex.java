@@ -34,6 +34,27 @@ public class SearchIndex implements Cloneable, Serializable {
 		return SearchIndexSerDes.toDTO(json);
 	}
 
+	public Boolean getExternal() {
+		return external;
+	}
+
+	public void setExternal(Boolean external) {
+		this.external = external;
+	}
+
+	public void setExternal(
+		UnsafeSupplier<Boolean, Exception> externalUnsafeSupplier) {
+
+		try {
+			external = externalUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean external;
+
 	public String getName() {
 		return name;
 	}

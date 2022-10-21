@@ -57,6 +57,34 @@ public class IndexConfiguration implements Serializable {
 	}
 
 	@Schema
+	public Boolean getExternal() {
+		return external;
+	}
+
+	public void setExternal(Boolean external) {
+		this.external = external;
+	}
+
+	@JsonIgnore
+	public void setExternal(
+		UnsafeSupplier<Boolean, Exception> externalUnsafeSupplier) {
+
+		try {
+			external = externalUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Boolean external;
+
+	@Schema
 	public String getIndexName() {
 		return indexName;
 	}
@@ -110,6 +138,16 @@ public class IndexConfiguration implements Serializable {
 		StringBundler sb = new StringBundler();
 
 		sb.append("{");
+
+		if (external != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"external\": ");
+
+			sb.append(external);
+		}
 
 		if (indexName != null) {
 			if (sb.length() > 1) {

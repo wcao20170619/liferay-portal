@@ -55,6 +55,16 @@ public class IndexConfigurationSerDes {
 
 		sb.append("{");
 
+		if (indexConfiguration.getExternal() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"external\": ");
+
+			sb.append(indexConfiguration.getExternal());
+		}
+
 		if (indexConfiguration.getIndexName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -90,6 +100,14 @@ public class IndexConfigurationSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		if (indexConfiguration.getExternal() == null) {
+			map.put("external", null);
+		}
+		else {
+			map.put(
+				"external", String.valueOf(indexConfiguration.getExternal()));
+		}
+
 		if (indexConfiguration.getIndexName() == null) {
 			map.put("indexName", null);
 		}
@@ -119,7 +137,13 @@ public class IndexConfigurationSerDes {
 			IndexConfiguration indexConfiguration, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "indexName")) {
+			if (Objects.equals(jsonParserFieldName, "external")) {
+				if (jsonParserFieldValue != null) {
+					indexConfiguration.setExternal(
+						(Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "indexName")) {
 				if (jsonParserFieldValue != null) {
 					indexConfiguration.setIndexName(
 						(String)jsonParserFieldValue);

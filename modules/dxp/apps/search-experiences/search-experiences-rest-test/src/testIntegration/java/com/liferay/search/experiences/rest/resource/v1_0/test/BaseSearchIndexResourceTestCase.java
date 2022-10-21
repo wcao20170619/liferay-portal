@@ -297,6 +297,14 @@ public abstract class BaseSearchIndexResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("external", additionalAssertFieldName)) {
+				if (searchIndex.getExternal() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (searchIndex.getName() == null) {
 					valid = false;
@@ -397,6 +405,17 @@ public abstract class BaseSearchIndexResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("external", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						searchIndex1.getExternal(),
+						searchIndex2.getExternal())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -505,6 +524,11 @@ public abstract class BaseSearchIndexResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
+		if (entityFieldName.equals("external")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("name")) {
 			sb.append("'");
 			sb.append(String.valueOf(searchIndex.getName()));
@@ -557,6 +581,7 @@ public abstract class BaseSearchIndexResourceTestCase {
 	protected SearchIndex randomSearchIndex() throws Exception {
 		return new SearchIndex() {
 			{
+				external = RandomTestUtil.randomBoolean();
 				name = StringUtil.toLowerCase(RandomTestUtil.randomString());
 			}
 		};

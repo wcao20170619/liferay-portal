@@ -55,6 +55,16 @@ public class SearchIndexSerDes {
 
 		sb.append("{");
 
+		if (searchIndex.getExternal() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"external\": ");
+
+			sb.append(searchIndex.getExternal());
+		}
+
 		if (searchIndex.getName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -88,6 +98,13 @@ public class SearchIndexSerDes {
 
 		Map<String, String> map = new TreeMap<>();
 
+		if (searchIndex.getExternal() == null) {
+			map.put("external", null);
+		}
+		else {
+			map.put("external", String.valueOf(searchIndex.getExternal()));
+		}
+
 		if (searchIndex.getName() == null) {
 			map.put("name", null);
 		}
@@ -116,7 +133,12 @@ public class SearchIndexSerDes {
 			SearchIndex searchIndex, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "name")) {
+			if (Objects.equals(jsonParserFieldName, "external")) {
+				if (jsonParserFieldValue != null) {
+					searchIndex.setExternal((Boolean)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					searchIndex.setName((String)jsonParserFieldValue);
 				}
