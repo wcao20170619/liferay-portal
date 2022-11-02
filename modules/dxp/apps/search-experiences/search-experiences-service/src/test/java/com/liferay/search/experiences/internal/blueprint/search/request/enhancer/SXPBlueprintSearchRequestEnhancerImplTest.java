@@ -30,6 +30,7 @@ import com.liferay.portal.search.aggregation.Aggregation;
 import com.liferay.portal.search.filter.ComplexQueryPart;
 import com.liferay.portal.search.highlight.FieldConfig;
 import com.liferay.portal.search.highlight.Highlight;
+import com.liferay.portal.search.index.IndexInformation;
 import com.liferay.portal.search.internal.aggregation.AggregationsImpl;
 import com.liferay.portal.search.internal.filter.ComplexQueryPartBuilderFactoryImpl;
 import com.liferay.portal.search.internal.geolocation.GeoBuildersImpl;
@@ -125,6 +126,9 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 		ReflectionTestUtil.setFieldValue(
 			_sxpBlueprintSearchRequestEnhancerImpl, "_highlightBuilderFactory",
 			new HighlightBuilderFactoryImpl());
+		ReflectionTestUtil.setFieldValue(
+			_sxpBlueprintSearchRequestEnhancerImpl, "_indexInformation",
+			_indexInformation);
 		ReflectionTestUtil.setFieldValue(
 			_sxpBlueprintSearchRequestEnhancerImpl, "_queries",
 			new QueriesImpl());
@@ -387,6 +391,33 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 		Assert.assertArrayEquals(preTags, highlight.getPreTags());
 
 		_assert(sxpBlueprint);
+	}
+
+	@Test
+	public void testIndexConfiguration() throws Exception {
+		Mockito.doReturn(
+			"liferay-12345"
+		).when(
+			_indexInformation
+		).getCompanyIndexName(
+			Mockito.anyLong()
+		);
+
+		Mockito.doReturn(
+			new String[] {"liferay-12345-this-is-an-index-name"}
+		).when(
+			_indexInformation
+		).getIndexNames();
+
+		SXPBlueprint sxpBlueprint = SXPBlueprintUtil.toSXPBlueprint(_read());
+
+		SearchRequest searchRequest = _toSearchRequest(sxpBlueprint);
+
+		List<String> indexes = searchRequest.getIndexes();
+
+		Assert.assertEquals(indexes.toString(), 1, indexes.size());
+		Assert.assertEquals(
+			"liferay-12345-this-is-an-index-name", indexes.get(0));
 	}
 
 	@Test
@@ -800,6 +831,8 @@ public class SXPBlueprintSearchRequestEnhancerImplTest {
 
 	private final DTOConverterRegistry _dtoConverterRegistry = Mockito.mock(
 		DTOConverterRegistry.class);
+	private final IndexInformation _indexInformation = Mockito.mock(
+		IndexInformation.class);
 	private SXPBlueprintSearchRequestEnhancerImpl
 		_sxpBlueprintSearchRequestEnhancerImpl;
 

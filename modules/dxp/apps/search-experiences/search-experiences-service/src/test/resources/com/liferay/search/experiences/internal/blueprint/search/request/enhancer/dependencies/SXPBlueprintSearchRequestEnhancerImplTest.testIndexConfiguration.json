@@ -1,0 +1,27 @@
+{
+	"configuration": {
+		"indexConfiguration": {
+			"external": false,
+			"indexName": "this-is-an-index-name"
+		},
+		"queryConfiguration": {
+			"applyIndexerClauses": false,
+			"queryEntries": [
+				{
+					"clauses": [
+						{
+							"context": "query",
+							"occur": "must",
+							"query": {
+								"match": {
+									"queryString": "test"
+								}
+							}
+						}
+					],
+					"enabled": true
+				}
+			]
+		}
+	}
+}
