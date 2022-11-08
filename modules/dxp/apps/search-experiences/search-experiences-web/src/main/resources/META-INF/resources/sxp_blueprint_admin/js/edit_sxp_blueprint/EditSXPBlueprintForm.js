@@ -35,7 +35,7 @@ import {
 	DEFAULT_INDEX_CONFIGURATION,
 	SIDEBARS,
 } from '../utils/constants';
-import {fetchData, fetchPreviewSearch} from '../utils/fetch';
+import {addParams, fetchData, fetchPreviewSearch} from '../utils/fetch';
 import {INPUT_TYPES} from '../utils/inputTypes';
 import {formatLocaleWithUnderscores, renameKeys} from '../utils/language';
 import {setStorageAddSXPElementSidebar} from '../utils/sessionStorage';
@@ -423,28 +423,6 @@ function EditSXPBlueprintForm({
 	useShouldConfirmBeforeNavigate(formik.dirty && !formik.isSubmitting);
 
 	useEffect(() => {
-
-		// Example response:
-		// {
-		// 	actions: {},
-		// 	facets: [],
-		// 	items: [
-		// 		{
-		// 			languageIdPosition: -1,
-		// 			name: 'ddmTemplateKey',
-		// 			type: 'keyword',
-		// 		}
-		// 	],
-		// 	lastPage: 1,
-		// 	page: 1,
-		// 	pageSize: 218,
-		// 	totalCount: 218,
-		// }
-
-		fetchData(`/o/search-experiences-rest/v1.0/field-mapping-infos`)
-			.then((responseContent) => setIndexFields(responseContent.items))
-			.catch(() => setIndexFields([]));
-
 		if (featureFlagLps153813 && isCompanyAdmin) {
 
 			// Example response:
@@ -475,6 +453,41 @@ function EditSXPBlueprintForm({
 
 		setStorageAddSXPElementSidebar('open');
 	}, []); //eslint-disable-line
+
+	/**
+	 * Refetch field mapping infos when indexConfiguration changes.
+	 */
+	useEffect(() => {
+
+		// Example response:
+		// {
+		// 	actions: {},
+		// 	facets: [],
+		// 	items: [
+		// 		{
+		// 			languageIdPosition: -1,
+		// 			name: 'ddmTemplateKey',
+		// 			type: 'keyword',
+		// 		}
+		// 	],
+		// 	lastPage: 1,
+		// 	page: 1,
+		// 	pageSize: 218,
+		// 	totalCount: 218,
+		// }
+
+		fetchData(
+			addParams('/o/search-experiences-rest/v1.0/field-mapping-infos', {
+				external: formik.values.indexConfig.external,
+				indexName: formik.values.indexConfig.indexName,
+			})
+		)
+			.then((responseContent) => setIndexFields(responseContent.items))
+			.catch(() => setIndexFields([]));
+	}, [
+		formik.values.indexConfig.external,
+		formik.values.indexConfig.indexName,
+	]);
 
 	/**
 	 * Formats the form values for the "configuration" parameter to send to
