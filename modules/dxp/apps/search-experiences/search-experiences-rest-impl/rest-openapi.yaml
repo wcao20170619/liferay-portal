@@ -544,7 +544,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.search.experiences.rest.client', and version '3.0.6'."
+        'com.liferay.search.experiences.rest.client', and version '3.0.8'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -590,6 +590,14 @@ paths:
         get:
             operationId: getFieldMappingInfosPage
             parameters:
+                - in: query
+                  name: external
+                  schema:
+                      type: boolean
+                - in: query
+                  name: indexName
+                  schema:
+                      type: string
                 - in: query
                   name: query
                   schema:
