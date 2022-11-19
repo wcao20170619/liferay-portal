@@ -42,12 +42,12 @@ public class SearchIndexResourceTest extends BaseSearchIndexResourceTestCase {
 	public void testGetSearchIndexesPage() throws Exception {
 		Page<SearchIndex> page = searchIndexResource.getSearchIndexesPage();
 
-		List<SearchIndex> searchIndexs = _getSearchIndexs();
+		List<SearchIndex> searchIndexes = _getSearchIndexes();
 
-		Assert.assertEquals(searchIndexs.size(), page.getTotalCount());
+		Assert.assertEquals(searchIndexes.size(), page.getTotalCount());
 
 		assertEqualsIgnoringOrder(
-			searchIndexs, (List<SearchIndex>)page.getItems());
+			searchIndexes, (List<SearchIndex>)page.getItems());
 
 		assertValid(page);
 	}
@@ -57,7 +57,7 @@ public class SearchIndexResourceTest extends BaseSearchIndexResourceTestCase {
 		Assert.assertTrue(true);
 	}
 
-	private List<SearchIndex> _getSearchIndexs() {
+	private List<SearchIndex> _getSearchIndexes() {
 		String prefix =
 			_indexNameBuilder.getIndexName(testCompany.getCompanyId()) +
 				StringPool.DASH;
@@ -66,10 +66,10 @@ public class SearchIndexResourceTest extends BaseSearchIndexResourceTestCase {
 			_searchEngineAdapter.execute(
 				new GetIndexIndexRequest(prefix + StringPool.STAR));
 
-		List<SearchIndex> searchIndexs = new ArrayList<>();
+		List<SearchIndex> searchIndexes = new ArrayList<>();
 
 		for (String indexName : getIndexIndexResponse.getIndexNames()) {
-			searchIndexs.add(
+			searchIndexes.add(
 				new SearchIndex() {
 					{
 						external = false;
@@ -78,7 +78,7 @@ public class SearchIndexResourceTest extends BaseSearchIndexResourceTestCase {
 				});
 		}
 
-		return searchIndexs;
+		return searchIndexes;
 	}
 
 	@Inject
