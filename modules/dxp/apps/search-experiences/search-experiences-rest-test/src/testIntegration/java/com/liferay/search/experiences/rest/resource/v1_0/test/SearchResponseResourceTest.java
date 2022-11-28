@@ -54,7 +54,6 @@ public class SearchResponseResourceTest
 		_testPostSearchThrowsElasticsearchStatusException();
 		_testPostSearchThrowsInvalidQueryEntryExceptionAndUnresolvedTemplateVariableException();
 		_testPostSearchThrowsUnrecognizedPropertyException();
-		_testPostSearchZeroResults();
 
 		if (false) {
 
@@ -62,6 +61,22 @@ public class SearchResponseResourceTest
 
 			_testPostSearchThrowsJsonParseException();
 		}
+	}
+
+	@Test
+	public void testPostSearchZeroResults() throws Exception {
+		SearchResponse searchResponse = _postSearch(_read());
+
+		SearchHits searchHits = searchResponse.getSearchHits();
+
+		Assert.assertEquals(Long.valueOf(0), searchHits.getTotalHits());
+
+		String response = String.valueOf(searchResponse.getResponse());
+
+		Assert.assertThat(response, CoreMatchers.containsString("hits"));
+		Assert.assertThat(
+			response,
+			CoreMatchers.not(CoreMatchers.containsString("max_score")));
 	}
 
 	@Override
@@ -223,21 +238,6 @@ public class SearchResponseResourceTest
 						"defined in Configuration. The property \"INVALID_1\" ",
 						"is not defined in General.")));
 		}
-	}
-
-	private void _testPostSearchZeroResults() throws Exception {
-		SearchResponse searchResponse = _postSearch(_read());
-
-		SearchHits searchHits = searchResponse.getSearchHits();
-
-		Assert.assertEquals(Long.valueOf(0), searchHits.getTotalHits());
-
-		String response = String.valueOf(searchResponse.getResponse());
-
-		Assert.assertThat(response, CoreMatchers.containsString("hits"));
-		Assert.assertThat(
-			response,
-			CoreMatchers.not(CoreMatchers.containsString("max_score")));
 	}
 
 	private static final String _CLASS_NAME_ELASTICSEARCH_INDEX_SEARCHER =
