@@ -63,15 +63,7 @@ public class FieldMappingInfoResourceImpl
 		boolean external, String indexName, String query) {
 
 		JSONObject jsonObject = FieldMappingsWebCacheItem.get(
-			_indexInformation, _getIndexName(external, indexName),
-			_jsonFactory);
-
-		if (jsonObject == null) {
-			jsonObject = FieldMappingsWebCacheItem.get(
-				_indexInformation,
-				_indexNameBuilder.getIndexName(contextCompany.getCompanyId()),
-				_jsonFactory);
-		}
+			_indexInformation, _getIndexName(indexName), _jsonFactory);
 
 		if (jsonObject.length() == 0) {
 			return Collections.<FieldMappingInfo>emptyList();
@@ -151,16 +143,15 @@ public class FieldMappingInfoResourceImpl
 		}
 	}
 
-	private String _getIndexName(boolean external, String indexName) {
+	private String _getIndexName(String indexName) {
 		String fullIndexName = _indexNameBuilder.getIndexName(
 			contextCompany.getCompanyId());
 
-		if (external) {
-			fullIndexName = "external-" + indexName;
+		if (Validator.isBlank(indexName)) {
+			return fullIndexName;
 		}
-		else if (!Validator.isBlank(indexName)) {
-			fullIndexName = fullIndexName + StringPool.DASH + indexName;
-		}
+
+		fullIndexName = fullIndexName + StringPool.DASH + indexName;
 
 		List<String> indexNames = Arrays.asList(
 			_indexInformation.getIndexNames());
