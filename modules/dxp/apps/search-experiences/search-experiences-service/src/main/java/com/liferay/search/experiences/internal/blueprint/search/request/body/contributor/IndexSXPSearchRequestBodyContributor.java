@@ -17,6 +17,7 @@ package com.liferay.search.experiences.internal.blueprint.search.request.body.co
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.index.IndexInformation;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
@@ -79,12 +80,9 @@ public class IndexSXPSearchRequestBodyContributor
 		SearchRequestBuilder searchRequestBuilder,
 		SearchContext searchContext) {
 
-		String fullIndexName = null;
+		String fullIndexName = indexName;
 
-		if ((external != null) && external.booleanValue()) {
-			fullIndexName = "external-" + indexName;
-		}
-		else {
+		if (!GetterUtil.getBoolean(external)) {
 			String companyIndexName = _indexInformation.getCompanyIndexName(
 				searchContext.getCompanyId());
 

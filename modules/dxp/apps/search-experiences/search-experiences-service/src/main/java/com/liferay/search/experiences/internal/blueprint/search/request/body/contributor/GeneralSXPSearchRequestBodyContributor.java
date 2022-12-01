@@ -42,26 +42,6 @@ public class GeneralSXPSearchRequestBodyContributor
 			return;
 		}
 
-		if ((generalConfiguration.getClauseContributorsExcludes() != null) &&
-			!_hasIndexConfiguration(configuration)) {
-
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.excludes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsExcludes())));
-		}
-
-		if ((generalConfiguration.getClauseContributorsIncludes() != null) &&
-			!_hasIndexConfiguration(configuration)) {
-
-			searchRequestBuilder.withSearchContext(
-				searchContext -> searchContext.setAttribute(
-					"search.full.query.clause.contributors.includes",
-					StringUtil.merge(
-						generalConfiguration.getClauseContributorsIncludes())));
-		}
-
 		if (generalConfiguration.getEmptySearchEnabled() != null) {
 			searchRequestBuilder.emptySearchEnabled(
 				generalConfiguration.getEmptySearchEnabled());
@@ -81,15 +61,6 @@ public class GeneralSXPSearchRequestBodyContributor
 				generalConfiguration.getQueryString());
 		}
 
-		if ((generalConfiguration.getSearchableAssetTypes() != null) &&
-			!_hasIndexConfiguration(configuration)) {
-
-			searchRequestBuilder.entryClassNames(
-				generalConfiguration.getSearchableAssetTypes());
-			searchRequestBuilder.modelIndexerClassNames(
-				generalConfiguration.getSearchableAssetTypes());
-		}
-
 		if (generalConfiguration.getLanguageId() != null) {
 			searchRequestBuilder.locale(
 				LocaleUtil.fromLanguageId(
@@ -102,24 +73,43 @@ public class GeneralSXPSearchRequestBodyContributor
 					TimeZoneUtil.getTimeZone(
 						generalConfiguration.getTimeZoneId())));
 		}
+
+		IndexConfiguration indexConfiguration =
+			configuration.getIndexConfiguration();
+
+		if ((indexConfiguration != null) &&
+			!Validator.isBlank(indexConfiguration.getIndexName())) {
+
+			return;
+		}
+
+		if (generalConfiguration.getClauseContributorsExcludes() != null) {
+			searchRequestBuilder.withSearchContext(
+				searchContext -> searchContext.setAttribute(
+					"search.full.query.clause.contributors.excludes",
+					StringUtil.merge(
+						generalConfiguration.getClauseContributorsExcludes())));
+		}
+
+		if (generalConfiguration.getClauseContributorsIncludes() != null) {
+			searchRequestBuilder.withSearchContext(
+				searchContext -> searchContext.setAttribute(
+					"search.full.query.clause.contributors.includes",
+					StringUtil.merge(
+						generalConfiguration.getClauseContributorsIncludes())));
+		}
+
+		if (generalConfiguration.getSearchableAssetTypes() != null) {
+			searchRequestBuilder.entryClassNames(
+				generalConfiguration.getSearchableAssetTypes());
+			searchRequestBuilder.modelIndexerClassNames(
+				generalConfiguration.getSearchableAssetTypes());
+		}
 	}
 
 	@Override
 	public String getName() {
 		return "generalConfiguration";
-	}
-
-	private boolean _hasIndexConfiguration(Configuration configuration) {
-		IndexConfiguration indexConfiguration =
-			configuration.getIndexConfiguration();
-
-		if ((indexConfiguration == null) ||
-			Validator.isBlank(indexConfiguration.getIndexName())) {
-
-			return false;
-		}
-
-		return true;
 	}
 
 }

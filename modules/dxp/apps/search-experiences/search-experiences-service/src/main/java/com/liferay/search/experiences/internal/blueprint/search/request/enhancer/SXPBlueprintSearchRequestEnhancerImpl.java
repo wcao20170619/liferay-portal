@@ -422,10 +422,22 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 			SXPElement sxpElement = elementInstance.getSxpElement();
 
 			if ((sxpElement != null) && sxpElement.getReadOnly()) {
-				ElementDefinition elementDefinition =
-					sxpElement.getElementDefinition();
+				if (Objects.equals(
+						sxpElement.getExternalReferenceCode(),
+						"BOOST_ALL_KEYWORDS_MATCH") ||
+					Objects.equals(
+						sxpElement.getExternalReferenceCode(),
+						"FILTER_BY_EXACT_TERMS_MATCH") ||
+					Objects.equals(
+						sxpElement.getExternalReferenceCode(),
+						"HIDE_BY_EXACT_TERM_MATCH") ||
+					Objects.equals(
+						sxpElement.getExternalReferenceCode(),
+						"SEARCH_WITH_QUERY_STRING_SYNTAX") ||
+					Objects.equals(
+						sxpElement.getExternalReferenceCode(),
+						"TEXT_MATCH_OVER_MULTIPLE_FIELDS")) {
 
-				if (Objects.equals("custom", elementDefinition.getCategory())) {
 					elementInstanceList.add(elementInstance);
 				}
 			}
