@@ -141,7 +141,7 @@ public class IndexSXPSearchRequestBodyContributorTest {
 		IndexConfiguration indexConfiguration = new IndexConfiguration();
 
 		indexConfiguration.setExternal(true);
-		indexConfiguration.setIndexName("this-is-external-index");
+		indexConfiguration.setIndexName("external-this-is-external-index");
 
 		configuration.setIndexConfiguration(indexConfiguration);
 
